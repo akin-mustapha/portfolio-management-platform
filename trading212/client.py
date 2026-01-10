@@ -17,22 +17,24 @@ class Trading212Client:
         self.url = url
         self.api_client = APIClient(url=url, api_token=api_token, secret_token=secret_token)
 
-    def fetch_all_positions(self) -> list[Trading212Asset]:
+    def fetch_all_positions(self) -> list[dict]:
         logging.info("Making API call to fetch all positions")
-        data = asyncio.run(self.api_client.get(endpoint="equity/positions"))
-        asset_list = []
-        logging.info(f"Mapping {len(data)} positions to Trading212Asset dataclass instances")
-        for item in data:
-            # TODO: Map to config
-            instrument = item.get("instrument", {})
-            asset = Trading212Asset(
-                # TODO: Map to config
-                external_id=instrument.get("ticker"),
-                name=instrument.get("ticker"),
-                description=instrument.get("name"),
-                source_name="trading212"
-            )
-            asset_list.append(asset)
 
-        logging.info(f"Mapped {len(asset_list)} positions to Trading212 Asset dataclass instances")
-        return asset_list
+        # TODO: MOVE LOGIC TO TRANSFORMATION
+        data = asyncio.run(self.api_client.get(endpoint="equity/positions"))
+        # asset_list = []
+        # logging.info(f"Mapping {len(data)} positions to Trading212Asset dataclass instances")
+        # for item in data:
+        #     # TODO: Map to config
+        #     instrument = item.get("instrument", {})
+        #     asset = Trading212Asset(
+        #         # TODO: Map to config
+        #         external_id=instrument.get("ticker"),
+        #         name=instrument.get("ticker"),
+        #         description=instrument.get("name"),
+        #         source_name="trading212"
+        #     )
+        #     asset_list.append(asset)
+
+        # logging.info(f"Mapped {len(asset_list)} positions to Trading212 Asset dataclass instances")
+        return data

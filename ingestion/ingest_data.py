@@ -6,6 +6,8 @@ import asyncio
 import logging
 import json
 from dataclasses import dataclass
+from database.client import JSONClient, SQLLiteClient
+from ingestion.models import raw_data
 
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
@@ -17,14 +19,25 @@ logging.basicConfig(level=logging.INFO, filename=f'{log_dir_name}/info.log', fil
 load_dotenv()
 
 if __name__ == "__main__":
+
+    logging.info("Starting data ingestion process")
     url = os.getenv("API_URL")
     api_token = os.getenv("API_TOKEN")
     secret_token = os.getenv("SECRET_TOKEN")
 
+    # Extract
+    logging.info("Extracting data")
     trading212_client = Trading212Client(url=url, api_token=api_token, secret_token=secret_token)
+    assets = trading212_client.fetch_all_positions()
 
     # with open("./ingestion/position.json", "r") as f:
-    #     data = json.load(f)
+    #     assets = json.load(f)
     
-    assets = trading212_client.fetch_all_positions()
+    # Load
+    logging.info("Loading data")
+    database_client = JSONClient(url="./data/trading212")
+    database_client = SQLLiteClient(url="sqlite:///./data/trading212.db")
+    database_client.save(model=raw_data, data={"source": "trading212", "payload": json.dumps(assets)})
     logging.info(assets)
+
+    # Transformation
