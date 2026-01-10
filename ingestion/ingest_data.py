@@ -7,7 +7,7 @@ import logging
 import json
 from dataclasses import dataclass
 from database.client import JSONClient, SQLLiteClient
-from ingestion.models import raw_data
+from ingestion.models import raw_data, asset
 
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
@@ -41,3 +41,23 @@ if __name__ == "__main__":
     logging.info(assets)
 
     # Transformation
+
+    asset_no = 0
+    logging.info(f"Mapping {len(assets)} positions to Trading212Asset dataclass instances")
+    for item in assets:
+        # TODO: Map to config
+        instrument = item.get("instrument", {})
+        data = dict(
+            # TODO: Map to config
+            external_id=instrument.get("ticker"),
+            name=instrument.get("ticker"),
+            description=instrument.get("name"),
+            source_name="trading212"
+        )
+        database_client.save(
+            model=asset,
+            data=data
+        )
+        asset_no += 1
+
+    logging.info(f"Mapped {asset_no} positions to Trading212 Asset dataclass instances")
