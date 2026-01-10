@@ -22,19 +22,4 @@ class Trading212Client:
 
         # TODO: MOVE LOGIC TO TRANSFORMATION
         data = asyncio.run(self.api_client.get(endpoint="equity/positions"))
-        # asset_list = []
-        # logging.info(f"Mapping {len(data)} positions to Trading212Asset dataclass instances")
-        # for item in data:
-        #     # TODO: Map to config
-        #     instrument = item.get("instrument", {})
-        #     asset = Trading212Asset(
-        #         # TODO: Map to config
-        #         external_id=instrument.get("ticker"),
-        #         name=instrument.get("ticker"),
-        #         description=instrument.get("name"),
-        #         source_name="trading212"
-        #     )
-        #     asset_list.append(asset)
-
-        # logging.info(f"Mapped {len(asset_list)} positions to Trading212 Asset dataclass instances")
         return data
