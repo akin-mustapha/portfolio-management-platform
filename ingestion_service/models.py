@@ -3,6 +3,7 @@ from datetime import datetime
 
 
 class raw_data(SQLModel, table=True):
+    # __table_args__ = {'schema': 'stg'}
     id: int = Field(default=None, primary_key=True)
     source: str
     payload: str
@@ -12,6 +13,7 @@ class raw_data(SQLModel, table=True):
 
 
 class asset(SQLModel, table=True):
+    # __table_args__ = {'schema': 'app'}
     id: int = Field(default=None, primary_key=True)
     external_id: str = Field(index=True)
     name: str
