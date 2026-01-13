@@ -1,15 +1,16 @@
 """ Tagging Service Module """
 from datetime import UTC, datetime
-from repository.asset_repository import AssetRepository
 from repository.base_repository import BaseRepository
 from repository.entity_repository import EntityRepository
 from tagging_service.repositories import DomainRepositoryFactory
 from database.client import SQLModelClient
 
-from tagging_service.models import Item, Item_tag, Tag
+from tagging_service.models.models import Item, Item_tag, Tag
 import logging
 from random import randint
 
+
+# TODO: Log to file_name, keep services logs separate
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
 class TaggingService:
@@ -51,9 +52,6 @@ class TaggingService:
     :param item: The item to create.
     :return: Description
     """
-    # Insert item into database
-      # itemRepository
-
     try :
       logging.info(f"Creating item: {item.name}")
       item = self.__item_repository__.insert(item)
@@ -93,9 +91,7 @@ class TaggingService:
     :param tags: A list of tags to assign to the item.
     :return: Description
     """
-    print(self.__item_repository__.select_by_id(item_tag.item_id))
     if not self.__item_repository__.select_by_id(item_tag.item_id):
-        
         raise ValueError(f"Item with ID {item_tag.item_id} does not exist.")
     
     if not self.__tag_repository__.select_by_id(item_tag.tag_id):
@@ -123,7 +119,7 @@ class TaggingService:
     """
     pass
 
-  def search_items_by_tag(self, tag):
+  def search_items_by_tag(self, tag_id):
     """
     Search for items by a specific tag.
 
@@ -132,6 +128,7 @@ class TaggingService:
     :return: A list of items matching the given tag.
     """
     pass
+    
 
   def get_tags_for_item(self, item_id):
     """

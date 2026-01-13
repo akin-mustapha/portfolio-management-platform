@@ -1,7 +1,8 @@
-sync_branch.sh
 .DS_Store
 .env
 *.log
 venv/
 __pycache__/
 *.pyc
+*.db
+*.ini

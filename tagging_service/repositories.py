@@ -1,6 +1,7 @@
-from tagging_service.models import Item, Item_tag, Tag
+from tagging_service.models.models import Item, Item_tag, Tag
 from repository.base_repository import BaseRepository
 
+# Domain Repositories
 class ItemRepository(BaseRepository):
     def __init__(self, entity_repository):
         self.entity_repository = entity_repository
