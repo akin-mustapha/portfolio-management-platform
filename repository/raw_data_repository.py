@@ -3,32 +3,19 @@ from database.client import SQLModelClient
 import logging
 from datetime import datetime, UTC
 
+from repository.entity_repository import EntityRepository
+
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
-class RawDataRepository(ABC):
-    @abstractmethod
-    def save_raw_data(self, **kwargs):
-        raise NotImplementedError("Subclasses must implement this method")
-    @abstractmethod
-    def get_raw_data(self, **kwargs):
-        raise NotImplementedError("Subclasses must implement this method")
-    @abstractmethod
-    def process_raw_data(self, **kwargs):
-        raise NotImplementedError("Subclasses must implement this method")
     
 
-class RawDataRepositorySQLite(RawDataRepository):
-    def __init__(self, client):
+class RawDataRepositorySQLite(EntityRepository):
+    def __init__(self, entity_name, client):
+        super().__init__(entity_name, client)
         self.client = client
+        self.entity_name = entity_name
 
-    def save_raw_data(self, source: str, payload: str):
-        logging.info(f"Saving raw data from source: {source}")
-        with self.client as client:
-            client.insert("raw_data", [{"source": source, "payload": payload, "is_processed": False, "created_datetime": datetime.utcnow()}])
-
-        logging.info("Raw data saved successfully")
-
-    def get_raw_data(self, source: str):
+    def select_by_id(self, source: str):
         logging.info(f"Fetching raw data from source: {source}")
         with self.client as client:
             result = client.execute("""
@@ -43,17 +30,17 @@ class RawDataRepositorySQLite(RawDataRepository):
         logging.info(f"Fetched {len(data)} records from source: {source}")
         return data
 
-    def process_raw_data(self, id: int):
-        logging.info(f"Processing raw data with id: {id}")
-        with self.client as client:
-            result = client.execute(
-                """UPDATE raw_data
-                    SET is_processed = :is_processed
-                      , processed_datetime = :processed_datetime
-                    WHERE id = :id""",
-                {"is_processed": True, "id": id, "processed_datetime": datetime.now(UTC)})
+    # def process_raw_data(self, id: int):
+    #     logging.info(f"Processing raw data with id: {id}")
+    #     with self.client as client:
+    #         result = client.execute(
+    #             """UPDATE raw_data
+    #                 SET is_processed = :is_processed
+    #                   , processed_datetime = :processed_datetime
+    #                 WHERE id = :id""",
+    #             {"is_processed": True, "id": id, "processed_datetime": datetime.now(UTC)})
 
-        logging.info(f"Raw data with id: {id} marked as processed")
+    #     logging.info(f"Raw data with id: {id} marked as processed")
         
 
 if __name__ == "__main__":

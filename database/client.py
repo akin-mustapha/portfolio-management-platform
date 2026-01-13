@@ -6,7 +6,7 @@ from contextlib import AbstractContextManager
 from sqlmodel import SQLModel, create_engine, Session, text
 from typing import Any, Dict, List, Optional, Tuple, Iterable
 
-from ingestion.models import raw_data
+from ingestion_service.models import raw_data
 
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
@@ -47,6 +47,7 @@ class SQLModelClient(DatabaseClient):
     """SQLModel client for database operations."""
     
     def __init__(self, database_url: str, echo: bool = False):
+        super().__init__()
         logging.info(f"Initializing SQLModelClient with database URL: {database_url}")
         self.engine = create_engine(database_url, echo=echo)
 
@@ -91,67 +92,6 @@ class SQLModelClient(DatabaseClient):
             self.execute(sql, record)
 
             logging.info(f"Inserted record into {table}")
-
-
-
-class Client(ABC):
-    def __init__(self, url: str = None):
-        self.url = url
-    @abstractmethod
-    def execute(self, query: str, params=None):
-        raise NotImplementedError("Subclasses must implement this method")
-    @abstractmethod
-    def save(self, **kwargs) -> None:
-        pass
-    
-class SQLLiteClient(Client):
-    def __init__(self, url: str = None):
-        super().__init__(url=url)
-        logging.info(f"Initializing SQLLiteClient with database URL: {self.url}")
-        self.engine = create_engine(self.url)
-
-        logging.info("Creating database tables if they do not exist")
-        SQLModel.metadata.create_all(self.engine)
-
-    def save(self, **kwargs) -> None:
-        model = kwargs.get('model')
-        data = kwargs.get('data')
-
-        logging.info(f"Saving data to database using model {model.__name__}")
-        with Session(self.engine) as session:
-          asset = model(
-              **data
-          )
-          session.add(asset)
-
-          logging.info("Committing session to save data")
-          session.commit()
-    
-    def execute(self, query: str, params=None):
-        if not self.session:
-            raise RuntimeError("Database session is not established.")
-        
-        result = None
-        try:
-            with self.session as s:
-                result = s.exec(text(query), params=params or {})
-                s.commit()
-        except Exception as e:
-            print(f"Error executing query: {e}")
-            raise
-        
-        return result
-            
-class JSONClient(Client):
-    def __init__(self, url: str = None):
-        super().__init__(url=url)
-        if self.url and not os.path.exists(self.url):
-            os.makedirs(self.url)
-
-    def save(self, **kwargs) -> None:
-        data = kwargs.get('data')
-        with open(f"{self.url}/{data['source']}_data.json", "+w") as f:
-            json.dump(data, f, indent=4)
 
 if __name__ == "__main__":
     
