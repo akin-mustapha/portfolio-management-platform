@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime
 
-
+# TODO: Refactor to dataclass
 class raw_data(SQLModel, table=True):
     # __table_args__ = {'schema': 'stg'}
     id: int = Field(default=None, primary_key=True)
@@ -10,6 +10,7 @@ class raw_data(SQLModel, table=True):
     is_processed: bool = Field(default=False)
     created_datetime: datetime = Field(default_factory=datetime.utcnow)
     processed_datetime: datetime | None = None
+    
 
 
 class asset(SQLModel, table=True):

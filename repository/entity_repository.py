@@ -1,9 +1,13 @@
-from repository.base_repository import BaseRepository
-from typing import Iterable
 import logging
+from typing import Iterable
+
+from repository.base_repository import BaseRepository
 from database.client import DatabaseClient
+
+
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
+# Data access Repository
 class EntityRepository(BaseRepository):
     def __init__(self, entity_name, client: DatabaseClient):
         self.client = client
