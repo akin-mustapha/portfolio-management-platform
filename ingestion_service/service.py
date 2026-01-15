@@ -24,6 +24,10 @@ SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
 class Trading212IngestionService:
     def __init__(self, api_client):
+
+        logging.info("=" * 80)
+        logging.info("Initializing Ingestion Service")
+        logging.info("=" * 80)
         self.api_client = api_client
 
     def ingest_asset(self,
@@ -54,15 +58,17 @@ if __name__ == "__main__":
 
     raw_data_repo = RawDataRepository(client=database_client)
 
-    asset_repo = EntityRepository("asset", client=database_client)
+    asset_repo = EntityRepository("asset_tag", client=database_client)
+
+    # asset_repo.delete({'id': 1})
 
     ingestion_service = Trading212IngestionService(api_client)
 
-    res = ingestion_service.ingest_asset(
-        raw_data_repository=raw_data_repo,
-        processed_data_repository=asset_repo,
-        extraction_strategy=Trading212APIStrategy,
-        transformation_strategy=AssetExtractionStrategy
-    )
+    # res = ingestion_service.ingest_asset(
+    #     raw_data_repository=raw_data_repo,
+    #     processed_data_repository=asset_repo,
+    #     extraction_strategy=Trading212APIStrategy,
+    #     transformation_strategy=AssetExtractionStrategy
+    # )
 
-    logging.info(f"Mapped {res} positions to Trading212 Asset dataclass instances")
+    # logging.info(f"Mapped {res} positions to Trading212 Asset dataclass instances")

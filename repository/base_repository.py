@@ -11,7 +11,7 @@ class BaseRepository(ABC):
         raise NotImplementedError("Subclasses must implement this method")
 
     @abstractmethod
-    def select_by_id(self, **kwargs):
+    def select(self, **kwargs):
         raise NotImplementedError("Subclasses must implement this method")
     
     @abstractmethod
