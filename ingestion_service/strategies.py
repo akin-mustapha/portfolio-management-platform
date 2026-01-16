@@ -33,6 +33,38 @@ class AssetExtractionStrategy:
 
     return len(assets)
   
+class AssetDataExtractionStrategy:
+  from datetime import datetime, UTC
+  @classmethod
+  def apply_to(self, record, asset_repository, asset_data_repository):
+    data_date = datetime.now(UTC)
+    assets = json.loads(record.get('payload', {}))
+    for asset in assets:
+      instrument = asset.get('instrument', {})
+      wallet_impact = asset.get('walletImpact', {})
+
+      ticker = instrument.get('ticker', '')
+      asset_id = asset_repository.select({'external_id': ticker})
+
+      data = {
+        "asset_id": "",
+        "data_date": data_date,
+        "share": asset.get('quantity', 0),
+        "price": asset.get('currentPrice', 0),
+        "avg_price": asset.get('averagePricePaid', 0),
+        "value": wallet_impact.get('currentValue', 0),
+        "cost": wallet_impact.get('totalCost', 0),
+        "profit": wallet_impact.get('unrealizedProfitLoss', 0),
+        "fx_impact": wallet_impact.get('fxImpact', 0),
+        "currency": instrument.get('currency', ''),
+        "local_currency": wallet_impact.get('currency', ''),
+        
+      }
+
+      asset_data_repository.insert([data])
+
+    return len(assets)
+  
 
 class Trading212APIStrategy:
   @staticmethod

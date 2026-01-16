@@ -9,7 +9,7 @@ from api.client import APIClient
 from ingestion_service.models import raw_data, asset
 from repository.entity_repository import EntityRepository
 from repository.raw_data_repository import RawDataRepository
-from ingestion_service.strategies import AssetExtractionStrategy, Trading212APIStrategy
+from ingestion_service.strategies import AssetExtractionStrategy, Trading212APIStrategy, AssetDataExtractionStrategy
 
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
@@ -33,6 +33,7 @@ class Trading212IngestionService:
     def ingest_asset(self,
                 raw_data_repository,
                 processed_data_repository,
+                asset_data_repository,
                 extraction_strategy,
                 transformation_strategy,
                 ):
@@ -45,7 +46,8 @@ class Trading212IngestionService:
                 "created_datetime": datetime.now(UTC)}
             )
         
-        transformation_strategy.apply_to(res, processed_data_repository)
+        transformation_strategy[0].apply_to(res, processed_data_repository)
+        transformation_strategy[1].apply_to(res, processed_data_repository, asset_data_repository)
 
         raw_data_repository.process_raw_data(res.get('id'))
 
@@ -58,17 +60,19 @@ if __name__ == "__main__":
 
     raw_data_repo = RawDataRepository(client=database_client)
 
-    asset_repo = EntityRepository("asset_tag", client=database_client)
+    asset_repo = EntityRepository("asset", client=database_client)
+    asset_data_repo = EntityRepository("asset_data", client=database_client)
 
     # asset_repo.delete({'id': 1})
 
     ingestion_service = Trading212IngestionService(api_client)
 
-    # res = ingestion_service.ingest_asset(
-    #     raw_data_repository=raw_data_repo,
-    #     processed_data_repository=asset_repo,
-    #     extraction_strategy=Trading212APIStrategy,
-    #     transformation_strategy=AssetExtractionStrategy
-    # )
+    res = ingestion_service.ingest_asset(
+        raw_data_repository=raw_data_repo,
+        processed_data_repository=asset_repo,
+        asset_data_repository=asset_data_repo,
+        extraction_strategy=Trading212APIStrategy,
+        transformation_strategy=[AssetExtractionStrategy, AssetDataExtractionStrategy],
+    )
 
     # logging.info(f"Mapped {res} positions to Trading212 Asset dataclass instances")

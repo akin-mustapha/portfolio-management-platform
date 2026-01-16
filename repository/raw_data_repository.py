@@ -28,18 +28,18 @@ class RawDataRepository:
 
         return {**record, "id": res.lastrowid}
 
-    def select_by_id(self, source: str):
+    def select(self, source: str):
         logging.info(f"Fetching raw data from source: {source}")
         with self.client as client:
             result = client.execute("""
-                                    SELECT *
+                                    SELECT id, payload
                                     FROM raw_data
                                     WHERE   source = :source
                                         AND is_processed = :is_processed
                                     ORDER BY id
                                     LIMIT 1""", 
                                 {"source": source, "is_processed": False})
-            data = result.fetchall()
+            data = result.first()
         logging.info(f"Fetched {len(data)} records from source: {source}")
         return data
 

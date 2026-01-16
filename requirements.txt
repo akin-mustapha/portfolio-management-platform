@@ -5,3 +5,4 @@ fastapi
 uvicorn
 sqlmodel
 alembic
+ipykernel
