@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting git operations..."
+echo "Syncing project to git"
 
 git status
 
