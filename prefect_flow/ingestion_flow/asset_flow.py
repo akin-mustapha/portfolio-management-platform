@@ -25,7 +25,7 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-@task(cache_policy=NO_CACHE)
+@task(retry_delay_seconds=30, retries=2, cache_policy=NO_CACHE)
 def ingest_asset(ingestion_service, raw_data_repo, asset_repo, extraction_strategy, transformation_strategy):
 
     ingestion_service.asset(
