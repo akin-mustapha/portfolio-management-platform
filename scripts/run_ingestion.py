@@ -15,12 +15,13 @@ load_dotenv()
 URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if __name__ == "__main__":
     logging.info("Starting data ingestion process")
 
     api_client = APIClient(url=URL, api_token=API_TOKEN, secret_token=SECRET_TOKEN)
-    database_client = SQLModelClient(database_url="sqlite:///./data/trading212.db")
+    database_client = SQLModelClient(database_url=DATABASE_URL)
 
     asset_repo = EntityRepository("asset", client=database_client)
     asset_snapshot_repo = EntityRepository("asset_snapshot", client=database_client)

@@ -1,12 +1,8 @@
 
 import json
 import logging
-from time import sleep
 from datetime import datetime, UTC
-from src.shared.database.client import SQLModelClient
-from src.services.ingestion_service.infrastructure.repositories.entity_repository import EntityRepository
-from src.services.ingestion_service.infrastructure.repositories.raw_data_repository import RawDataRepository
-from src.services.ingestion_service.application.strategy.strategies import Trading212APIStrategy, AssetSnapshotTLStrategy
+
 from src.shared.utils.custom_logger import customer_logger
 
 logging = customer_logger("ingestion_service")
