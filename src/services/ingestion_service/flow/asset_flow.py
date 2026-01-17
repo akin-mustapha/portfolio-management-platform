@@ -11,7 +11,7 @@ from api.client import APIClient
 from database.client import SQLModelClient
 from repository.entity_repository import EntityRepository
 from repository.raw_data_repository import RawDataRepository
-from ingestion_service.service import Trading212IngestionService
+from ingestion_service.application.service import Trading212IngestionService
 from ingestion_service.strategy.strategies import AssetTLStrategy, Trading212APIStrategy
 
 os.path.exists('logs') or os.makedirs('logs')
@@ -25,7 +25,7 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-@task(retry_delay_seconds=30, retries=2, cache_policy=NO_CACHE)
+@task(cache_policy=NO_CACHE)
 def ingest_asset(ingestion_service, raw_data_repo, asset_repo, extraction_strategy, transformation_strategy):
 
     ingestion_service.asset(

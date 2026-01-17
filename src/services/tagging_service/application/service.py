@@ -8,7 +8,7 @@ from repository.base_repository import BaseRepository
 from repository.entity_repository import EntityRepository
 from repository.query_repository import ItemSQLQueryRepository
 from tagging_service.models.models import Item, Item_tag, Tag
-from tagging_service.repositories import DomainRepositoryFactory
+from src.tagging_service.infrastructure.repositories import DomainRepositoryFactory
 
 
 

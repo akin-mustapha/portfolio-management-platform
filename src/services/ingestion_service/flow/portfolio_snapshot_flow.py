@@ -1,18 +1,18 @@
-import os
-import json
 import logging
 from prefect import flow, task
 from dotenv import load_dotenv
 from datetime import timedelta
+import os
+import json
 from datetime import datetime, UTC
-from prefect.cache_policies import NO_CACHE
 
-from api.client import APIClient
 from database.client import SQLModelClient
+from api.client import APIClient
+from ingestion_service.domain.models import raw_data, asset
 from repository.entity_repository import EntityRepository
 from repository.raw_data_repository import RawDataRepository
-from ingestion_service.service import Trading212IngestionService
-from ingestion_service.strategy.strategies import Trading212APIStrategy, PortfolioSnapshotTLStrategy
+from ingestion_service.strategy.strategies import AssetTLStrategy, Trading212APIStrategy, AssetSnapshotTLStrategy, PortfolioSnapshotTLStrategy
+from ingestion_service.application.service import Trading212IngestionService
 
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
@@ -25,7 +25,8 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-@task(retry_delay_seconds=30, retries=2, cache_policy=NO_CACHE)
+
+@task
 def ingest_portfolio_snapshot(ingestion_service, raw_data_repo, asset_repo, extraction_strategy, transformation_strategy):
     ingestion_service.portfolio_snapshot(
         raw_data_repo,
@@ -33,6 +34,7 @@ def ingest_portfolio_snapshot(ingestion_service, raw_data_repo, asset_repo, extr
         extraction_strategy,
         transformation_strategy)
     
+
 @flow
 def trading_212_portfolio_snapshot():
     logging.info("Starting the flow to fetch account cash")
