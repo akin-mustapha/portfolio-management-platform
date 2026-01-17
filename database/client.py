@@ -6,7 +6,7 @@ from contextlib import AbstractContextManager
 from sqlmodel import SQLModel, create_engine, Session, text
 from typing import Any, Dict, List, Optional, Tuple, Iterable
 
-from ingestion_service.models import raw_data
+from ingestion_service.models.models import raw_data
 
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
