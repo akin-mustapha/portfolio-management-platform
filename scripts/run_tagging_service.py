@@ -1,5 +1,7 @@
 
 import logging
+import os
+from dotenv import load_dotenv
 from random import randint
 from datetime import UTC, datetime
 
@@ -11,6 +13,12 @@ from src.services.tagging_service.infrastructure.repositories.repositories impor
 from src.services.ingestion_service.infrastructure.repositories.query_repository import ItemSQLQueryRepository
 from src.shared.utils.custom_logger import customer_logger
 from src.services.tagging_service.application.service import TaggingService
+
+logging = customer_logger("Tagging Service")
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 
 if __name__ == "__main__":
   # Example usage
@@ -33,7 +41,7 @@ if __name__ == "__main__":
               created_datetime=datetime.now(UTC),
               updated_datetime=None,
           )
-  database_client = SQLModelClient(database_url="sqlite:///./data/trading212.db")
+  database_client = SQLModelClient(database_url=DATABASE_URL)
 
   item_repo = DomainRepositoryFactory.get_repository("item", EntityRepository("asset", client=database_client))
   tag_repo = DomainRepositoryFactory.get_repository("tag", EntityRepository("tag", client=database_client))

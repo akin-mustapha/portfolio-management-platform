@@ -1,33 +1,51 @@
 # Commands
 
-## Migration
+## Tools
 
-### Create new migration
+### Migration
+
+#### Create new migration
 
 ```sh
   alembic revision -m "<descritpion>"
 ```
 
-### Apply migration
+#### Apply migration
 
 ```sh
   alembic upgrade head
 ```
 
-### Downgrade migration
+#### Downgrade migration
 
 ```sh
   alembic downgrade -2
 ```
 
-## Ingestion Service
+### Prefect Deployment
 
 ```sh
-  python -m ingestion_service.service
+  ./deploy/prefect_deploy.sh
 ```
 
-## Tagging Service
+## Services
+
+### Ingestion Service
 
 ```sh
-  python -m tagging_service.service
+  python3 -m scripts.run_ingestion_service
+```
+
+### Tagging Service
+
+```sh
+  python3 -m scripts.run_tagging_service
+```
+
+## Util
+
+### Sync branch
+
+```sh
+  ./scripts/git/sync_branch.sh
 ```
