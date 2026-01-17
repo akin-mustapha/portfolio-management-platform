@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
-        "asset_data",
+        "asset_snapshot",
         sa.Column('id', sa.Integer, primary_key=True),
         sa.Column('asset_id', sa.Integer, sa.ForeignKey('asset.id')),
         sa.Column('data_date', sa.DateTime),
@@ -39,5 +39,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('asset_data')
+    op.drop_table('asset_snapshot')
 

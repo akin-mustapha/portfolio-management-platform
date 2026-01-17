@@ -13,7 +13,7 @@ log_dir_name = 'logs'
 logging.basicConfig(level=logging.INFO, filename=f'{log_dir_name}/info.log', filemode='w', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
 
-class AssetExtractionStrategy:
+class AssetTLStrategy:
   @classmethod
   def apply_to(self, record, repository):
     # TODO: Map to config
@@ -30,24 +30,28 @@ class AssetExtractionStrategy:
           created_datetime=datetime.now(UTC),
       )
       repository.upsert(records=[data], unique_key="external_id")
-
     return len(assets)
   
-class AssetDataExtractionStrategy:
+class AssetSnapshotTLStrategy:
   from datetime import datetime, UTC
   @classmethod
-  def apply_to(self, record, asset_repository, asset_data_repository):
+  def apply_to(self, record, asset_repository, asset_snapshot_repository):
+    """
+      record: Data to be processed
+      asset_repository: Where to get asset_data from, we need asset.id as FK to the asset_snapshot table
+      asset_snapshot_repository: Where to put the asset data 
+    """
     data_date = datetime.now(UTC)
     assets = json.loads(record.get('payload', {}))
+
     for asset in assets:
+      ticker = instrument.get('ticker', '')
       instrument = asset.get('instrument', {})
       wallet_impact = asset.get('walletImpact', {})
-
-      ticker = instrument.get('ticker', '')
-      asset_id = asset_repository.select({'external_id': ticker})
-
+      asset = asset_repository.select({'external_id': ticker})
+      asset_id = asset[0]
       data = {
-        "asset_id": "",
+        "asset_id": asset_id.get('id', 0),
         "data_date": data_date,
         "share": asset.get('quantity', 0),
         "price": asset.get('currentPrice', 0),
@@ -58,19 +62,33 @@ class AssetDataExtractionStrategy:
         "fx_impact": wallet_impact.get('fxImpact', 0),
         "currency": instrument.get('currency', ''),
         "local_currency": wallet_impact.get('currency', ''),
-        
       }
-
-      asset_data_repository.insert([data])
-
+      asset_snapshot_repository.insert([data])
     return len(assets)
   
+class PortfolioSnapshotTLStrategy:
+  from datetime import datetime, UTC
+  @classmethod
+  def apply_to(self, record, repository):
+    data_date = datetime.now(UTC)
+    asset = json.loads(record.get('payload', {}))
+    investment = asset.get('investments', {})
+    data = {
+      "external_id": asset.get('id', None),
+      "data_date": data_date,
+      "currency": asset.get('currency', ''),
+      "current_value": investment.get('currentValue', 0),
+      "total_value": asset.get('totalValue', 0),
+      "total_cost": asset.get('totalCost', 0),
+      "unrealized_profit": investment.get('unrealizedProfitLoss', 0),
+      "realized_profit": investment.get('realizedProfitLoss', 0),
+    }
+    repository.insert([data])
+    return len(asset)
 
 class Trading212APIStrategy:
   @staticmethod
   def apply_to(endpoint, api_client) -> list[dict]:
       logging.info("Making API call to fetch all positions")
-
-      # TODO: MOVE LOGIC TO TRANSFORMATION
       data = asyncio.run(api_client.get(endpoint=endpoint))
       return data

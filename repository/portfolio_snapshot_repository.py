@@ -1,12 +1,13 @@
 from repository.base_repository import BaseRepository
 
-class AssetDataRepository(BaseRepository):
-    def __init__(self, client):
+class PortfolioSnapshotRepository(BaseRepository):
+    def __init__(self, client, entity_name):
         self.client = client
+        self.entity_name = entity_name
         
-    def save(self, data):
+    def insert(self, data):
         with self.client as client:
-            client.insert("asset_data", [data])
+            client.insert("portfolio_snapshot", [data])
 
     def get_by_id(self, id: int):
         pass

@@ -6,3 +6,6 @@ uvicorn
 sqlmodel
 alembic
 ipykernel
+prefect
+pytest-mock
+pytest
