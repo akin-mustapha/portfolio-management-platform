@@ -1,18 +1,18 @@
-import logging
-from prefect import flow, task
-from dotenv import load_dotenv
-from datetime import timedelta
 import os
 import json
+import logging
+from datetime import timedelta
+from prefect import flow, task
+from dotenv import load_dotenv
 from datetime import datetime, UTC
+from prefect.cache_policies import NO_CACHE
 
-from database.client import SQLModelClient
 from api.client import APIClient
-from ingestion_service.models.models import raw_data, asset
+from database.client import SQLModelClient
 from repository.entity_repository import EntityRepository
 from repository.raw_data_repository import RawDataRepository
-from ingestion_service.strategy.strategies import AssetTLStrategy, Trading212APIStrategy, AssetSnapshotTLStrategy, PortfolioSnapshotTLStrategy
 from ingestion_service.service import Trading212IngestionService
+from ingestion_service.strategy.strategies import AssetTLStrategy, Trading212APIStrategy
 
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
@@ -25,7 +25,7 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-@task
+@task(cache_policy=NO_CACHE)
 def ingest_asset(ingestion_service, raw_data_repo, asset_repo, extraction_strategy, transformation_strategy):
 
     ingestion_service.asset(

@@ -45,13 +45,13 @@ class AssetSnapshotTLStrategy:
     assets = json.loads(record.get('payload', {}))
 
     for asset in assets:
-      ticker = instrument.get('ticker', '')
       instrument = asset.get('instrument', {})
+      ticker = instrument.get('ticker', '')
       wallet_impact = asset.get('walletImpact', {})
-      asset = asset_repository.select({'external_id': ticker})
-      asset_id = asset[0]
+      record = asset_repository.select({'external_id': ticker})
+      asset_id = record[0]
       data = {
-        "asset_id": asset_id.get('id', 0),
+        "asset_id": asset_id,
         "data_date": data_date,
         "share": asset.get('quantity', 0),
         "price": asset.get('currentPrice', 0),
