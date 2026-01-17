@@ -1,5 +1,6 @@
 from tagging_service.models.models import Item, Item_tag, Tag
 from repository.base_repository import BaseRepository
+from datetime import datetime, UTC
 
 # Domain Repositories
 class ItemRepository(BaseRepository):
@@ -20,9 +21,8 @@ class ItemRepository(BaseRepository):
             updated_datetime=item.updated_datetime,
         )
     
-    def select_by_id(self, item_id: int):
-        result = self.entity_repository.select_by_id(item_id)
-        print(result)
+    def select(self, item_id: int):
+        result = self.entity_repository.select({"id": item_id})
         if result:
             row = result
             return Item(
@@ -77,8 +77,9 @@ class TagRepository(BaseRepository):
             created_datetime=tag.created_datetime,
             updated_datetime=tag.updated_datetime,
         )
-    def select_by_id(self, tag_id: int):
-        result = self.entity_repository.select_by_id(tag_id)
+    
+    def select(self, tag_id: int):
+        result = self.entity_repository.select({"id": tag_id})
         if result:
             return Tag(
                 *result
@@ -126,8 +127,8 @@ class ItemTagRepository(BaseRepository):
 
         )
     
-    def select_by_id(self, item_tag_id: int):
-        result = self.entity_repository.select_by_id(item_tag_id)
+    def select(self, item_tag_id: int):
+        result = self.entity_repository.select({"tag_id": item_tag_id})
         if result:
             return Item_tag(*result
             )
@@ -145,7 +146,9 @@ class ItemTagRepository(BaseRepository):
 
     
     def delete(self, item_tag: Item_tag):
-        pass
+        params = {'asset_id': item_tag.item_id, 'tag_id': item_tag.tag_id}
+
+        self.entity_repository.update(params, {'is_active': 0, 'updated_datetime': '1'})
 
     def update(self, **kwargs):
         pass
