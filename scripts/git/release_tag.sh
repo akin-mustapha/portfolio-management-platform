@@ -27,7 +27,8 @@ if [ "$create_release_tag" == "y" ]; then
   read -p "Continue? (y/n): " continue
 
   if [ "$continue" == "y" ]; then
-    git tag -a "$create_release_tag" -m "$description"
+    git tag -a "$release_tag" -m "$description"
+    git push origin "$release_tag"
   fi
 
   # git push origin v0.1.0
