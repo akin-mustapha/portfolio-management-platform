@@ -1,5 +1,5 @@
-from tagging_service.models.models import Item, Item_tag, Tag
-from repository.base_repository import BaseRepository
+from src.services.tagging_service.domain.models.models import Item, Item_tag, Tag
+from src.services.tagging_service.infrastructure.repositories.interface import BaseRepository
 from datetime import datetime, UTC
 
 # Domain Repositories

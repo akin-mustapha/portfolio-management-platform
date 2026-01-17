@@ -1,8 +1,8 @@
 import logging
 from typing import Iterable, Dict
 
-from repository.base_repository import BaseRepository
-from database.client import DatabaseClient
+from src.services.ingestion_service.infrastructure.repositories.base_repository import BaseRepository
+from src.shared.database.client import DatabaseClient
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
@@ -45,22 +45,18 @@ class EntityRepository:
     def upsert(self, records: Iterable[Dict], unique_key: str) -> None:
         for record in records:
             logging.debug(f"Preparing to upsert record into {self.entity_name}")
-
             column_names = ", ".join(record.keys())
             placeholders = ", ".join(f":{key}" for key in record.keys())
             update_placeholders = ", ".join(f"{key} = :{key}" for key in record.keys() if key != unique_key)
-
             sql = f"""
                 INSERT INTO {self.entity_name} ({column_names}) 
                 VALUES ({placeholders})
                 ON CONFLICT({unique_key}) 
                 DO UPDATE SET {update_placeholders}
             """
-
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self.client as client:
                 res = client.execute(sql, record)
-
             logging.info(f"Upserted record into {self.entity_name}")
             return res
 

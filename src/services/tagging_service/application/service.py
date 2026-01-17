@@ -3,18 +3,15 @@ import logging
 from random import randint
 from datetime import UTC, datetime
 
-from database.client import SQLModelClient
-from repository.base_repository import BaseRepository
-from repository.entity_repository import EntityRepository
-from repository.query_repository import ItemSQLQueryRepository
-from tagging_service.models.models import Item, Item_tag, Tag
-from src.tagging_service.infrastructure.repositories import DomainRepositoryFactory
+from src.shared.database.client import SQLModelClient
+from src.services.tagging_service.domain.models.models import Item, Item_tag, Tag
+from src.services.tagging_service.infrastructure.repositories.interface import BaseRepository
+from src.services.ingestion_service.infrastructure.repositories.entity_repository import EntityRepository
+from src.services.tagging_service.infrastructure.repositories.repositories import DomainRepositoryFactory
+from src.services.ingestion_service.infrastructure.repositories.query_repository import ItemSQLQueryRepository
+from src.shared.utils.custom_logger import customer_logger
 
-
-
-
-# TODO: Log to file_name, keep services logs separate
-logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
+logging = customer_logger("tagging_service")
 
 # What can it do
 # Create a tag
@@ -23,7 +20,6 @@ logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', 
 # Delete tagged from item
 # Get all item by tag
 # Get all tag by item
-
 class TaggingService:
   def __init__(self
                , item_repository: BaseRepository

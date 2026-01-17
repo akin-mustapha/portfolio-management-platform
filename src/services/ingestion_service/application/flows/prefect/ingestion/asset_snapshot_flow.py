@@ -8,17 +8,14 @@ from datetime import datetime, UTC
 from prefect.cache_policies import NO_CACHE
 
 from api.client import APIClient
-from database.client import SQLModelClient
-from repository.entity_repository import EntityRepository
-from repository.raw_data_repository import RawDataRepository
-from ingestion_service.application.service import Trading212IngestionService
-from ingestion_service.strategy.strategies import Trading212APIStrategy, AssetSnapshotTLStrategy
+from src.shared.database.client import SQLModelClient
+from src.services.ingestion_service.infrastructure.repositories.entity_repository import EntityRepository
+from src.services.ingestion_service.infrastructure.repositories.raw_data_repository import RawDataRepository
+from src.services.ingestion_service.application.service import Trading212IngestionService
+from src.services.ingestion_service.application.strategy.strategies import Trading212APIStrategy, AssetSnapshotTLStrategy
+from src.shared.utils.custom_logger import customer_logger
 
-os.path.exists('logs') or os.makedirs('logs')
-log_dir_name = 'logs'
-
-logging.basicConfig(level=logging.INFO, filename=f'{log_dir_name}/info.log', filemode='w', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
-
+logging = customer_logger("asset_snapshot_flow_run")
 load_dotenv()
 
 URL = os.getenv("API_URL")

@@ -1,5 +1,5 @@
 
-from repository.base_repository import BaseRepository
+from src.services.ingestion_service.infrastructure.repositories.base_repository import BaseRepository
 
 class AssetSnapshotRepository(BaseRepository):
     def __init__(self, client):

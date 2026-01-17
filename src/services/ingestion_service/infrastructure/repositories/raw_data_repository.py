@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, UTC
 from abc import ABC, abstractmethod
 
-from database.client import SQLModelClient
+from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
