@@ -1,0 +1,85 @@
+import os
+import json
+import asyncio
+import logging
+from datetime import datetime, UTC
+
+class AssetTLStrategy:
+  @classmethod
+  def apply_to(self, record, repository):
+    # TODO: Map to config
+    assets = json.loads(record.get('payload', {}))
+    for asset in assets:
+      instrument = asset.get("instrument", {})
+      data = dict(
+          # TODO: Map to config
+          external_id=instrument.get("ticker"),
+          name=instrument.get("ticker"),
+          description=instrument.get("name"),
+          source_name="trading212",
+          is_active=True,
+          created_datetime=datetime.now(UTC),
+      )
+      repository.upsert(records=[data], unique_key="external_id")
+    return len(assets)
+  
+class AssetSnapshotTLStrategy:
+  from datetime import datetime, UTC
+  @classmethod
+  def apply_to(self, record, asset_repository, asset_snapshot_repository):
+    """
+      record: Data to be processed
+      asset_repository: Where to get asset_data from, we need asset.id as FK to the asset_snapshot table
+      asset_snapshot_repository: Where to put the asset data 
+    """
+    data_date = datetime.now(UTC)
+    assets = json.loads(record.get('payload', {}))
+
+    for asset in assets:
+      instrument = asset.get('instrument', {})
+      ticker = instrument.get('ticker', '')
+      wallet_impact = asset.get('walletImpact', {})
+      record = asset_repository.select({'external_id': ticker})
+      asset_id = record[0]
+      data = {
+        "asset_id": asset_id,
+        "data_date": data_date,
+        "share": asset.get('quantity', 0),
+        "price": asset.get('currentPrice', 0),
+        "avg_price": asset.get('averagePricePaid', 0),
+        "value": wallet_impact.get('currentValue', 0),
+        "cost": wallet_impact.get('totalCost', 0),
+        "profit": wallet_impact.get('unrealizedProfitLoss', 0),
+        "fx_impact": wallet_impact.get('fxImpact', 0),
+        "currency": instrument.get('currency', ''),
+        "local_currency": wallet_impact.get('currency', ''),
+      }
+      asset_snapshot_repository.insert([data])
+    return len(assets)
+  
+class PortfolioSnapshotTLStrategy:
+  from datetime import datetime, UTC
+  @classmethod
+  def apply_to(self, record, repository):
+    data_date = datetime.now(UTC)
+    asset = json.loads(record.get('payload', {}))
+    investment = asset.get('investments', {})
+    data = {
+      "external_id": asset.get('id', None),
+      "data_date": data_date,
+      "currency": asset.get('currency', ''),
+      "current_value": investment.get('currentValue', 0),
+      "total_value": asset.get('totalValue', 0),
+      "total_cost": asset.get('totalCost', 0),
+      "unrealized_profit": investment.get('unrealizedProfitLoss', 0),
+      "realized_profit": investment.get('realizedProfitLoss', 0),
+    }
+    repository.insert([data])
+    return len(asset)
+
+class Trading212APIStrategy:
+  @staticmethod
+  def apply_to(endpoint, api_client) -> list[dict]:
+      logging.info("Making API call to fetch all positions")
+      data = asyncio.run(api_client.get(endpoint=endpoint))
+      return data
