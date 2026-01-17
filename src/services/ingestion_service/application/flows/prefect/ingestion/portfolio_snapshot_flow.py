@@ -7,8 +7,8 @@ from datetime import timedelta
 from datetime import datetime, UTC
 from prefect.cache_policies import NO_CACHE
 
-from api.client import APIClient
 from src.shared.database.client import SQLModelClient
+from src.services.ingestion_service.api.client import APIClient
 from src.services.ingestion_service.infrastructure.repositories.entity_repository import EntityRepository
 from src.services.ingestion_service.infrastructure.repositories.raw_data_repository import RawDataRepository
 from src.services.ingestion_service.application.service import Trading212IngestionService

@@ -4,15 +4,6 @@ import asyncio
 import logging
 from datetime import datetime, UTC
 
-from api.client import APIClient
-
-os.path.exists('logs') or os.makedirs('logs')
-log_dir_name = 'logs'
-
-# Ensures all logs are stored in <project_dir>/logs/info.log
-logging.basicConfig(level=logging.INFO, filename=f'{log_dir_name}/info.log', filemode='w', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
-
-
 class AssetTLStrategy:
   @classmethod
   def apply_to(self, record, repository):
