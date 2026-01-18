@@ -16,12 +16,6 @@ from src.services.ingestion_service.application.strategy.strategies import Tradi
 from src.shared.utils.custom_logger import customer_logger
 
 logging = customer_logger("portfolio_snapshot_flow_run")
-load_dotenv()
-
-URL = os.getenv("API_URL")
-API_TOKEN = os.getenv("API_TOKEN")
-SECRET_TOKEN = os.getenv("SECRET_TOKEN")
-DATABASE_URL = os.getenv("DATABASE_URL")
 
 @task(retry_delay_seconds=30, retries=2, cache_policy=NO_CACHE)
 def ingest_portfolio_snapshot(ingestion_service, raw_data_repo, asset_repo, extraction_strategy, transformation_strategy):
@@ -35,6 +29,13 @@ def ingest_portfolio_snapshot(ingestion_service, raw_data_repo, asset_repo, extr
 def trading_212_portfolio_snapshot():
     logging.info("Starting the flow to fetch account cash")
     logging.info("Starting data ingestion process")
+    
+    load_dotenv()
+
+    URL = os.getenv("API_URL")
+    API_TOKEN = os.getenv("API_TOKEN")
+    SECRET_TOKEN = os.getenv("SECRET_TOKEN")
+    DATABASE_URL = os.getenv("DATABASE_URL")
 
     api_client = APIClient(url=URL, api_token=API_TOKEN, secret_token=SECRET_TOKEN)
 

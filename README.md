@@ -13,19 +13,19 @@
 #### Apply migration
 
 ```sh
-  alembic upgrade head
+alembic upgrade head
 ```
 
 #### Downgrade migration
 
 ```sh
-  alembic downgrade -2
+alembic downgrade -2
 ```
 
 ### Prefect Deployment
 
 ```sh
-  ./deploy/prefect_deploy.sh
+./deploy/prefect_deploy.sh
 ```
 
 ## Services
@@ -33,13 +33,13 @@
 ### Ingestion Service
 
 ```sh
-  python3 -m scripts.run_ingestion_service
+python3 -m scripts.run_ingestion_service
 ```
 
 ### Tagging Service
 
 ```sh
-  python3 -m scripts.run_tagging_service
+python3 -m scripts.run_tagging_service
 ```
 
 ## Util
@@ -47,5 +47,5 @@
 ### Sync branch
 
 ```sh
-  ./scripts/git/sync_branch.sh
+./scripts/git/sync_branch.sh
 ```
