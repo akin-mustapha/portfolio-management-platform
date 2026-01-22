@@ -64,6 +64,56 @@ class ItemSQLQueryRepository:
     """
 
     with self.client as client:
-      res = client.excute(sql, params)
+      res = client.execute(sql, params)
 
     return res
+  
+
+class SnapshotSQLQueryRepository:
+  def __init__(self, client):
+    self.client = client
+  def select_asset_snapshot(self, params=None):
+    sql = f"""
+      SELECT
+        a.name,
+        at.*
+      FROM asset a 
+        INNER JOIN asset_snapshot at
+          ON a.id = at.asset_id
+    """
+    with self.client as client:
+      res = client.execute(sql, params)
+    return res.fetchall()
+  
+  def select_top_10_profit_asset_snapshot(self, params=None):
+    sql = f"""
+      SELECT
+        a.name as name,
+        a.description as description,
+        avg(at.profit) as profit,
+        avg(at.price) as price,
+        avg(at.value) as value
+      FROM asset a 
+        INNER JOIN asset_snapshot at
+          ON a.id = at.asset_id
+      GROUP BY asset_id
+      ORDER BY profit DESC
+    """
+    with self.client as client:
+      res = client.execute(sql, params)
+    return res.fetchall()
+  
+  def select_portfolio_unrealized_return(self):
+    sql = """
+      SELECT
+        data_date,
+        current_value AS portfolio_value,
+        unrealized_profit AS unrealized_return
+      FROM portfolio_snapshot
+      WHERE external_id iS NOT NULL
+      GROUP BY data_date
+      ORDER BY data_date
+    """
+    with self.client as client:
+        res = client.execute(sql)
+    return res.fetchall()

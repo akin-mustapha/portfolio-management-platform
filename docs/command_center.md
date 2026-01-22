@@ -42,6 +42,12 @@
   python3 -m scripts.run_tagging_service
 ```
 
+### Dash UI
+
+```sh
+  python -m src.dashboard.app_2
+```
+
 ## Util
 
 ### Sync branch
@@ -49,3 +55,7 @@
 ```sh
   ./scripts/git/sync_branch.sh
 ```
+
+### HOW-TO
+
+#### Create database client
