@@ -49,3 +49,7 @@
 ```sh
   ./scripts/git/sync_branch.sh
 ```
+
+### HOW-TO
+
+#### Create database client
