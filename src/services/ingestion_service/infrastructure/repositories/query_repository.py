@@ -64,6 +64,41 @@ class ItemSQLQueryRepository:
     """
 
     with self.client as client:
-      res = client.excute(sql, params)
+      res = client.execute(sql, params)
 
     return res
+  
+
+class SnapshotSQLQueryRepository:
+  def __init__(self, client):
+    self.client = client
+  def select_asset_snapshot(self, params=None):
+    sql = f"""
+      SELECT
+        a.name,
+        at.*
+      FROM asset a 
+        INNER JOIN asset_snapshot at
+          ON a.id = at.asset_id
+    """
+    with self.client as client:
+      res = client.execute(sql, params)
+    return res.fetchall()
+  
+  def select_top_10_profit_asset_snapshot(self, params=None):
+    sql = f"""
+      SELECT
+        a.description as name,
+        avg(at.profit) as profit,
+        avg(at.price) as price,
+        avg(at.value) as value
+      FROM asset a 
+        INNER JOIN asset_snapshot at
+          ON a.id = at.asset_id
+      GROUP BY asset_id
+      ORDER BY profit DESC
+      LIMIT 20;
+    """
+    with self.client as client:
+      res = client.execute(sql, params)
+    return res.fetchall()
