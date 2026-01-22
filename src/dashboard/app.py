@@ -34,6 +34,36 @@ top_10_profit_df = prepare_data(top_10_profit)
 # Initialize the app
 app = Dash(__name__)
 
+columnDefs = [
+    {"field": "name"},
+    {"field": "description"},
+    {
+        "field": "profit",
+        "type": "numericColumn",
+        "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
+        "cellStyle": {
+            "styleConditions": [
+                {
+                    "condition": "params.value > 0",
+                    "style": {"color": "green"}
+                },
+                {
+                    "condition": "params.value < 0",
+                    "style": {"color": "red"}
+                }
+            ]
+        }
+    },
+    {
+        "field": "price",
+        "valueFormatter": {"function": "d3.format(',.2f')(params.value)"}
+    },
+    {
+        "field": "value",
+        "valueFormatter": {"function": "d3.format(',.2f')(params.value)"}
+    }
+]
+
 # App Layout
 app.layout = html.Div([
   html.Div(children=name,
@@ -43,10 +73,14 @@ app.layout = html.Div([
   html.Div(className='row', children=[
     dcc.RadioItems(options=['profit', 'value', 'price'], value='profit', id='controls-and-radio-item'),
   ]),
+  html.H2(
+    f"Total Profit: {top_10_profit_df['profit'].sum():,.2f}",
+    style={"textAlign": "center"}
+  ),
   html.Div(className='row', children=[
     dag.AgGrid(
       rowData=top_10_profit_df.to_dict("records"),
-      columnDefs=[{'field': k} for k in top_10_profit_df.columns]
+      columnDefs=columnDefs
     ),
 
   ]),
@@ -62,15 +96,20 @@ app.layout = html.Div([
 
 def update_graph(col_chosen):
     fig = px.histogram(top_10_profit_df, x='name', y=col_chosen, histfunc='avg', height=800, width=1300)
+    fig.update_layout(
+    xaxis_title="Asset",
+    yaxis_title=f"Avg {col_chosen.capitalize()}",
+    template="plotly_dark",
+    xaxis_tickangle=-45,
+    margin=dict(l=40, r=40, t=40, b=20)
+    )
+
+    # fig.update_traces(marker_line_width=0)
+    fig.update_traces(
+    hovertemplate='<b>%{x}</b><br>' + f'{col_chosen}'
+)
     return fig
 
 # Run the app
 if __name__ == "__main__":
-
-  # print(data)
-
-  # for i in data_df:
-  #   print(i)
-
-  #   break
   app.run(debug=True)

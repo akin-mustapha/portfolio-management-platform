@@ -20,3 +20,5 @@ dash
 dash-ag-grid
 plotly
 pandas
+dash_design_kit
+dash-bootstrap-components
