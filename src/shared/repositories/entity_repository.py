@@ -1,7 +1,7 @@
 import logging
 from typing import Iterable, Dict
 
-from src.services.ingestion_service.infrastructure.repositories.base_repository import BaseRepository
+from src.shared.repositories.base_repository import BaseRepository
 from src.shared.database.client import DatabaseClient
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
@@ -58,7 +58,7 @@ class EntityRepository:
             with self.client as client:
                 res = client.execute(sql, record)
             logging.info(f"Upserted record into {self.entity_name}")
-            return res
+        return res
 
     def update(self, params: Dict, data: Dict):
         filters = [f'{key} = :{key}' for key in params.keys()]
