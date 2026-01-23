@@ -40,7 +40,7 @@ class EntityRepository:
             with self.client as client:
                 res = client.execute(sql, record)
             logging.info(f"Inserted record into {self.entity_name}")
-            return res
+        return res
 
     def upsert(self, records: Iterable[Dict], unique_key: str) -> None:
         for record in records:
