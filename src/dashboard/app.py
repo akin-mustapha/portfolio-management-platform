@@ -4,7 +4,7 @@ from src.dashboard.src.layouts.layout import layout
 
 
 # App
-app = Dash(external_stylesheets=[dbc.themes.DARKLY])
+app = Dash(external_stylesheets=[dbc.themes.DARKLY, dbc.icons.FONT_AWESOME])
 
 app.layout = layout
 
