@@ -1,5 +1,5 @@
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion_service.infrastructure.repositories.entity_repository import EntityRepository
+from src.shared.repositories.entity_repository import EntityRepository
 from dotenv import load_dotenv
 import os
 import pandas as pd

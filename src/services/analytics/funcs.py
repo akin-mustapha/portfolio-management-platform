@@ -21,5 +21,10 @@ class FuncAssetDerivedMetric:
           .rolling(30)
           .std()
       )
+    df['dca_bias'] = (
+        -0.5 * df['pct_drawdown']
+        -0.4 * df['price_vs_ma_50']
+        +0.1 * df['volatility_30d']
+    )
     df = df.drop(['price'], axis=1)
     return df

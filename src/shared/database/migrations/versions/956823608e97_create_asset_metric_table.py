@@ -33,6 +33,7 @@ def upgrade() -> None:
         sa.Column('volatility_30d', sa.Float),
         sa.Column('price_vs_ma_50', sa.Float),
         sa.Column('ma_50', sa.Float),
+        sa.Column('dca_bias', sa.Float),
     )
 
 def downgrade() -> None:

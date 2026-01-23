@@ -20,3 +20,13 @@ def kpi_row(df):
           ],
           className="mb-4"
         )
+
+def asset_kpi_row(df):
+  return dbc.Row(
+          [
+            dbc.Col(kpi("Drawdown", "€12,430", "white")),
+            dbc.Col(kpi("Average Price", "+€1,240", "success")),
+            dbc.Col(kpi("Volatity", "+€860", "success"))
+          ],
+          className="mb-4"
+        )
