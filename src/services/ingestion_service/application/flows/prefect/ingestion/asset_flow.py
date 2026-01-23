@@ -41,8 +41,8 @@ def trading_212_asset():
     DATABASE_URL = os.getenv("DATABASE_URL")
 
     api_client = APIClient(url=URL, api_token=API_TOKEN, secret_token=SECRET_TOKEN)
-
     database_client = SQLModelClient(database_url=DATABASE_URL)
+
 
     asset_repo = EntityRepository("asset", client=database_client)
     raw_data_repo = RawDataRepository(client=database_client)

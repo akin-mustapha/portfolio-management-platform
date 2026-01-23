@@ -4,7 +4,7 @@ import os
 from dash import html
 
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion_service.infrastructure.repositories.query_repository import SnapshotSQLQueryRepository
+from src.shared.repositories.query_repository import SnapshotSQLQueryRepository
 from src.dashboard.src.layouts.portfolio import portfolio_layout
 from src.dashboard.src.services.portfolio_service import PortfolioService
 
