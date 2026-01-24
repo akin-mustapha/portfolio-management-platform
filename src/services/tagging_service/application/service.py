@@ -3,6 +3,7 @@ import logging
 from src.services.tagging_service.domain.models.models import Item, Item_tag, Tag
 from src.services.tagging_service.infrastructure.repositories.interface import BaseRepository
 from src.shared.utils.custom_logger import customer_logger
+from datetime import datetime, UTC
 
 logging = customer_logger("tagging_service")
 
@@ -66,7 +67,7 @@ class TaggingService:
         raise
 
 
-  def create_tag(self, tag: Tag):
+  def create_tag(self, tag: str):
     """
     Create a new tag with an optional category.
 
@@ -74,8 +75,17 @@ class TaggingService:
     :param tag: The tag to create.
     :return: Description
     """
+    tag = Tag(
+              id=None,
+              name=tag,
+              description=tag,
+              tag_type_id=1,
+              is_active=True,
+              created_datetime=datetime.now(UTC),
+              updated_datetime=None,
+          )
     try:
-      logging.info(f"Creating tag: {tag.name}")
+      logging.info(f"Creating tag: {tag}")
       tag = self.tag_repo.insert(tag)
 
       logging.info(f"Created tag with ID: {tag.id}")
