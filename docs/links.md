@@ -8,7 +8,3 @@
 ## Trading212
 
 - RateLimiting:
-
-## Dash
-
-- <https://dash.plotly.com/dash-core-components>
