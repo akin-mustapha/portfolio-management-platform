@@ -1,13 +1,8 @@
 import os
-from dotenv import load_dotent
+from dotenv import load_dotenv
 from typing import List, Dict
 from src.shared.repositories.entity_repository import EntityRepository
 from src.services.ingestion_service.application.interfaces import Destination
-
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
 
 class Trading212AssetDestination(Destination):
   def __init__(self):
