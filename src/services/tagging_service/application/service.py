@@ -95,7 +95,7 @@ class TaggingService:
         raise
   
   # Controller while handle translating http parameters to domain models
-  def tag_item(self, item_tag: Item_tag):
+  def tag_item(self, item_tag: dict):
     """
     Tag an item with the provided tags.
 
@@ -104,18 +104,18 @@ class TaggingService:
     :param tags: A list of tags to assign to the item.
     :return: Description
     """
-    if not self.item_repo.select(item_tag.item_id):
-        raise ValueError(f"Item with ID {item_tag.item_id} does not exist.")
+    if not self.item_repo.select(item_tag.get("item_id")):
+        raise ValueError(f"Item with ID {item_tag.get("item_id")} does not exist.")
     
-    if not self.tag_repo.select(item_tag.tag_id):
-        raise ValueError(f"Tag with ID {item_tag.tag_id} does not exist.")
+    if not self.tag_repo.select(item_tag.get("tag_id")):
+        raise ValueError(f"Tag with ID {item_tag.get("tag_id")} does not exist.")
 
     try:
-      logging.info(f"Tagging item ID {item_tag.item_id} with tag ID {item_tag.tag_id}")
+      # logging.info(f"Tagging item ID {item_tag.item_id} with tag ID {item_tag.tag_id}")
       
-      self.item_tag_repo.insert(item_tag)
+      self.item_tag_repo.insert_2(item_tag)
 
-      logging.info(f"Tagged item ID {item_tag.item_id} with tag ID {item_tag.tag_id}")
+      # logging.info(f"Tagged item ID {item_tag.item_id} with tag ID {item_tag.tag_id}")
       return item_tag
     except Exception as e:
         logging.error(f"Error tagging item: {e}")
@@ -157,3 +157,7 @@ class TaggingService:
     """
     result = self.query_repo.select_tag_by_item(item.id)
     return result
+  
+  def get_all_tags(self):
+     result = self.query_repo.select_all_tag_item()
+     return result

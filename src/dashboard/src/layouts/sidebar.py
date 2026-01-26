@@ -6,11 +6,12 @@ from src.dashboard.src.services.portfolio_service import PortfolioService
 
 from src.dashboard.src.styles.style import SIDEBAR_HIDDEN, SIDEBAR_STYLE, CONTENT_STYLE, CONTENT_STYLE_EXPANDED
 
-sidebar = dbc.Container([
+sidebar = html.Div([
     dbc.Nav(
         [
             dbc.NavLink("Portfolio", href="/portfolio", active="exact"),
             dbc.NavLink("Asset", href="/asset", active="exact"),
+            dbc.NavLink("Tag", href="/tag", active="exact"),
         ],
         vertical=True,
         pills=True,

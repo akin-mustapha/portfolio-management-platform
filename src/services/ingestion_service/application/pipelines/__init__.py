@@ -1,3 +1,3 @@
-from .trading212_asset_pipeline import Trading212AssetPipeline
+from .trading212_ingestion_pipeline import Trading212IngestionPipeline
 
-__all__ = [Trading212AssetPipeline]
+__all__ = [Trading212IngestionPipeline]

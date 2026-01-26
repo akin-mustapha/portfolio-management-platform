@@ -7,11 +7,17 @@ from src.dashboard.src.layouts.layout import layout
 app = Dash(
     __name__,
     suppress_callback_exceptions=True,
-    external_stylesheets=[dbc.themes.DARKLY, dbc.icons.FONT_AWESOME]
+    external_stylesheets=[dbc.themes.LUMEN, dbc.icons.FONT_AWESOME]
     )
 
 app.layout = layout
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(
+    #     debug=True)
+    app.run(
+        host='0.0.0.0',
+        port=8050,
+        debug=True
+    )

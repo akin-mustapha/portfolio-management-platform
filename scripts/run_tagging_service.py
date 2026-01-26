@@ -10,7 +10,7 @@ from src.services.tagging_service.domain.models.models import Item, Item_tag, Ta
 from src.services.tagging_service.infrastructure.repositories.interface import BaseRepository
 from src.services.ingestion_service.infrastructure.repositories.entity_repository import EntityRepository
 from src.services.tagging_service.infrastructure.repositories.repositories import DomainRepositoryFactory
-from src.services.ingestion_service.infrastructure.repositories.query_repository import ItemSQLQueryRepository
+from src.shared.repositories.query_repository import ItemSQLQueryRepository
 from src.shared.utils.custom_logger import customer_logger
 from src.services.tagging_service.application.service import TaggingService
 

@@ -14,21 +14,24 @@ def create_table(id, columns, data, page_size=20, editable=False, filter_action=
         style_header={
             "backgroundColor": "#232426",
             "fontWeight": "thin",
-            "fontSize": 12,
+            "fontSize": 13,
+            'color': "#DCE0E7",
         },
         style_cell={
             "textAlign": "left",
             "padding": "8px",
             "minWidth": "80px", "width": "120px", "maxWidth": "200px",
-            'backgroundColor': '#232426',
-            "fontSize": 10,
+            'color': '#232426',
+            "fontSize": 12,
 
 
         },
         style_data_conditional=[
             {
                 'if': {'row_index': 'odd'},
-                'backgroundColor': '#232426'
+                'backgroundColor': '#232426',
+                'color': "#DCE0E7",
             }
+     
         ],
     )
