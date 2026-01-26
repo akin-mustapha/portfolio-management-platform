@@ -1,13 +1,5 @@
 # Commands
 
-## Naming Convention
-
-### HTML id name
-
-[Element type]-description
-
-- btn-create-tag
-
 ## Tools
 
 ### Migration
