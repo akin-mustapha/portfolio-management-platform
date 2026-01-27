@@ -3,11 +3,9 @@ import os
 
 from dash import Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
-from src.dashboard.src.pages.portfolio_page.portfolio import portfolio_layout
+from src.dashboard.src.layouts.portfolio import portfolio_layout
 from src.dashboard.src.pages.asset_page import asset_layout
-from src.dashboard.src.pages.tag_page import tag_layout
 from src.dashboard.src.services.portfolio_service import PortfolioService
-from src.services.tagging_service.application.tagging_service_builder import build_trading212_pipeline
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.layouts.sidebar import content, sidebar
 
@@ -35,6 +33,20 @@ def render_page_content(pathname):
     className="p-3 bg-light rounded-3",
   )
 
+porfoltio_serivce = build_trading212_pipeline()
+from dash import callback, Input, Output, State, no_update
+@callback(
+    Output("tag-create-status", "value"),
+    Input("btn-create-tag-name", "n_clicks"),
+    State("input-tag-name", "value"),
+    prevent_initial_call=True
+)
+def create_new_tag(n_clicks, value):
+    if not value:
+        return "⚠️ Tag name cannot be empty"
+
+    porfoltio_serivce.create_tag(value)
+    return f"✅ Tag '{value}' created"
 
 # Layout
 layout = dbc.Container(
