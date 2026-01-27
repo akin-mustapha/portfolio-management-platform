@@ -1,19 +1,24 @@
+import os
 import logging
+from abc import ABC
+from typing import Dict
+from dotenv import load_dotenv
 from datetime import datetime, UTC
-from abc import ABC, abstractmethod
-
 from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
+load_dotenv()
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 class RawDataRepository:
-    def __init__(self, client):
-        self.client = client
+    def __init__(self):
+        self._client = SQLModelClient(DATABASE_URL)
 
-    def insert(self, record):
+    def insert(self, record: Dict):
         logging.debug(f"Preparing to insert record into {record}")
-
         column_names = ", ".join(record.keys())
         placeholders = ", ".join(f":{key}" for key in record.keys())
 
@@ -21,7 +26,7 @@ class RawDataRepository:
 
         logging.debug(f"Executing query: {sql} with params: {record}")
 
-        with self.client as client:
+        with self._client as client:
             res = client.execute(sql, record)
 
         logging.info(f"Inserted record into raw_data")
@@ -30,7 +35,7 @@ class RawDataRepository:
 
     def select(self, source: str):
         logging.info(f"Fetching raw data from source: {source}")
-        with self.client as client:
+        with self._client as client:
             result = client.execute("""
                                     SELECT id, payload
                                     FROM raw_data
@@ -45,7 +50,7 @@ class RawDataRepository:
 
     def process_raw_data(self, id: int):
         logging.info(f"Processing raw data with id: {id}")
-        with self.client as client:
+        with self._client as client:
             result = client.execute(
                 """UPDATE raw_data
                     SET is_processed = :is_processed

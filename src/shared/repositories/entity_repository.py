@@ -1,15 +1,22 @@
+import os
 import logging
+from dotenv import load_dotenv
 from typing import Iterable, Dict
 
 from src.shared.repositories.base_repository import BaseRepository
-from src.shared.database.client import DatabaseClient
+from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
 # Data access Repository
 class EntityRepository:
-    def __init__(self, entity_name, client: DatabaseClient):
-        self.client = client
+    def __init__(self, entity_name):
+        self._client = SQLModelClient(DATABASE_URL)
         self.entity_name = entity_name
 
     def select(self, params: Dict):
@@ -17,7 +24,7 @@ class EntityRepository:
         filters_str = ' AND '.join(filters)
         sql = f"SELECT * FROM {self.entity_name} WHERE {filters_str}"
         logging.info(f"Selecting record from {self.entity_name}")
-        with self.client as client:
+        with self._client as client:
             result = client.execute(sql, params)
         logging.info(f"Count of records fetched: {result.rowcount}")
         return result.first()
@@ -25,7 +32,7 @@ class EntityRepository:
     def select_all(self):
         sql = f"SELECT * FROM {self.entity_name}"
         logging.info(f"Selecting all records from {self.entity_name}")
-        with self.client as client:
+        with self._client as client:
             result = client.execute(sql)
         logging.info(f"Count of records fetched: {result.rowcount}")
         return result.fetchall()
@@ -37,7 +44,7 @@ class EntityRepository:
             placeholders = ", ".join(f":{key}" for key in record.keys())
             sql = f"INSERT INTO {self.entity_name} ({column_names}) VALUES ({placeholders})"
             logging.debug(f"Executing query: {sql} with params: {record}")
-            with self.client as client:
+            with self._client as client:
                 res = client.execute(sql, record)
             logging.info(f"Inserted record into {self.entity_name}")
         return res
@@ -55,7 +62,7 @@ class EntityRepository:
                 DO UPDATE SET {update_placeholders}
             """
             logging.debug(f"Executing query: {sql} with params: {record}")
-            with self.client as client:
+            with self._client as client:
                 res = client.execute(sql, record)
             logging.info(f"Upserted record into {self.entity_name}")
         return res
@@ -70,7 +77,7 @@ class EntityRepository:
         sql = f"UPDATE {self.entity_name} SET {column_names} WHERE {filters_str}"
 
         logging.info(f"Updating record in {self.entity_name}")
-        with self.client as client:
+        with self._client as client:
             res = client.execute(sql, params)
 
         logging.info(f"Updated record in {self.entity_name}")
@@ -83,7 +90,7 @@ class EntityRepository:
         sql = f"DELETE FROM {self.entity_name} WHERE {filters_str}"
 
         logging.info(f"Deleting record from {self.entity_name}")
-        with self.client as client:
+        with self._client as client:
             res = client.execute(sql, params)
 
         logging.info(f"Deleted record from {self.entity_name}")

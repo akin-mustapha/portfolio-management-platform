@@ -3,6 +3,47 @@ class ItemSQLQueryRepository:
   def __init__(self, client):
     self.client = client
 
+  def select_all_asset(self):
+    sql = f"""
+      SELECT
+        a.id as asset_id
+      ,	a.name as asset_name
+      FROM asset a
+      WHERE a.is_active = 1
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
+  
+  def select_all_tag(self):
+    sql = f"""
+      SELECT
+        t.id as tag_id
+      ,	t.name as tag_name
+      FROM tag t
+      WHERE t.is_active = 1
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
+    
+  def select_all_tag_item(self):
+    sql = f"""
+      SELECT
+        at.asset_id
+      ,	a.name as asset_name
+      , at.tag_id 
+      ,	t.name as tag_name
+      FROM asset a 
+        INNER JOIN asset_tag at
+          ON a.id = at.asset_id
+        INNER JOIN tag t
+          ON at.tag_id = t.id
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
+  
   def select_item_by_tag(self, tag_id):
     sql = f"""
       SELECT
@@ -18,10 +59,8 @@ class ItemSQLQueryRepository:
       WHERE t.id = :tag_id
     """
     params = {'tag_id': tag_id}
-
     with self.client as client:
       res = client.execute(sql, params)
-
     return res.fetchall()
   
   def select_tag_by_item(self, item_id):
@@ -42,11 +81,9 @@ class ItemSQLQueryRepository:
 
     with self.client as client:
       res = client.execute(sql, params)
-
     return res.fetchall()
 
   def select_item_by_parameter(self, params):
-
     filter = [f'{k} = :{k}' for k in params.keys()]
     filter_str = ' AND'.join(filter)
     sql = f"""

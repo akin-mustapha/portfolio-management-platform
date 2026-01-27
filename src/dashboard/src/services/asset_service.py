@@ -1,9 +1,8 @@
-import pandas as pd
-from src.shared.repositories.entity_repository import EntityRepository
-from src.shared.database.client import SQLModelClient
-from src.shared.repositories.query_repository import SnapshotSQLQueryRepository
-from dotenv import load_dotenv 
 import os
+import pandas as pd
+from dotenv import load_dotenv 
+from src.shared.database.client import SQLModelClient
+from src.shared.repositories.query_repository import ItemSQLQueryRepository
 
 
 load_dotenv()
@@ -15,9 +14,15 @@ class AssetService:
     # def __init__(self):
     _client = SQLModelClient(database_url=DATABASE_URL)
     @classmethod
-    def get_asset(cls):
-        repo = SnapshotSQLQueryRepository(cls._client)
-        rows = repo.select_top_10_profit_asset_snapshot()
+    def get_all_asset(cls):
+        repo = ItemSQLQueryRepository(cls._client)
+        rows = repo.select_all_asset()
+        df = pd.DataFrame([dict(r._mapping) for r in rows])
+        return df
+    @classmethod
+    def get_all_tag(cls):
+        repo = ItemSQLQueryRepository(cls._client)
+        rows = repo.select_all_tag()
         df = pd.DataFrame([dict(r._mapping) for r in rows])
         return df
     @classmethod
@@ -26,6 +31,7 @@ class AssetService:
             SELECT
                     a.name
                 ,   a.description
+                ,	STRING_AGG(t.name, ',') as tag_list
                 ,   [as].value
                 ,   [as].profit
                 ,   [as].price
@@ -38,9 +44,16 @@ class AssetService:
             FROM asset a
                 INNER JOIN asset_metric am
                     ON a.id = am.asset_id
-                INNER JOIN asset_snapshot as [as]
+                LEFT JOIN asset_snapshot as [as]
                     ON a.id = [as].asset_id
-                    AND am.data_date = [as].data_date
+                AND am.data_date = [as].data_date
+                LEFT JOIN asset_tag at
+                    ON a.id = at.asset_id
+                    AND at.is_active = True
+                LEFT JOIN tag t 
+                    ON at.tag_id  = t.id
+                AND t.is_active = True
+            WHERE a.is_active = True
             GROUP BY a.id
             HAVING am.data_date = MAX(am.data_date)
         """
@@ -49,6 +62,5 @@ class AssetService:
             res = client.execute(
                 sql
             )
-
             res = res.fetchall()
         return pd.DataFrame(res)

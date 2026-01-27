@@ -126,7 +126,16 @@ class ItemTagRepository(BaseRepository):
             updated_datetime=item_tag.updated_datetime
 
         )
-    
+    def insert_2(self, item_tag: dict):
+        record = {
+
+            "tag_id": item_tag.get("tag_id"),
+            "asset_id": item_tag.get("item_id"),
+            "is_active": 1,
+            "created_datetime": datetime.now(UTC)
+        }
+        res = self.entity_repository.insert([record])
+        return record
     def select(self, item_tag_id: int):
         result = self.entity_repository.select({"tag_id": item_tag_id})
         if result:

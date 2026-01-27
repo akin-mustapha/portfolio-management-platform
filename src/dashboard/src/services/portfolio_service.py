@@ -1,13 +1,11 @@
+import os
 import pandas as pd
-import pandas as pd
-from src.shared.repositories.entity_repository import EntityRepository
 from src.shared.database.client import SQLModelClient
 from src.shared.repositories.query_repository import SnapshotSQLQueryRepository
 from dotenv import load_dotenv 
-import os
-
 
 load_dotenv()
+
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 database_client = SQLModelClient(database_url=DATABASE_URL)
