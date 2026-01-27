@@ -7,6 +7,7 @@ from src.services.tagging_service.application. tagging_service_builder import bu
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
 from src.dashboard.src.components.tables.table import create_table
+from src.dashboard.src.components.select import create_select
 import pandas as pd
 
 def create_table_from_df(df, table_name: str):
@@ -14,18 +15,6 @@ def create_table_from_df(df, table_name: str):
 
 create_dropdown_item_from_list = lambda ls: html.Div([dbc.DropdownMenuItem(item, className="sm") for item in ls])
 
-def create_select(df, select_id="asset-select", label="asset_name", value="asset_id"):
-    return dbc.Select(
-        id=select_id,
-        options=[
-            {
-                "label": row[label],
-                "value": row[value],
-            }
-            for _, row in df.iterrows()
-        ],
-        placeholder="Select asset",
-    )
 
 portfolio_serivce = build_tagging_service()
 asset_service = AssetService

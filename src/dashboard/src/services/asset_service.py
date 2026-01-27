@@ -64,3 +64,47 @@ class AssetService:
             )
             res = res.fetchall()
         return pd.DataFrame(res)
+    
+    @classmethod
+    def get_asset_data(cls, start_date, end_date):
+        sql = f"""
+           select
+                a.name,
+                [a_snap].*,
+                MAX(price) OVER (
+                PARTITION BY a_snap.asset_id
+                ORDER BY data_date
+                ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+                ) AS recent_high_30d,
+                MIN(price) OVER (
+                PARTITION BY a_snap.asset_id
+                ORDER BY data_date
+                ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+                ) AS recent_low_30d,
+                AVG(price) OVER (
+                PARTITION BY a_snap.asset_id
+                ORDER BY data_date
+                ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+                ) AS ma_30,
+                AVG(price) OVER (
+                PARTITION BY a_snap.asset_id
+                ORDER BY data_date
+                ROWS BETWEEN 49 PRECEDING AND CURRENT ROW
+                ) AS ma_50,
+                t.name as tag_name
+            from asset a
+            INNER JOIN asset_snapshot as [a_snap]
+                on a.id = [a_snap].asset_id
+            LEFT JOIN asset_tag as at
+                ON a.id = at.asset_id
+            INNER JOIN tag as t
+                ON at.tag_id = t.id
+            WHERE date(a_snap.data_date) BETWEEN '{start_date}' AND '{end_date}'
+            AND a_snap.asset_id IS NOT NULL
+        """
+        with cls._client as client:
+            res = client.execute(
+                sql
+            )
+            res = res.fetchall()
+        return pd.DataFrame(res)
