@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from src.dashboard.src.components.cards import card
 from src.dashboard.src.components.kpi import asset_kpi_row
 from src.dashboard.src.components.charts.asset import asset_chart
-from src.services.tagging_service.application.tagging_service_builder import build_trading212_pipeline
+from src.services.tagging_service.application. tagging_service_builder import build_tagging_service
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
 from src.dashboard.src.components.tables.table import create_table
@@ -27,7 +27,7 @@ def create_select(df, select_id="asset-select", label="asset_name", value="asset
         placeholder="Select asset",
     )
 
-portfolio_serivce = build_trading212_pipeline()
+portfolio_serivce = build_tagging_service()
 asset_service = AssetService
 tag_df = pd.DataFrame(asset_service.get_all_tag())
 asset_df = pd.DataFrame(asset_service.get_all_asset())
@@ -36,23 +36,23 @@ tags_df = pd.DataFrame(portfolio_serivce.get_all_tags())
 tags_table = lambda df: html.Div([
   card("tag", create_table_from_df(df, "tag-table"))
 ])
-@callback(
-    Output("tag-create-status", "value"),
-    Output("tag-table", "data"),
-    Input("btn-create-tag-name", "n_clicks"),
-    State("input-tag-name", "value"),
-    prevent_initial_call=True
-)
-def create_new_tag(n_clicks, value):
-    if not value:
-        return "⚠️ Tag name cannot be empty"
-    portfolio_serivce.create_tag(value)
+# @callback(
+#     Output("tag-create-status", "value"),
+#     Output("tag-table", "data"),
+#     Input("btn-create-tag-name", "n_clicks"),
+#     State("input-tag-name", "value"),
+#     prevent_initial_call=True
+# )
+# def create_new_tag(n_clicks, value):
+#     if not value:
+#         return "⚠️ Tag name cannot be empty"
+#     portfolio_serivce.create_tag(value)
 
-    tag_df = pd.DataFrame(asset_service.get_all_tag())
-    return (
-        f"✅ Tag '{value}' created",
-        tag_df.to_dict("records")
-    )
+#     tag_df = pd.DataFrame(asset_service.get_all_tag())
+#     return (
+#         f"✅ Tag '{value}' created",
+#         tag_df.to_dict("records")
+#     )
 @callback(
     Output("tag-item-status", "children"),
     Output("tag-item-table", "data"),
