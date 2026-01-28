@@ -28,38 +28,46 @@ class AssetService:
     @classmethod
     def get_asset_data(cls):
         sql = """
+            WITH LatestMetric AS (
+                SELECT *,
+                    ROW_NUMBER() OVER (PARTITION BY asset_id ORDER BY data_date DESC) AS rn
+                FROM asset_metric
+            )
             SELECT
-                    a.name
-                ,   a.description
-                ,	STRING_AGG(t.name, ',') as tag_list
-                ,   [as].value
-                ,   [as].profit
-                ,   [as].price
-                ,   [am].recent_high_30d
-                ,   [am].recent_low_30d
-                ,   am.pct_drawdown
-                ,   am.volatility_30d
-                ,   am.price_vs_ma_50
-                ,   am.ma_30
-                ,   am.ma_50
-                ,   am.dca_bias
-                ,   case when am.ma_30 > am.ma_50 THEN 'Bullish' ELSE 'Bearish' END AS trend
-                ,   am.data_date
+                a.name,
+                a.description AS asset_description,
+                STRING_AGG(t.name, ',') AS tag_list,
+                snap.value,
+                snap.profit,
+                snap.price,
+                lm.recent_high_30d,
+                lm.recent_low_30d,
+                lm.pct_drawdown,
+                lm.volatility_30d,
+                lm.price_vs_ma_50,
+                lm.ma_30,
+                lm.ma_50,
+                lm.dca_bias,
+                CASE WHEN lm.ma_30 > lm.ma_50 THEN 'Bullish' ELSE 'Bearish' END AS trend,
+                lm.data_date
             FROM asset a
-                INNER JOIN asset_metric am
-                    ON a.id = am.asset_id
-                LEFT JOIN asset_snapshot as [as]
-                    ON a.id = [as].asset_id
-                AND am.data_date = [as].data_date
-                LEFT JOIN asset_tag at
-                    ON a.id = at.asset_id
-                    AND at.is_active = True
-                LEFT JOIN tag t 
-                    ON at.tag_id  = t.id
-                AND t.is_active = True
-            WHERE a.is_active = True
-            GROUP BY a.id
-            HAVING am.data_date = MAX(am.data_date)
+            INNER JOIN LatestMetric lm
+                ON a.id = lm.asset_id
+                AND lm.rn = 1               -- only take latest metric per asset
+            LEFT JOIN asset_snapshot snap
+                ON a.id = snap.asset_id
+                AND snap.data_date = lm.data_date
+            LEFT JOIN asset_tag at
+                ON a.id = at.asset_id
+                AND at.is_active = 1
+            LEFT JOIN tag t
+                ON at.tag_id = t.id
+                AND t.is_active = 1
+            WHERE a.is_active = 1
+            GROUP BY 
+                a.id, a.name, a.description, snap.value, snap.profit, snap.price,
+                lm.recent_high_30d, lm.recent_low_30d, lm.pct_drawdown, lm.volatility_30d,
+                lm.price_vs_ma_50, lm.ma_30, lm.ma_50, lm.dca_bias, lm.data_date
         """
 
         with cls._client as client:
@@ -74,7 +82,7 @@ class AssetService:
         sql = f"""
            select
                 a.name,
-                a.description,
+                a.description as asset_description,
                 [a_snap].*,
                 MAX(price) OVER (
                 PARTITION BY a_snap.asset_id

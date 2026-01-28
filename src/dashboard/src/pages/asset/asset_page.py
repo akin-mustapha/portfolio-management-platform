@@ -116,7 +116,7 @@ def assets_tab(df):
 
 def asset_page_filter(data):
     df = pd.DataFrame(data)
-    ASSET_NAMES = sorted_descriptions = sorted(df["description"].unique())
+    ASSET_NAMES = sorted(df["asset_description"].unique())
     return dbc.Row(
         dbc.Row([
             dbc.Col(dbc.Select(id="assetpage_asset_select",
@@ -194,32 +194,56 @@ def asset_layout():
 @callback(
     Output("asset_kpi_container", "children"),
     Output("asset_page_chart_tab", "children"),
-    # Output("profit_graph", "figure"),
-    # Output("ma_graph", "figure"),
-    # Output("drawdown_graph", "figure"),
-    # Output("dca_graph", "figure"),
     Input("asset_page_filter_btn", "n_clicks"),
     State("asset_page_asset_store", "data"),
-    # State("asset_page_asset_snapshot_store", "data"),
     State("assetpage_asset_select", "value"),
     State("asset_page_date_picker_filter", "start_date"),
     State("asset_page_date_picker_filter", "end_date"),
     prevent_initial_call=True
 )
-def update_asset_page(n_clicks, stored_data, asset_name, start_date, end_date):
-    # raise PreventUpdate
-    if not all([stored_data, asset_name, start_date, end_date]):
+def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
+    if not all([data, asset_name, start_date, end_date]):
         raise PreventUpdate
-    asset_data = pd.DataFrame(stored_data)
-    asset_data = asset_data[asset_data["description"] == asset_name].to_dict("records")
+
+    # normalize the selected value once
+    asset_key = asset_name.strip().lower()
+
+    asset_data = pd.DataFrame(data)
+
+    # normalize description column
+    asset_data["asset_description_norm"] = (
+        asset_data["asset_description"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    asset_data_df = asset_data[
+        asset_data["asset_description_norm"] == asset_key
+    ].to_dict("records")
+
     asset_snapshot = AssetService.get_asset_snapshot(start_date, end_date)
-    asset_snapshot = prep_data(asset_snapshot)
-    if len(asset_snapshot) == 0:
+    asset_snapshot_df = prep_data(asset_snapshot)
+
+    if asset_snapshot_df.empty:
         raise PreventUpdate
-    asset_snapshot = asset_snapshot[(asset_snapshot["description"] == asset_name) ].to_dict("records")
+
+    asset_snapshot_df["asset_description_norm"] = (
+        asset_snapshot_df["asset_description"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    asset_snapshot_data = asset_snapshot_df[
+        asset_snapshot_df["asset_description_norm"] == asset_key
+    ].to_dict("records")
+
+    if len(asset_snapshot_data) == 0 or len(asset_data_df) == 0:
+        PreventUpdate
     return (
-        asset_kpi_section(asset_data),
-        chart_tab(asset_snapshot)
+        asset_kpi_section(asset_data_df),
+        chart_tab(asset_snapshot_data)
     )
 
 @callback(

@@ -9,7 +9,7 @@ def asset_table(df):
     rowData=df.to_dict("records"),
     columnDefs=[
         {"field": "name"},
-        {"field": "description"},
+        {"field": "asset_description"},
         {"field": "data_date"},
         {
             "field": "value",
