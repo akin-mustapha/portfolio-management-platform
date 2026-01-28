@@ -78,7 +78,7 @@ def kpi_color(value, kind):
 
     if kind == "dca":
         return PALETTE["positive"] if value > 0 else PALETTE["neutral"]
-
+    
     return PALETTE["neutral"]
 
 def asset_kpi_section(data):
@@ -138,8 +138,8 @@ def asset_page_filter(data):
             ], md=4)
         ], className="mb-3")
     )
-
-
+# Duplicate logic. Needed
+# Might want to move graphs
 def chart_tab(data):
     return html.Div([
         dbc.Row([
@@ -168,9 +168,9 @@ def chart_tab_empty():
 
 def page_content():
     return dbc.Tabs([
-                dbc.Tab(id="asset_tab", children=[dag.AgGrid()], label="Assets", style=TAB_CONTENT_STYLE),
-                dbc.Tab(id="asset_chart_tab", children=chart_tab_empty(), label="Charts", style=TAB_CONTENT_STYLE),
-            ])
+        dbc.Tab(id="asset_tab", children=[dag.AgGrid()], label="Assets", style=TAB_CONTENT_STYLE),
+        dbc.Tab(id="asset_chart_tab", children=chart_tab_empty(), label="Charts", style=TAB_CONTENT_STYLE),
+    ])
 # ─────────────────────────────────────────────
 # Page layout
 def asset_layout():
@@ -187,7 +187,6 @@ def asset_layout():
 
         dbc.Row(id="asset_page_content_container", children=[page_content()]),
     ], id="asset_page")
-
 # ─────────────────────────────────────────────
 # Callbacks
 # ─────────────────────────────────────────────

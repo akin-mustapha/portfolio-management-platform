@@ -3,7 +3,7 @@ import os
 
 from dash import Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
-from src.dashboard.src.layouts.portfolio import portfolio_layout
+from src.dashboard.src.pages.portfolio.portfolio_page import portfolio_layout
 from src.dashboard.src.pages.asset.asset_page import asset_layout
 from src.dashboard.src.pages.tag.tag_page import tag_layout
 from src.dashboard.src.services.portfolio_service import PortfolioService
