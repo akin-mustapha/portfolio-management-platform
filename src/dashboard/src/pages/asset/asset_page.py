@@ -216,7 +216,7 @@ def update_asset_page(n_clicks, stored_data, asset_name, start_date, end_date):
     asset_snapshot = prep_data(asset_snapshot)
     if len(asset_snapshot) == 0:
         raise PreventUpdate
-    asset_snapshot = asset_snapshot[(asset_snapshot["name"] == asset_name) ].to_dict("records")
+    asset_snapshot = asset_snapshot[(asset_snapshot["description"] == asset_name) ].to_dict("records")
     return (
         asset_kpi_section(asset_data),
         chart_tab(asset_snapshot)
