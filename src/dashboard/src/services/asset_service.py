@@ -26,7 +26,7 @@ class AssetService:
         df = pd.DataFrame([dict(r._mapping) for r in rows])
         return df
     @classmethod
-    def get_asset_metric(cls):
+    def get_asset_data(cls):
         sql = """
             SELECT
                     a.name
@@ -40,7 +40,11 @@ class AssetService:
                 ,   am.pct_drawdown
                 ,   am.volatility_30d
                 ,   am.price_vs_ma_50
+                ,   am.ma_30
+                ,   am.ma_50
                 ,   am.dca_bias
+                ,   case when am.ma_30 > am.ma_50 THEN 'Bullish' ELSE 'Bearish' END AS trend
+                ,   am.data_date
             FROM asset a
                 INNER JOIN asset_metric am
                     ON a.id = am.asset_id
@@ -63,13 +67,14 @@ class AssetService:
                 sql
             )
             res = res.fetchall()
-        return pd.DataFrame(res)
+        return pd.DataFrame([dict(r._mapping) for r in res])  # <<-- this preserves column names
     
     @classmethod
-    def get_asset_data(cls, start_date, end_date):
+    def get_asset_snapshot(cls, start_date, end_date):
         sql = f"""
            select
                 a.name,
+                a.description,
                 [a_snap].*,
                 MAX(price) OVER (
                 PARTITION BY a_snap.asset_id
@@ -107,4 +112,4 @@ class AssetService:
                 sql
             )
             res = res.fetchall()
-        return pd.DataFrame(res)
+        return pd.DataFrame([dict(r._mapping) for r in res]) 

@@ -1,18 +1,16 @@
 import dash_ag_grid as dag
-from src.dashboard.src.components.tables.table import create_table
-
 def asset_table(df):
-  decimals = 4
+  decimals = 6
   df['pct_drawdown'] = df['pct_drawdown'].round(decimals=decimals)
   df['volatility_30d'] = df['volatility_30d'].round(decimals=decimals)
   df['price_vs_ma_50'] = df['price_vs_ma_50'].round(decimals=decimals)
   df['dca_bias'] = df['dca_bias'].round(decimals=decimals)
-  return create_table("asset_table", df.columns, df.to_dict("records"))
   return dag.AgGrid(
     rowData=df.to_dict("records"),
     columnDefs=[
         {"field": "name"},
         {"field": "description"},
+        {"field": "data_date"},
         {
             "field": "value",
             "valueFormatter": {"function": "d3.format(',.2f')(params.value)"}
@@ -75,7 +73,7 @@ def asset_table(df):
         {
             "field": "pct_drawdown",
             "type":"numericColumn",
-            "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
+            "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
             "cellStyle": {
                 "styleConditions": [
                 {
@@ -92,7 +90,7 @@ def asset_table(df):
         {
             "field": "volatility_30d",
             "type":"numericColumn",
-            "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
+            "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
             "cellStyle": {
                 "styleConditions": [
                 {
@@ -109,7 +107,7 @@ def asset_table(df):
         {
             "field": "price_vs_ma_50",
             "type":"numericColumn",
-            "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
+            "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
             "cellStyle": {
                 "styleConditions": [
                 {
@@ -126,7 +124,7 @@ def asset_table(df):
         {
             "field": "dca_bias",
             "type":"numericColumn",
-            "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
+            "valueFormatter": {"function": "d3.format('.4f')(params.value)"},
             "cellStyle": {
                 "styleConditions": [
                 {
@@ -140,6 +138,5 @@ def asset_table(df):
                 ]
             }
         }
-    ],
-    # style={"height": "100%"},
+    ]
   )

@@ -31,4 +31,5 @@ CONTENT_STYLE_EXPANDED["margin-left"] = "0rem"
 
 TAB_CONTENT_STYLE = {
   "padding": "2rem 1rem",
+  "height": 800
 }

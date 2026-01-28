@@ -134,6 +134,8 @@ def assign_tag_card(asset_df, tags_df):
 def tag_layout(df):
   return html.Div(
     [
+       
+      dcc.Location(id="tag_page_location"),
       dbc.Row(
         [
           dbc.Col(

@@ -39,6 +39,7 @@ def history_section(df):
 # ─────────────────────────────────────────────
 def portfolio_layout(df):
     return html.Div([
+        dcc.Location(id="portfolio_page_location"),
 
         # KPIs
         kpi_row(df),
