@@ -8,11 +8,13 @@ load_dotenv()
 
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-database_client = SQLModelClient(database_url=DATABASE_URL)
 
 class PortfolioService:
-    def get_unrealized_profit(self):
-        repo = SnapshotSQLQueryRepository(database_client)
+    def __init__(self):
+        self.database_client = SQLModelClient(database_url=DATABASE_URL)
+
+    def get_unrealized_profit(self) -> dict:
+        repo = SnapshotSQLQueryRepository(self.database_client)
         rows = repo.select_portfolio_unrealized_return()
-        df = pd.DataFrame([dict(r._mapping) for r in rows])
-        return df
+        data = [dict(r._mapping) for r in rows]
+        return data

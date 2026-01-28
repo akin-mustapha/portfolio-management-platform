@@ -1,16 +1,19 @@
 import dash_ag_grid as dag
+import pandas as pd
 def asset_table(data=None):
 
   if data is None:
     return dag.AgGrid()
+  
+  df = pd.DataFrame(data)
   # TODO: CREATE ENUM TO HOLD CONSTANT VALUES.
   decimals = 6
-  data['pct_drawdown'] = data['pct_drawdown'].round(decimals=decimals)
-  data['volatility_30d'] = data['volatility_30d'].round(decimals=decimals)
-  data['price_vs_ma_50'] = data['price_vs_ma_50'].round(decimals=decimals)
-  data['dca_bias'] = data['dca_bias'].round(decimals=decimals)
+  df['pct_drawdown'] = df['pct_drawdown'].round(decimals=decimals)
+  df['volatility_30d'] = df['volatility_30d'].round(decimals=decimals)
+  df['price_vs_ma_50'] = df['price_vs_ma_50'].round(decimals=decimals)
+  df['dca_bias'] = df['dca_bias'].round(decimals=decimals)
   return dag.AgGrid(
-    rowData=data.to_dict("records"),
+    rowData=df.to_dict("records"),
     columnDefs=[
         {"field": "name"},
         {"field": "asset_description"},
