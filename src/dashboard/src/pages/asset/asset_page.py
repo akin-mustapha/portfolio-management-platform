@@ -240,7 +240,7 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
     ].to_dict("records")
 
     if len(asset_snapshot_data) == 0 or len(asset_data_df) == 0:
-        PreventUpdate
+        raise PreventUpdate
     return (
         asset_kpi_section(asset_data_df),
         chart_tab(asset_snapshot_data)
