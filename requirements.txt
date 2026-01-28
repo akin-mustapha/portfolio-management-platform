@@ -22,3 +22,4 @@ plotly
 pandas
 dash_design_kit
 dash-bootstrap-components
+nbformat>=4.2.0

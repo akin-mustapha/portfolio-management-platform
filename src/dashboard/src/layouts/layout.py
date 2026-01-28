@@ -4,8 +4,8 @@ import os
 from dash import Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
 from src.dashboard.src.layouts.portfolio import portfolio_layout
-from src.dashboard.src.pages.asset_page import asset_layout
-from src.dashboard.src.pages.tag_page import tag_layout
+from src.dashboard.src.pages.asset.asset_page import asset_layout
+from src.dashboard.src.pages.tag.tag_page import tag_layout
 from src.dashboard.src.services.portfolio_service import PortfolioService
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.layouts.sidebar import content, sidebar
@@ -14,15 +14,15 @@ from src.services.tagging_service.application. tagging_service_builder import bu
 from src.dashboard.src.components.buttons import btn_side_toggle
 # extraction
 portfolio_profit = PortfolioService().get_unrealized_profit()
-asset_metric = AssetService().get_asset_metric()
+asset_metric = AssetService().get_asset_data()
 
 
 @callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
   if pathname == "/portfolio":
     return portfolio_layout(portfolio_profit)
-  elif pathname == "/asset":
-    return asset_layout(asset_metric)
+  elif pathname == "/assets":
+    return asset_layout()
   elif pathname == "/tag":
     return tag_layout(asset_metric)
   # If the user tries to reach a different page, return a 404 message

@@ -1,34 +1,60 @@
 import dash_bootstrap_components as dbc
-from src.dashboard.src.components.kpi import kpi_row
-from src.dashboard.src.components.cards import card
-from src.dashboard.src.components.charts.portfolio import portfolio_performance_chart
 from dash import dcc, html
 
-from src.dashboard.src.components.tables.portfolio import portfolio_timeseries_table
+# ─────────────────────────────────────────────
+# App imports
+# ─────────────────────────────────────────────
+from src.dashboard.src.components.kpi import kpi_row
+from src.dashboard.src.components.cards import card
+from src.dashboard.src.components.charts.portfolio import (
+    portfolio_performance_chart,
+)
+from src.dashboard.src.components.tables.portfolio import (
+    portfolio_timeseries_table,
+)
 
 
-def portfolio_layout(df):
-    return html.Div(
-      [
-        kpi_row(df),
-        dbc.Row(
-        [
-          dbc.Col(
-              card("Performance", dcc.Graph(
-                  figure=portfolio_performance_chart(df),
-                  config={'displayModeBar': False},
-                  # id='controls-and-graph',
-                  # style={'height':"100%"}
-              )),
-              # width="auto",
-              className="mt-4",
-          ),
-          dbc.Col(
-              card("History", portfolio_timeseries_table(df)),
-              width="auto",
-              className="mt-4",
-          ),
-        ]
+# ─────────────────────────────────────────────
+# Section builders
+# ─────────────────────────────────────────────
+def performance_section(df):
+    return card(
+        "Performance",
+        dcc.Graph(
+            figure=portfolio_performance_chart(df),
+            config={"displayModeBar": False},
         ),
-      ]
     )
+
+
+def history_section(df):
+    return card(
+        "History",
+        portfolio_timeseries_table(df),
+    )
+
+
+# ─────────────────────────────────────────────
+# Page layout
+# ─────────────────────────────────────────────
+def portfolio_layout(df):
+    return html.Div([
+        dcc.Location(id="portfolio_page_location"),
+
+        # KPIs
+        kpi_row(df),
+
+        # Main content
+        dbc.Row([
+            dbc.Col(
+                performance_section(df),
+                md=8,
+                className="mt-4",
+            ),
+            dbc.Col(
+                history_section(df),
+                md=4,
+                className="mt-4",
+            ),
+        ])
+    ])
