@@ -14,7 +14,8 @@ import dash_ag_grid as dag
 # ─────────────────────────────────────────────
 from src.dashboard.src.components.cards import card
 from src.dashboard.src.pages.asset.tables import asset_table
-from src.dashboard.src.services.asset_service import AssetService
+# from src.dashboard.src.services.asset_service import AssetService
+from src.dashboard.src.services.local_asset_service import LocalAssetService
 from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
 # ─────────────────────────────────────────────
 # Figures
@@ -119,8 +120,14 @@ def asset_page_filter(data):
     ASSET_NAMES = sorted(df["asset_description"].unique())
     return dbc.Row(
         dbc.Row([
-            dbc.Col(dbc.Select(id="assetpage_asset_select",
-                                options=[{"label": a, "value": a} for a in ASSET_NAMES],
+            # dbc.Col(dbc.Select(id="assetpage_asset_select",
+            #                     options=[{"label": a, "value": a} for a in ASSET_NAMES],
+            #                     value=ASSET_NAMES[0]), md=4),
+            dbc.Col(dcc.Dropdown(
+                                ASSET_NAMES,
+                                # options=[{"label": a, "value": a} for a in ASSET_NAMES],
+                                multi=True,
+                                id="assetpage_asset_select",
                                 value=ASSET_NAMES[0]), md=4),
             dbc.Col([
                 dcc.DatePickerRange(
@@ -218,7 +225,9 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
         raise PreventUpdate
 
     # normalize the selected value once
-    asset_key = asset_name.strip().lower()
+    if isinstance(asset_name, str):
+        asset_name = [asset_name]
+    asset_key = [name.strip().lower() for name in asset_name]
 
     asset_data = pd.DataFrame(data)
 
@@ -230,12 +239,16 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
         .str.lower()
     )
 
-    asset_data_df = asset_data[
-        asset_data["asset_description_norm"] == asset_key
-    ].to_dict("records")
+    mask = asset_data["asset_description_norm"].isin(asset_key)
+    asset_data_df = asset_data[mask]
 
-    asset_snapshot = AssetService.get_asset_snapshot(start_date, end_date)
+    asset_data_df = asset_data_df.to_dict("records")
+
+    # TODO: UNCOMMENT TO CONNECT TO DB
+    # asset_snapshot = AssetService.get_asset_snapshot(start_date, end_date)
+    asset_snapshot = LocalAssetService.get_asset_snapshot(start_date, end_date)
     asset_snapshot_df = prep_data(asset_snapshot)
+
 
     if asset_snapshot_df.empty:
         raise PreventUpdate
@@ -247,9 +260,14 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
         .str.lower()
     )
 
-    asset_snapshot_data = asset_snapshot_df[
-        asset_snapshot_df["asset_description_norm"] == asset_key
-    ].to_dict("records")
+    mask = asset_snapshot_df["asset_description_norm"].isin(asset_key)
+    asset_snapshot_df = asset_snapshot_df[mask]
+    asset_snapshot_data = asset_snapshot_df.to_dict("records")
+
+
+    # asset_snapshot_data = asset_snapshot_df[
+    #     any(asset_snapshot_df["asset_description_norm"]) in asset_key
+    # ].to_dict("records")
 
     if len(asset_snapshot_data) == 0 or len(asset_data_df) == 0:
         raise PreventUpdate
@@ -268,7 +286,9 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
 def load_asset_page(pathname):
     if pathname != "/assets":
         raise PreventUpdate
-    df = AssetService.get_asset_data()
+    # TODO: UNCOMMENT TO CONNECT TO DB
+    # df = AssetService.get_asset_data()
+    df = LocalAssetService.get_asset_data()
     if df.empty:
         raise PreventUpdate
     data = df.to_dict("records")

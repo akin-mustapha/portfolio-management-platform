@@ -131,7 +131,7 @@ def assign_tag_card(asset_df, tags_df):
         ),
     )
 
-def tag_layout(df):
+def tag_layout():
   return html.Div(
     [
        

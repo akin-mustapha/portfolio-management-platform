@@ -145,5 +145,12 @@ def asset_table(data=None):
             }
         },
         {"field": "data_date"}
-    ]
+    ],
+    columnSize="responsiveSizeToFit",
+    dashGridOptions={
+    #   "theme": "themeBalham.withParams",
+        "rowSelection": {"mode": "multiRow"},
+        "theme" : {"function": "themeBalham.withParams({ accentColor: 'blue', spacing: 5})" }
+      
+      },
   )

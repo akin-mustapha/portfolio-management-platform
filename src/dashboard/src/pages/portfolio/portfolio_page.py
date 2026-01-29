@@ -38,12 +38,12 @@ def value_chart(data=None):
 # ─────────────────────────────────────────────
 # Page layout
 # ─────────────────────────────────────────────
-def portfolio_layout(df):
+def portfolio_layout():
     return html.Div([
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
         # KPIs
-        kpi_row(df),
+        # kpi_row(df),
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
