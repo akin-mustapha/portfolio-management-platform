@@ -13,3 +13,4 @@ data/csv/asset.csv
 data/csv/portfolio.csv
 data/csv/tags.csv
 data/database/dev_1.db-journal
+data/csv/unrealized_return.csv
