@@ -13,17 +13,9 @@ from src.dashboard.src.pages.portfolio.tables import (
 )
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.services.portfolio_service import PortfolioService
-# ──────────────────────────────────────────── ─
+# ─────────────────────────────────────────────
 # Section builders
 # ─────────────────────────────────────────────
-# def performance_section(df):
-#     return card(
-#         "Performance",
-#         dcc.Graph(
-#             figure=WinnersPlotlyBarChart(),
-#             config={"displayModeBar": False},
-#         ),
-#     )
 def asset_section():
     return html.Div(
         id="portfolio_page_asset_table_container",

@@ -19,7 +19,7 @@ from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
 # ─────────────────────────────────────────────
 # Figures
 # ─────────────────────────────────────────────
-from src.dashboard.src.pages.asset.charts import ProfitOverTimePlotlyLineChart, MovingAveragePriceOverTimePlotlyLineChart, RecentHeighDrawdownOverTimePlotlyLineChart, DollarCostAVGBiasOverTimePlotlyLineChart
+from src.dashboard.src.pages.asset.charts import  PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
 # ─────────────────────────────────────────────
 # Data prep
 # ─────────────────────────────────────────────
@@ -142,37 +142,50 @@ def asset_page_filter(data):
 # Might want to move graphs
 def chart_tab(data):
     return html.Div([
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="profit_graph", figure=ProfitOverTimePlotlyLineChart().render(data)), md=6),
-            dbc.Col(dcc.Graph(id="ma_graph", figure=MovingAveragePriceOverTimePlotlyLineChart().render(data)), md=6)
-        ], className="mb-3"),
 
         dbc.Row([
-            dbc.Col(dcc.Graph(id="drawdown_graph", figure=RecentHeighDrawdownOverTimePlotlyLineChart().render(data)), md=6),
-            dbc.Col(dcc.Graph(id="dca_graph", figure=DollarCostAVGBiasOverTimePlotlyLineChart().render(data)), md=6)
-        ])
+            dbc.Col(dcc.Graph(id="price_graph", figure=PriceStructurePlotlyLineChart
+().render(data)), md=6),
+            dbc.Col(dcc.Graph(id="value_graph", figure=AssetValuePlotlyLineChart().render(data)), md=6)
+        ], className="mb-3"),
+
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="risk_graph", figure=RiskContextPlotlyLineChart().render(data)), md=6),
+            dbc.Col(dcc.Graph(id="dca_graph", figure=DCABiasPlotlyLineChart().render(data)), md=6)
+        ], className="mb-3"),
+
+        # dbc.Row([
+        #     dbc.Col(dcc.Graph(id="drawdown_graph", figure=RecentHeighDrawdownOverTimePlotlyLineChart().render(data)), md=6),
+        # ])
     ], id="asset_page_chart_tab")
 
 def chart_tab_empty():
     return html.Div([
         dbc.Row([
-            dbc.Col(dcc.Graph(id="profit_graph"), md=6),
-            dbc.Col(dcc.Graph(id="ma_graph"), md=6)
+            dbc.Col(dcc.Graph(id="price_graph"), md=6),
+            dbc.Col(dcc.Graph(id="value_graph"), md=6)
+        ], className="mb-3"),
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="risk_graph"), md=6),
+            dbc.Col(dcc.Graph(id="dca_graph"), md=6)
         ], className="mb-3"),
 
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="drawdown_graph"), md=6),
-            dbc.Col(dcc.Graph(id="dca_graph"), md=6)
-        ])
+        # dbc.Row([
+        #     dbc.Col(dcc.Graph(id="drawdown_graph"), md=6),
+        #     dbc.Col(dcc.Graph(id="dca_graph"), md=6)
+        # ])
     ], id="asset_page_chart_tab")
 
 def page_content():
     return dbc.Tabs([
-        dbc.Tab(id="asset_tab", children=[dag.AgGrid()], label="Assets", style=TAB_CONTENT_STYLE),
+        # Depreciated: Moved to portfolio page
+        # dbc.Tab(id="asset_tab", children=[dag.AgGrid()], label="Assets", style=TAB_CONTENT_STYLE),
         dbc.Tab(id="asset_chart_tab", children=chart_tab_empty(), label="Charts", style=TAB_CONTENT_STYLE),
     ])
 # ─────────────────────────────────────────────
 # Page layout
+# ─────────────────────────────────────────────
 def asset_layout():
     return html.Div([
         dcc.Location(id="asset_page_location"),
@@ -248,7 +261,8 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
 @callback(
     Output("asset_page_asset_store", "data"),
     Output("asset_page_filter_container", "children"),
-    Output("asset_tab", "children"),
+    # Depreciated: Moved to portfolio page
+    # Output("asset_tab", "children"),
     Input("asset_page_location", "pathname"),
 )
 def load_asset_page(pathname):
@@ -261,5 +275,6 @@ def load_asset_page(pathname):
     return (
         data,
         asset_page_filter(data),
-        asset_table(df),
+        # Depreciated: Moved to portfolio page
+        # asset_table(df),
     )

@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.express as px
 
+
 class WinnersPlotlyBarChart:
     def render(self, data):
         df = pd.DataFrame(data)
@@ -19,6 +20,7 @@ class WinnersPlotlyBarChart:
                 color="#2ecc71",
                 line=dict(width=0),
             ),
+            width=0.35,  # 👈 slimmer bars
             texttemplate="%{text:.2f}",
             textposition="outside",
         )
@@ -30,12 +32,15 @@ class WinnersPlotlyBarChart:
             xaxis_title=None,
             yaxis_title="Profit",
             font=dict(size=12),
+            bargap=0.45,        # 👈 more air between bars
+            bargroupgap=0.1,
         )
 
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
 
         return fig
+
 
 class LosersPlotlyBarChart:
     def render(self, data):
@@ -55,6 +60,7 @@ class LosersPlotlyBarChart:
                 color="#e74c3c",
                 line=dict(width=0),
             ),
+            width=0.35,  # 👈 slimmer bars
             texttemplate="%{text:.2f}",
             textposition="outside",
         )
@@ -66,12 +72,15 @@ class LosersPlotlyBarChart:
             xaxis_title=None,
             yaxis_title="Profit",
             font=dict(size=12),
+            bargap=0.45,
+            bargroupgap=0.1,
         )
 
         fig.update_xaxes(showgrid=False)
         fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
 
         return fig
+
 
 class PortfolioPerformancePlotlyLineChart:
     def render(self, data):
@@ -86,7 +95,7 @@ class PortfolioPerformancePlotlyLineChart:
 
         fig.update_traces(
             line=dict(
-                width=3,
+                width=1,
                 color="#34495e",
             ),
             mode="lines",

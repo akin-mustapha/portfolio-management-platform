@@ -17,7 +17,6 @@ def asset_table(data=None):
     columnDefs=[
         {"field": "name"},
         {"field": "asset_description"},
-        {"field": "data_date"},
         {
             "field": "value",
             "valueFormatter": {"function": "d3.format(',.2f')(params.value)"}
@@ -144,6 +143,7 @@ def asset_table(data=None):
                 }
                 ]
             }
-        }
+        },
+        {"field": "data_date"}
     ]
   )
