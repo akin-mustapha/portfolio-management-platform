@@ -5,7 +5,7 @@ import pandas as pd
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from src.dashboard.src.components.kpi import kpi_row
+from src.dashboard.src.pages.portfolio.kpis import kpi_row
 from src.dashboard.src.components.cards import card
 from src.dashboard.src.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
 from src.dashboard.src.pages.portfolio.tables import (
@@ -13,17 +13,11 @@ from src.dashboard.src.pages.portfolio.tables import (
 )
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.services.portfolio_service import PortfolioService
-# ──────────────────────────────────────────── ─
+from src.dashboard.src.services.local_portfolio_service import LocalPortfolioService
+from src.dashboard.src.services.local_asset_service import LocalAssetService
+# ─────────────────────────────────────────────
 # Section builders
 # ─────────────────────────────────────────────
-# def performance_section(df):
-#     return card(
-#         "Performance",
-#         dcc.Graph(
-#             figure=WinnersPlotlyBarChart(),
-#             config={"displayModeBar": False},
-#         ),
-#     )
 def asset_section():
     return html.Div(
         id="portfolio_page_asset_table_container",
@@ -46,12 +40,12 @@ def value_chart(data=None):
 # ─────────────────────────────────────────────
 # Page layout
 # ─────────────────────────────────────────────
-def portfolio_layout(df):
+def portfolio_layout():
     return html.Div([
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
         # KPIs
-        kpi_row(df),
+        kpi_row(),
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
@@ -92,14 +86,18 @@ def load_portfolio_page(pathname, cached_data):
     # Decide data source
     cached_data = dict()
     if cached_data.get("asset_data", None) is None:
-        asset_data_df = AssetService.get_asset_data()
+        # TODO: UNCOMMENT CODE
+        # asset_data_df = AssetService.get_asset_data()
+        asset_data_df = LocalAssetService.get_asset_data()
         asset_data_dict = asset_data_df.to_dict("records")
         cached_data.update({"asset_data": asset_data_dict })
     else:
         asset_data_df = pd.DataFrame(cached_data.get("asset_data", {}))
     
     if cached_data.get("portfolio_return_data", None) is None:
-        return_data = PortfolioService().get_unrealized_profit()
+        # TODO: UNCOMMENT CODE
+        # return_data = PortfolioService().get_unrealized_profit()
+        return_data = LocalPortfolioService().get_unrealized_profit()
         cached_data.update({"portfolio_return_data": return_data})
     else:
         return_data = cached_data.get("portfolio_return_data", {})

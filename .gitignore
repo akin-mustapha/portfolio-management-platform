@@ -6,3 +6,11 @@ __pycache__/
 *.pyc
 *.db
 *.ini
+data/csv/asset_data.csv
+data/csv/asset_snapshot.csv
+data/csv/assets.csv
+data/csv/asset.csv
+data/csv/portfolio.csv
+data/csv/tags.csv
+data/database/dev_1.db-journal
+data/csv/unrealized_return.csv

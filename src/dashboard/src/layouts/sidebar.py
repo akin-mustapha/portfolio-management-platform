@@ -41,7 +41,7 @@ sidebar = html.Div([
             dbc.NavLink("Assets", href="/assets", active="exact"),
             dbc.NavLink("Tag", href="/tag", active="exact"),
         ],
-        vertical=True,
+        # vertical=True,
         pills=True,
         className="mt-3"
     )

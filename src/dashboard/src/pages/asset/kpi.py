@@ -11,16 +11,6 @@ def kpi(title, value, color="primary"):
         className="shadow-sm"
     )
 
-def kpi_row(df):
-  return dbc.Row(
-          [
-            dbc.Col(kpi("Portfolio Value", "€100", "white")),
-            dbc.Col(kpi("Unrealized P&L", "+€50", "success")),
-            dbc.Col(kpi("Realized P&L", "+€60", "success"))
-          ],
-          className="mb-4"
-        )
-
 def asset_kpi_row(df):
   return dbc.Row(
           [
