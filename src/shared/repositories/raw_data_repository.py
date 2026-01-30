@@ -1,0 +1,73 @@
+import os
+import logging
+from abc import ABC
+from typing import Dict
+from dotenv import load_dotenv
+from datetime import datetime, UTC
+from src.shared.database.client import SQLModelClient
+
+logging.basicConfig(level=logging.INFO, filename='logs/info.log', filemode='a', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
+
+load_dotenv()
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+class RawDataRepository:
+    def __init__(self):
+        self._client = SQLModelClient(DATABASE_URL)
+
+    def insert(self, record: Dict):
+        logging.debug(f"Preparing to insert record into {record}")
+        column_names = ", ".join(record.keys())
+        placeholders = ", ".join(f":{key}" for key in record.keys())
+
+        sql = f"INSERT INTO raw_data ({column_names}) VALUES ({placeholders})"
+
+        logging.debug(f"Executing query: {sql} with params: {record}")
+
+        with self._client as client:
+            res = client.execute(sql, record)
+
+        logging.info(f"Inserted record into raw_data")
+
+        return {**record, "id": res.lastrowid}
+
+    def select(self, source: str):
+        logging.info(f"Fetching raw data from source: {source}")
+        with self._client as client:
+            result = client.execute("""
+                                    SELECT id, payload
+                                    FROM raw_data
+                                    WHERE   source = :source
+                                        AND is_processed = :is_processed
+                                    ORDER BY id
+                                    LIMIT 1""", 
+                                {"source": source, "is_processed": False})
+            data = result.first()
+        logging.info(f"Fetched {len(data)} records from source: {source}")
+        return data
+
+    def process_raw_data(self, id: int):
+        logging.info(f"Processing raw data with id: {id}")
+        with self._client as client:
+            result = client.execute(
+                """UPDATE raw_data
+                    SET is_processed = :is_processed
+                      , processed_datetime = :processed_datetime
+                    WHERE id = :id""",
+                {"is_processed": True, "id": id, "processed_datetime": datetime.now(UTC)})
+        
+
+if __name__ == "__main__":
+    pass
+    # database_client = SQLModelClient(database_url="sqlite:///./data/trading212.db")
+    # # raw_data_repo = RawDataRepositorySQLite(client=database_client)
+    
+
+    # # Example usage
+    # raw_data_repo.save_raw_data(source="trading212", payload='{"example": "data"}')
+    # data = raw_data_repo.get_raw_data(source="trading212")
+
+    # for record in data:
+    #     raw_data_repo.process_raw_data(id=record.id)

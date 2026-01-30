@@ -3,9 +3,23 @@ python-dotenv
 httpx
 fastapi
 uvicorn
+# Relation DB
 sqlmodel
 alembic
+# Notebook
 ipykernel
+# orchestration
 prefect
+# Test
 pytest-mock
 pytest
+#
+yfinance
+# Dashboard
+dash
+dash-ag-grid
+plotly
+pandas
+dash_design_kit
+dash-bootstrap-components
+nbformat>=4.2.0
