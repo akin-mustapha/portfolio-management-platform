@@ -3,8 +3,6 @@ import json
 import logging
 from datetime import timedelta
 from prefect import flow, task
-from dotenv import load_dotenv
-from datetime import datetime, UTC
 from prefect.cache_policies import NO_CACHE
 from src.services.analytics.query import AssetMetricQuery
 from src.services.analytics.funcs import FuncAssetDerivedMetric

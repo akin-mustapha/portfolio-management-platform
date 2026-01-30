@@ -1,4 +1,4 @@
-from src.services.ingestion_service.infrastructure.repositories import repositories
+from src.services.ingestion.infrastructure.repositories import repositories
 
 class RepositoryFactory:
   registry: {}

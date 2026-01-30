@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict
-from src.services.ingestion_service.application.interfaces import Data
-from src.services.ingestion_service.application.interfaces import Sink
+from src.services.ingestion.app.interfaces import Data
+from src.services.ingestion.app.interfaces import Sink
 from src.shared.repositories.raw_data_repository import RawDataRepository
 
 
