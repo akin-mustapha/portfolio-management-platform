@@ -8,7 +8,7 @@ from src.shared.utils.custom_logger import customer_logger
 
 logging = customer_logger("asset_flow_run")
 
-@task(retry_delay_seconds=30, retries=2, cache_policy=NO_CACHE)
+@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_run_asset_pipeline():
     pipeline = PipelineFactory.get("trading212AssetPipeline")
     pipeline.run()
