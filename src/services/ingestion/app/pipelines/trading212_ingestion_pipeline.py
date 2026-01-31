@@ -2,11 +2,11 @@ import logging
 from typing import List, Any
 from dataclasses import replace
 from datetime import datetime, UTC
-from src.services.ingestion_service.application.interfaces import Sink
-from src.services.ingestion_service.application.interfaces import Source
-from src.services.ingestion_service.application.interfaces import Destination
-from src.services.ingestion_service.application.interfaces import Transformation
-from src.services.ingestion_service.application.interfaces import Pipeline
+from src.services.ingestion.app.interfaces import Sink
+from src.services.ingestion.app.interfaces import Source
+from src.services.ingestion.app.interfaces import Destination
+from src.services.ingestion.app.interfaces import Transformation
+from src.services.ingestion.app.interfaces import Pipeline
 
 
 logging.basicConfig(level="INFO")

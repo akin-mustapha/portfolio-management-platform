@@ -1,8 +1,8 @@
 from typing import Dict
 from datetime import datetime, UTC
-from src.services.ingestion_service.application.interfaces import Data
+from src.services.ingestion.app.interfaces import Data
 from src.shared.repositories.entity_repository import EntityRepository
-from src.services.ingestion_service.application.interfaces import Transformation
+from src.services.ingestion.app.interfaces import Transformation
 
 
 class Trading212AssetTransformation(Transformation):

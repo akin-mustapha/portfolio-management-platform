@@ -59,3 +59,33 @@
 .DayPickerNavigation_button {
     filter: invert(80%);
 } */
+
+/* Track */
+.timeframe-slider .rc-slider-track {
+    background-color: #386f9a; /* active line */
+}
+
+/* Rail (inactive line) */
+.timeframe-slider .rc-slider-rail {
+    /* background-color: #e0e0e0; */
+}
+
+/* Handle (the knob) */
+.timeframe-slider .rc-slider-handle {
+    border: solid 3px #386f9a;
+    /* background-color: white; */
+    width: 16px;
+    height: 16px;
+    margin-top: -6px;
+}
+
+/* Hover glow */
+.timeframe-slider .rc-slider-handle:hover {
+    border-color: #151212;
+}
+
+/* Marks text */
+.timeframe-slider .rc-slider-mark-text {
+    color: #555;
+    font-weight: 500;
+}

@@ -2,6 +2,7 @@ from typing import Protocol
 from abc import ABC, abstractmethod
 
 class Calc(ABC):
+  @abstractmethod
   def run(self):
     raise NotImplementedError
 

@@ -1,11 +1,8 @@
-import httpx
-import asyncio
-import base64
-from urllib.parse import urljoin
-import logging
 import os
-
-DEBUG = 1
+import httpx
+import base64
+import logging
+from urllib.parse import urljoin
 
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
@@ -23,7 +20,6 @@ class Trading212APIClient:
         token = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
 
         logging.info(token)
-
         return token
 
     async def get(self, endpoint: str) -> dict:

@@ -1,8 +1,6 @@
-import os
-from dotenv import load_dotenv
 from typing import List, Dict
 from src.shared.repositories.entity_repository import EntityRepository
-from src.services.ingestion_service.application.interfaces import Destination
+from src.services.ingestion.app.interfaces import Destination
 
 class Trading212AssetDestination(Destination):
   def __init__(self):

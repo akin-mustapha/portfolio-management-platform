@@ -118,6 +118,17 @@ def assets_tab(df):
 def asset_page_filter(data):
     df = pd.DataFrame(data)
     ASSET_NAMES = sorted(df["asset_description"].unique())
+    # get unique, sorted dates
+    dates = sorted(df['data_date'].dt.date.unique())
+    TIMEFRAMES = {
+        0: ("1D", 0),
+        1: ("1W", 7),
+        2: ("1M", 30),
+        3: ("3M", 90),
+        4: ("6M", 180),
+        5: ("1Y", 365),
+        6: ("ALL", None),
+    }
     return dbc.Row(
         dbc.Row([
             # dbc.Col(dbc.Select(id="assetpage_asset_select",
@@ -139,10 +150,40 @@ def asset_page_filter(data):
                     start_date_placeholder_text="Start",
                     end_date_placeholder_text="End",
                 )
-            ], md=4),
+            ], md=2),
+            dbc.Col([
+                # dcc.Slider(1, 30, 7, value=1, id='my-slider', marks={
+                #     1: "1D",
+                #     7: "1W",
+                #     14: "2W",
+                #     30: "1M",
+                # }),
+                html.Div([
+                    html.Label("Timeframe"),
+                    # dcc.Slider(
+                    #     id='date-slider',
+                    #     min=0,
+                    #     max=len(df)-1,
+                    #     value=len(df)-1,
+                    #     marks={
+                    #         i: dates[i].strftime('%b %d')
+                    #         for i in range(0, len(dates), max(1, len(dates)//10))},
+                    #     step=1
+                    # )
+                    dcc.Slider(
+                        id="date-slider",
+                        className="timeframe-slider",
+                        min=0,
+                        max=len(TIMEFRAMES) - 1,
+                        value=0,  # default = 1Y
+                        step=1,
+                        marks={k: v[0] for k, v in TIMEFRAMES.items()},
+                )
+                ]),
+            ], md=2),
             dbc.Col([
                 dbc.Button("Submit", id="asset_page_filter_btn")
-            ], md=4)
+            ], md=2)
         ], className="mb-3")
     )
 # Duplicate logic. Needed
@@ -289,6 +330,7 @@ def load_asset_page(pathname):
     # TODO: UNCOMMENT TO CONNECT TO DB
     # df = AssetService.get_asset_data()
     df = LocalAssetService.get_asset_data()
+    df['data_date'] = pd.to_datetime(df['data_date'])
     if df.empty:
         raise PreventUpdate
     data = df.to_dict("records")

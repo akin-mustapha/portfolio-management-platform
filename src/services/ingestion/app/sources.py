@@ -2,8 +2,8 @@ import os
 import asyncio
 from dotenv import load_dotenv
 
-from src.services.ingestion_service.application.interfaces import Source
-from src.services.ingestion_service.api.trading212_api_client import Trading212APIClient
+from src.services.ingestion.app.interfaces import Source
+from src.services.ingestion.api.trading212_api_client import Trading212APIClient
 
 load_dotenv()
 

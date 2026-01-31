@@ -1,9 +1,9 @@
-from src.services.ingestion_service.application.interfaces import Pipeline
-from src.services.ingestion_service.application.pipelines import Trading212IngestionPipeline
-from src.services.ingestion_service.application.sources import Trading212AssetSource, Trading212AssetSnapshotSource, Trading212PortfolioSnapshotSource
-from src.services.ingestion_service.application.trasformations import Trading212AssetTransformation, Trading212AssetSnapshotTransformation, Trading212PortfolioSnapshotTransformation
-from src.services.ingestion_service.application.destinations import Trading212AssetDestination, Trading212AssetSnapshotDestination, Trading212PortfolioSnapshotDestination
-from src.services.ingestion_service.application.sink import Trading212AssetSink, Trading212AssetSnapshotSink, Trading212PortfolioSnapshotSink
+from src.services.ingestion.app.interfaces import Pipeline
+from src.services.ingestion.app.pipelines import Trading212IngestionPipeline
+from src.services.ingestion.app.sources import Trading212AssetSource, Trading212AssetSnapshotSource, Trading212PortfolioSnapshotSource
+from src.services.ingestion.app.trasformations import Trading212AssetTransformation, Trading212AssetSnapshotTransformation, Trading212PortfolioSnapshotTransformation
+from src.services.ingestion.app.destinations import Trading212AssetDestination, Trading212AssetSnapshotDestination, Trading212PortfolioSnapshotDestination
+from src.services.ingestion.app.sink import Trading212AssetSink, Trading212AssetSnapshotSink, Trading212PortfolioSnapshotSink
 
 PIPELINE_REGISTRY = {}
 
