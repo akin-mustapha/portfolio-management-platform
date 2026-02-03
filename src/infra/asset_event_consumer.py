@@ -105,7 +105,7 @@ class Trading212AssetConsumer:
       "source": event.get('source', ''),
       "payload": json.dumps(event.get('payload', '')),
       "is_processed": 1,
-      "created_datetime": event.get('data_datetime', ''),
+      "created_datetime": datetime.now(UTC),
       "processed_datetime": "",
     }
     self._raw_data_repo.insert(record=data)
