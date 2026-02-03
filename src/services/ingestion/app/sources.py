@@ -48,3 +48,15 @@ class Trading212PortfolioSnapshotSource(Source):
     data = asyncio.run(self._api_client.get(endpoint=self._endpoint))
     data = self._to_data(data)
     return data
+  
+class Trading212AllInstrumentSource(Source):
+  def __init__(self):
+    self._url = URL
+    self._endpoint = "equity/metadata/instruments"
+    self._api_token = API_TOKEN
+    self._secret_token = SECRET_TOKEN
+    self._api_client = Trading212APIClient(self._url, self._api_token, self._secret_token)
+  def fetch(self):
+    data = asyncio.run(self._api_client.get(endpoint=self._endpoint))
+    data = self._to_data(data)
+    return data

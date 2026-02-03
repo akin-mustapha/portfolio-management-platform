@@ -4,7 +4,7 @@ import pandas as pd
 
 if __name__ == "__main__":
   df_asset_data = AssetService().get_asset_data()
-  df_asset_snapshot = AssetService().get_asset_snapshot('2026-01-01', '2026-01-30')
+  df_asset_snapshot = AssetService().get_asset_snapshot('2026-01-01', '2026-02-28')
   df_all_tags = AssetService().get_all_tag()
   df_all_assets = AssetService().get_all_asset()
   df_unrealized_return = pd.DataFrame(PortfolioService().get_unrealized_profit())
