@@ -3,12 +3,12 @@ import json
 
 consumer = Consumer({
     "bootstrap.servers": "localhost:9092",
-    "group.id": "discovery-group-4",
+    "group.id": "discovery-group-1",
     # "auto.offset.reset": "earliest",
     "enable.auto.commit": True
 })
 
-consumer.subscribe(["asset"])
+consumer.subscribe(["asset.ingestion"])
 
 print("Listening for messages…")
 while True:

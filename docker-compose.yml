@@ -4,7 +4,6 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"       # internal Docker access
-      - "29092:29092"     # host access
     environment:
       KAFKA_KRAFT_MODE: 'true'
       CLUSTER_ID: 'f94c3fe5dd4330061677212d39fffbc16b8d3bd801793a0b38ddc85abe54c58c'

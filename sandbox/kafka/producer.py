@@ -22,10 +22,10 @@ def delivery_report(err, msg):
     else:
         print(f"Message delivered to {msg.topic()} [{msg.partition()}] at offset {msg.offset()}")
 
-# Update produce call
-producer.produce("asset", json.dumps(event), callback=delivery_report)
-producer.poll(3.0) # Serve delivery reports
-producer.flush()
 
-
-print("Message produced ✅")
+def send():
+    # Update produce call
+    producer.produce("asset.ingestion", json.dumps(event), callback=delivery_report)
+    producer.poll(3.0) # Serve delivery reports
+    producer.flush()
+    print("Message produced ✅")
