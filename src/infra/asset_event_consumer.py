@@ -1,43 +1,60 @@
 from confluent_kafka import Consumer
+import os
 import json
 from typing import Dict
 from datetime import datetime, UTC
 from src.services.ingestion.app.interfaces import Data
 from src.shared.repositories.entity_repository import EntityRepository
 from src.shared.repositories.raw_data_repository import RawDataRepository
+import logging
 
 
+log_dir_name = 'logs'
+os.path.exists(log_dir_name) or os.makedirs(log_dir_name)
+logging.basicConfig(
+  level=logging.INFO,
+  filename=f'{log_dir_name}/asset_event_consumer_run.log',
+  filemode='a',
+  format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+  )
 class Trading212AssetConsumer:
   """
     Trading212AssetConsumer:
   """
-  _consumer = Consumer({
-      "bootstrap.servers": "localhost:9092",
-      "group.id": "discovery-group-1",
-      # "auto.offset.reset": "earliest",
-      "enable.auto.commit": True
-  })
-  _topic: list[str] = ["asset.ingestion"]
-  _raw_data_repo = RawDataRepository()
-  _asset_repo = EntityRepository("asset")
-  _asset_snapshot_repo = EntityRepository("asset_snapshot")
+  def __init__(self):
+    logging.info("Initializing Tradin212AssetConsumer")
+    self._consumer = Consumer({
+        "bootstrap.servers": "localhost:9092",
+        "group.id": "discovery-group-1",
+        # "auto.offset.reset": "earliest",
+        "enable.auto.commit": True
+    })
+    self._topic: list[str] = ["asset.ingestion"]
+    self._raw_data_repo = RawDataRepository()
+    self._asset_repo = EntityRepository("asset")
+    self._asset_snapshot_repo = EntityRepository("asset_snapshot")
 
   def run(self):
+    logging.info("Subcribing to topic : %s", self._topic)
     self._consumer.subscribe(self._topic)
-    print("Listening for messages…")
+    logging.info("Listening for messages…")
     while True:
         msg = self._consumer.poll(3.0)  # 1 second timeout
         if msg is None:
             continue
         if msg.error():
-            print("Error:", msg.error())
+            logging.error("Error:", msg.error())
             continue
+        
+        logging.info("Decoding Message")
         event = json.loads(msg.value().decode())
         record = event.get("payload", [])
+        logging.info("Consuming Asset")
         self._consume_asset(record)
+        logging.info("Consuming Asset Snapshot")
         self._consume_asset_snapshot(record)
+        logging.info("Saving Raw Data")
         self._to_sink(event)
-        print("Received")
 
   def _consume_asset(self, record: list) -> list[Dict]:
     record = self._extract_asset(record)
@@ -98,6 +115,7 @@ class Trading212AssetConsumer:
      self._asset_repo.upsert(records=record, unique_key='external_id')
 
   def _load_asset_snapshot(self, record):
+     logging.info("Inserting Snapshot Data")
      self._asset_snapshot_repo.insert(records=record)
 
   def _to_sink(self, event):
@@ -108,6 +126,7 @@ class Trading212AssetConsumer:
       "created_datetime": datetime.now(UTC),
       "processed_datetime": "",
     }
+    logging.info("Inserting raw data")
     self._raw_data_repo.insert(record=data)
      
      
