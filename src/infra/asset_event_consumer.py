@@ -49,10 +49,14 @@ class Trading212AssetConsumer:
         logging.info("Decoding Message")
         event = json.loads(msg.value().decode())
         record = event.get("payload", [])
-        logging.info("Consuming Asset")
-        self._consume_asset(record)
-        logging.info("Consuming Asset Snapshot")
-        self._consume_asset_snapshot(record)
+
+        # Api error check
+        if isinstance(record, dict) and record.get("error", None) == None:
+          logging.info("Consuming Asset")
+          self._consume_asset(record)
+          logging.info("Consuming Asset Snapshot")
+          self._consume_asset_snapshot(record)
+
         logging.info("Saving Raw Data")
         self._to_sink(event)
 

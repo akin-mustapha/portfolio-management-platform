@@ -8,9 +8,11 @@
   touch .env
 ```
 
-- Make sure .env is in gitignore
+- Make sure `.env` is in `gitignore`
 
-### Parameters
+### Variables
+
+Add the following variables to env file
 
 - API_URL
 - API_TOKEN
@@ -20,5 +22,7 @@
 ## Set Prefect server port
 
 - deploy/prefect_deploy.sh
+- Start Kafka
+- Start Consumer
 
 ### Set Alembic ini

@@ -2,7 +2,18 @@
 
 ## Tools
 
+### Docker
+
+```sh
+  docker compose down --remove-orphans
+  docker compose up -d
+```
+
 ### Migration
+
+```sh
+  alembic init <migration name>
+```
 
 #### Create new migration
 
