@@ -3,9 +3,8 @@ import os
 import json
 from typing import Dict
 from datetime import datetime, UTC
-from src.services.ingestion.app.interfaces import Data
-from src.shared.repositories.entity_repository import EntityRepository
-from src.shared.repositories.raw_data_repository import RawDataRepository
+from src.infra.repositories.entity_repository import EntityRepositoryFactory
+from src.infra.repositories.raw_data_repository import RawDataRepository
 import logging
 
 
@@ -31,8 +30,8 @@ class Trading212AssetConsumer:
     })
     self._topic: list[str] = ["asset.ingestion"]
     self._raw_data_repo = RawDataRepository()
-    self._asset_repo = EntityRepository("asset")
-    self._asset_snapshot_repo = EntityRepository("asset_snapshot")
+    self._asset_repo = EntityRepositoryFactory.get_repository("asset", schema_name="portfolio")
+    self._asset_snapshot_repo = EntityRepositoryFactory.get_repository("asset_snapshot", schema_name="portfolio")
 
   def run(self):
     logging.info("Subcribing to topic : %s", self._topic)

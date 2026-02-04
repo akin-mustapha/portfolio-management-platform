@@ -4,10 +4,10 @@ import logging
 from datetime import timedelta
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
-from src.services.analytics.query import AssetMetricQuery
-from src.services.analytics.funcs import FuncAssetDerivedMetric
-from src.services.analytics.sink import SinkAssetMetric
-from src.services.analytics.processes import CalcAssetMetric
+from src.app.services.analytics.query import AssetMetricQuery
+from src.app.services.analytics.funcs import FuncAssetDerivedMetric
+from src.app.services.analytics.sink import SinkAssetMetric
+from src.app.services.analytics.processes import CalcAssetMetric
 
 from src.shared.utils.custom_logger import customer_logger
 

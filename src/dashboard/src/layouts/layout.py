@@ -9,7 +9,7 @@ from src.dashboard.src.pages.tag.tag_page import tag_layout
 from src.dashboard.src.services.asset_service import AssetService
 # from src.dashboard.src.layouts.sidebar import content, sidebar
 from src.dashboard.src.layouts.horizontal_sidebar import horizontal_sidebar, content
-from src.services.tagging_service.application. tagging_service_builder import build_tagging_service
+from src.app.services.portfolio.application. tagging_service_builder import build_tagging_service
 
 from src.dashboard.src.components.buttons import btn_side_toggle
 # extraction

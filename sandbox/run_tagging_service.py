@@ -5,16 +5,15 @@ from dotenv import load_dotenv
 from random import randint
 from datetime import UTC, datetime
 
-from src.shared.database.client import SQLModelClient
-from src.services.tagging_service.domain.models.models import Item, Item_tag, Tag
-from src.services.tagging_service.infrastructure.repositories.interface import BaseRepository
-from src.services.ingestion.infrastructure.repositories.entity_repository import EntityRepository
-from src.services.tagging_service.infrastructure.repositories.repositories import DomainRepositoryFactory
-from src.shared.repositories.query_repository import ItemSQLQueryRepository
+from src.infra.database.client import SQLModelClient
+from src.app.domain.models.models import Item, Item_tag, Tag
+from src.infra.repositories.entity_repository import EntityRepositoryFactory
+from src.infra.repositories.repositories import DomainRepositoryFactory
+from src.infra.repositories.query_repository import ItemSQLQueryRepository
 from src.shared.utils.custom_logger import customer_logger
-from src.services.tagging_service.application.service import TaggingService
+from src.app.services.portfolio.service import PortfolioService
 
-logging = customer_logger("Tagging Service")
+logging = customer_logger("Portfolio Service")
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -43,12 +42,12 @@ if __name__ == "__main__":
           )
   database_client = SQLModelClient(database_url=DATABASE_URL)
 
-  item_repo = DomainRepositoryFactory.get_repository("item", EntityRepository("asset", client=database_client))
-  tag_repo = DomainRepositoryFactory.get_repository("tag", EntityRepository("tag", client=database_client))
-  item_tag_repo = DomainRepositoryFactory.get_repository("item_tag", EntityRepository("asset_tag", client=database_client))
+  item_repo = EntityRepositoryFactory.get_repository("asset", schema_name="portfolio")
+  tag_repo = EntityRepositoryFactory.get_repository("tag", schema_name="portfolio")
+  item_tag_repo = EntityRepositoryFactory.get_repository("asset_tag", schema_name="portfolio")
   item_query_repo = ItemSQLQueryRepository(database_client)
 
-  tag_service = TaggingService(item_repo, tag_repo, item_tag_repo, item_query_repo)
+  tag_service = PortfolioService(item_repo, tag_repo, item_tag_repo, item_query_repo)
 
   # res = tag_service.create_item(t_item)
   # print(res)
