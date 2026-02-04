@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -22,14 +23,13 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
         "raw_data",
-        sa.Column('id', sa.UUID, primary_key=True),
-        sa.Column('source', sa.String),
-        sa.Column('payload', sa.String),
-        sa.Column('is_processed', sa.Boolean, default=False),
-        sa.Column('created_datetime', sa.DateTime, default=sa.func.now()),
-        sa.Column('processed_datetime', sa.DateTime),
-        
-        schema='staging'
+        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column("source", sa.String, nullable=False),
+        sa.Column("payload", postgresql.JSONB, nullable=False),
+        sa.Column("is_processed", sa.Boolean, server_default=sa.false(), nullable=False),
+        sa.Column("created_datetime", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("processed_datetime", sa.DateTime(timezone=True)),
+        schema="staging"
     )
 
 

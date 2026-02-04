@@ -6,9 +6,9 @@ Create Date: 2026-02-04 18:14:23.679537
 
 """
 from typing import Sequence, Union
-
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -22,55 +22,54 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
         "asset",
-        sa.Column('id', sa.UUID, primary_key=True),
-        sa.Column('external_id', sa.String, unique=True),
-        sa.Column('name', sa.String),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column('external_id', sa.String, unique=True, nullable=False),
+        sa.Column('name', sa.String, nullable=False),
         sa.Column('description', sa.String),
         sa.Column('source_name', sa.String),
-        sa.Column('is_active', sa.Boolean, default=True),
-        sa.Column('created_timestamp', sa.DateTime, default=sa.func.now()),
+        sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
+        sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_timestamp', sa.DateTime),
-
         schema='portfolio'
     )
+
     op.create_table(
         "tag_category",
-        sa.Column('id', sa.UUID, primary_key=True),
-        sa.Column('name', sa.String, unique=True),
-        sa.Column('is_active', sa.Boolean, default=True),
-        sa.Column('created_timestamp', sa.DateTime, default=sa.func.now()),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column('name', sa.String, unique=True, nullable=False),
+        sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
+        sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_timestamp', sa.DateTime),
-
         schema='portfolio'
     )
+
     op.create_table(
         "tag",
-        sa.Column('id', sa.UUID, primary_key=True),
-        sa.Column('name', sa.String, unique=True),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column('name', sa.String, unique=True, nullable=False),
         sa.Column('description', sa.String),
-        sa.Column('tag_category_id', sa.UUID, sa.ForeignKey('portfolio.tag_category.id')),
-        sa.Column('is_active', sa.Boolean, default=True),
-        sa.Column('created_timestamp', sa.DateTime, default=sa.func.now()),
+        sa.Column('tag_category_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.tag_category.id')),
+        sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
+        sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_timestamp', sa.DateTime),
         schema='portfolio'
     )
-
 
     op.create_table(
         "asset_tag",
-        sa.Column('asset_id', sa.UUID, sa.ForeignKey('portfolio.asset.id'), primary_key=True),
-        sa.Column('tag_id', sa.UUID, sa.ForeignKey('portfolio.tag.id'), primary_key=True),
-        sa.Column('is_active', sa.Boolean, default=True),
-        sa.Column('created_timestamp', sa.DateTime, default=sa.func.now()),
+        sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id'), primary_key=True),
+        sa.Column('tag_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.tag.id'), primary_key=True),
+        sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
+        sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_timestamp', sa.DateTime),
-
         schema='portfolio'
     )
+
     op.create_table(
         "asset_snapshot",
-        sa.Column('id', sa.UUID, primary_key=True),
-        sa.Column('asset_id', sa.UUID, sa.ForeignKey('portfolio.asset.id')),
-        sa.Column('data_date', sa.DateTime),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id')),
+        sa.Column('data_date', sa.DateTime(timezone=True)),
         sa.Column('currency', sa.String),
         sa.Column('local_currency', sa.String),
         sa.Column('share', sa.Float),
@@ -82,11 +81,12 @@ def upgrade() -> None:
         sa.Column('fx_impact', sa.Float),
         schema='portfolio'
     )
+
     op.create_table(
         "asset_metric",
-        sa.Column('id', sa.UUID, primary_key=True),
-        sa.Column('asset_id', sa.UUID, sa.ForeignKey('portfolio.asset.id')),
-        sa.Column('data_date', sa.DateTime),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id')),
+        sa.Column('data_date', sa.DateTime(timezone=True)),
         sa.Column('pct_drawdown', sa.Float),
         sa.Column('recent_high_30d', sa.Float),
         sa.Column('recent_low_30d', sa.Float),
@@ -96,21 +96,20 @@ def upgrade() -> None:
         sa.Column('price_vs_ma_50', sa.Float),
         sa.Column('ma_50', sa.Float),
         sa.Column('dca_bias', sa.Float),
-
         schema='portfolio'
     )
+
     op.create_table(
         "portfolio_snapshot",
-        sa.Column('id', sa.UUID, primary_key=True),
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('external_id', sa.String),
-        sa.Column('data_date', sa.DateTime),
+        sa.Column('data_date', sa.DateTime(timezone=True)),
         sa.Column('currency', sa.String),
         sa.Column('current_value', sa.Float),
         sa.Column('total_value', sa.Float),
         sa.Column('total_cost', sa.Float),
         sa.Column('unrealized_profit', sa.Float),
         sa.Column('realized_profit', sa.Float),
-
         schema='portfolio'
     )
 
@@ -118,9 +117,9 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     op.drop_table('asset_tag', schema='portfolio')
-    op.drop_table('tag_category', schema='portfolio')
     op.drop_table('tag', schema='portfolio')
-    op.drop_table('asset', schema='portfolio')
+    op.drop_table('tag_category', schema='portfolio')
     op.drop_table('asset_snapshot', schema='portfolio')
+    op.drop_table('asset_metric', schema='portfolio')
+    op.drop_table('asset', schema='portfolio')
     op.drop_table('portfolio_snapshot', schema='portfolio')
-
