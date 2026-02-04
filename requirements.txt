@@ -6,6 +6,7 @@ uvicorn
 # Relation DB
 sqlmodel
 alembic
+psycopg2-binary
 # Notebook
 ipykernel
 # orchestration
