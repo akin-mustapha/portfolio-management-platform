@@ -28,7 +28,7 @@ def upgrade() -> None:
         sa.Column("payload", postgresql.JSONB, nullable=False),
         sa.Column("is_processed", sa.Boolean, server_default=sa.false(), nullable=False),
         sa.Column("created_datetime", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("processed_datetime", sa.DateTime(timezone=True)),
+        sa.Column("processed_datetime", sa.DateTime(timezone=True), nullable=True),
         schema="staging"
     )
 

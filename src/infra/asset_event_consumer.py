@@ -3,8 +3,7 @@ import os
 import json
 from typing import Dict
 from datetime import datetime, UTC
-from src.infra.repositories.entity_repository import EntityRepositoryFactory
-from src.infra.repositories.raw_data_repository import RawDataRepository
+from src.infra.repositories.table_repository_factory import TableRepositoryFactory
 import logging
 
 
@@ -29,9 +28,9 @@ class Trading212AssetConsumer:
         "enable.auto.commit": True
     })
     self._topic: list[str] = ["asset.ingestion"]
-    self._raw_data_repo = RawDataRepository()
-    self._asset_repo = EntityRepositoryFactory.get_repository("asset", schema_name="portfolio")
-    self._asset_snapshot_repo = EntityRepositoryFactory.get_repository("asset_snapshot", schema_name="portfolio")
+    self._raw_data_repo = TableRepositoryFactory.get("raw_data")
+    self._asset_repo = TableRepositoryFactory.get("asset")
+    self._asset_snapshot_repo = TableRepositoryFactory.get("asset_snapshot")
 
   def run(self):
     logging.info("Subcribing to topic : %s", self._topic)
@@ -125,9 +124,9 @@ class Trading212AssetConsumer:
     data = {
       "source": event.get('source', ''),
       "payload": json.dumps(event.get('payload', '')),
-      "is_processed": 1,
+      "is_processed": True,
       "created_datetime": datetime.now(UTC),
-      "processed_datetime": "",
+      "processed_datetime": datetime.now(UTC),
     }
     logging.info("Inserting raw data")
     self._raw_data_repo.insert(record=data)

@@ -4,7 +4,7 @@ from src.app.interfaces.ingestion import Data
 from src.app.interfaces.ingestion import Sink
 
 # TODO: Refactor to use repository interface
-from src.infra.repositories.raw_data_repository import RawDataRepositoryFactory
+from src.infra.repositories.table_repository_factory import TableRepositoryFactory
 
 
 class SQLModelRawDataSchema:
@@ -22,21 +22,21 @@ class SQLModelRawDataSchema:
 
 class Trading212AssetSink(Sink, SQLModelRawDataSchema):
   def __init__(self):
-    self._sink_repo = RawDataRepositoryFactory.get_repository(schema_name="staging")
+    self._sink_repo = TableRepositoryFactory.get("raw_data")
   def save(self, data: Data):
     data = self._to_schema(data)
     self._sink_repo.insert(record=data)
 
 class Trading212AssetSnapshotSink(Sink, SQLModelRawDataSchema):
   def __init__(self):
-    self._sink_repo = RawDataRepositoryFactory.get_repository(schema_name="staging")
+    self._sink_repo = TableRepositoryFactory.get("raw_data")
   def save(self, data: Data):
     data = self._to_schema(data)
     self._sink_repo.insert(record=data)
 
 class Trading212PortfolioSnapshotSink(Sink, SQLModelRawDataSchema):
   def __init__(self):
-    self._sink_repo = RawDataRepositoryFactory.get_repository(schema_name="staging")
+    self._sink_repo = TableRepositoryFactory.get("raw_data")
   def save(self, data: Data):
     data = self._to_schema(data)
     self._sink_repo.insert(record=data)

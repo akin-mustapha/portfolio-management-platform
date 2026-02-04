@@ -38,7 +38,7 @@ class AssetMetricQuery:
           ORDER BY data_date
           ROWS BETWEEN 49 PRECEDING AND CURRENT ROW
         ) AS ma_50
-      FROM asset_snapshot
+      FROM portfolio.asset_snapshot
       WHERE asset_id IS NOT NULL;
     """
 

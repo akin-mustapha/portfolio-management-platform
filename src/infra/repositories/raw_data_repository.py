@@ -88,7 +88,7 @@ class SQLiteRawDataRepository(RawDataRepositoryInterface):
 class PostgresRawDataRepository(RawDataRepositoryInterface):
     def __init__(self, schema_name: str = None):
         self._client = SQLModelClient(DATABASE_URL)
-        self._table_name = f"{schema_name}.raw_data" if schema_name else "raw_data"
+        self._table_name = f"{'staging'}.raw_data"
 
     def insert(self, record: Dict) -> Dict:
         columns = ", ".join(record.keys())

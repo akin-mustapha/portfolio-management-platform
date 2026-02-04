@@ -5,6 +5,7 @@ import pandas as pd
 # TODO: Rafactor to use repository interface
 from src.app.interfaces.interface import BaseRepositoryInterface
 from src.infra.repositories.entity_repository import EntityRepositoryFactory
+from src.infra.repositories.table_repository_factory import TableRepositoryFactory
 
 
 class SinkAssetMetric:

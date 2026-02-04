@@ -23,13 +23,17 @@ class BaseTableRepository(BaseRepositoryInterface):
         return {reverse_map.get(k, k): v for k, v in data.items()}
 
     def insert(self, data: Dict):
-        db_data = self._to_db_fields(data)
-        return self._entity_repo.insert(db_data)
+        for record in data:
+            logging.info(f"Inserting data into {self._entity_repo._entity_name}: {record}")
+            db_data = self._to_db_fields(record)
+            self._entity_repo.insert(db_data)
 
     def upsert(self, data: Dict, unique_key: str):
-        db_data = self._to_db_fields(data)
-        db_unique_key = self._field_map.get(unique_key, unique_key)
-        return self._entity_repo.upsert([db_data], unique_key=db_unique_key)
+        for record in data:
+            db_data = self._to_db_fields(record)
+            db_unique_key = self._field_map.get(unique_key, unique_key)
+            self._entity_repo.upsert([db_data], unique_key=db_unique_key)
+
 
     def select(self, params: Dict):
         db_params = self._to_db_fields(params)
