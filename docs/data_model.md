@@ -1,4 +1,4 @@
-# ReadME
+# README
 
 ## Overview
 
@@ -15,6 +15,9 @@ Data model for tagging system
 
 - An **Asset** can have more than one **Tag**
 - A **Tag** can be assigned to more than one **Asset**
+- An **Asset** can belong to an industry
+- An **Asset** can belong to a sector
+- An **Sector** can belong to an industry
 
 ## Action
 
@@ -50,6 +53,15 @@ Constraint
 - Unique(asset_external_id)
 - PK(id)
 <!-- - Unique asset_name -->
+
+### asset_metric
+
+---
+Att
+
+- id
+- asset_id
+- ma_30
 
 ### tag
 
@@ -120,3 +132,11 @@ Constraint
 - Foreign Key tag_id REFERENCE tag.id
 
 ---
+
+## New Data
+
+- industry
+- sector
+- market cap
+- beta
+- ETF (asset list)

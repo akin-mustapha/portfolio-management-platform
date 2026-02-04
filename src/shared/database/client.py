@@ -4,7 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from contextlib import AbstractContextManager
 from sqlmodel import SQLModel, create_engine, Session, text
-from typing import Any, Dict, List, Optional, Tuple, AsyncIterable, Iterable
+from typing import Any, Dict, Optional, Iterable
 
 class DatabaseClient(ABC):
     """Abstract base class for database clients."""

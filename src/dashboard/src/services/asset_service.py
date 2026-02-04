@@ -69,13 +69,12 @@ class AssetService:
                 lm.recent_high_30d, lm.recent_low_30d, lm.pct_drawdown, lm.volatility_30d,
                 lm.price_vs_ma_50, lm.ma_30, lm.ma_50, lm.dca_bias, lm.data_date
         """
-
         with cls._client as client:
             res = client.execute(
                 sql
             )
             res = res.fetchall()
-        return pd.DataFrame([dict(r._mapping) for r in res])  # <<-- this preserves column names
+        return pd.DataFrame([dict(r._mapping) for r in res])
     
     @classmethod
     def get_asset_snapshot(cls, start_date, end_date):
