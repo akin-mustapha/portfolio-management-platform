@@ -6,12 +6,13 @@ from random import randint
 from datetime import UTC, datetime
 
 from src.infra.database.client import SQLModelClient
-from src.app.domain.models.models import Item, Item_tag, Tag
+from src.app.domain.models.models import Asset, AssetTag, Tag
 from src.infra.repositories.entity_repository import EntityRepositoryFactory
 from src.infra.repositories.repositories import DomainRepositoryFactory
 from src.infra.repositories.query_repository import ItemSQLQueryRepository
 from src.shared.utils.custom_logger import customer_logger
 from src.app.services.portfolio.service import PortfolioService
+
 
 logging = customer_logger("Portfolio Service")
 load_dotenv()
@@ -21,7 +22,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 if __name__ == "__main__":
   # Example usage
-  t_item = Item(
+  t_item = Asset(
               id=4,
               external_id=f"instrument_{randint(1000, 9999)}",
               name="Sample Instrument",
@@ -55,14 +56,14 @@ if __name__ == "__main__":
   res_tag = tag_service.create_tag(t_tag)
   print(res_tag)
 
-  t_tag_item = Item_tag(
+  t_tag_item = AssetTag(
                 item_id=randint(1, 20),
                 tag_id=1,
                 is_active=True,
                 created_datetime=datetime.now(UTC),
                 updated_datetime=None,
             )
-  res_tag_item = tag_service.tag_item(t_tag_item)
+  res_tag_item = tag_service.tag_asset(t_tag_item)
   print(res_tag_item)
 
   # tag_service.remove_tag_from_item(t_tag_item)
