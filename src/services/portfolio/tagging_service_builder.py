@@ -16,7 +16,7 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
-def build_tagging_service():
+def build_portfolio_service():
   asset_repo = TableRepositoryFactory.get("asset")
   tag_repo = TableRepositoryFactory.get("tag")
   asset_tag_repo = TableRepositoryFactory.get("asset_tag")

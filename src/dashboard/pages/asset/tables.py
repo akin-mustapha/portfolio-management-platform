@@ -1,4 +1,6 @@
 import dash_ag_grid as dag
+
+
 def asset_table(df):
   decimals = 6
   df['pct_drawdown'] = df['pct_drawdown'].round(decimals=decimals)

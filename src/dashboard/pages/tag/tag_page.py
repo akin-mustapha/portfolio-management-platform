@@ -1,12 +1,12 @@
 from dash import dcc, html, callback, Input, Output, State, dash
 import dash_bootstrap_components as dbc
-from src.dashboard.src.components.cards import card
-from src.services.portfolio.tagging_service_builder import build_tagging_service
-from src.dashboard.src.services.asset_service import AssetService
-from src.dashboard.src.services.local_asset_service import LocalAssetService
-from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
-from src.dashboard.src.components.tables.table import create_table
-from src.dashboard.src.components.select import create_select
+from src.dashboard.components.cards import card
+from src.services.portfolio.tagging_service_builder import build_portfolio_service
+from src.dashboard.services.asset_service import AssetService
+from src.dashboard.services.local_asset_service import LocalAssetService
+from src.dashboard.styles.style import TAB_CONTENT_STYLE
+from src.dashboard.components.tables.table import create_table
+from src.dashboard.components.select import create_select
 import pandas as pd
 
 def create_table_from_df(df, table_name: str):
@@ -15,7 +15,7 @@ def create_table_from_df(df, table_name: str):
 create_dropdown_item_from_list = lambda ls: html.Div([dbc.DropdownMenuItem(item, className="sm") for item in ls])
 
 
-portfolio_serivce = build_tagging_service()
+portfolio_serivce = build_portfolio_service()
 asset_service = AssetService
 tag_df = pd.DataFrame(LocalAssetService.get_all_tag())
 asset_df = pd.DataFrame(LocalAssetService.get_all_asset())
