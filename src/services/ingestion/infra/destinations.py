@@ -8,7 +8,7 @@ class Trading212AssetDestination(Destination):
   def __init__(self, repo):
       self._repo = repo
   def save(self, data: List[Dict]) -> None:
-      self._repo.upsert(data=data, unique_key="external_id")
+      self._repo.upsert(data=data, unique_key=["external_id"])
 
 class Trading212AssetSnapshotDestination(Destination):
   def __init__(self, repo):

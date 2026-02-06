@@ -21,3 +21,12 @@ docker exec -it kafka kafka-topics \
   --partitions 1 \
   --replication-factor 1
 ```
+
+```sh
+docker exec -it kafka kafka-topics \
+  --create \
+  --topic analytics.ingestion \
+  --bootstrap-server localhost:9092 \
+  --partitions 1 \
+  --replication-factor 1
+```

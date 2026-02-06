@@ -55,15 +55,15 @@ class SQLiteDatabaseClient(DatabaseClientInterface):
             logging.info(f"Inserted record into {self._entity_name}")
         return res
 
-    def upsert(self, records: Iterable[Dict], unique_key: str):
+    def upsert(self, records: Iterable[Dict], unique_key: list[str]):
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k != unique_key)
+            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in unique_key)
             sql = f"""
                 INSERT INTO {self._entity_name} ({columns})
                 VALUES ({placeholders})
-                ON CONFLICT({unique_key}) DO UPDATE SET {updates}
+                ON CONFLICT({', '.join(unique_key)}) DO UPDATE SET {updates}
             """
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self._client as client:
@@ -101,10 +101,15 @@ class PostgresDatabaseClient(DatabaseClientInterface):
         where_clause = " AND ".join(f"{k} = :{k}" for k in params.keys())
         sql = f"SELECT * FROM {self._entity_name} WHERE {where_clause}"
         logging.info(f"Selecting record from {self._entity_name}")
+
         with self._client as client:
             result = client.execute(sql, params)
-        logging.info(f"Count of records fetched: {result.rowcount}")
-        return result.first()
+            row = result.first()
+
+            logging.info(f"Count of records fetched: {result.rowcount}")
+            if not row:
+                return None
+            return dict(row._mapping)
 
     def select_all(self):
         sql = f"SELECT * FROM {self._entity_name}"
@@ -117,7 +122,6 @@ class PostgresDatabaseClient(DatabaseClientInterface):
     def insert(self, records: Iterable[Dict]):
         if not isinstance(records, list):
             records = [records]
-        print(records)
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
@@ -128,15 +132,15 @@ class PostgresDatabaseClient(DatabaseClientInterface):
             logging.info(f"Inserted record into {self._entity_name}")
         return res
 
-    def upsert(self, records: Iterable[Dict], unique_key: str):
+    def upsert(self, records: Iterable[Dict], unique_key: list[str]):
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k != unique_key)
+            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in unique_key)
             sql = f"""
                 INSERT INTO {self._entity_name} ({columns})
                 VALUES ({placeholders})
-                ON CONFLICT({unique_key}) DO UPDATE SET {updates}
+                ON CONFLICT({', '.join(unique_key)}) DO UPDATE SET {updates}
             """
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self._client as client:

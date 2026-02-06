@@ -69,7 +69,7 @@ def upgrade() -> None:
         "asset_snapshot",
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id')),
-        sa.Column('data_date', sa.DateTime(timezone=True)),
+        sa.Column('data_timestamp', sa.DateTime(timezone=True)),
         sa.Column('currency', sa.String),
         sa.Column('local_currency', sa.String),
         sa.Column('share', sa.Float),
@@ -83,18 +83,18 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        "asset_metric",
+        "asset_derived_metrics",
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id')),
-        sa.Column('data_date', sa.DateTime(timezone=True)),
+        sa.Column('data_timestamp', sa.DateTime(timezone=True)),
         sa.Column('pct_drawdown', sa.Float),
         sa.Column('recent_high_30d', sa.Float),
         sa.Column('recent_low_30d', sa.Float),
-        sa.Column('ma_30', sa.Float),
+        sa.Column('ma_30d', sa.Float),
         sa.Column('norm_price_30d', sa.Float),
         sa.Column('volatility_30d', sa.Float),
-        sa.Column('price_vs_ma_50', sa.Float),
-        sa.Column('ma_50', sa.Float),
+        sa.Column('price_vs_ma_30d', sa.Float),
+        sa.Column('ma_50d', sa.Float),
         sa.Column('dca_bias', sa.Float),
         schema='portfolio'
     )
@@ -103,7 +103,7 @@ def upgrade() -> None:
         "portfolio_snapshot",
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('external_id', sa.String),
-        sa.Column('data_date', sa.DateTime(timezone=True)),
+        sa.Column('data_timestamp', sa.DateTime(timezone=True)),
         sa.Column('currency', sa.String),
         sa.Column('current_value', sa.Float),
         sa.Column('total_value', sa.Float),

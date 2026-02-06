@@ -28,17 +28,17 @@ class BaseTableRepository(BaseRepositoryInterface):
             db_data = self._to_db_fields(record)
             self._entity_repo.insert(db_data)
 
-    def upsert(self, data: Dict, unique_key: str):
+    def upsert(self, data: Dict, unique_key: list[str]):
         for record in data:
             db_data = self._to_db_fields(record)
-            db_unique_key = self._field_map.get(unique_key, unique_key)
+            db_unique_key = [self._field_map.get(k, k) for k in unique_key]
             self._entity_repo.upsert([db_data], unique_key=db_unique_key)
 
     def select(self, params: Dict):
         db_params = self._to_db_fields(params)
         result = self._entity_repo.select(db_params)
         if result:
-            return self._from_db_fields(dict(result))
+            return self._from_db_fields(result)
         return None
 
     def select_all(self):

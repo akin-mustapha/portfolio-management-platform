@@ -1,5 +1,5 @@
 from typing import Dict, Iterable
-from src.services.analytics.infra.repositories.entity_repository import EntityRepositoryFactory
+from src.services.analytics.infra.clients.database.database_client import DatabaseClientFactory
 from src.services.analytics.app.interfaces import BaseRepositoryInterface
 import logging
 
@@ -11,7 +11,7 @@ class BaseTableRepository(BaseRepositoryInterface):
         :param field_map: Mapping from domain name -> DB column name
         """
         self._field_map = field_map or {}
-        self._entity_repo = EntityRepositoryFactory.get_repository(entity_name, schema_name)
+        self._entity_repo = DatabaseClientFactory.get_repository(entity_name, schema_name)
 
     def _to_db_fields(self, data: Dict) -> Dict:
         """Map domain-friendly fields to DB column names."""
@@ -28,10 +28,10 @@ class BaseTableRepository(BaseRepositoryInterface):
             db_data = self._to_db_fields(record)
             self._entity_repo.insert(db_data)
 
-    def upsert(self, data: Dict, unique_key: str):
+    def upsert(self, data: Dict, unique_key: list[str]):
         for record in data:
             db_data = self._to_db_fields(record)
-            db_unique_key = self._field_map.get(unique_key, unique_key)
+            db_unique_key = [self._field_map.get(k, k) for k in unique_key]
             self._entity_repo.upsert([db_data], unique_key=db_unique_key)
 
 

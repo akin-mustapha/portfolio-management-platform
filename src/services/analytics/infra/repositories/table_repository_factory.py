@@ -1,27 +1,17 @@
 import os
-from src.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
-from src.infra.repositories.raw_data_repository import SQLiteRawDataRepository, PostgresRawDataRepository
-from src.infra.repositories.asset_snapshot_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
-
+from src.services.analytics.infra.repositories.asset_metric_repository import PostgresAssetMetricRepository, SQLiteAssetMetricRepository
+from src.services.analytics.infra.repositories.raw_data_repository import SQLiteRawDataRepository, PostgresRawDataRepository
 class TableRepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
     registry = {
-        "asset": {
-            "postgres": PostgresAssetRepository,
-            "sqlite": SQLiteAssetRepository,
+        "asset_metric": {
+            "postgres": PostgresAssetMetricRepository,
+            "sqlite": SQLiteAssetMetricRepository,
         },
         "raw_data": {
             "postgres": PostgresRawDataRepository, 
             "sqlite": SQLiteRawDataRepository
         },
-        "asset_snapshot": {
-          "postgres": PostgresAssetSnapshotRepository, 
-          "sqlite": SQLiteAssetSnapshotRepository
-        },
-        # "portfolio_snapshot": {
-        #   "postgres": PostgresPortfolioSnapshotRepository, 
-        #   "sqlite": SQLitePortfolioSnapshotRepository
-        # },
         # Add more tables here
     }
 
