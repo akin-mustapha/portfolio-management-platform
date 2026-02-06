@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 # from src.shared.database.client import SQLModelClient
-# from src.shared.repositories.query_repository import SnapshotSQLQueryRepository
+# from src.infra.repositories.query_repository import SnapshotSQLQueryRepository
 from dotenv import load_dotenv 
 
 load_dotenv()

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from dotenv import load_dotenv 
 from src.shared.database.client import SQLModelClient
-from src.shared.repositories.query_repository import ItemSQLQueryRepository
+from src.infra.repositories.query_repository import ItemSQLQueryRepository
 
 
 load_dotenv()

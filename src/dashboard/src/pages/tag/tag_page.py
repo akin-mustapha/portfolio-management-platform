@@ -1,7 +1,7 @@
 from dash import dcc, html, callback, Input, Output, State, dash
 import dash_bootstrap_components as dbc
 from src.dashboard.src.components.cards import card
-from src.services.tagging_service.application. tagging_service_builder import build_tagging_service
+from src.app.services.portfolio.application. tagging_service_builder import build_tagging_service
 from src.dashboard.src.services.asset_service import AssetService
 from src.dashboard.src.services.local_asset_service import LocalAssetService
 from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
