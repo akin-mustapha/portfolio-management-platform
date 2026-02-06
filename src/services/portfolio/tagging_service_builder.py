@@ -6,15 +6,9 @@ from dotenv import load_dotenv
 from random import randint
 from datetime import UTC, datetime
 
-from src.infra.database.client import SQLModelClient
-from src.app.domain.models import Item, Item_tag, Tag
-from src.app.interfaces.interface import BaseRepositoryInterface
-from src.infra.repositories.entity_repository import EntityRepositoryFactory
-from src.infra.repositories.repositories import DomainRepositoryFactory
-from src.infra.repositories.table_repository_factory import TableRepositoryFactory
-from src.infra.repositories.query_repository import ItemSQLQueryRepository
+from src.services.portfolio.infra.repositories.table_repository_factory import TableRepositoryFactory
 from src.shared.utils.custom_logger import customer_logger
-from src.app.services.portfolio import PortfolioService
+from src.services.portfolio.service import PortfolioService
 
 logging = customer_logger("Portfolio Service")
 load_dotenv()
@@ -23,9 +17,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 def build_tagging_service():
-  database_client = SQLModelClient(database_url=DATABASE_URL)
-  item_repo = DomainRepositoryFactory.get_repository("asset", TableRepositoryFactory.get_repository("asset", schema_name="portfolio"))
-  tag_repo = DomainRepositoryFactory.get_repository("tag", TableRepositoryFactory.get_repository("tag", schema_name="portfolio"))
-  item_tag_repo = DomainRepositoryFactory.get_repository("asset_tag", TableRepositoryFactory.get_repository("asset_tag", schema_name="portfolio"))
-  item_query_repo = ItemSQLQueryRepository(database_client)
-  return PortfolioService(item_repo, tag_repo, item_tag_repo, item_query_repo)
+  asset_repo = TableRepositoryFactory.get("asset")
+  tag_repo = TableRepositoryFactory.get("tag")
+  asset_tag_repo = TableRepositoryFactory.get("asset_tag")
+  asset_query_repo = TableRepositoryFactory.get("asset_query")
+  return PortfolioService(asset_repo, tag_repo, asset_tag_repo, asset_query_repo)

@@ -2,8 +2,8 @@ import os
 import pandas as pd
 from dotenv import load_dotenv 
 from src.shared.database.client import SQLModelClient
-from src.infra.repositories.query_repository import ItemSQLQueryRepository
 
+from src.services.portfolio.infra.repositories.table_repository_factory import TableRepositoryFactory
 
 load_dotenv()
 
@@ -15,13 +15,13 @@ class AssetService:
     _client = SQLModelClient(database_url=DATABASE_URL)
     @classmethod
     def get_all_asset(cls):
-        repo = ItemSQLQueryRepository(cls._client)
+        repo = TableRepositoryFactory.get("asset_query")
         rows = repo.select_all_asset()
         df = pd.DataFrame([dict(r._mapping) for r in rows])
         return df
     @classmethod
     def get_all_tag(cls):
-        repo = ItemSQLQueryRepository(cls._client)
+        repo = TableRepositoryFactory.get("asset_query")
         rows = repo.select_all_tag()
         df = pd.DataFrame([dict(r._mapping) for r in rows])
         return df
