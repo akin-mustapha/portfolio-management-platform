@@ -2,8 +2,6 @@
 import dash
 from dash import Input, Output, dcc, html, callback, State
 import dash_bootstrap_components as dbc
-from src.dashboard.src.layouts.portfolio import portfolio_layout
-from src.dashboard.src.services.portfolio_service import PortfolioService
 
 
 

@@ -5,16 +5,10 @@ import pandas as pd
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from src.dashboard.src.pages.portfolio.kpis import kpi_row
-from src.dashboard.src.components.cards import card
-from src.dashboard.src.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
-from src.dashboard.src.pages.portfolio.tables import (
-    asset_table,
-)
-from src.dashboard.src.services.asset_service import AssetService
-from src.dashboard.src.services.portfolio_service import PortfolioService
-from src.dashboard.src.services.local_portfolio_service import LocalPortfolioService
-from src.dashboard.src.services.local_asset_service import LocalAssetService
+from src.dashboard.pages.portfolio.kpis import kpi_row
+from src.dashboard.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
+from src.dashboard.pages.portfolio.tables import asset_table
+from src.dashboard.controllers import PortfolioController, AssetController
 # ─────────────────────────────────────────────
 # Section builders
 # ─────────────────────────────────────────────
@@ -75,48 +69,31 @@ def portfolio_layout():
     Output("portfolio_page_asset_store", "data"),
     Output("portfolio_page_charts_container", "children"),
     Output("portfolio_page_asset_table_container", "children"),
-    Output("portfolio_page_value_chart_container", "children"),
+    # Output("portfolio_page_value_chart_container", "children"),
     Input("portfolio_page_location", "pathname"),
     State("portfolio_page_asset_store", "data"),
 )
 def load_portfolio_page(pathname, cached_data):
     if pathname != "/portfolio":
         raise PreventUpdate
-
     # Decide data source
-    cached_data = dict()
-    if cached_data.get("asset_data", None) is None:
-        # TODO: UNCOMMENT CODE
-        # asset_data_df = AssetService.get_asset_data()
-        asset_data_df = LocalAssetService.get_asset_data()
-        asset_data_dict = asset_data_df.to_dict("records")
-        cached_data.update({"asset_data": asset_data_dict })
-    else:
-        asset_data_df = pd.DataFrame(cached_data.get("asset_data", {}))
-    
-    if cached_data.get("portfolio_return_data", None) is None:
-        # TODO: UNCOMMENT CODE
-        # return_data = PortfolioService().get_unrealized_profit()
-        return_data = LocalPortfolioService().get_unrealized_profit()
-        cached_data.update({"portfolio_return_data": return_data})
-    else:
-        return_data = cached_data.get("portfolio_return_data", {})
-
-    if asset_data_df.empty:
+    cached_data = cached_data or {}
+    view_model = cached_data.get("view_model", None)
+    if view_model is None:
+        view_model = PortfolioController().get_data()
+        cached_data.update({"view_model": view_model})
+    if view_model is None:
         raise PreventUpdate
-
     # Compose UI (policy layer)
     charts = [
-        performance_chart(asset_data_dict),
+        performance_chart(view_model.get("asset_table", {}).get("rows", []))
         # other charts go here
     ]
-
-    table = asset_table(asset_data_dict)
-
+    table = asset_table(view_model.get("asset_table", {}).get("rows", []))
     # Return state + UI
     return (
         cached_data,
         charts,
         table,
-        value_chart(return_data)
+        # value_chart(view_model.get("asset_table", {}).get("rows", []))
     )

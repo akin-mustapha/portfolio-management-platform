@@ -1,18 +1,11 @@
 from dash import Dash
 import dash_bootstrap_components as dbc
-from src.dashboard.src.layouts.layout import layout
+from src.dashboard.layouts.layout import layout
 
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
-
-# Set ploting default
-# pio.templates.default = "plotly_dark"
-# px.defaults.height = 600
-# px.defaults.template = "plotly_dark"
-# px.defaults.color_continuous_scale = px.colors.sequential.Bluyl_r
-# px.defaults.color_discrete_sequence = px.colors.sequential.Bluyl_r
 
 
 plotly_config = {

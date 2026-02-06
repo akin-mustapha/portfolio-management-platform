@@ -1,18 +1,15 @@
-from dotenv import load_dotenv 
-import os
-
-from dash import Input, Output, dcc, html, callback
 import dash_bootstrap_components as dbc
-from src.dashboard.src.pages.portfolio.portfolio_page import portfolio_layout
-from src.dashboard.src.pages.asset.asset_page import asset_layout
-from src.dashboard.src.pages.tag.tag_page import tag_layout
-from src.dashboard.src.services.asset_service import AssetService
-# from src.dashboard.src.layouts.sidebar import content, sidebar
-from src.dashboard.src.layouts.horizontal_sidebar import horizontal_sidebar, content
-from src.services.portfolio.tagging_service_builder import build_tagging_service
+from dash import Input, Output, dcc, html, callback
+from src.dashboard.pages.portfolio.portfolio_page import portfolio_layout
+from src.dashboard.pages.asset.asset_page import asset_layout
+from src.dashboard.pages.tag.tag_page import tag_layout
+from src.dashboard.layouts.horizontal_sidebar import horizontal_sidebar
+from src.services.portfolio.tagging_service_builder import build_portfolio_service
 
-from src.dashboard.src.components.buttons import btn_side_toggle
+from src.dashboard.components.buttons import btn_side_toggle
 # extraction
+
+porfoltio_serivce = build_portfolio_service()
 
 @callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
@@ -32,7 +29,6 @@ def render_page_content(pathname):
     className="p-3 bg-light rounded-3",
   )
 
-porfoltio_serivce = build_tagging_service()
 from dash import callback, Input, Output, State, no_update
 @callback(
     Output("tag-create-status", "value"),

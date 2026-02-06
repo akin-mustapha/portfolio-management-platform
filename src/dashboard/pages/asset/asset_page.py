@@ -12,15 +12,15 @@ import dash_ag_grid as dag
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from src.dashboard.src.components.cards import card
-from src.dashboard.src.pages.asset.tables import asset_table
+from src.dashboard.components.cards import card
+from src.dashboard.pages.asset.tables import asset_table
 # from src.dashboard.src.services.asset_service import AssetService
-from src.dashboard.src.services.local_asset_service import LocalAssetService
-from src.dashboard.src.styles.style import TAB_CONTENT_STYLE
+from src.dashboard.services.local_asset_service import LocalAssetService
+from src.dashboard.styles.style import TAB_CONTENT_STYLE
 # ─────────────────────────────────────────────
 # Figures
 # ─────────────────────────────────────────────
-from src.dashboard.src.pages.asset.charts import  PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
+from src.dashboard.pages.asset.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
 # ─────────────────────────────────────────────
 # Data prep
 # ─────────────────────────────────────────────
