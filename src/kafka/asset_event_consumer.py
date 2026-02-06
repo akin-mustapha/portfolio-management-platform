@@ -5,7 +5,7 @@ import logging
 from typing import Dict, List
 from datetime import datetime, UTC
 
-from src.infra.repositories.table_repository_factory import TableRepositoryFactory
+from src.services.ingestion.infra.repositories.table_repository_factory import TableRepositoryFactory
 
 
 # ───────────────────────── Logging ─────────────────────────

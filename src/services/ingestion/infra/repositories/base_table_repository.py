@@ -1,5 +1,5 @@
 from typing import Dict, Iterable
-from src.services.ingestion.infra.repositories.database_client import EntityRepositoryFactory
+from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
 from src.services.ingestion.app.interfaces import BaseRepositoryInterface
 import logging
 

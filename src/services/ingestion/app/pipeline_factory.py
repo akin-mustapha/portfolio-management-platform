@@ -1,7 +1,7 @@
-from src.services.ingestion import Pipeline
+from src.services.ingestion.app.pipeline import Pipeline
 from src.services.ingestion.app.policies import Trading212IngestionPipeline
 from src.services.ingestion.infra.sources import SourceFactory
-from src.services.ingestion.infra.trasformations import TransformationFactory
+from src.services.ingestion.infra.transformations import TransformationFactory
 from src.services.ingestion.infra.destinations import DestinationFactory
 from src.services.ingestion.infra.sink import SinkFactory
 

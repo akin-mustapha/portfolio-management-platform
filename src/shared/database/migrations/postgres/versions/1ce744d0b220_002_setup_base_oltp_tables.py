@@ -34,7 +34,7 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        "tag_category",
+        "category",
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('name', sa.String, unique=True, nullable=False),
         sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
@@ -48,7 +48,7 @@ def upgrade() -> None:
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('name', sa.String, unique=True, nullable=False),
         sa.Column('description', sa.String),
-        sa.Column('tag_category_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.tag_category.id')),
+        sa.Column('category_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.category.id')),
         sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
         sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
         sa.Column('updated_timestamp', sa.DateTime),

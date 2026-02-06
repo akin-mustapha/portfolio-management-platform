@@ -3,8 +3,8 @@ import logging
 from dotenv import load_dotenv
 from typing import Iterable, Dict
 
-from src.app.interfaces.interface import BaseRepositoryInterface
-from src.infra.database.client import SQLModelClient
+from src.services.ingestion.app.interfaces import DatabaseClientInterface
+from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,7 +19,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASE_TYPE = os.getenv("DATABASE_TYPE", "sqlite").lower()
 
 
-class SQLiteEntityRepository(BaseRepositoryInterface):
+class SQLiteDatabaseClient(DatabaseClientInterface):
     def __init__(self, entity_name, schema_name=None):
         self._client = SQLModelClient(DATABASE_URL)
         self._entity_name = entity_name
@@ -92,7 +92,7 @@ class SQLiteEntityRepository(BaseRepositoryInterface):
         return res
 
 
-class PostgresEntityRepository(BaseRepositoryInterface):
+class PostgresDatabaseClient(DatabaseClientInterface):
     def __init__(self, entity_name, schema_name: str):
         self._client = SQLModelClient(DATABASE_URL)
         self._entity_name = f"{schema_name}.{entity_name}" if schema_name else entity_name
@@ -167,12 +167,12 @@ class PostgresEntityRepository(BaseRepositoryInterface):
 
 class EntityRepositoryFactory:
     registry = {
-        "sqlite": SQLiteEntityRepository,
-        "postgres": PostgresEntityRepository,
+        "sqlite": SQLiteDatabaseClient,
+        "postgres": PostgresDatabaseClient,
     }
 
     @classmethod
-    def get_repository(cls, entity_name: str, schema_name: str = None) -> BaseRepositoryInterface:
+    def get_repository(cls, entity_name: str, schema_name: str = None) -> DatabaseClientInterface:
         repo_class = cls.registry.get(DATABASE_TYPE)
         if not repo_class:
             raise ValueError(f"No repository for database type: {DATABASE_TYPE}")

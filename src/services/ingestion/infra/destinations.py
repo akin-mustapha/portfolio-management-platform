@@ -1,5 +1,4 @@
 from typing import List, Dict
-from src.services.ingestion.infra.repositories.table_repository_factory import EntityRepositoryFactory
 from src.services.ingestion.infra.repositories.table_repository_factory import TableRepositoryFactory
 from src.services.ingestion.app.interfaces import Destination
 
@@ -21,7 +20,7 @@ class Trading212PortfolioSnapshotDestination(Destination):
   def __init__(self, repo):
       self._repo = repo
   def save(self, data: List[Dict]) -> None:
-      self._repo.insert(records=data)
+      self._repo.insert(data=data)
 
 class DestinationFactory:
   @staticmethod
@@ -34,10 +33,7 @@ class DestinationFactory:
         repo = TableRepositoryFactory.get("asset_snapshot")
         return Trading212AssetSnapshotDestination(repo)
       case "trading212_portfolio_snapshot":
-        repo = EntityRepositoryFactory.get_repository(
-            "portfolio_snapshot",
-            schema_name="portfolio"
-        )
+        repo = TableRepositoryFactory.get("portfolio_snapshot")
         return Trading212PortfolioSnapshotDestination(repo)
       case _:
         raise ValueError(f"Unknown destination type: {destination_type}")

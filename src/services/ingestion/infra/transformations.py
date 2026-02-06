@@ -1,7 +1,7 @@
 from typing import Dict
 from datetime import datetime, UTC
 from src.services.ingestion.app.interfaces import Data
-from src.services.ingestion.infra.repositories.database_client import EntityRepositoryFactory
+from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
 from src.services.ingestion.app.interfaces import Transformation
 
 
@@ -94,15 +94,15 @@ class Trading212PortfolioSnapshotTransformation(Transformation):
   
 
 
-  class TransformationFactory:
-    @staticmethod
-    def create(transformation_type: str) -> Transformation:
-      match transformation_type:
-        case "trading212_asset":
-          return Trading212AssetTransformation()
-        case "trading212_asset_snapshot":
-          return Trading212AssetSnapshotTransformation()
-        case "trading212_portfolio_snapshot":
-          return Trading212PortfolioSnapshotTransformation()
-        case _:
-          raise ValueError(f"Unknown transformation type: {transformation_type}")
+class TransformationFactory:
+  @staticmethod
+  def create(transformation_type: str) -> Transformation:
+    match transformation_type:
+      case "trading212_asset":
+        return Trading212AssetTransformation()
+      case "trading212_asset_snapshot":
+        return Trading212AssetSnapshotTransformation()
+      case "trading212_portfolio_snapshot":
+        return Trading212PortfolioSnapshotTransformation()
+      case _:
+        raise ValueError(f"Unknown transformation type: {transformation_type}")

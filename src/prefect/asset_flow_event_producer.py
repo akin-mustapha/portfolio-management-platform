@@ -3,7 +3,7 @@ from prefect import flow, task
 from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
 from src.shared.utils.custom_logger import customer_logger
-from src.infra.asset_event_producer import AssetEventProducer
+from src.kafka.asset_event_producer import AssetEventProducer
 
 logging = customer_logger("asset_flow_run")
 

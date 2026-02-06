@@ -2,7 +2,8 @@ import json
 from datetime import datetime, UTC
 
 from confluent_kafka import Producer
-from src.infra.trading212_asset_source import Trading212AssetSource
+from dataclasses import asdict
+from src.kafka.trading212_asset_source import Trading212AssetSource
 
 class AssetEventProducer:
     def __init__(self):
@@ -18,7 +19,7 @@ class AssetEventProducer:
           "source": "Trading 212",
           "endpoint": "Trading 212",
           "payload": data,
-          "data_datetime": datetime.now(UTC).strftime("%y-%m-%d"),
+          "data_datetime": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
       }
       self._producer.produce(self._topic, json.dumps(event))
       self._producer.poll(1.0)

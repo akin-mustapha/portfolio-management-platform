@@ -1,8 +1,7 @@
 import os
 import logging
-from abc import ABC, abstractmethod
-from typing import Optional, Dict
 from dotenv import load_dotenv
+from typing import Optional, Dict
 from datetime import datetime, timezone
 from src.shared.database.client import SQLModelClient
 from src.services.ingestion.app.interfaces import RawDataRepositoryInterface

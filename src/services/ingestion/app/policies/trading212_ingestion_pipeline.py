@@ -6,7 +6,7 @@ from src.services.ingestion.app.interfaces import Sink
 from src.services.ingestion.app.interfaces import Source
 from src.services.ingestion.app.interfaces import Destination
 from src.services.ingestion.app.interfaces import Transformation
-from src.services.ingestion.app.interfaces import Pipeline
+from src.services.ingestion.app.pipeline import Pipeline
 
 
 logging.basicConfig(level="INFO")

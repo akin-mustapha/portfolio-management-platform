@@ -1,7 +1,8 @@
 import os
-from src.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
-from src.infra.repositories.raw_data_repository import SQLiteRawDataRepository, PostgresRawDataRepository
-from src.infra.repositories.asset_snapshot_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
+from src.services.ingestion.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
+from src.services.ingestion.infra.repositories.raw_data_repository import SQLiteRawDataRepository, PostgresRawDataRepository
+from src.services.ingestion.infra.repositories.asset_snapshot_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
+from src.services.ingestion.infra.repositories.portfolio_snapshot_repository import PostgresPortfolioSnapshotRepository, SQLitePortfolioSnapshotRepository
 
 class TableRepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
@@ -18,10 +19,10 @@ class TableRepositoryFactory:
           "postgres": PostgresAssetSnapshotRepository, 
           "sqlite": SQLiteAssetSnapshotRepository
         },
-        # "portfolio_snapshot": {
-        #   "postgres": PostgresPortfolioSnapshotRepository, 
-        #   "sqlite": SQLitePortfolioSnapshotRepository
-        # },
+        "portfolio_snapshot": {
+          "postgres": PostgresPortfolioSnapshotRepository, 
+          "sqlite": SQLitePortfolioSnapshotRepository
+        },
         # Add more tables here
     }
 
