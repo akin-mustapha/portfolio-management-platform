@@ -1,4 +1,5 @@
 from confluent_kafka import Consumer
+from confluent_kafka import Producer
 import os
 import json
 import logging
@@ -34,7 +35,12 @@ class Trading212AssetConsumer:
             # "auto.offset.reset": "earliest",
         })
 
-        self._topics = ["asset.ingestion"]
+        self._producer = Producer({
+            "bootstrap.servers": "localhost:9092"
+        })
+
+        self._subscribe_to_topic = ["asset.ingestion"]
+        self._topic = "analytics.ingestion"
 
         self._raw_data_repo = TableRepositoryFactory.get("raw_data")
         self._asset_repo = TableRepositoryFactory.get("asset")
@@ -43,8 +49,8 @@ class Trading212AssetConsumer:
     # ───────────────────────── Runtime ─────────────────────────
 
     def run(self):
-        self._consumer.subscribe(self._topics)
-        logging.info("Subscribed to topics: %s", self._topics)
+        self._consumer.subscribe(self._subscribe_to_topic)
+        logging.info("Subscribed to topics: %s", self._subscribe_to_topic)
 
         while True:
             msg = self._consumer.poll(3.0)
@@ -95,6 +101,8 @@ class Trading212AssetConsumer:
 
             self._save_raw(event, processed=True)
 
+            self._produce_to_analytics()
+
         except Exception as e:
             logging.exception("Processing failure")
             self._save_raw(event, processed=False)
@@ -124,7 +132,7 @@ class Trading212AssetConsumer:
             return
 
         logging.info("Upserting %d assets", len(records))
-        self._asset_repo.upsert(data=records, unique_key="external_id")
+        self._asset_repo.upsert(data=records, unique_key=["external_id"])
 
     # ───────────────────────── Snapshots ─────────────────────────
 
@@ -141,7 +149,7 @@ class Trading212AssetConsumer:
                 logging.error("Asset not found for ticker %s", ticker)
                 continue
 
-            asset_id = asset_rows[0]
+            asset_id = asset_rows.get("id", None)
             wallet = item.get("walletImpact", {})
 
             snapshots.append({
@@ -179,6 +187,18 @@ class Trading212AssetConsumer:
             "created_datetime": now,
             "processed_datetime": now if processed else None,
         })
+
+
+    def _produce_to_analytics(self):
+        event = {
+            "source": "Trading 212",
+            "endpoint": "Trading 212",
+            "payload": {"data": "processed"},  # Replace with actual processed data
+            "data_datetime": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        self._producer.produce(self._topic, json.dumps(event))
+        self._producer.poll(1.0)
+        self._producer.flush()
 
 
 # ───────────────────────── Entrypoint ─────────────────────────

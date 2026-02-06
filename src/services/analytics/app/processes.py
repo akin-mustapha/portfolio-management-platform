@@ -1,5 +1,5 @@
-from src.app.interfaces.analytics import Calc
-from src.app.interfaces.analytics import Func, Sink, Query
+from src.services.analytics.app.interfaces import Calc
+from src.services.analytics.app.interfaces import Func, Sink, Query
 
 # Inner Polcies, using relative import
 from ..query import AssetMetricQuery

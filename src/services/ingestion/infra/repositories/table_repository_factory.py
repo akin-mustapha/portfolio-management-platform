@@ -3,6 +3,7 @@ from src.services.ingestion.infra.repositories.asset_repository import PostgresA
 from src.services.ingestion.infra.repositories.raw_data_repository import SQLiteRawDataRepository, PostgresRawDataRepository
 from src.services.ingestion.infra.repositories.asset_snapshot_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
 from src.services.ingestion.infra.repositories.portfolio_snapshot_repository import PostgresPortfolioSnapshotRepository, SQLitePortfolioSnapshotRepository
+from src.services.ingestion.infra.repositories.fact_asset_price_daily_repository import PostgresFactAssetPriceDailyRepository, SQLiteFactAssetPriceDailyRepository
 
 class TableRepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
@@ -22,6 +23,10 @@ class TableRepositoryFactory:
         "portfolio_snapshot": {
           "postgres": PostgresPortfolioSnapshotRepository, 
           "sqlite": SQLitePortfolioSnapshotRepository
+        },
+        "fact_asset_price_daily": {
+          "postgres": PostgresFactAssetPriceDailyRepository, 
+          "sqlite": SQLiteFactAssetPriceDailyRepository
         },
         # Add more tables here
     }

@@ -1,0 +1,11 @@
+table: fact_asset_return_daily
+schema: analytics
+fields:
+  - name: asset_id
+    type: uuid
+  - name: date
+    type: date
+  - name: return_pct
+    type: float
+  - name: risk_level
+    type: string

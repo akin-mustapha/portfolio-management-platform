@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict
 from dotenv import load_dotenv
 from datetime import datetime, timezone
-from src.infra.database.client import SQLModelClient
+from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(
     level=logging.INFO,

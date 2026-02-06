@@ -22,4 +22,4 @@ def trading_212_asset_event_producer():
     
 if __name__ == "__main__": 
     trading_212_asset_event_producer.serve(
-        name="trading_212_asset_event_producer", interval=timedelta(seconds=3600))  # Runs every 5mins
+        name="trading_212_asset_event_producer", interval=timedelta(seconds=600))  # Runs every 5mins

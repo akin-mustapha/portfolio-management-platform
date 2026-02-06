@@ -3,8 +3,8 @@ import logging
 from dotenv import load_dotenv
 from typing import Iterable, Dict
 
-from src.app.interfaces.interface import BaseRepositoryInterface
-from src.infra.database.client import SQLModelClient
+from src.services.analytics.app.interfaces import BaseRepositoryInterface
+from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,7 +19,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASE_TYPE = os.getenv("DATABASE_TYPE", "sqlite").lower()
 
 
-class SQLiteEntityRepository(BaseRepositoryInterface):
+class SQLiteDatabaseClient(BaseRepositoryInterface):
     def __init__(self, entity_name, schema_name=None):
         self._client = SQLModelClient(DATABASE_URL)
         self._entity_name = entity_name
@@ -55,15 +55,15 @@ class SQLiteEntityRepository(BaseRepositoryInterface):
             logging.info(f"Inserted record into {self._entity_name}")
         return res
 
-    def upsert(self, records: Iterable[Dict], unique_key: str):
+    def upsert(self, records: Iterable[Dict], unique_key: list[str]):
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k != unique_key)
+            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in unique_key)
             sql = f"""
                 INSERT INTO {self._entity_name} ({columns})
                 VALUES ({placeholders})
-                ON CONFLICT({unique_key}) DO UPDATE SET {updates}
+                ON CONFLICT({', '.join(unique_key)}) DO UPDATE SET {updates}
             """
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self._client as client:
@@ -92,7 +92,7 @@ class SQLiteEntityRepository(BaseRepositoryInterface):
         return res
 
 
-class PostgresEntityRepository(BaseRepositoryInterface):
+class PostgresDatabaseClient(BaseRepositoryInterface):
     def __init__(self, entity_name, schema_name: str):
         self._client = SQLModelClient(DATABASE_URL)
         self._entity_name = f"{schema_name}.{entity_name}" if schema_name else entity_name
@@ -165,10 +165,10 @@ class PostgresEntityRepository(BaseRepositoryInterface):
         return res
 
 
-class EntityRepositoryFactory:
+class DatabaseClientFactory:
     registry = {
-        "sqlite": SQLiteEntityRepository,
-        "postgres": PostgresEntityRepository,
+        "sqlite": SQLiteDatabaseClient,
+        "postgres": PostgresDatabaseClient,
     }
 
     @classmethod

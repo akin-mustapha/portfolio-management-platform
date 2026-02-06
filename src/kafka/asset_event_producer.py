@@ -2,7 +2,6 @@ import json
 from datetime import datetime, UTC
 
 from confluent_kafka import Producer
-from dataclasses import asdict
 from src.kafka.trading212_asset_source import Trading212AssetSource
 
 class AssetEventProducer:
