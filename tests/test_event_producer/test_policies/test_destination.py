@@ -3,12 +3,13 @@
 import pytest
 from traitlets import Any
 from src.services.event_producer.policies import Destination
+from src.services.event_producer.domain import Event
 
 class TestDestination:
   @pytest.fixture
   def fixture_destination(self):
     class TestDestinationImpl(Destination):
-      def save(self, data: list[Any]) -> None:
+      def send(self, event: Event) -> None:
         pass
     destination = TestDestinationImpl(destination_name="test_destination")
     return destination
