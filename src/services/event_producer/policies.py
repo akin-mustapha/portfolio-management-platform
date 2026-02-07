@@ -34,7 +34,7 @@ class Origin(ABC):
     event = Event(
           metadata=metadata,
           payload = data,
-          timestamp= datetime.now(UTC),
+          timestamp=datetime.now(UTC).isoformat(),
      )
     return event
 
