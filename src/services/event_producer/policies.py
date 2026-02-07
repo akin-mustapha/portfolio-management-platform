@@ -1,6 +1,5 @@
 from datetime import datetime, UTC
 from abc import ABC, abstractmethod
-from typing import Protocol, Any
 
 from .domain import Event
 
