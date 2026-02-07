@@ -1,7 +1,5 @@
 import logging
 from dataclasses import replace
-from datetime import datetime, UTC
-
 from .policies import Origin
 from .policies import Destination
 from .policies import EventProducer
@@ -34,7 +32,7 @@ class Trading212EventProducer(EventProducer):
     try:
       # fetch from origin
       logging.info("Fetching data from origin")
-      event = self._origin.fetch()
+      event: Event = self._origin.fetch()
       logging.info("Data fetched from origin")
       logging.info(f"Sending event to destination: {dict(replace(event, payload='xxxx'))}")
       # Save to Destination

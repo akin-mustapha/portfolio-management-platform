@@ -1,6 +1,5 @@
 from datetime import datetime, UTC
 from abc import ABC, abstractmethod
-from typing import Protocol, Any
 
 from .domain import Event
 
@@ -34,7 +33,7 @@ class Origin(ABC):
     event = Event(
           metadata=metadata,
           payload = data,
-          timestamp= datetime.now(UTC),
+          timestamp=datetime.now(UTC).isoformat(),
      )
     return event
 

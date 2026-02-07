@@ -46,7 +46,7 @@ echo -e "${GREEN}Starting the Asset metric flow...${NC}"
 python3 -m src.prefect.asset_metric_flow > logs/asset_metric_flow.log 2>&1 & ASSET_METRIC_FLOW_PID=$!
 
 echo -e "${GREEN}Starting the Asset Ingestion Event Producer${NC}"
-python3 -m src.prefect.asset_flow_event_producer > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
+python3 -m src.services.event_producer.main > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
 
 echo -e "${GREEN} Running flow...${NC}"
 echo "Server PID: $SERVER_PID"

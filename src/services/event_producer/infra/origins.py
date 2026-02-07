@@ -15,8 +15,9 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-class Trading212AssetOrigin(Origin):
+class Trading212AssetAPIOrigin(Origin):
   def __init__(self, origin_name: str):
+    super().__init__(origin_name)
     self._url = URL
     self._endpoint = "equity/positions"
     self._api_token = API_TOKEN
@@ -25,4 +26,9 @@ class Trading212AssetOrigin(Origin):
     
   def _handler(self):
     data = asyncio.run(self._api_client.get(endpoint=self._endpoint))
+    self._metadata = {
+      "url": self._url,
+      "endpoint": self._endpoint,
+      "origin": self.origin_name
+    }
     return data
