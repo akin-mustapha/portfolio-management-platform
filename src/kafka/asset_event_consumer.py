@@ -51,7 +51,7 @@ class Trading212AssetConsumer:
     def run(self):
         self._consumer.subscribe(self._subscribe_to_topic)
         logging.info("Subscribed to topics: %s", self._subscribe_to_topic)
-
+        logging.info("Listening...")
         while True:
             msg = self._consumer.poll(3.0)
 

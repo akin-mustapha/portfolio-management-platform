@@ -8,7 +8,6 @@ from ..trading212_event_producer import Trading212EventProducer
 from ..infra.origins import Trading212AssetAPIOrigin
 from ..infra.destination import Trading212KafkaDestination
 
-logging = get_run_logger()
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_run_trading_212_asset_event_producer():
@@ -19,6 +18,7 @@ def task_run_trading_212_asset_event_producer():
     producer.run()
 @flow
 def trading_212_asset_event_producer():
+    logging = get_run_logger()
     logging.info("Starting Flow")
     task_run_trading_212_asset_event_producer()
     logging.info("End")

@@ -29,7 +29,7 @@ def upgrade() -> None:
         sa.Column('source_name', sa.String),
         sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
         sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('updated_timestamp', sa.DateTime),
+        sa.Column('updated_timestamp', sa.DateTime(timezone=True)),
         schema='portfolio'
     )
 
@@ -39,7 +39,7 @@ def upgrade() -> None:
         sa.Column('name', sa.String, unique=True, nullable=False),
         sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
         sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('updated_timestamp', sa.DateTime),
+        sa.Column('updated_timestamp', sa.DateTime(timezone=True)),
         schema='portfolio'
     )
 
@@ -51,7 +51,7 @@ def upgrade() -> None:
         sa.Column('category_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.category.id')),
         sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
         sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('updated_timestamp', sa.DateTime),
+        sa.Column('updated_timestamp', sa.DateTime(timezone=True)),
         schema='portfolio'
     )
 
@@ -61,7 +61,7 @@ def upgrade() -> None:
         sa.Column('tag_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.tag.id'), primary_key=True),
         sa.Column('is_active', sa.Boolean, server_default=sa.true(), nullable=False),
         sa.Column('created_timestamp', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column('updated_timestamp', sa.DateTime),
+        sa.Column('updated_timestamp', sa.DateTime(timezone=True)),
         schema='portfolio'
     )
 
@@ -79,23 +79,6 @@ def upgrade() -> None:
         sa.Column('cost', sa.Float),
         sa.Column('profit', sa.Float),
         sa.Column('fx_impact', sa.Float),
-        schema='portfolio'
-    )
-
-    op.create_table(
-        "asset_derived_metrics",
-        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id')),
-        sa.Column('data_timestamp', sa.DateTime(timezone=True)),
-        sa.Column('pct_drawdown', sa.Float),
-        sa.Column('recent_high_30d', sa.Float),
-        sa.Column('recent_low_30d', sa.Float),
-        sa.Column('ma_30d', sa.Float),
-        sa.Column('norm_price_30d', sa.Float),
-        sa.Column('volatility_30d', sa.Float),
-        sa.Column('price_vs_ma_30d', sa.Float),
-        sa.Column('ma_50d', sa.Float),
-        sa.Column('dca_bias', sa.Float),
         schema='portfolio'
     )
 
@@ -118,8 +101,7 @@ def downgrade() -> None:
     """Downgrade schema."""
     op.drop_table('asset_tag', schema='portfolio')
     op.drop_table('tag', schema='portfolio')
-    op.drop_table('tag_category', schema='portfolio')
+    op.drop_table('category', schema='portfolio')
     op.drop_table('asset_snapshot', schema='portfolio')
-    op.drop_table('asset_metric', schema='portfolio')
     op.drop_table('asset', schema='portfolio')
     op.drop_table('portfolio_snapshot', schema='portfolio')

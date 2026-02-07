@@ -19,7 +19,7 @@ class Trading212KafkaDestination(Destination):
     self._topic: str = "asset.ingestion"
   def send(self, event: Event):
     kafka_producer = Producer({
-          "bootstrap.servers": "localhost:9092"
+          "bootstrap.servers": KAFKA_URL
       })
     
     kafka_producer.produce(self._topic, json.dumps(dict(event)))

@@ -20,18 +20,25 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # =========================
-    # PORTFOLIO FACTS
-    # =========================
-
-    # Portfolio positions (ownership truth)
     op.create_table(
-        "fact_portfolio_position_daily",
+        "fact_valuation",
         sa.Column(
             "id",
             postgresql.UUID(as_uuid=True),
             primary_key=True,
             server_default=sa.text("gen_random_uuid()")
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False
         ),
         sa.Column(
             "portfolio_id",
@@ -40,73 +47,49 @@ def upgrade() -> None:
             nullable=False
         ),
         sa.Column(
-            "asset_id",
+            "sector_id",
             postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("analytics.dim_asset.id"),
+            sa.ForeignKey("analytics.dim_sector.id"),
             nullable=False
         ),
         sa.Column(
-            "date_id",
+            "tag_id",
             postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("analytics.dim_date.id"),
-            nullable=False
-        ),
-        sa.Column("quantity", sa.Float, nullable=False),
-        sa.Column("cost_basis", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
-
-        sa.UniqueConstraint(
-            "portfolio_id",
-            "asset_id",
-            "date_id",
-            name="uq_fact_portfolio_position_daily_grain"
-        ),
-        schema="analytics"
-    )
-
-    # Portfolio valuation
-    op.create_table(
-        "fact_portfolio_valuation_daily",
-        sa.Column(
-            "id",
-            postgresql.UUID(as_uuid=True),
-            primary_key=True,
-            server_default=sa.text("gen_random_uuid()")
-        ),
-        sa.Column(
-            "portfolio_id",
-            postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("analytics.dim_portfolio.id"),
+            sa.ForeignKey("analytics.dim_tag.id"),
             nullable=False
         ),
         sa.Column(
-            "date_id",
+            "asset_type_id",
             postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("analytics.dim_date.id"),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
             nullable=False
         ),
-        sa.Column("market_value", sa.Float, nullable=False),
+        sa.Column("value", sa.Float, nullable=False),
         sa.Column("unrealized_pnl", sa.Float, nullable=False),
         sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
-
-        sa.UniqueConstraint(
-            "portfolio_id",
-            "date_id",
-            name="uq_fact_portfolio_valuation_daily_grain"
-        ),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics"
     )
-
-    # Portfolio cash flows
+    
     op.create_table(
-        "fact_portfolio_cashflow_daily",
+        "fact_cashflow",
         sa.Column(
             "id",
             postgresql.UUID(as_uuid=True),
             primary_key=True,
             server_default=sa.text("gen_random_uuid()")
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False
         ),
         sa.Column(
             "portfolio_id",
@@ -115,31 +98,49 @@ def upgrade() -> None:
             nullable=False
         ),
         sa.Column(
-            "date_id",
+            "sector_id",
             postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("analytics.dim_date.id"),
+            sa.ForeignKey("analytics.dim_sector.id"),
             nullable=False
         ),
-        sa.Column("cash_flow", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
-
-        sa.UniqueConstraint(
-            "portfolio_id",
-            "date_id",
-            name="uq_fact_portfolio_cashflow_daily_grain"
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False
         ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False
+        ),
+        sa.Column("cashflow", sa.Float, nullable=False),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics"
     )
 
-    # Portfolio performance
+    # Asset returns
     op.create_table(
-        "fact_portfolio_return_daily",
+        "fact_return",
         sa.Column(
             "id",
             postgresql.UUID(as_uuid=True),
             primary_key=True,
             server_default=sa.text("gen_random_uuid()")
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False
         ),
         sa.Column(
             "portfolio_id",
@@ -148,28 +149,32 @@ def upgrade() -> None:
             nullable=False
         ),
         sa.Column(
-            "date_id",
+            "sector_id",
             postgresql.UUID(as_uuid=True),
-            sa.ForeignKey("analytics.dim_date.id"),
+            sa.ForeignKey("analytics.dim_sector.id"),
             nullable=False
         ),
-        sa.Column("daily_return", sa.Float, nullable=False),
-        sa.Column("twr", sa.Float, nullable=True),
-        sa.Column("mwr", sa.Float, nullable=True),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
-        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
-
-        sa.UniqueConstraint(
-            "portfolio_id",
-            "date_id",
-            name="uq_fact_portfolio_return_daily_grain"
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False
         ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False
+        ),
+        sa.Column("return", sa.Float, nullable=False),
+        sa.Column("cumulative_return", sa.Float, nullable=False),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics"
     )
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table("fact_portfolio_valuation_daily", schema="analytics")
-    op.drop_table("fact_portfolio_cashflow_daily", schema="analytics")
-    op.drop_table("fact_portfolio_return_daily", schema="analytics")
-    op.drop_table("fact_portfolio_position_daily", schema="analytics")
+    op.drop_table("fact_valuation", schema="analytics")
+    op.drop_table("fact_cashflow", schema="analytics")
+    op.drop_table("fact_return", schema="analytics")
