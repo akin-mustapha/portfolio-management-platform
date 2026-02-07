@@ -16,7 +16,13 @@ class Source(ABC):
     pass
 
 class Destination(ABC):
-  _destination_name: str
+  def __init__(self, destination_name: str):
+    self._destination_name = destination_name
+  
+  @property
+  def destination_name(self) -> str:
+    return self._destination_name
+
   @abstractmethod
   def save(self, data: list[Any]) -> None:
     pass
