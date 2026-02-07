@@ -29,6 +29,8 @@ def upgrade() -> None:
         sa.Column("month", sa.Integer, nullable=False, unique=False),
         sa.Column("day_of_week", sa.Integer, nullable=False, unique=False),
         sa.Column("quarter", sa.Integer, nullable=False, unique=False),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
         schema="analytics"
     )
     op.create_table(
@@ -38,6 +40,8 @@ def upgrade() -> None:
         sa.Column("hour", sa.Integer, nullable=False, unique=False),
         sa.Column("minute", sa.Integer, nullable=False, unique=False),
         sa.Column("second", sa.Integer, nullable=False, unique=False),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
         schema="analytics"
     )
     op.create_table(
@@ -49,6 +53,8 @@ def upgrade() -> None:
         sa.Column("asset_type", sa.String, nullable=False),
         sa.Column("exchange", sa.String, nullable=True, unique=False),
         sa.Column("currency", sa.String, nullable=True, unique=False),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
         sa.UniqueConstraint("asset_id", name="uq_dim_asset_asset_id"),
         schema="analytics"
     )
@@ -69,6 +75,8 @@ def upgrade() -> None:
             server_default=sa.func.now(),
             nullable=False
         ),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=False),
         schema="analytics"
     )
 

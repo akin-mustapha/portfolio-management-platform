@@ -1,14 +1,13 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html, Output, Input, callback, State
 from dash.exceptions import PreventUpdate
-import pandas as pd
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
 from src.dashboard.pages.portfolio.kpis import kpi_row
 from src.dashboard.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
 from src.dashboard.pages.portfolio.tables import asset_table
-from src.dashboard.controllers import PortfolioController, AssetController
+from src.dashboard.controllers import PortfolioController
 # ─────────────────────────────────────────────
 # Section builders
 # ─────────────────────────────────────────────
@@ -43,8 +42,6 @@ def portfolio_layout():
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
-                # md=4,
-                # className="mt-4",
             ),
         ]),
         # Main content
@@ -54,15 +51,12 @@ def portfolio_layout():
                 children=value_chart(),
                 width="auto",
                 md=12,
-                    # className="mt-4",
                 ),
 
         ]),
         html.Div(
             id="portfolio_page_charts_container",
             children=performance_chart(),
-                # md=8,
-                # className="mt-4",
             ),
     ])
 @callback(
