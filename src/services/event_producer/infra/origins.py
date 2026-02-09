@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from src.services.ingestion.app.interfaces import Source
 
-from ..policies import Origin
+from ..app.policies import Origin
 
 # TODO: should depend on interface
 from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient

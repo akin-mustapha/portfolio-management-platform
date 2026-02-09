@@ -1,5 +1,5 @@
-from src.services.ingestion.app.pipeline import Pipeline
-from src.services.ingestion.app.policies import Trading212IngestionPipeline
+from src.services.ingestion.app.policies import Pipeline
+from src.services.ingestion.app.ingestion_pipeline import IngestionPipeline
 from src.services.ingestion.infra.sources import SourceFactory
 from src.services.ingestion.infra.transformations import TransformationFactory
 from src.services.ingestion.infra.destinations import DestinationFactory
@@ -20,7 +20,7 @@ class PipelineFactory:
     
   @register("trading212AssetPipeline")
   def build_trading212_asset_pipeline() -> Pipeline:
-    return Trading212IngestionPipeline(
+    return IngestionPipeline(
         source=SourceFactory.create("trading212_asset"),
         transformation=TransformationFactory.create("trading212_asset"),
         destination=DestinationFactory.create("trading212_asset"),
@@ -28,7 +28,7 @@ class PipelineFactory:
     )
   @register("trading212AssetSnapshotPipeline")
   def build_trading212_asset_snapshot_pipeline() -> Pipeline:
-    return Trading212IngestionPipeline(
+    return IngestionPipeline(
         source=SourceFactory.create("trading212_asset_snapshot"),
         transformation=TransformationFactory.create("trading212_asset_snapshot"),
         destination=DestinationFactory.create("trading212_asset_snapshot"),
@@ -36,7 +36,7 @@ class PipelineFactory:
     )
   @register("trading212PortfolioSnapshotPipeline")
   def build_trading212_portfolio_snapshot_pipeline() -> Pipeline:
-    return Trading212IngestionPipeline(
+    return IngestionPipeline(
         source=SourceFactory.create("trading212_portfolio_snapshot"),
         transformation=TransformationFactory.create("trading212_portfolio_snapshot"),
         destination=DestinationFactory.create("trading212_portfolio_snapshot"),

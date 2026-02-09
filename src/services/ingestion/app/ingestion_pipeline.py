@@ -6,12 +6,12 @@ from src.services.ingestion.app.interfaces import Sink
 from src.services.ingestion.app.interfaces import Source
 from src.services.ingestion.app.interfaces import Destination
 from src.services.ingestion.app.interfaces import Transformation
-from src.services.ingestion.app.pipeline import Pipeline
+from src.services.ingestion.app.policies import Pipeline
 
 
 logging.basicConfig(level="INFO")
 
-class Trading212IngestionPipeline(Pipeline):
+class IngestionPipeline(Pipeline):
   def __init__(self,
                source: Source,
                transformation: Transformation,

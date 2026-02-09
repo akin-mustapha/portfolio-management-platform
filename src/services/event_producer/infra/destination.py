@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 import json
 
-from ..domain import Event
-from ..policies import Destination
+from ..app.domain import Event
+from ..app.policies import Destination
 
 from confluent_kafka import Producer
 
@@ -19,7 +19,7 @@ class Trading212KafkaDestination(Destination):
     self._topic: str = "asset.ingestion"
   def send(self, event: Event):
     kafka_producer = Producer({
-          "bootstrap.servers": "localhost:9092"
+          "bootstrap.servers": KAFKA_URL
       })
     
     kafka_producer.produce(self._topic, json.dumps(dict(event)))

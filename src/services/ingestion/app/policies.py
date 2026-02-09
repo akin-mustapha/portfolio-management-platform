@@ -1,5 +1,13 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
+
+
+class Pipeline(ABC):
+  @abstractmethod
+  def run(self):
+    raise NotImplementedError
+
 
 """
   DOMAIN

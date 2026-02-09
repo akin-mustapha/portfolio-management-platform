@@ -1,14 +1,14 @@
 from typing import List, Dict
 from src.services.ingestion.infra.repositories.table_repository_factory import TableRepositoryFactory
 from src.services.ingestion.app.interfaces import Destination
-
 from typing import List, Dict
 
 class Trading212AssetDestination(Destination):
   def __init__(self, repo):
       self._repo = repo
   def save(self, data: List[Dict]) -> None:
-      self._repo.upsert(data=data, unique_key=["external_id"])
+    # Save to staging raw data
+    self._repo.upsert(data=data, unique_key=["external_id"])
 
 class Trading212AssetSnapshotDestination(Destination):
   def __init__(self, repo):

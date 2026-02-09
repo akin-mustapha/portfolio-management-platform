@@ -2,22 +2,20 @@ import logging
 from prefect import flow, task
 from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
-from src.shared.utils.custom_logger import customer_logger
-from src.kafka.asset_event_producer import AssetEventProducer
+from prefect.logging import get_run_logger
+from src.services.event_producer.event_producer_factory import EventProducerFactory
 
-logging = customer_logger("asset_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_run_trading_212_asset_event_producer():
-    producer = AssetEventProducer()
+    producer = EventProducerFactory.get("trading212AssetEventProducer")
     producer.run()
 @flow
 def trading_212_asset_event_producer():
-
-    logging.info("Starting the flow to fetch account cash")
-    logging.info("Starting data ingestion process")
+    logging = get_run_logger()
+    logging.info("Starting Flow")
     task_run_trading_212_asset_event_producer()
-    logging.info("End data ingestion process")
+    logging.info("End")
 
     
 if __name__ == "__main__": 
