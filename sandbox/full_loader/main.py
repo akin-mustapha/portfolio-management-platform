@@ -79,17 +79,7 @@ class PostgresAssetFullLoader(FullLoader):
     with self._client as client:
       client.execute(sql)
     
-    
-
-
 
 if __name__ == "__main__":
-  data = {
-    "Name": "Apple",
-    "Ticker": "APPL"
-  }
-  
-  
   PostgresAssetFullLoader("raw.asset").load()
-  print(datetime.now().day)
   

@@ -92,17 +92,27 @@ class Trading212PortfolioSnapshotTransformation(Transformation):
     }
     return [transformed_data]
   
-
+class NoneTransformation(Transformation):
+  """
+    Trading212PortfolioSnapshotTransformation:
+  """
+  def apply_to(self, data: Data) -> list[Dict]:
+    """
+      apply_to: 
+    """
+    pass
 
 class TransformationFactory:
   @staticmethod
   def create(transformation_type: str) -> Transformation:
-    match transformation_type:
+    match transformation_type.lower():
       case "trading212_asset":
         return Trading212AssetTransformation()
       case "trading212_asset_snapshot":
         return Trading212AssetSnapshotTransformation()
       case "trading212_portfolio_snapshot":
         return Trading212PortfolioSnapshotTransformation()
+      case "none":
+        return NoneTransformation()
       case _:
         raise ValueError(f"Unknown transformation type: {transformation_type}")

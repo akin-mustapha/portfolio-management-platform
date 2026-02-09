@@ -21,18 +21,18 @@ class SQLModelRawDataSchema:
     }
     return data_dict
 
+class Trading212FullLoaderAssetSink(Sink, SQLModelRawDataSchema):
+  def save(self, data: Data):
+    data = asdict(data)
+    for record in data.get("payload", []):
+      PostgresAssetFullLoader("raw.asset").load(json.dumps(record))
 
 class Trading212AssetSink(Sink, SQLModelRawDataSchema):
   def __init__(self):
     self._sink_repo = TableRepositoryFactory.get("raw_data")
   def save(self, data: Data):
-    # data = self._to_schema(data)
-    data = asdict(data)
-    
-    import json
-    for record in data.get("payload", []):
-      PostgresAssetFullLoader("raw.asset").load(json.dumps(record))
-    # self._sink_repo.insert(record=data)
+    data = self._to_schema(data)
+    self._sink_repo.insert(record=data)
 
 class Trading212AssetSnapshotSink(Sink, SQLModelRawDataSchema):
   def __init__(self):
@@ -59,5 +59,7 @@ class SinkFactory:
         return Trading212AssetSnapshotSink()
       case "trading212_portfolio_snapshot":
         return Trading212PortfolioSnapshotSink()
+      case "trading212_full_loader_asset":
+        return Trading212FullLoaderAssetSink()
       case _:
         raise ValueError(f"Unknown sink type: {sink_type}")
