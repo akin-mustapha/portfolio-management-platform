@@ -1,5 +1,5 @@
 from src.services.ingestion.app.policies import Pipeline
-from src.services.ingestion.app.ingestion_pipeline import IngestionPipeline
+from src.services.ingestion.pipelines.ingestion_pipeline import IngestionPipeline
 from src.services.ingestion.infra.sources import SourceFactory
 from src.services.ingestion.infra.transformations import TransformationFactory
 from src.services.ingestion.infra.destinations import DestinationFactory
@@ -17,6 +17,15 @@ class PipelineFactory:
   @staticmethod
   def get(name: str) -> Pipeline:
       return PIPELINE_REGISTRY[name]()
+  
+  @register("trading212FullLoaderAssetPipeline")
+  def build_trading212_asset_pipeline() -> Pipeline:
+    return IngestionPipeline(
+        source=SourceFactory.create("trading212_asset"),
+        transformation=TransformationFactory.create("None"),
+        destination=DestinationFactory.create("None"),
+        sink=SinkFactory.create("trading212_full_loader_asset"),
+    )
     
   @register("trading212AssetPipeline")
   def build_trading212_asset_pipeline() -> Pipeline:

@@ -22,10 +22,18 @@ class Trading212PortfolioSnapshotDestination(Destination):
   def save(self, data: List[Dict]) -> None:
       self._repo.insert(data=data)
 
+
+class NullDestination(Destination):
+  def __init__(self, repo):
+      self._repo = repo
+  def save(self, data: List[Dict]) -> None:
+    # Save to staging raw data
+    pass
+    
 class DestinationFactory:
   @staticmethod
   def create(destination_type: str):
-    match destination_type:
+    match destination_type.lower():
       case "trading212_asset":
         repo = TableRepositoryFactory.get("asset")
         return Trading212AssetDestination(repo)
@@ -35,5 +43,7 @@ class DestinationFactory:
       case "trading212_portfolio_snapshot":
         repo = TableRepositoryFactory.get("portfolio_snapshot")
         return Trading212PortfolioSnapshotDestination(repo)
+      case "none":
+        return  NullDestination(repo=None)
       case _:
         raise ValueError(f"Unknown destination type: {destination_type}")
