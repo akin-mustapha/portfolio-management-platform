@@ -2,7 +2,7 @@ from datetime import datetime, UTC
 from abc import ABC, abstractmethod
 from typing import Dict, Optional, Protocol, Any
 
-from src.services.ingestion.model.data import Data
+from .policies import Data
 
 """
   PROTOCOLS

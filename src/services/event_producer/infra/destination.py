@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 import json
 
-from ..domain import Event
-from ..policies import Destination
+from ..app.domain import Event
+from ..app.policies import Destination
 
 from confluent_kafka import Producer
 
