@@ -60,14 +60,7 @@ class AssetSilverQueryRepo:
   _window_in_hrs = 1
 
   @classmethod
-  def get_bronze_asset(cls, delta_timestamp):
-    
-    # Convert deltatime from string to datetime to add window
-    if isinstance(delta_timestamp, str):
-      end_timestamp = datetime.strptime(delta_timestamp, '%Y-%m-%d %H:%M:%S') + timedelta(hours=cls._window_in_hrs)
-    else:
-      end_timestamp = delta_timestamp + timedelta(hours=cls._window_in_hrs)
-
+  def get_bronze_asset(cls):
     sql = """
     SELECT
       ticker,
@@ -86,15 +79,18 @@ class AssetSilverQueryRepo:
       unrealized_pnl,
       fx_impact,
       ingested_date,
-      ingested_timestamp
+      ingested_timestamp,
+      business_key
     FROM raw.v_bronze_asset t1
-    WHERE
-          ingested_timestamp >= (:delta_timestamp)
-        AND
-          ingested_timestamp <= (:end_timestamp)
+    WHERE NOT EXISTS (
+          SELECT 1
+          FROM portfolio.asset_v2 x1
+          WHERE t1.business_key = x1.business_key
+        )
+    LIMIT 1000;
     """
     with cls._client as db:
-      result = db.execute(sql, params={"delta_timestamp": delta_timestamp, "end_timestamp": end_timestamp})
+      result = db.execute(sql)
     return result.fetchall()
       
       
@@ -156,25 +152,6 @@ class AssetSilverQueryRepo:
                 MIN(value) OVER (PARTITION BY ticker) AS low
             FROM base
         )
-
-        INSERT INTO portfolio.asset_computed (
-            asset_id,
-            cashflow,
-            return,
-            cumulative_return,
-            dca_bias,
-            pct_drawdown,
-            recent_high_30d,
-            recent_low_30d,
-            high,
-            low,
-            ma_20,
-            ma_30,
-            ma_50d,
-            volatility_20d,
-            volatility_30d,
-            volatility_50d
-        )
         SELECT
             s.asset_id,
             cost                                AS cashflow,
@@ -199,7 +176,7 @@ class AssetSilverQueryRepo:
             volatility_50d
         FROM stats s
     """
-    # with cls._client as db:
-    #   result = db.execute(sql)
-    # return result.fetchall()
+    with cls._client as db:
+      result = db.execute(sql)
+    return result.fetchall()
       

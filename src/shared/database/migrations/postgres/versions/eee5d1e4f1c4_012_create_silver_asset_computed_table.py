@@ -40,6 +40,7 @@ def upgrade() -> None:
             cost FLOAT,
             profit FLOAT,
             fx_impact FLOAT,
+            business_key TEXT NOT NULL UNIQUE,
             created_timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
             updated_timestamp TIMESTAMPTZ
             
@@ -50,7 +51,7 @@ def upgrade() -> None:
     op.execute("""
         CREATE TABLE portfolio.asset_computed
         (
-            asset_id UUID,
+            asset_id UUID NOT NULL UNIQUE,
             cashflow FLOAT,
             return FLOAT,
             cumulative_return FLOAT,

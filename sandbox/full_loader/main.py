@@ -55,32 +55,34 @@ class PostgresAssetFullLoader(FullLoader):
   
   def _exposition_abstraction(self):
     sql = f"""
-    CREATE OR REPLACE VIEW raw.v_bronze_asset AS
-    SELECT
-        payload->'instrument'->>'ticker' AS ticker,
-        payload->'instrument'->>'name' AS instrument_name,
-        payload->'instrument'->>'isin' AS isin,
-        payload->'instrument'->>'currency' AS instrument_currency,
-        (payload->>'createdAt')::TIMESTAMP AS created_at,
-        (payload->>'quantity')::NUMERIC AS quantity,
-        (payload->>'quantityAvailableForTrading')::NUMERIC AS quantity_available,
-        (payload->>'quantityInPies')::NUMERIC AS quantity_in_pies,
-        (payload->>'currentPrice')::NUMERIC AS current_price,
-        (payload->>'averagePricePaid')::NUMERIC AS average_price_paid,
-        (payload->'walletImpact'->>'currency') AS wallet_currency,
-        (payload->'walletImpact'->>'totalCost')::NUMERIC AS total_cost,
-        (payload->'walletImpact'->>'currentValue')::NUMERIC AS current_value,
-        (payload->'walletImpact'->>'unrealizedProfitLoss')::NUMERIC AS unrealized_pnl,
-        (payload->'walletImpact'->>'fxImpact')::NUMERIC AS fx_impact,
-        id AS external_id,
-        ingested_date,
-        ingested_timestamp
-    FROM {self._partition_name};  -- << select from the partition
+      CREATE OR REPLACE VIEW raw.v_bronze_asset AS
+      WITH cte AS (
+          SELECT
+              payload->'instrument'->>'ticker' AS ticker,
+              payload->'instrument'->>'name' AS instrument_name,
+              payload->'instrument'->>'isin' AS isin,
+              payload->'instrument'->>'currency' AS instrument_currency,
+              (payload->>'createdAt')::TIMESTAMP AS created_at,
+              (payload->>'quantity')::NUMERIC AS quantity,
+              (payload->>'quantityAvailableForTrading')::NUMERIC AS quantity_available,
+              (payload->>'quantityInPies')::NUMERIC AS quantity_in_pies,
+              (payload->>'currentPrice')::NUMERIC AS current_price,
+              (payload->>'averagePricePaid')::NUMERIC AS average_price_paid,
+              (payload->'walletImpact'->>'currency') AS wallet_currency,
+              (payload->'walletImpact'->>'totalCost')::NUMERIC AS total_cost,
+              (payload->'walletImpact'->>'currentValue')::NUMERIC AS current_value,
+              (payload->'walletImpact'->>'unrealizedProfitLoss')::NUMERIC AS unrealized_pnl,
+              (payload->'walletImpact'->>'fxImpact')::NUMERIC AS fx_impact,
+              id AS external_id,
+              ingested_date,
+              ingested_timestamp
+          FROM {self._table_name}
+      )
+      SELECT
+          *,
+          external_id || '_' || ticker || '_' || ingested_timestamp AS business_key
+      FROM cte;
     """
     with self._client as client:
       client.execute(sql)
     
-
-if __name__ == "__main__":
-  PostgresAssetFullLoader("raw.asset").load()
-  

@@ -22,6 +22,7 @@ class IngestionPipeline(Pipeline):
     self._transformation = transformation
     self._destination = destination
     self._sink = sink
+
   def run(self):
     # Fetch raw data from source
     raw_data = self._source.fetch()

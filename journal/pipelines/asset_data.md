@@ -12,13 +12,45 @@ Pipeline to ingest Trading 212 Asset API
 - Partitioned Asset table, partitioned by date
 - v_bronze_asset exposition abstraction view by current day partition
 
+#### Bronze Tables
+
+- `asset`
+- `asset_YYYY_MM_DD`
+- `v_bronze_asset` exposition abstraction view
+
+#### Bronze Issues
+
+- Error handling, api can return error due to rate limiting, especially when multiple pipelines are running
+
+#### Bronze Solutions
+
+- Error Handling
+  - Implement Error handling logic in python
+  - Write error to different table for inspection
+
 ### Silver Layer
 
 - Incremental Loader
 - asset table
 - asset_computed table for computed columns
 
-#### Issues
+#### Silver Layer Tables
+
+- `asset_v2`
+- `asset_computed`
+
+#### Silver Issues
 
 - Backfill, not possible from exposition abstraction
 - Duplication from Bronze, batch run loads entire view
+
+#### Silver Solutions
+
+- Backfill - parameterize loader
+- Implement Idempotency pattern, Update pattern,
+  - define unique
+  - implement merge logic, update when key match, insert when not
+
+### Gold Layer
+
+- Store data using star schema

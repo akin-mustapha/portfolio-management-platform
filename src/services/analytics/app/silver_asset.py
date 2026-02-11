@@ -3,9 +3,10 @@ from src.services.analytics.app.interfaces import Func, Sink, Query
 from datetime import datetime, UTC
 
 # Inner Polcies, using relative import
-from ..query import AssetSilverQueryRepo
-from ..funcs import FuncAssetDerivedMetric
-from ..sink import SinkSilverAsset
+# from ..query import AssetSilverQueryRepo
+# from ..funcs import FuncAssetDerivedMetric
+# from ..sink import SinkSilverAsset
+from ..sink import SinkRepositoryFactory
 
 import yaml
 import os
@@ -18,19 +19,13 @@ class SilverAsset(Calc):
     self._func = derived_func
     self._sink = sink
     
-    self._last_run = delta_time.get('SilverAsset')
-    
   def run(self):
-    # data = self._query.get()
-    # metric = self._func.run(data)
     bronze_asset_df = self._get_v_bronze()
-    
-    asset_df = self._asset(bronze_asset_df)
-    self._sink.save(asset_df)
+    self._asset(bronze_asset_df)
     self._asset_decoration()
     
   def _get_v_bronze(self):
-    bronze_asset = self._query.get_bronze_asset(self._last_run)
+    bronze_asset = self._query.get_bronze_asset()
     bronze_asset_df = pd.DataFrame(bronze_asset)
     return bronze_asset_df
   
@@ -39,8 +34,9 @@ class SilverAsset(Calc):
     df.rename({
       "ticker": "external_id"
     })
+    df = df
+    df = df[df["ticker"].notna()]
     asset_df = pd.DataFrame()
-    
     asset_df["external_id"] = df["ticker"]
     asset_df["ticker"] = df["ticker"].apply(lambda x: x.split("_")[0])
     asset_df["name"] = df["instrument_name"]
@@ -55,20 +51,23 @@ class SilverAsset(Calc):
     asset_df["cost"] = df["total_cost"]
     asset_df["profit"] = df["unrealized_pnl"]
     asset_df["fx_impact"] = df["fx_impact"]
+    asset_df["business_key"] = df["business_key"]
     asset_df["updated_timestamp"] = datetime.now(UTC)
     
     # Using ingested date as marker to sequential ordering of data
     asset_df["data_timestamp"] = df['ingested_timestamp']
     
-    return asset_df
-  
-  
-  # def _asset_snapshot(self, df):
     
-  
+    asset_sink = SinkRepositoryFactory.get('asset')
+    asset_sink.save(asset_df)
+    
   def _asset_decoration(self):
-    self._query.get_asset_computed()
+    computed = self._query.get_asset_computed()
+    computed_df = pd.DataFrame(computed)
     
+    
+    asset_computed_sink = SinkRepositoryFactory.get('asset_computed')
+    asset_computed_sink.save(computed_df)
     
   
 
@@ -87,8 +86,8 @@ if __name__ == "__main__":
     }
 
   
-  x = SilverAsset(AssetSilverQueryRepo
-                      , FuncAssetDerivedMetric
-                      , SinkSilverAsset)
+  # x = SilverAsset(AssetSilverQueryRepo
+  #                     , FuncAssetDerivedMetric
+  #                     , SinkSilverAsset)
   
-  x.run()
+  # x.run()
