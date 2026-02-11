@@ -72,6 +72,7 @@ class PostgresAssetFullLoader(FullLoader):
         (payload->'walletImpact'->>'currentValue')::NUMERIC AS current_value,
         (payload->'walletImpact'->>'unrealizedProfitLoss')::NUMERIC AS unrealized_pnl,
         (payload->'walletImpact'->>'fxImpact')::NUMERIC AS fx_impact,
+        id AS external_id,
         ingested_date,
         ingested_timestamp
     FROM {self._partition_name};  -- << select from the partition
