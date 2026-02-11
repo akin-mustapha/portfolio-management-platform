@@ -1,0 +1,6 @@
+# TODO
+
+- [ ] Separate Migration for Bronze, Silver and Gold Storage
+- [ ] Set up Silver Layer pipeline
+- [ ] Add unique constraint to `portfolio.tag`
+- [ ] Create history table for slowly changing dimension `scd` (portfolio, asset, tag, category)
