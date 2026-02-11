@@ -8,10 +8,9 @@ from src.services.ingestion.app.interfaces import Destination
 from src.services.ingestion.app.interfaces import Transformation
 from src.services.ingestion.app.policies import Pipeline
 
-
 logging.basicConfig(level="INFO")
 
-class IngestionPipeline(Pipeline):
+class SilverAssetIngestionPipeline(Pipeline):
   def __init__(self,
                source: Source,
                transformation: Transformation,
@@ -22,7 +21,6 @@ class IngestionPipeline(Pipeline):
     self._transformation = transformation
     self._destination = destination
     self._sink = sink
-
   def run(self):
     # Fetch raw data from source
     raw_data = self._source.fetch()

@@ -25,6 +25,7 @@ def upgrade() -> None:
     
     op.execute("""
         CREATE TABLE IF NOT EXISTS raw.asset (
+        -- ID is needed to ensure idempotency
         id TEXT,
         payload JSONB NOT NULL,
         ingested_date DATE NOT NULL,
@@ -46,7 +47,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    
-    
     op.execute("DROP TABLE IF EXISTS raw.asset CASCADE")
     op.execute("DROP SCHEMA IF EXISTS raw CASCADE")

@@ -128,15 +128,32 @@ class PostgresDatabaseClient(BaseRepositoryInterface):
             logging.info(f"Inserted record into {self._entity_name}")
         return res
 
-    def upsert(self, records: Iterable[Dict], unique_key: str):
+    # DEPRECIATED
+    # def upsert(self, records: Iterable[Dict], unique_key: str):
+    #     for record in records:
+    #         columns = ", ".join(record.keys())
+    #         placeholders = ", ".join(f":{k}" for k in record.keys())
+    #         updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k != unique_key)
+    #         sql = f"""
+    #             INSERT INTO {self._entity_name} ({columns})
+    #             VALUES ({placeholders})
+    #             ON CONFLICT({unique_key}) DO UPDATE SET {updates}
+    #         """
+    #         logging.debug(f"Executing query: {sql} with params: {record}")
+    #         with self._client as client:
+    #             res = client.execute(sql, record)
+    #         logging.info(f"Upserted record into {self._entity_name}")
+    #     return res
+    
+    def upsert(self, records: Iterable[Dict], unique_key: list[str]):
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k != unique_key)
+            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in unique_key)
             sql = f"""
                 INSERT INTO {self._entity_name} ({columns})
                 VALUES ({placeholders})
-                ON CONFLICT({unique_key}) DO UPDATE SET {updates}
+                ON CONFLICT({', '.join(unique_key)}) DO UPDATE SET {updates}
             """
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self._client as client:
