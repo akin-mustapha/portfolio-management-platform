@@ -22,7 +22,7 @@ def upgrade() -> None:
     """Upgrade schema."""
     
     op.execute("""
-        CREATE TABLE portfolio.asset_v2
+        CREATE TABLE staging.asset_v2
         (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             data_timestamp TIMESTAMPTZ NOT NULL,
@@ -49,11 +49,11 @@ def upgrade() -> None:
     """)
     
     op.execute("""
-        CREATE TABLE portfolio.asset_computed
+        CREATE TABLE staging.asset_computed
         (
             asset_id UUID NOT NULL UNIQUE,
             cashflow FLOAT,
-            return FLOAT,
+            daily_return FLOAT,
             cumulative_return FLOAT,
             dca_bias FLOAT,
             pct_drawdown FLOAT,
@@ -61,8 +61,8 @@ def upgrade() -> None:
             recent_low_30d FLOAT,
             high FLOAT,
             low FLOAT,
-            ma_20 FLOAT,
-            ma_30 FLOAT,
+            ma_20d FLOAT,
+            ma_30d FLOAT,
             ma_50d FLOAT,
             volatility_20d FLOAT,
             volatility_30d FLOAT,
@@ -71,7 +71,7 @@ def upgrade() -> None:
 
             CONSTRAINT fk_asset_computed_asset_id
                 FOREIGN KEY (asset_id)
-                REFERENCES portfolio.asset_v2(id)
+                REFERENCES staging.asset_v2(id)
             
             
         )           
@@ -79,5 +79,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('asset_computed', schema="portfolio")
-    op.drop_table('asset_v2', schema="portfolio")
+    op.drop_table('asset_computed', schema="staging")
+    op.drop_table('asset_v2', schema="staging")

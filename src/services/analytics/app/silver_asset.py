@@ -2,10 +2,9 @@ from src.services.analytics.app.interfaces import Calc
 from src.services.analytics.app.interfaces import Func, Sink, Query
 from datetime import datetime, UTC
 
-# Inner Polcies, using relative import
-# from ..query import AssetSilverQueryRepo
-# from ..funcs import FuncAssetDerivedMetric
-# from ..sink import SinkSilverAsset
+from ..query import AssetSilverQueryRepo
+from ..funcs import FuncAssetDerivedMetric
+from ..sink import SinkSilverAsset
 from ..sink import SinkRepositoryFactory
 
 import yaml
@@ -73,21 +72,10 @@ class SilverAsset(Calc):
 
 
 if __name__ == "__main__":
-  
-  delta_timestamp_path = "delta_timestamp.yml"
-  delta_time = None
-  if os.path.exists(delta_timestamp_path):
-    # print('a')
-    with open("./data/delta_timestamp.yml") as f:
-      delta_time = yaml.full_load(f)
-  if delta_time is None:
-    delta_time = {
-      "SilverAsset": datetime.now(UTC)
-    }
 
   
-  # x = SilverAsset(AssetSilverQueryRepo
-  #                     , FuncAssetDerivedMetric
-  #                     , SinkSilverAsset)
+  x = SilverAsset(AssetSilverQueryRepo
+                      , FuncAssetDerivedMetric
+                      , SinkSilverAsset)
   
-  # x.run()
+  x.run()

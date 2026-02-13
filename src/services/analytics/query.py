@@ -39,7 +39,7 @@ class AssetMetricQuery:
           ORDER BY data_date
           ROWS BETWEEN 49 PRECEDING AND CURRENT ROW
         ) AS ma_50
-      FROM portfolio.asset_snapshot
+      FROM staging.asset_snapshot
       WHERE asset_id IS NOT NULL;
     """
 
@@ -84,7 +84,7 @@ class AssetSilverQueryRepo:
     FROM raw.v_bronze_asset t1
     WHERE NOT EXISTS (
           SELECT 1
-          FROM portfolio.asset_v2 x1
+          FROM staging.asset_v2 x1
           WHERE t1.business_key = x1.business_key
         )
     LIMIT 1000;
@@ -114,7 +114,7 @@ class AssetSilverQueryRepo:
                     ORDER BY b.created_timestamp
                 ), 0) AS daily_return,
                 b.created_timestamp
-            FROM portfolio.asset_v2 b
+            FROM staging.asset_v2 b
         ),
 
         stats AS (
@@ -134,8 +134,8 @@ class AssetSilverQueryRepo:
                 )) - 1 AS cumulative_return,
 
                 -- moving averages
-                AVG(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS ma_20,
-                AVG(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS ma_30,
+                AVG(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS ma_20d,
+                AVG(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS ma_30d,
                 AVG(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 49 PRECEDING AND CURRENT ROW) AS ma_50d,
 
                 -- volatility
@@ -155,7 +155,7 @@ class AssetSilverQueryRepo:
         SELECT
             s.asset_id,
             cost                                AS cashflow,
-            daily_return                        AS return,
+            daily_return,
             cumulative_return,
 
             -- DCA bias: current value vs average cost
@@ -168,8 +168,8 @@ class AssetSilverQueryRepo:
             recent_low_30d,
             high,
             low,
-            ma_20,
-            ma_30,
+            ma_20d,
+            ma_30d,
             ma_50d,
             volatility_20d,
             volatility_30d,
