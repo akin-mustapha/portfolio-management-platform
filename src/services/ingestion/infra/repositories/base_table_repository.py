@@ -2,6 +2,8 @@ from typing import Dict, Iterable
 from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
 from src.services.ingestion.app.interfaces import BaseRepositoryInterface
 import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(filemode="w", level=logging.INFO)
 
 class BaseTableRepository(BaseRepositoryInterface):
     def __init__(self, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None):
@@ -24,7 +26,7 @@ class BaseTableRepository(BaseRepositoryInterface):
 
     def insert(self, data: Dict):
         for record in data:
-            logging.info(f"Inserting data into {self._entity_repo._entity_name}: {record}")
+            logger.info(f"Inserting data into {self._entity_repo._entity_name}: {record}")
             db_data = self._to_db_fields(record)
             self._entity_repo.insert(db_data)
 

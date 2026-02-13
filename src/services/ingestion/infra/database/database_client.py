@@ -92,6 +92,7 @@ class SQLiteDatabaseClient(DatabaseClientInterface):
         return res
 
 
+# TODO: SHOULD TRANSFORM TO A REPO. IT IMPLEMENTS ALL REPO APIS
 class PostgresDatabaseClient(DatabaseClientInterface):
     def __init__(self, entity_name, schema_name: str):
         self._client = SQLModelClient(DATABASE_URL)
