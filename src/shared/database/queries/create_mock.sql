@@ -1,11 +1,7 @@
 
 MERGE INTO portfolio.category AS tgt
 USING (
-  SELECT *
-  FROM (
-    VALUES('Portfolio')
-
-  ) AS t1 (name)
+    VALUES('Portfolio') ,('asset') 
 
 ) AS src (name)
   ON  tgt.name = src.name

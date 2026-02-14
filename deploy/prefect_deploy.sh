@@ -39,14 +39,14 @@ python3 -m orc.prefect.asset_flow > logs/asset_flow_run.log 2>&1 & ASSET_FLOW_PI
 # echo -e "${GREEN}Starting the Asset snapshot ingestion...${NC}"
 # python3 -m src.prefect.asset_snapshot_flow > logs/asset_snapshot_flow_run.log 2>&1 & ASSET_SNAPSHOT_FLOW_PID=$!
 
-echo -e "${GREEN}Starting the Portfolio snapshot flow...${NC}"
-python3 -m src.orc.prefect.portfolio_snapshot_flow > logs/portfolio_snapshot_flow_run.log 2>&1 & PORTFOLIO_SNAPSHOT_FLOW_PID=$!
+# echo -e "${GREEN}Starting the Portfolio snapshot flow...${NC}"
+# python3 -m src.orc.prefect.portfolio_snapshot_flow > logs/portfolio_snapshot_flow_run.log 2>&1 & PORTFOLIO_SNAPSHOT_FLOW_PID=$!
 
-echo -e "${GREEN}Starting the Asset metric flow...${NC}"
-python3 -m orc.prefect.asset_metric_flow > logs/asset_metric_flow.log 2>&1 & ASSET_METRIC_FLOW_PID=$!
+# echo -e "${GREEN}Starting the Asset metric flow...${NC}"
+# python3 -m orc.prefect.asset_metric_flow > logs/asset_metric_flow.log 2>&1 & ASSET_METRIC_FLOW_PID=$!
 
-echo -e "${GREEN}Starting the Asset Ingestion Event Producer${NC}"
-python3 -m orc.prefect.asset_flow_event_producer > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
+# echo -e "${GREEN}Starting the Asset Ingestion Event Producer${NC}"
+# python3 -m orc.prefect.asset_flow_event_producer > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
 
 
 

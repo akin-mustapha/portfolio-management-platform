@@ -12,10 +12,13 @@ class TableRepositoryFactory:
             "postgres": PostgresAssetRepository,
             "sqlite": SQLiteAssetRepository,
         },
+        
         "raw_data": {
             "postgres": PostgresRawDataRepository, 
             "sqlite": SQLiteRawDataRepository
         },
+        
+        ## Table no long exist - TODO: REMOVE
         "asset_snapshot": {
           "postgres": PostgresAssetSnapshotRepository, 
           "sqlite": SQLiteAssetSnapshotRepository

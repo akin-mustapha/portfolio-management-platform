@@ -16,7 +16,7 @@ class SinkAssetMetric:
     
 
 class SinkSilverAsset:
-  _repository = DatabaseClientFactory.get_repository("asset_v2", schema_name="portfolio")
+  _repository = DatabaseClientFactory.get_repository("asset_v2", schema_name="staging")
   @classmethod
   def save(cls, df: pd.DataFrame):
     records = df.to_dict(orient="records")
@@ -24,7 +24,7 @@ class SinkSilverAsset:
     
     
 class SinkSilverAssetComputed:
-  _repository = DatabaseClientFactory.get_repository("asset_computed", schema_name="portfolio")
+  _repository = DatabaseClientFactory.get_repository("asset_computed", schema_name="staging")
   @classmethod
   def save(cls, df: pd.DataFrame):
     records = df.to_dict(orient="records")

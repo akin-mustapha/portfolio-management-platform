@@ -66,23 +66,6 @@ def upgrade() -> None:
     )
 
     op.create_table(
-        "asset_snapshot",
-        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column('asset_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('portfolio.asset.id')),
-        sa.Column('data_timestamp', sa.DateTime(timezone=True)),
-        sa.Column('currency', sa.String),
-        sa.Column('local_currency', sa.String),
-        sa.Column('share', sa.Float),
-        sa.Column('price', sa.Float),
-        sa.Column('avg_price', sa.Float),
-        sa.Column('value', sa.Float),
-        sa.Column('cost', sa.Float),
-        sa.Column('profit', sa.Float),
-        sa.Column('fx_impact', sa.Float),
-        schema='portfolio'
-    )
-
-    op.create_table(
         "portfolio_snapshot",
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column('external_id', sa.String),
@@ -102,6 +85,5 @@ def downgrade() -> None:
     op.drop_table('asset_tag', schema='portfolio')
     op.drop_table('tag', schema='portfolio')
     op.drop_table('category', schema='portfolio')
-    op.drop_table('asset_snapshot', schema='portfolio')
     op.drop_table('asset', schema='portfolio')
     op.drop_table('portfolio_snapshot', schema='portfolio')
