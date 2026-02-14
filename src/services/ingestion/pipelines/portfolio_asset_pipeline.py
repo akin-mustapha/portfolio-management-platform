@@ -10,8 +10,6 @@ import os
 import logging
 from dataclasses import dataclass, asdict
 from dotenv import load_dotenv
-from src.services.ingestion.infra.database.database_client import PostgresDatabaseClient
-
 from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(filename="logs/sync.log", level=logging.INFO, filemode="w")

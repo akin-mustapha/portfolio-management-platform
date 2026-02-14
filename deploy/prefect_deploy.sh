@@ -30,30 +30,27 @@ sleep 5
 # flows
 # ==============================
 # asset ingestion flow
-echo -e "${GREEN}Starting Bronze Asset Pipeline...${NC}"
-python3 -m orc.prefect.bronze_asset_flow > logs/bronze_asset_flow.log 2>&1 & BRONZE_ASSET_FLOW_PID=$!
+echo -e "${GREEN}Starting Asset Pipeline Bronze...${NC}"
+python3 -m orc.prefect.asset_flow_bronze > logs/asset_flow_bronze.log 2>&1 & ASSET_FLOW_BRONZE_PID=$!
 
-echo -e "${GREEN}Starting Silver Asset Pipeline...${NC}"
-python3 -m src.prefect.silver_asset_pipeline_flow > logs/silver_asset_pipeline_flow.log 2>&1 & SILVER_ASSET_FLOW_PID=$!
-
-echo -e "${GREEN}Starting Silver Asset Compute Pipeline...${NC}"
-python3 -m orc.prefect.silver_asset_compute_flow > logs/silver_asset_compute_flow.log 2>&1 & SILVER_ASSET_COMPUTED_FLOW_PID=$!
+echo -e "${GREEN}Starting Asset Pipeline Silver...${NC}"
+python3 -m orc.prefect.asset_flow_silver > logs/asset_flow_silver.log 2>&1 & ASSET_FLOW_SILVER_PID=$!
 
 echo -e "${GREEN}Starting Portfolio Asset Pipeline...${NC}"
-python3 -m src.orc.prefect.portfolio_asset_flow > logs/portfolio_asset_flow_run.log 2>&1 & PORTFOLIO_ASSET_FLOW_PID=$!
+python3 -m orc.prefect.asset_flow_portfolio > logs/asset_flow_portfolio.log 2>&1 & ASSET_FLOW_PORTFOLIO_PID=$!
 
 # echo -e "${GREEN}Starting the Asset Ingestion Event Producer${NC}"
 # python3 -m orc.prefect.asset_flow_event_producer > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
 
 
 
-echo -e "${GREEN} Running...${NC}"
+echo -e "${GREEN}Running...${NC}"
 echo "Server PID: $SERVER_PID"
 echo "Agent PID: $AGENT_PID"
 
-echo "Bronze Asset Flow PID: $BRONZE_ASSET_FLOW_PID"
-echo "Silver Asset Flow PID: $SILVER_ASSET_FLOW_PID"
-echo "Silver Asset Computed Flow PID: $SILVER_ASSET_COMPUTED_FLOW_PID"
+echo "Asset Flow Bronze PID: $ASSET_FLOW_BRONZE_PID"
+echo "Asset Flow Silver PID: $ASSET_FLOW_SILVER_PID"
+echo "Asset Flow Portfolio PID: $ASSET_FLOW_PORTFOLIO_PID"
 # echo "Asset_flow_event_producer PID: $asset_flow_event_producer_PID"
 
 trap "echo -e '${GREEN}Stopping all processes...${NC}'; kill $SERVER_PID $AGENT_PID $FLOW_PID; exit" SIGINT SIGTERM

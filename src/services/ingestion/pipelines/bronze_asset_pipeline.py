@@ -1,14 +1,14 @@
 import os
+import asyncio
 from dotenv import load_dotenv
+from typing import List, Dict, Any
 import logging
-from typing import List, Dict
-from dataclasses import asdict, Any
 import json
 from dataclasses import replace
 from datetime import datetime, UTC
-from src.services.ingestion.app.interfaces import Source
-from src.services.ingestion.app.interfaces import Destination
-from src.services.ingestion.app.interfaces import Transformation
+from src.services.ingestion.app.protocols import Source
+from src.services.ingestion.app.protocols import Destination
+from src.services.ingestion.app.protocols import Transformation
 from src.services.ingestion.app.policies import Pipeline
 
 from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
@@ -22,6 +22,8 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
+
+
 class Trading212AssetSource(Source):
   def __init__(self):
     self._url = URL
@@ -30,14 +32,14 @@ class Trading212AssetSource(Source):
     self._secret_token = SECRET_TOKEN
     self._api_client = Trading212APIClient(self._url, self._api_token, self._secret_token)
     
+  def extract(self):
+    data = asyncio.run(self._api_client.get(endpoint=self._endpoint))
+    return data
+    
 
 class Trading212AssetDestination(Destination):
-  def __init__(self, repo):
-    pass
-  def save(self, data: List[Dict]) -> None:
-    data = asdict(data)
-    for record in data.get("payload", []):
-      PostgresAssetFullLoader("raw.asset").load(json.dumps(record))
+  def load(self, data: Any) -> None:
+    PostgresAssetFullLoader("raw.asset").load(json.dumps(data))
 
 
 class Trading212AssetTransformation(Transformation):
@@ -51,23 +53,11 @@ class Trading212AssetTransformation(Transformation):
   }
   _SOURCE_NAME = "trading212"
 
-  def apply_to(self, data: Data) -> list[Dict]:
+  def transform(self, data: list[Dict]) -> list[Dict]:
     """
-      apply_to: 
+      transform: 
     """
-    record = self._get_raw_data(data)
-    transformed_data = []
-    field_map = self._FIELD_MAP
-    source_name = self._SOURCE_NAME
-    created_datetime = datetime.now(UTC)
-    for asset in record:
-      instrument = asset.get("instrument", {})
-      data = {target: instrument.get(source) for target, source in field_map.items()}
-      data["source_name"] = source_name
-      data["is_active"] = True
-      data["created_datetime"] = created_datetime
-      transformed_data.append(data)
-    return transformed_data
+    pass
   
   
 class BronzeAssetIngestionPipeline(Pipeline):
@@ -77,23 +67,24 @@ class BronzeAssetIngestionPipeline(Pipeline):
     self._destination = Trading212AssetDestination()
 
   def run(self):
-    # Fetch raw data from source
-    data = self._source.fetch()
-    # Copy to prevent mutating object
+    
     try:
-      # Apply Transformation Logic
-      transformed_data: List[Any] = self._transformation.apply_to(data)
+      # Extract raw data from source
+      data: list[Dict] = self._source.extract()
       
-      # Save to Destination Table
-      self._destination.save(transformed_data)
+      # Load to Destination Table
+      self._destination.load(data)
       return None
     
     except Exception as e:
       # Update raw data
-      data = replace(data, is_processed=False)
       
       # TODO REPLACE WITH ERROR MANAGEMENT 
       # Persist raw data
       # self._sink.save(data)
 
       raise e
+    
+    
+if __name__ == "__main__":
+  BronzeAssetIngestionPipeline().run()

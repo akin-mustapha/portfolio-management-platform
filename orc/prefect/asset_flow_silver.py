@@ -9,18 +9,25 @@ from src.shared.utils.custom_logger import customer_logger
 logging = customer_logger("asset_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
-def task_run_asset_full_loader_pipeline():
-    pipeline = PipelineFactory.get("bronze_asset")
+def task_asset_silver_pipeline():
+    pipeline = PipelineFactory.get("silver_asset")
+    pipeline.run()
+
+
+@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
+def task_asset_computed_silver():
+    pipeline = PipelineFactory.get("silver_asset_computed")
     pipeline.run()
 
 @flow
-def trading_212_asset_full_loader():
+def flow_t212_asset_silver():
     logging.info("Starting the flow to fetch account cash")
     logging.info("Starting data ingestion process")
-    task_run_asset_full_loader_pipeline()
+    task_asset_silver_pipeline()
+    task_asset_computed_silver()
     logging.info("End data ingestion process")
 
     
 if __name__ == "__main__": 
-    trading_212_asset_full_loader.serve(
-        name="asset_full_load_ingestion", interval=timedelta(seconds=600))  # Runs every 5mins
+    flow_t212_asset_silver.serve(
+        name="t212_asset_silver", interval=timedelta(seconds=600))  # Runs every 5mins

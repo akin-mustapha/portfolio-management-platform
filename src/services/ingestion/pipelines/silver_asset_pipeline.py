@@ -1,14 +1,15 @@
 import os
-import asyncio
-from dotenv import load_dotenv
 import logging
-from typing import List, Any, Dict
-from dataclasses import replace
 from datetime import datetime, UTC
-from src.services.ingestion.app.policies import Pipeline, Data
-from src.services.ingestion.app.interfaces import Source
-from src.services.ingestion.app.interfaces import Destination
-from src.services.ingestion.app.interfaces import Transformation
+from typing import List, Any, Dict
+from dataclasses import dataclass, asdict
+
+import pandas as pd
+
+from src.services.ingestion.app.policies import Pipeline
+from src.services.ingestion.app.protocols import Source
+from src.services.ingestion.app.protocols import Destination
+from src.services.ingestion.app.protocols import Transformation
 
 # TODO: should depend on interface
 from src.shared.database.client import SQLModelClient
@@ -19,11 +20,32 @@ logging.basicConfig(level="INFO")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+
+@dataclass
+class Asset:
+  data_timestamp: datetime
+  external_id: str 
+  ticker: str 
+  name: str
+  description: str 
+  broker: str 
+  currency: str 
+  local_currency: str 
+  share: float
+  price: float
+  avg_price: float
+  value: float
+  cost: float
+  profit: float
+  fx_impact: float
+  business_key: str
+  
+  
 class Trading212AssetSourceSilver(Source):
   def __init__(self):
     self._client = SQLModelClient(DATABASE_URL)
     
-  def fetch(self):
+  def extract(self):
     sql = """
       SELECT
         ticker,
@@ -50,6 +72,7 @@ class Trading212AssetSourceSilver(Source):
             FROM staging.asset_v2 x1
             WHERE t1.business_key = x1.business_key
           )
+          AND ticker IS NOT NULL
       LIMIT 1000;
     """
 
@@ -64,16 +87,17 @@ class Trading212AssetTransformationSilver(Transformation):
   """
     Trading212AssetTransformationSilver
   """
-  def transform(self, data: Data) -> list[Dict]:
+  def transform(self, data: list[Dict]) -> list[Dict]:
     """
       transform
     """
     bronze_asset_df = pd.DataFrame(data)
-    df.rename({
+    bronze_asset_df.rename({
       "ticker": "external_id"
     })
-    df = df
-    df = df[df["ticker"].notna()]
+    
+    # REMOVE NULL
+    df = bronze_asset_df[bronze_asset_df["ticker"].notna()]
     
     asset_df = pd.DataFrame()
     asset_df["external_id"] = df["ticker"]
@@ -95,16 +119,16 @@ class Trading212AssetTransformationSilver(Transformation):
     
     # Using ingested date as marker to sequential ordering of data
     asset_df["data_timestamp"] = df['ingested_timestamp']
-    
-    
-    return asset_df
+    asset_dict = asset_df.to_dict("records")
+    return asset_dict
 
 class Trading212AssetDestination(Destination):
-  def __init__(self, repo):
-      self._repository = EntityRepositoryFactory.get_repository("asset", schema_name="staging")
+  def __init__(self):
+      # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
+      self._repository = EntityRepositoryFactory.get_repository("asset_v2", schema_name="staging")
   
-  def save(self, data: List[Dict]) -> None:
-      self._repository.upsert(data=data, unique_key='asset_id')
+  def load(self, data: List[Dict]) -> None:
+      self._repository.upsert(records=data, unique_key=['business_key'])
       
 
 class SilverAssetPipeline(Pipeline):
@@ -114,23 +138,56 @@ class SilverAssetPipeline(Pipeline):
     self._destination = Trading212AssetDestination()
 
   def run(self):
-    # Fetch raw data from source
-    data = self._source.fetch()
-    # Copy to prevent mutating object
     try:
+      
+      # Fetch raw data from source
+      # Copy to prevent mutating object
+      data = self._source.extract()
+
+      if len(data) == 0:
+        logging.warning("NO RECORD")
+        return
+      
       # Apply Transformation Logic
-      transformed_data: List[Any] = self._transformation.apply_to(data)
+      transformed_data: List[Any] = self._transformation.transform(data)
       
+      # Mapping
+      data = [
+        asdict(Asset(
+          data_timestamp = row.get("data_timestamp"),
+          external_id = row.get("external_id"), 
+          ticker = row.get("ticker"), 
+          name = row.get("name"),
+          description = row.get("description"), 
+          broker = row.get("broker"), 
+          currency = row.get("currency"), 
+          local_currency = row.get("local_currency"), 
+          share = row.get("share"),
+          price = row.get("price"),
+          avg_price = row.get("avg_price"),
+          value = row.get("value"),
+          cost = row.get("cost"),
+          profit = row.get("profit"),
+          fx_impact = row.get("fx_impact"),
+          business_key = row.get("business_key"),
+          )
+        )
+        
+        for row in transformed_data
+      ]
+      
+      # print(data)
       # Save to Destination Table
-      self._destination.save(transformed_data)
+      self._destination.load(data)
       return None
-    
     except Exception as e:
-      # Update raw data
-      data = replace(data, is_processed=False)
-      
       # TODO REPLACE WITH ERROR MANAGEMENT 
       # Persist raw data
       # self._sink.save(data)
 
       raise e
+    
+    
+    
+if __name__ == "__main__":
+  SilverAssetPipeline().run()
