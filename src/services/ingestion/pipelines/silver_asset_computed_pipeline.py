@@ -1,99 +1,39 @@
-
-# TODO: Refactor to use repository interface (Query Repo for Asset)
-from src.shared.database.client import SQLModelClient
-from dotenv import load_dotenv
 import os
+import asyncio
+from dotenv import load_dotenv
+import logging
+from typing import List, Any, Dict
+from dataclasses import replace
+from datetime import datetime, UTC
+from src.services.ingestion.app.policies import Pipeline, Data
+from src.services.ingestion.app.interfaces import Source
+from src.services.ingestion.app.interfaces import Destination
+from src.services.ingestion.app.interfaces import Transformation
+
+# TODO: should depend on interface
+from src.shared.database.client import SQLModelClient
+from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
+
+logging.basicConfig(level="INFO")
+
+
 
 load_dotenv()
 
+URL = os.getenv("API_URL")
+API_TOKEN = os.getenv("API_TOKEN")
+SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-class AssetMetricQuery:
-  _client = SQLModelClient(DATABASE_URL)
-  @classmethod
-  def get(cls):
-    sql = """
-      SELECT
-        asset_id,
-        data_date,
-        price,
-        MAX(price) OVER (
-          PARTITION BY asset_id
-          ORDER BY data_date
-          ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
-        ) AS recent_high_30d,
-        MIN(price) OVER (
-          PARTITION BY asset_id
-          ORDER BY data_date
-          ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
-        ) AS recent_low_30d,
-        AVG(price) OVER (
-          PARTITION BY asset_id
-          ORDER BY data_date
-          ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
-        ) AS ma_30,
-        AVG(price) OVER (
-          PARTITION BY asset_id
-          ORDER BY data_date
-          ROWS BETWEEN 49 PRECEDING AND CURRENT ROW
-        ) AS ma_50
-      FROM staging.asset_snapshot
-      WHERE asset_id IS NOT NULL;
-    """
-
-    with cls._client as db:
-      result = db.execute(sql)
-
-    # TODO: Convert result to data
-    return result.fetchall()
 
 
-
-class AssetSilverQueryRepo:
-  """
-    Query Window. Incremental Loader
-  """
-  _client = SQLModelClient(DATABASE_URL)
-  
-  _window_in_hrs = 1
-
-  @classmethod
-  def get_bronze_asset(cls):
-    sql = """
-    SELECT
-      ticker,
-      instrument_name,
-      isin,
-      instrument_currency,
-      created_at,
-      quantity,
-      quantity_available,
-      quantity_in_pies,
-      current_price,
-      average_price_paid,
-      wallet_currency,
-      total_cost,
-      current_value,
-      unrealized_pnl,
-      fx_impact,
-      ingested_date,
-      ingested_timestamp,
-      business_key
-    FROM raw.v_bronze_asset t1
-    WHERE NOT EXISTS (
-          SELECT 1
-          FROM staging.asset_v2 x1
-          WHERE t1.business_key = x1.business_key
-        )
-    LIMIT 1000;
-    """
-    with cls._client as db:
-      result = db.execute(sql)
-    return result.fetchall()
-      
-      
-  @classmethod
-  def get_asset_computed(cls):
+class Trading212AssetComputedSourceSilver(Source):
+  def __init__(self):
+    self._client = SQLModelClient(DATABASE_URL)
+    
+  def fetch(self):
+    
+    # TODO - MOVE AGGREGATION TO PYTHON
     sql = """
             WITH base AS (
             SELECT
@@ -174,7 +114,69 @@ class AssetSilverQueryRepo:
             volatility_50d
         FROM stats s
     """
-    with cls._client as db:
+    with self._client as db:
       result = db.execute(sql)
     return result.fetchall()
+
+
+class Trading212AssetComputedTransformation(Transformation):
+  """
+    Trading212AssetComputedTransformation:
+  """
+  _portfolio_snapshot_repository = EntityRepositoryFactory.get_repository("portfolio_snapshot", schema_name="portfolio")
+  # FIXME - NEED TO MAP TO DATA CONTRACT
+  def transform(self, data: Data) -> list[Dict]:
+    """
+      transform: 
+    """
+    record = self._get_raw_data(data)
+    data_date = datetime.now(UTC)
+    investment = record.get('investments', {})
+    transformed_data = {
+      "external_id": record.get('id', None),
+      "data_date": data_date,
+      "currency": record.get('currency', ''),
+      "current_value": investment.get('currentValue', 0),
+      "total_value": record.get('totalValue', 0),
+      "total_cost": record.get('totalCost', 0),
+      "unrealized_profit": investment.get('unrealizedProfitLoss', 0),
+      "realized_profit": investment.get('realizedProfitLoss', 0),
+    }
+    return [transformed_data]
+  
+class Trading212AssetComputedDestination(Destination):
+  def __init__(self, repo):
+      self._repository = EntityRepositoryFactory.get_repository("asset_computed", schema_name="staging")
+  
+  def save(self, data: List[Dict]) -> None:
+      self._repository.upsert(data=data, unique_key='asset_id')
       
+      
+class SilverAssetComputedPipeline(Pipeline):
+  def __init__(self):
+    self._source = Trading212AssetComputedSourceSilver()
+    self._transformation = Trading212AssetComputedTransformation()
+    self._destination = Trading212AssetComputedDestination()
+
+  def run(self):
+    # Fetch raw data from source
+    data = self._source.fetch()
+    # Copy to prevent mutating object
+    try:
+      # Apply Transformation Logic
+      # FIXME - RENAME apply_to - to transform
+      transformed_data: List[Any] = self._transformation.apply_to(data)
+      
+      # Save to Destination Table
+      self._destination.save(transformed_data)
+      return None
+    
+    except Exception as e:
+      # Update raw data
+      data = replace(data, is_processed=False)
+      
+      # TODO REPLACE WITH ERROR MANAGEMENT 
+      # Persist raw data
+      # self._sink.save(data)
+
+      raise e

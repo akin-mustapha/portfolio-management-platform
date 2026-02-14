@@ -24,7 +24,7 @@ from src.dashboard.pages.asset.charts import PriceStructurePlotlyLineChart, Asse
 # ─────────────────────────────────────────────
 # Data prep
 # ─────────────────────────────────────────────
-# TODO: MOVE LOGIC TO SERVICE LAYER
+# TODO - MOVE LOGIC TO SERVICE LAYER
 def prep_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["pct_drawdown"] = (df["price"] - df["recent_high_30d"]) / df["recent_high_30d"]
