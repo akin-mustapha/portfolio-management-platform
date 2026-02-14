@@ -50,7 +50,7 @@ class PortfolioService:
         - AS A USER I WANT TO BE ABLE TO ASSIGN CATEGORIES TO TAGS SO THAT I CAN BETTER ORGANIZE THEM.
       """
       logging.info("=" * 20)
-      logging.info("Initializing TaggingService")
+      logging.info("Initializing Tagging Service")
       logging.info("=" * 20)
 
       self._asset_repo = asset_repository

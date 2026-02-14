@@ -1,9 +1,15 @@
+"""
+  Component
+  
+  Sync asset list from silver asset store to OLTP portfolio asset table
+  
+  Extract
+  Load
+"""
 import os
 import logging
 from dataclasses import dataclass, asdict
 from dotenv import load_dotenv
-from src.services.ingestion.infra.database.database_client import PostgresDatabaseClient
-
 from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(filename="logs/sync.log", level=logging.INFO, filemode="w")
@@ -14,20 +20,6 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 DATABASE_TYPE = os.getenv("DATABASE_TYPE", "sqlite").lower()
 
 
-sql = """
-  SELECT ticker, name, broker, currency
-  FROM (
-      SELECT *,
-            ROW_NUMBER() OVER (
-                PARTITION BY ticker, broker, currency
-                ORDER BY data_timestamp DESC
-            ) as rn
-      FROM staging.asset_v2
-  ) t
-  WHERE rn = 1;
-"""
-
-
 @dataclass
 class Asset():
   ticker: str
@@ -36,8 +28,19 @@ class Asset():
   currency: str
   
   
-
-if __name__ == "__main__":
+def extract():
+  sql = """
+    SELECT ticker, name, broker, currency
+    FROM (
+        SELECT *,
+              ROW_NUMBER() OVER (
+                  PARTITION BY ticker, broker, currency
+                  ORDER BY data_timestamp DESC
+              ) as rn
+        FROM staging.asset_v2
+    ) t
+    WHERE rn = 1;
+  """
   
   # Source
   try:
@@ -47,26 +50,12 @@ if __name__ == "__main__":
   except Exception as e:
     raise e
   
-  
-  # DESTINATION Schema Contract
-  # Also response can converted to a dict, this layer exist to 
-  # create a boundary between the source and destination physical storage
-  data = [
-    asdict(Asset(
-      ticker = row._mapping.get("ticker"),
-      name = row._mapping.get("name"),
-      broker = row._mapping.get("broker"),
-      currency = row._mapping.get("currency"),
-      )
-    )
-    
-    for row in data
-  ]
-  
-  
+  return data
+
+
+def load(data):
   # INSERTION POLICY
   # IDEMPOTENT
-
   merge_value_mapping =  ",".join([
       f"""(
           '{r.get('ticker')}'
@@ -101,8 +90,31 @@ if __name__ == "__main__":
         SET to_timestamp = NOW();
   """
   
-  
-  # # Destination
+  # Destination
   with SQLModelClient(DATABASE_URL) as client:
     client.execute(asset_upsert_sql)
+
+class PortfolioAssetPipeline:
+  @classmethod
+  def run(self):  
+    data = extract()
     
+    # DESTINATION Schema Contract
+    # Also response can be converted to a dict, this layer exist to 
+    # create a boundary between the source and destination physical storage
+    data = [
+      asdict(Asset(
+        ticker = row._mapping.get("ticker"),
+        name = row._mapping.get("name"),
+        broker = row._mapping.get("broker"),
+        currency = row._mapping.get("currency"),
+        )
+      )
+      
+      for row in data
+    ]
+    
+    load(data)
+  
+if __name__ == "__main__":
+  PortfolioAssetPipeline.run()

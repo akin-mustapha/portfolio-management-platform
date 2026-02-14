@@ -4,6 +4,8 @@ import uuid
 from datetime import date, timedelta, datetime
 from .policies import FullLoader
 
+from typing import List, Dict, Any
+from dataclasses import asdict, dataclass
 from src.shared.database.client import SQLModelClient
 load_dotenv()
 
@@ -14,6 +16,13 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Extract
 # Load
 
+
+
+@dataclass
+class AssetRaw:
+  payload: Any
+  ingested_date: str
+  ingested_timestamp: str
 
 class PostgresAssetFullLoader(FullLoader):
   

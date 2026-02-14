@@ -13,18 +13,21 @@ database_client = SQLModelClient(database_url=DATABASE_URL)
 class AssetService:
     # def __init__(self):
     _client = SQLModelClient(database_url=DATABASE_URL)
+    
     @classmethod
     def get_all_asset(cls):
         repo = TableRepositoryFactory.get("asset_query")
         rows = repo.select_all_asset()
         df = pd.DataFrame([dict(r._mapping) for r in rows])
         return df
+    
     @classmethod
     def get_all_tag(cls):
         repo = TableRepositoryFactory.get("asset_query")
         rows = repo.select_all_tag()
         df = pd.DataFrame([dict(r._mapping) for r in rows])
         return df
+    
     @classmethod
     def get_asset_data(cls):
         sql = """

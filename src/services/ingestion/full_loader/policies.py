@@ -8,15 +8,19 @@ class FullLoader(ABC):
     self._next_day = (self._current_datetime + timedelta(days=1)).strftime('%Y_%m_%d')
     self._table_name = table_name
     self._partition_name = f"{self._table_name}_{self._day}" 
+    
   def load(self, data):
     self._create_partition()
     self._loader(data)
     self._exposition_abstraction()
+    
   @abstractmethod
   def _create_partition(self):
     pass
+  
   @abstractmethod
   def _loader(self):
     pass
+  
   def _exposition_abstraction(self):
     pass
