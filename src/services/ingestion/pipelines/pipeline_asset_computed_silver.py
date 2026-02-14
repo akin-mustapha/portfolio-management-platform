@@ -179,7 +179,7 @@ class Trading212AssetComputedDestination(Destination):
       self._repository.upsert(records=data, unique_key=['asset_id'])
 
       
-class SilverAssetComputedPipeline(Pipeline):
+class PipelineAssetComputedSilver(Pipeline):
   def __init__(self):
     self._source = Trading212AssetComputedSourceSilver()
     self._transformation = Trading212AssetComputedTransformation()
@@ -235,4 +235,4 @@ class SilverAssetComputedPipeline(Pipeline):
     
     
 if __name__ == "__main__":
-  SilverAssetComputedPipeline().run()
+  PipelineAssetComputedSilver().run()

@@ -94,7 +94,7 @@ def load(data):
   with SQLModelClient(DATABASE_URL) as client:
     client.execute(asset_upsert_sql)
 
-class PortfolioAssetPipeline:
+class PipelineAssetPortfolio:
   @classmethod
   def run(self):  
     data = extract()
@@ -117,4 +117,4 @@ class PortfolioAssetPipeline:
     load(data)
   
 if __name__ == "__main__":
-  PortfolioAssetPipeline.run()
+  PipelineAssetPortfolio.run()

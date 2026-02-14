@@ -10,7 +10,7 @@ logging = customer_logger("asset_snapshot_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_asset_portfolio_sync():
-    pipeline = PipelineFactory.get("portfolio_asset_pipeline")
+    pipeline = PipelineFactory.get("asset_portfolio")
     pipeline.run()
 
 @flow

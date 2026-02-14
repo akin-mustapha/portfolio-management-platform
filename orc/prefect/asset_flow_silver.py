@@ -10,13 +10,13 @@ logging = customer_logger("asset_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_asset_silver_pipeline():
-    pipeline = PipelineFactory.get("silver_asset")
+    pipeline = PipelineFactory.get("asset_silver")
     pipeline.run()
 
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_asset_computed_silver():
-    pipeline = PipelineFactory.get("silver_asset_computed")
+    pipeline = PipelineFactory.get("asset_computed_silver")
     pipeline.run()
 
 @flow
