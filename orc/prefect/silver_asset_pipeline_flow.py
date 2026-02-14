@@ -2,10 +2,7 @@ import logging
 from prefect import flow, task
 from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
-from src.services.analytics.app.silver_asset import SilverAsset
-from src.services.analytics.query import AssetSilverQueryRepo
-from src.services.analytics.funcs import FuncAssetDerivedMetric
-from src.services.analytics.sink import SinkSilverAsset
+from src.services.ingestion.pipeline_factory import PipelineFactory
 
 from src.shared.utils.custom_logger import customer_logger
 
@@ -13,9 +10,7 @@ logging = customer_logger("asset_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_run_silver_layer_asset_ingestion():
-    pipeline = SilverAsset(AssetSilverQueryRepo
-                      , FuncAssetDerivedMetric
-                      , SinkSilverAsset)
+    pipeline = PipelineFactory.get("silver_asset")
     pipeline.run()
 
 @flow

@@ -10,7 +10,7 @@ logging = customer_logger("asset_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_run_asset_full_loader_pipeline():
-    pipeline = PipelineFactory.get("trading212FullLoaderAssetPipeline")
+    pipeline = PipelineFactory.get("bronze_asset")
     pipeline.run()
 
 @flow

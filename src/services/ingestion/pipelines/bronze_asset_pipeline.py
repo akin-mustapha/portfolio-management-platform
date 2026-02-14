@@ -1,5 +1,4 @@
 import os
-import asyncio
 from dotenv import load_dotenv
 import logging
 from typing import List, Dict
@@ -13,7 +12,7 @@ from src.services.ingestion.app.interfaces import Transformation
 from src.services.ingestion.app.policies import Pipeline
 
 from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
-from sandbox.full_loader.main import PostgresAssetFullLoader
+from src.services.ingestion.full_loader.main import PostgresAssetFullLoader
 
 logging.basicConfig(level="INFO")
 
