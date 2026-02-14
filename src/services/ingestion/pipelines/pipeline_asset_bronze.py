@@ -60,7 +60,7 @@ class Trading212AssetTransformation(Transformation):
     pass
   
   
-class BronzeAssetIngestionPipeline(Pipeline):
+class PipelineAssetBronze(Pipeline):
   def __init__(self):
     self._source = Trading212AssetSource()
     self._transformation = Trading212AssetTransformation()
@@ -87,4 +87,4 @@ class BronzeAssetIngestionPipeline(Pipeline):
     
     
 if __name__ == "__main__":
-  BronzeAssetIngestionPipeline().run()
+  PipelineAssetBronze().run()

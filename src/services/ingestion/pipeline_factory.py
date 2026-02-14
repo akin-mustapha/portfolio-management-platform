@@ -1,15 +1,15 @@
 from src.services.ingestion.app.policies import Pipeline
-from src.services.ingestion.pipelines.bronze_asset_pipeline import BronzeAssetIngestionPipeline
-from src.services.ingestion.pipelines.silver_asset_pipeline import SilverAssetPipeline
-from src.services.ingestion.pipelines.silver_asset_computed_pipeline import SilverAssetComputedPipeline
-from src.services.ingestion.pipelines.portfolio_asset_pipeline import PortfolioAssetPipeline
+from src.services.ingestion.pipelines.pipeline_asset_bronze import PipelineAssetBronze
+from src.services.ingestion.pipelines.pipeline_asset_silver import PipelineAssetSilver
+from src.services.ingestion.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
+from src.services.ingestion.pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
 
 class PipelineFactory:
   _registry = {
-    "bronze_asset": BronzeAssetIngestionPipeline,
-    "silver_asset": SilverAssetPipeline,
-    "silver_asset_computed": SilverAssetComputedPipeline,
-    "portfolio_asset_pipeline": PortfolioAssetPipeline,
+    "asset_bronze": PipelineAssetBronze,
+    "asset_silver": PipelineAssetSilver,
+    "asset_computed_silver": PipelineAssetComputedSilver,
+    "asset_portfolio": PipelineAssetPortfolio,
   }
   @classmethod
   def get(self, name: str) -> Pipeline:

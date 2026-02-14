@@ -131,7 +131,7 @@ class Trading212AssetDestination(Destination):
       self._repository.upsert(records=data, unique_key=['business_key'])
       
 
-class SilverAssetPipeline(Pipeline):
+class PipelineAssetSilver(Pipeline):
   def __init__(self):
     self._source = Trading212AssetSourceSilver()
     self._transformation = Trading212AssetTransformationSilver()
@@ -190,4 +190,4 @@ class SilverAssetPipeline(Pipeline):
     
     
 if __name__ == "__main__":
-  SilverAssetPipeline().run()
+  PipelineAssetSilver().run()
