@@ -1,85 +1,63 @@
+from typing import Dict, Optional, Iterable
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
   
-class BaseRepositoryInterface(ABC):
-  def __init__(self, entity_name, schema_name):
-    self._entity_name = entity_name
+class Repository(ABC):
+  
+  def __init__(self, entity_name, schema_name, field_mapping=None):
+    
+    self._entity_name = f"{schema_name}.{entity_name}" if schema_name else entity_name
     self._schema_name = schema_name
+    self._field_mapping = field_mapping
+    
   @property
   def entity_name(self):
     return self._entity_name
+  
   @entity_name.setter
   def entity_name(self, entity_name):
     self._entity_name = entity_name
+    
   @property
   def schema_name(self):
     return self._schema_name
+  
   @schema_name.setter
   def schema_name(self, schema_name):
     self._schema_name = schema_name
+    
   @abstractmethod
-  def insert(self, **kwargs):
+  def insert(self, records: Iterable[Dict]):
     raise NotImplementedError("Subclasses must implement this method")
+  
   @abstractmethod
-  def upsert(self, **kwargs):
+  def upsert(self, records: Iterable[Dict]):
     raise NotImplementedError("Subclasses must implement this method")
+  
   @abstractmethod
-  def select(self, **kwargs):
+  def select(self, params: Dict):
     raise NotImplementedError("Subclasses must implement this method")
+  
   @abstractmethod
-  def select_all(self, **kwargs):
+  def select_all(self):
     raise NotImplementedError("Subclasses must implement this method")
+  
   @abstractmethod
-  def update(self, **kwargs):
+  def update(self, records: Dict, params: Dict):
     raise NotImplementedError("Subclasses must implement this method")
+  
   @abstractmethod
-  def delete(self, **kwargs):
+  def delete(self, params: Dict):
     raise NotImplementedError("Subclasses must implement this method")
 
 class RawDataRepositoryInterface(ABC):
   @abstractmethod
   def insert(self, record: Dict) -> Dict:
     pass
+  
   @abstractmethod
   def select(self, source: str) -> Optional[Dict]:
     pass
+  
   @abstractmethod
   def process_raw_data(self, id: int) -> None:
     pass
-
-
-
-class DatabaseClientInterface(ABC):
-  def __init__(self, entity_name, schema_name):
-    self._entity_name = entity_name
-    self._schema_name = schema_name
-  @property
-  def entity_name(self):
-    return self._entity_name
-  @entity_name.setter
-  def entity_name(self, entity_name):
-    self._entity_name = entity_name
-  @property
-  def schema_name(self):
-    return self._schema_name
-  @schema_name.setter
-  def schema_name(self, schema_name):
-    self._schema_name = schema_name
-  @abstractmethod
-  def insert(self, **kwargs):
-    raise NotImplementedError("Subclasses must implement this method")
-  @abstractmethod
-  def upsert(self, **kwargs):
-    raise NotImplementedError("Subclasses must implement this method")
-  @abstractmethod
-  def select(self, **kwargs):
-    raise NotImplementedError("Subclasses must implement this method")
-  @abstractmethod
-  def select_all(self, **kwargs):
-    raise NotImplementedError("Subclasses must implement this method")
-  @abstractmethod
-  def update(self, **kwargs):
-    raise NotImplementedError("Subclasses must implement this method")
-  @abstractmethod
-  def delete(self, **kwargs):
-    raise NotImplementedError("Subclasses must implement this method")

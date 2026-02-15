@@ -8,6 +8,7 @@ import json
 from typing import List, Dict, Any
 from dataclasses import asdict, dataclass
 from src.shared.database.client import SQLModelClient
+
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")

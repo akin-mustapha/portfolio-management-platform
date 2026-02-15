@@ -1,5 +1,6 @@
 import os
 import logging
+from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Any, Dict
 from dataclasses import dataclass, asdict
@@ -13,10 +14,16 @@ from src.services.ingestion.app.protocols import Transformation
 
 # TODO: should depend on interface
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
+from src.services.ingestion.infra.repositories.repositories import DatabaseRepositoryFactory
 
+logging.basicConfig(
+    level=logging.INFO,
+    filename='logs/info.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+)
 
-logging.basicConfig(level="INFO")
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -125,7 +132,7 @@ class Trading212AssetTransformationSilver(Transformation):
 class Trading212AssetDestination(Destination):
   def __init__(self):
       # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
-      self._repository = EntityRepositoryFactory.get_repository("asset_v2", schema_name="staging")
+      self._repository = DatabaseRepositoryFactory.get_repository("asset_v2", schema_name="staging")
   
   def load(self, data: List[Dict]) -> None:
       self._repository.upsert(records=data, unique_key=['business_key'])

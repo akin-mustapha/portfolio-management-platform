@@ -4,18 +4,21 @@ from dotenv import load_dotenv
 from typing import List, Any, Dict
 from dataclasses import replace, dataclass, asdict
 
-from src.services.ingestion.app.policies import Pipeline
 from src.services.ingestion.app.protocols import Source
+from src.services.ingestion.app.policies import Pipeline
 from src.services.ingestion.app.protocols import Destination
 from src.services.ingestion.app.protocols import Transformation
 
 # TODO: should depend on interface
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
+from src.services.ingestion.infra.repositories.repositories import DatabaseRepositoryFactory
 
-logging.basicConfig(level="INFO")
-
-
+logging.basicConfig(
+    level=logging.INFO,
+    filename='logs/info.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+)
 
 load_dotenv()
 
@@ -173,7 +176,7 @@ class Trading212AssetComputedTransformation(Transformation):
   
 class Trading212AssetComputedDestination(Destination):
   def __init__(self):
-      self._repository = EntityRepositoryFactory.get_repository("asset_computed", schema_name="staging")
+      self._repository = DatabaseRepositoryFactory.get_repository("asset_computed", schema_name="staging")
   
   def load(self, data: List[Dict]) -> None:
       self._repository.upsert(records=data, unique_key=['asset_id'])

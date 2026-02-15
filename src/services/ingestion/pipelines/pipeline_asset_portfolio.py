@@ -12,7 +12,12 @@ from dataclasses import dataclass, asdict
 from dotenv import load_dotenv
 from src.shared.database.client import SQLModelClient
 
-logging.basicConfig(filename="logs/sync.log", level=logging.INFO, filemode="w")
+logging.basicConfig(
+    level=logging.INFO,
+    filename='logs/info.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+)
 
 load_dotenv()
 

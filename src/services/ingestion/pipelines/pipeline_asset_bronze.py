@@ -1,28 +1,32 @@
+"""
+  Asset Bronze Pipeline
+"""
 import os
-import asyncio
-from dotenv import load_dotenv
-from typing import List, Dict, Any
 import logging
-import json
-from dataclasses import replace
-from datetime import datetime, UTC
+import asyncio
+from typing import Dict, Any
+from dotenv import load_dotenv
+
 from src.services.ingestion.app.protocols import Source
+from src.services.ingestion.app.policies import Pipeline
 from src.services.ingestion.app.protocols import Destination
 from src.services.ingestion.app.protocols import Transformation
-from src.services.ingestion.app.policies import Pipeline
 
-from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
 from src.services.ingestion.full_loader.main import PostgresAssetFullLoader
+from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
 
-logging.basicConfig(level="INFO")
+logging.basicConfig(
+    level=logging.INFO,
+    filename='logs/info.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+)
 
 load_dotenv()
 
 URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
-
-
 
 class Trading212AssetSource(Source):
   def __init__(self):

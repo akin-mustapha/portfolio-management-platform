@@ -1,8 +1,9 @@
 from src.services.ingestion.app.policies import Pipeline
+
 from src.services.ingestion.pipelines.pipeline_asset_bronze import PipelineAssetBronze
 from src.services.ingestion.pipelines.pipeline_asset_silver import PipelineAssetSilver
-from src.services.ingestion.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
 from src.services.ingestion.pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
+from src.services.ingestion.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
 
 class PipelineFactory:
   _registry = {
