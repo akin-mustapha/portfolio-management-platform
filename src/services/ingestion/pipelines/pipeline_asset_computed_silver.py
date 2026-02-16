@@ -11,7 +11,7 @@ from src.services.ingestion.app.protocols import Transformation
 
 # TODO: should depend on interface
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion.infra.repositories.repositories import DatabaseRepositoryFactory
+from src.services.ingestion.infra.repositories.repository_factory import RepositoryFactory
 
 logging.basicConfig(
     level=logging.INFO,
@@ -176,7 +176,7 @@ class Trading212AssetComputedTransformation(Transformation):
   
 class Trading212AssetComputedDestination(Destination):
   def __init__(self):
-      self._repository = DatabaseRepositoryFactory.get_repository("asset_computed", schema_name="staging")
+      self._repository = RepositoryFactory.get("asset_computed", schema_name="staging")
   
   def load(self, data: List[Dict]) -> None:
       self._repository.upsert(records=data, unique_key=['asset_id'])

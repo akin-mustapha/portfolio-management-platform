@@ -1,6 +1,6 @@
 from typing import Dict
 from src.services.ingestion.infra.database.database_client import DatabaseRepositoryFactory
-from src.services.ingestion.app.interfaces import Repository
+from src.services.ingestion.app.interfaces.interfaces import Repository
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(filemode="w", level=logging.INFO)
