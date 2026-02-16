@@ -4,12 +4,14 @@ import base64
 import logging
 from urllib.parse import urljoin
 
+from src.services.ingestion.app.interfaces.interface_api_client import APIClient
+
 os.path.exists('logs') or os.makedirs('logs')
 log_dir_name = 'logs'
 
 logging.basicConfig(level=logging.INFO, filename=f'{log_dir_name}/info.log', filemode='w', format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s')
 
-class Trading212APIClient:
+class Trading212APIClient(APIClient):
     def __init__(self, url: str, api_token: str, secret_token: str):
         self.url = url
         self.api_token = api_token

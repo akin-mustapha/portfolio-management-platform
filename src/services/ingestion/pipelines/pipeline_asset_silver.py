@@ -14,7 +14,7 @@ from src.services.ingestion.app.protocols import Transformation
 
 # TODO: should depend on interface
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion.infra.repositories.repositories import DatabaseRepositoryFactory
+from src.services.ingestion.infra.repositories.repository_factory import RepositoryFactory
 
 logging.basicConfig(
     level=logging.INFO,
@@ -132,7 +132,7 @@ class Trading212AssetTransformationSilver(Transformation):
 class Trading212AssetDestination(Destination):
   def __init__(self):
       # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
-      self._repository = DatabaseRepositoryFactory.get_repository("asset_v2", schema_name="staging")
+      self._repository = RepositoryFactory.get("asset_v2", schema_name="staging")
   
   def load(self, data: List[Dict]) -> None:
       self._repository.upsert(records=data, unique_key=['business_key'])

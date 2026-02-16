@@ -14,7 +14,7 @@ from src.services.ingestion.app.protocols import Destination
 from src.services.ingestion.app.protocols import Transformation
 
 from src.services.ingestion.full_loader.account_full_loader import PostgresAccountFullLoader
-from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
+from src.services.ingestion.infra.api.api_client_trading212 import Trading212APIClient
 
 logging.basicConfig(
     level=logging.INFO,

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from typing import Optional, Dict
 from datetime import datetime, timezone
 from src.shared.database.client import SQLModelClient
-from src.services.ingestion.app.interfaces import RawDataRepositoryInterface
+from src.services.ingestion.app.interfaces.interfaces import RawDataRepositoryInterface
 
 logging.basicConfig(
     level=logging.INFO,

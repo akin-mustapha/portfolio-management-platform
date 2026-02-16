@@ -28,5 +28,6 @@ class Transformation(Protocol):
     return data.payload
   
 class Destination(Protocol):
+
   def load(self, data: list[Any]) -> None:
     raise NotImplementedError
