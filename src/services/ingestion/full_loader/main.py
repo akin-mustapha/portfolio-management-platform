@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import uuid
 from datetime import date, timedelta, datetime
 from .policies import FullLoader
+import json
 
 from typing import List, Dict, Any
 from dataclasses import asdict, dataclass
@@ -30,25 +31,28 @@ class PostgresAssetFullLoader(FullLoader):
     super().__init__(table_name)
     self._client = SQLModelClient(DATABASE_URL)
 
-  def _loader(self, data):
-    sql=f"""
-      INSERT INTO {self._table_name} (
-          id
-        , payload
-        , ingested_date
-      )
-      VALUES ((:id), (:payload), (:ingested_date))
-    """
+  def _loader(self, data: list[dict]):
     
-    params = {
-      "id": uuid.uuid4(),
-      "payload": data,
-      "ingested_date": datetime.now().date()
-    }
-    
-    with self._client as client:
-      client.execute(sql, params=params)
-    
+    ingested_time = datetime.now().date()
+    for record in data:
+      sql=f"""
+        INSERT INTO {self._table_name} (
+            id
+          , payload
+          , ingested_date
+        )
+        VALUES ((:id), (:payload), (:ingested_date))
+      """
+      
+      params = {
+        "id": uuid.uuid4(),
+        "payload": json.dumps(record),
+        "ingested_date": ingested_time
+      }
+      
+      with self._client as client:
+        client.execute(sql, params=params)
+
   def _create_partition(self):
 
     sql = f"""

@@ -39,7 +39,7 @@ class Trading212AssetSource(Source):
 
 class Trading212AssetDestination(Destination):
   def load(self, data: Any) -> None:
-    PostgresAssetFullLoader("raw.asset").load(json.dumps(data))
+    PostgresAssetFullLoader("raw.asset").load(data)
 
 
 class Trading212AssetTransformation(Transformation):
