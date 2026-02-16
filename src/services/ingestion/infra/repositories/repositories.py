@@ -233,7 +233,7 @@ class PostgresRepository(Repository):
         res = client.execute(sql, record)
         result.append(res)
       logging.info(f"Upserted record into {self._entity_name}")
-      return result
+    return result
 
   @schema
   def update(self, records: Dict, params: Dict):

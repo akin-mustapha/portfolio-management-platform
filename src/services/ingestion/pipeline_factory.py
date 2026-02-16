@@ -1,7 +1,9 @@
 from src.services.ingestion.app.policies import Pipeline
 
 from src.services.ingestion.pipelines.pipeline_asset_bronze import PipelineAssetBronze
+from src.services.ingestion.pipelines.pipeline_portfolio_bronze import PipelinePortfolioBronze
 from src.services.ingestion.pipelines.pipeline_asset_silver import PipelineAssetSilver
+from src.services.ingestion.pipelines.pipeline_portfolio_silver import PipelinePortfolioSilver
 from src.services.ingestion.pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
 from src.services.ingestion.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
 
@@ -11,6 +13,8 @@ class PipelineFactory:
     "asset_silver": PipelineAssetSilver,
     "asset_computed_silver": PipelineAssetComputedSilver,
     "asset_portfolio": PipelineAssetPortfolio,
+    "portfolio_portfolio": PipelinePortfolioBronze,
+    "asset_portfolio": PipelinePortfolioSilver,
   }
   @classmethod
   def get(self, name: str) -> Pipeline:

@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Iterable
+from typing import Dict, Optional, Iterable, Any
 from abc import ABC, abstractmethod
   
 class Repository(ABC):
@@ -49,15 +49,28 @@ class Repository(ABC):
   def delete(self, params: Dict):
     raise NotImplementedError("Subclasses must implement this method")
 
-class RawDataRepositoryInterface(ABC):
-  @abstractmethod
-  def insert(self, record: Dict) -> Dict:
-    pass
-  
-  @abstractmethod
-  def select(self, source: str) -> Optional[Dict]:
-    pass
-  
-  @abstractmethod
-  def process_raw_data(self, id: int) -> None:
-    pass
+class DatabaseClient(ABC):
+    """Abstract base class for database clients."""
+    @abstractmethod
+    def connect(self) -> Any:
+        """Establish a connection to the database."""
+        pass
+    @abstractmethod
+    def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> Any:
+        """Execute a SQL query."""
+        pass
+    @abstractmethod
+    def insert(self, table: str, records: Iterable[dict]) -> None:
+        """Insert data into a specified table."""
+        pass
+    @abstractmethod
+    def close(self) -> None:
+        """Close the database connection."""
+        pass
+
+    def __enter__(self) -> "DatabaseClient":
+        self.connect()
+        return self
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+        return False  # Propagate exceptions if any

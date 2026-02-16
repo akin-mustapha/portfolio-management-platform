@@ -1,12 +1,13 @@
 import os
-from dotenv import load_dotenv
 import uuid
-from datetime import date, timedelta, datetime
-from .policies import FullLoader
 import json
+from typing import Any
+from datetime import datetime
+from dotenv import load_dotenv
+from dataclasses import dataclass
 
-from typing import List, Dict, Any
-from dataclasses import asdict, dataclass
+from .policies import FullLoader
+
 from src.shared.database.client import SQLModelClient
 
 load_dotenv()
