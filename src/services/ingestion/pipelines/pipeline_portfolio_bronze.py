@@ -1,5 +1,6 @@
+
 """
-  Asset Bronze Pipeline
+  Portfolio Bronze Pipeline
 """
 import os
 import logging
@@ -12,7 +13,7 @@ from src.services.ingestion.app.policies import Pipeline
 from src.services.ingestion.app.protocols import Destination
 from src.services.ingestion.app.protocols import Transformation
 
-from src.services.ingestion.full_loader.asset_full_loader import PostgresAssetFullLoader
+from src.services.ingestion.full_loader.portfolio_full_loader import PostgresPortfolioFullLoader
 from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
 
 logging.basicConfig(
@@ -28,10 +29,10 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-class Trading212AssetSource(Source):
+class Trading212PortfolioSource(Source):
   def __init__(self):
     self._url = URL
-    self._endpoint = "equity/positions"
+    self._endpoint = "equity/account/summary"
     self._api_token = API_TOKEN
     self._secret_token = SECRET_TOKEN
     self._api_client = Trading212APIClient(self._url, self._api_token, self._secret_token)
@@ -41,14 +42,14 @@ class Trading212AssetSource(Source):
     return data
     
 
-class Trading212AssetDestination(Destination):
+class Trading212PortfolioDestination(Destination):
   def load(self, data: Any) -> None:
-    PostgresAssetFullLoader("raw.asset").load(data)
+    PostgresPortfolioFullLoader("raw.portfolio").load(data)
 
 
-class Trading212AssetTransformation(Transformation):
+class Trading212PortfolioTransformation(Transformation):
   """
-    Trading212AssetTransformation:
+    Trading212PortfolioTransformation:
   """
   _FIELD_MAP = {
     "external_id": "ticker",
@@ -64,11 +65,11 @@ class Trading212AssetTransformation(Transformation):
     pass
   
   
-class PipelineAssetBronze(Pipeline):
+class PipelinePortfolioBronze(Pipeline):
   def __init__(self):
-    self._source = Trading212AssetSource()
-    self._transformation = Trading212AssetTransformation()
-    self._destination = Trading212AssetDestination()
+    self._source = Trading212PortfolioSource()
+    self._transformation = Trading212PortfolioTransformation()
+    self._destination = Trading212PortfolioDestination()
 
   def run(self):
     
@@ -91,4 +92,4 @@ class PipelineAssetBronze(Pipeline):
     
     
 if __name__ == "__main__":
-  PipelineAssetBronze().run()
+  PipelinePortfolioBronze().run()

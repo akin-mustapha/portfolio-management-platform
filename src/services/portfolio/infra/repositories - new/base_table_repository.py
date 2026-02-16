@@ -1,11 +1,11 @@
-from typing import Dict, Iterable
-from src.services.ingestion.infra.database.database_client import EntityRepositoryFactory
-from src.services.ingestion.app.interfaces import BaseRepositoryInterface
+from typing import Dict
+from src.services.ingestion.infra.database.database_client import DatabaseRepositoryFactory
+from src.services.ingestion.app.interfaces import Repository
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(filemode="w", level=logging.INFO)
 
-class BaseTableRepository(BaseRepositoryInterface):
+class BaseTableRepository(Repository):
     def __init__(self, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None):
         """
         :param entity_name: Table name in DB
@@ -13,7 +13,8 @@ class BaseTableRepository(BaseRepositoryInterface):
         :param field_map: Mapping from domain name -> DB column name
         """
         self._field_map = field_map or {}
-        self._entity_repo = EntityRepositoryFactory.get_repository(entity_name, schema_name)
+        self._entity_repo = DatabaseRepositoryFactory.get_repository(entity_name, schema_name)
+
 
     def _to_db_fields(self, data: Dict) -> Dict:
         """Map domain-friendly fields to DB column names."""
