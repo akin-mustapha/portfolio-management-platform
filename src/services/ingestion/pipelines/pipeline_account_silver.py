@@ -30,7 +30,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 @dataclass
-class Portfolio:
+class Account:
   data_timestamp: datetime
   external_id: str
   cash_in_pies: float
@@ -44,7 +44,7 @@ class Portfolio:
   investments_unrealized_pnl: float
   business_key: str  
   
-class Trading212PortfolioSourceSilver(Source):
+class Trading212AccountSourceSilver(Source):
   def __init__(self):
     self._client = SQLModelClient(DATABASE_URL)
     
@@ -63,10 +63,10 @@ class Trading212PortfolioSourceSilver(Source):
         ingested_date,
         ingested_timestamp,
         business_key
-      FROM raw.v_bronze_portfolio t1
+      FROM raw.v_bronze_account t1
       WHERE NOT EXISTS (
             SELECT 1
-            FROM staging.portfolio x1
+            FROM staging.account x1
             WHERE t1.business_key = x1.business_key
           )
           AND external_id IS NOT NULL
@@ -80,17 +80,17 @@ class Trading212PortfolioSourceSilver(Source):
     return result.fetchall()
 
 
-class Trading212PortfolioTransformationSilver(Transformation):
+class Trading212AccountTransformationSilver(Transformation):
   """
-    Trading212PortfolioTransformationSilver
+    Trading212AccountTransformationSilver
   """
   def transform(self, data: list[Dict]) -> list[Dict]:
     """
       transform
     """
-    bronze_portfolio_df = pd.DataFrame(data)
+    bronze_account_df = pd.DataFrame(data)
     # REMOVE NULL
-    df = bronze_portfolio_df[bronze_portfolio_df["external_id"].notna()]
+    df = bronze_account_df[bronze_account_df["external_id"].notna()]
     
     account_df = pd.DataFrame()
     account_df["external_id"] = df["external_id"]
@@ -111,20 +111,20 @@ class Trading212PortfolioTransformationSilver(Transformation):
     asset_dict = account_df.to_dict("records")
     return asset_dict
 
-class Trading212PortfolioDestination(Destination):
+class Trading212AccountDestination(Destination):
   def __init__(self):
       # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
-      self._repository = DatabaseRepositoryFactory.get_repository("portfolio", schema_name="staging")
+      self._repository = DatabaseRepositoryFactory.get_repository("account", schema_name="staging")
   
   def load(self, data: List[Dict]) -> None:
       self._repository.upsert(records=data, unique_key=['business_key'])
       
 
-class PipelinePortfolioSilver(Pipeline):
+class PipelineAccountSilver(Pipeline):
   def __init__(self):
-    self._source = Trading212PortfolioSourceSilver()
-    self._transformation = Trading212PortfolioTransformationSilver()
-    self._destination = Trading212PortfolioDestination()
+    self._source = Trading212AccountSourceSilver()
+    self._transformation = Trading212AccountTransformationSilver()
+    self._destination = Trading212AccountDestination()
 
   def run(self):
     try:
@@ -143,7 +143,7 @@ class PipelinePortfolioSilver(Pipeline):
       # Mapping
       data = [
         asdict(
-          Portfolio(
+          Account(
           data_timestamp = row.get("data_timestamp"),
           external_id = row.get("external_id"), 
           cash_in_pies = row.get("cash_in_pies"), 
@@ -176,4 +176,4 @@ class PipelinePortfolioSilver(Pipeline):
     
     
 if __name__ == "__main__":
-  PipelinePortfolioSilver().run()
+  PipelineAccountSilver().run()

@@ -22,12 +22,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 @dataclass
-class PortfolioRaw:
+class AccountRaw:
   payload: Any
   ingested_date: str
   ingested_timestamp: str
 
-class PostgresPortfolioFullLoader(FullLoader):
+class PostgresAccountFullLoader(FullLoader):
   
   def __init__(self, table_name):
     super().__init__(table_name)
@@ -70,7 +70,7 @@ class PostgresPortfolioFullLoader(FullLoader):
   
   def _exposition_abstraction(self):
     sql = f"""
-      CREATE OR REPLACE VIEW raw.v_bronze_portfolio AS
+      CREATE OR REPLACE VIEW raw.v_bronze_account AS
       WITH cte AS (
           SELECT
               payload->'id' AS external_id,

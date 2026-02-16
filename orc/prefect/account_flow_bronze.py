@@ -9,7 +9,7 @@ logger = loggers.get_logger(__name__)
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_account_bronze_pipeline():
-    pipeline = PipelineFactory.get("portfolio_bronze")
+    pipeline = PipelineFactory.get("account_bronze")
     logger.info("Running Pipeline")
     pipeline.run()
 
