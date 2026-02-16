@@ -22,7 +22,7 @@ def upgrade() -> None:
     """Upgrade schema."""
     
     op.execute("""
-        CREATE TABLE staging.portfolio
+        CREATE TABLE staging.account
         (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             data_timestamp TIMESTAMPTZ NOT NULL,
@@ -45,4 +45,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.execute("DROP TABLE IF EXISTS staging.portfolio")
+    op.execute("DROP TABLE IF EXISTS staging.account")

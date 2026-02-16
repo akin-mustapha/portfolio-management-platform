@@ -10,7 +10,7 @@ logging = customer_logger("asset_flow_run")
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_account_silver_pipeline():
-    pipeline = PipelineFactory.get("portfolio_silver")
+    pipeline = PipelineFactory.get("account_silver")
     pipeline.run()
 
 

@@ -1,6 +1,6 @@
 
 """
-  Portfolio Bronze Pipeline
+  Account Bronze Pipeline
 """
 import os
 import logging
@@ -13,7 +13,7 @@ from src.services.ingestion.app.policies import Pipeline
 from src.services.ingestion.app.protocols import Destination
 from src.services.ingestion.app.protocols import Transformation
 
-from src.services.ingestion.full_loader.portfolio_full_loader import PostgresPortfolioFullLoader
+from src.services.ingestion.full_loader.account_full_loader import PostgresAccountFullLoader
 from src.services.ingestion.infra.api.trading212_api_client import Trading212APIClient
 
 logging.basicConfig(
@@ -29,7 +29,7 @@ URL = os.getenv("API_URL")
 API_TOKEN = os.getenv("API_TOKEN")
 SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
-class Trading212PortfolioSource(Source):
+class Trading212AccountSource(Source):
   def __init__(self):
     self._url = URL
     self._endpoint = "equity/account/summary"
@@ -42,14 +42,14 @@ class Trading212PortfolioSource(Source):
     return data
     
 
-class Trading212PortfolioDestination(Destination):
+class Trading212AccountDestination(Destination):
   def load(self, data: Any) -> None:
-    PostgresPortfolioFullLoader("raw.portfolio").load(data)
+    PostgresAccountFullLoader("raw.account").load(data)
 
 
-class Trading212PortfolioTransformation(Transformation):
+class Trading212AccountTransformation(Transformation):
   """
-    Trading212PortfolioTransformation:
+    Trading212AccountTransformation:
   """
   _FIELD_MAP = {
     "external_id": "ticker",
@@ -65,11 +65,11 @@ class Trading212PortfolioTransformation(Transformation):
     pass
   
   
-class PipelinePortfolioBronze(Pipeline):
+class PipelineAccountBronze(Pipeline):
   def __init__(self):
-    self._source = Trading212PortfolioSource()
-    self._transformation = Trading212PortfolioTransformation()
-    self._destination = Trading212PortfolioDestination()
+    self._source = Trading212AccountSource()
+    self._transformation = Trading212AccountTransformation()
+    self._destination = Trading212AccountDestination()
 
   def run(self):
     
@@ -92,4 +92,4 @@ class PipelinePortfolioBronze(Pipeline):
     
     
 if __name__ == "__main__":
-  PipelinePortfolioBronze().run()
+  PipelineAccountBronze().run()
