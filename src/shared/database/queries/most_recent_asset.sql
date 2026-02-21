@@ -15,10 +15,10 @@
   SELECT
       ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) as rn
     , id
-  FROM staging.asset_v2
+  FROM staging.asset
 )
 SELECT 
-  t1.ticker
+    t1.ticker
   , t1.name
   , t1.price
   , t1.avg_price
@@ -26,10 +26,10 @@ SELECT
   , t1.profit 
   , t1.fx_impact
   , t3.*
-FROM staging.asset_v2 t1
+FROM staging.asset t1
   INNER JOIN most_recent_asset t2
     ON t1.id = t2.id
   INNER JOIN staging.asset_computed t3
     ON t1.id = t3.asset_id
 WHERE t2.rn = 1
-ORDER BY "daily_return" desc
+ORDER BY "recent_profit_high_30d" desc

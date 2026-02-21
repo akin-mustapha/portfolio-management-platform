@@ -36,10 +36,12 @@ class AssetComputed:
   cumulative_return: float
   dca_bias: float
   pct_drawdown: float
-  recent_high_30d: float
-  recent_low_30d: float
-  high: float
-  low: float
+  recent_value_high_30d: float
+  recent_value_low_30d: float
+  recent_profit_high_30d: float
+  recent_profit_low_30d: float
+  value_high: float
+  value_low: float
   ma_20d: float
   ma_30d: float
   ma_50d: float
@@ -54,7 +56,8 @@ class Trading212AssetComputedSourceSilver(Source):
     
   def extract(self):
     # TODO - MOVE AGGREGATION TO PYTHON
-    sql = """
+    table_name = 'staging.asset'
+    sql = f"""
             WITH base AS (
             SELECT
                 b.id as asset_id,
@@ -72,7 +75,7 @@ class Trading212AssetComputedSourceSilver(Source):
                     ORDER BY b.created_timestamp
                 ), 0) AS daily_return,
                 b.created_timestamp
-            FROM staging.asset_v2 b
+            FROM {table_name} b
         ),
 
         stats AS (
@@ -151,33 +154,35 @@ class Trading212AssetComputedTransformation(Transformation):
     Trading212AssetComputedTransformation:
   """
   # FIXME - COMPUTATION HERE
-  def transform(self, data: list[Dict]) -> list[Dict]:
+  def transform(self, data: list[Dict]) -> list[AssetComputed]:
     """
       transform: 
     """
     transformed_data = []
     for record in data:
       record = dict(record._mapping)
+      rget = record.get
       transformed_data.append(
-        {
-          # TODO: IS NULL REALLY ZERO? - 
-          "asset_id": record.get("asset_id"),
-          "cashflow": record.get("cashflow", 0),
-          "daily_return": record.get("daily_return", 0),
-          "cumulative_return": record.get("cumulative_return", 0),
-          "dca_bias": record.get("dca_bias", 0),
-          "pct_drawdown": record.get("pct_drawdown", 0),
-          "recent_high_30d": record.get("recent_value_high_30d", 0),
-          "recent_low_30d": record.get("recent_value_low_30d", 0),
-          "high": record.get("value_high", 0),
-          "low": record.get("value_low", 0),
-          "ma_20d": record.get("ma_20d", 0),
-          "ma_30d": record.get("ma_30d", 0),
-          "ma_50d": record.get("ma_50d", 0),
-          "volatility_20d": record.get("volatility_20d", 0),
-          "volatility_30d": record.get("volatility_30d", 0),
-          "volatility_50d": record.get("volatility_50d", 0),
-        }
+        AssetComputed(
+          asset_id=rget("asset_id"),
+          cashflow=0 if (value := rget("cashflow")) is None else value,
+          daily_return=0 if (value := rget("daily_return")) is None else value,
+          cumulative_return=0 if (value := rget("cumulative_return")) is None else value,
+          dca_bias=0 if (value := rget("dca_bias")) is None else value,
+          pct_drawdown=0 if (value := rget("pct_drawdown")) is None else value,
+          recent_value_high_30d=0 if (value := rget("recent_value_high_30d")) is None else value,
+          recent_value_low_30d=0 if (value := rget("recent_value_low_30d")) is None else value,
+          recent_profit_high_30d=0 if (value := rget("recent_profit_high_30d")) is None else value,
+          recent_profit_low_30d=0 if (value := rget("recent_profit_low_30d")) is None else value,
+          value_high=0 if (value := rget("value_high")) is None else value,
+          value_low=0 if (value := rget("value_low")) is None else value,
+          ma_20d=0 if (value := rget("ma_20d")) is None else value,
+          ma_30d=0 if (value := rget("ma_30d")) is None else value,
+          ma_50d=0 if (value := rget("ma_50d")) is None else value,
+          volatility_20d=0 if (value := rget("volatility_20d")) is None else value,
+          volatility_30d=0 if (value := rget("volatility_30d")) is None else value,
+          volatility_50d=0 if (value := rget("volatility_50d")) is None else value,
+        )
       )
     return transformed_data
   
@@ -207,30 +212,13 @@ class PipelineAssetComputedSilver(Pipeline):
       # Mapping
       data = [
         asdict(
-          AssetComputed(
-            asset_id = row.get("asset_id"),
-            cashflow = row.get("cashflow", 0),
-            daily_return = row.get("daily_return", 0),
-            cumulative_return = row.get("cumulative_return", 0),
-            dca_bias = row.get("dca_bias", 0),
-            pct_drawdown = row.get("pct_drawdown", 0),
-            recent_high_30d = row.get("recent_high_30d", 0),
-            recent_low_30d = row.get("recent_low_30d", 0),
-            high = row.get("high", 0),
-            low = row.get("low", 0),
-            ma_20d = row.get("ma_20d", 0),
-            ma_30d = row.get("ma_30d", 0),
-            ma_50d = row.get("ma_50d", 0),
-            volatility_20d = row.get("volatility_20d", 0),
-            volatility_30d = row.get("volatility_30d", 0),
-            volatility_50d = row.get("volatility_50d", 0),
-            )
+          row
         )
         for row in transformed_data
       ]
       
       # Save to Destination Table
-      self._destination.load(transformed_data)
+      self._destination.load(data)
       return None
     
     except Exception as e:
