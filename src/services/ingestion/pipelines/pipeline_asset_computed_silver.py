@@ -79,8 +79,18 @@ class Trading212AssetComputedSourceSilver(Source):
             SELECT
                 asset_id,
                 value,
+                
+                -- rolling highs & lows
+                MAX(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS recent_value_high_30d,
+                MIN(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS recent_value_low_30d,
+                
                 cost,
                 profit,
+                
+                -- TODO: EXPOSE
+                MAX(profit) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS recent_profit_high_30d,
+                MIN(profit) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS recent_profit_low_30d,
+                
                 fx_impact,
                 daily_return,
 
@@ -101,13 +111,9 @@ class Trading212AssetComputedSourceSilver(Source):
                 STDDEV(daily_return) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS volatility_30d,
                 STDDEV(daily_return) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 49 PRECEDING AND CURRENT ROW) AS volatility_50d,
 
-                -- rolling highs & lows
-                MAX(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS recent_high_30d,
-                MIN(value) OVER (PARTITION BY ticker ORDER BY created_timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS recent_low_30d,
-
                 -- all-time high / low
-                MAX(value) OVER (PARTITION BY ticker) AS high,
-                MIN(value) OVER (PARTITION BY ticker) AS low
+                MAX(value) OVER (PARTITION BY ticker) AS value_high,
+                MIN(value) OVER (PARTITION BY ticker) AS value_low
             FROM base
         )
         SELECT
@@ -120,12 +126,13 @@ class Trading212AssetComputedSourceSilver(Source):
             (value - cost) / NULLIF(cost, 0)    AS dca_bias,
 
             -- drawdown from recent high
-            (value - recent_high_30d) / NULLIF(recent_high_30d, 0) AS pct_drawdown,
-
-            recent_high_30d,
-            recent_low_30d,
-            high,
-            low,
+            (value - recent_value_high_30d) / NULLIF(recent_value_high_30d, 0) AS pct_drawdown,
+            recent_profit_high_30d,
+            recent_profit_low_30d,
+            value_high,
+            value_low,
+            recent_value_high_30d,
+            recent_value_low_30d,
             ma_20d,
             ma_30d,
             ma_50d,
@@ -160,10 +167,10 @@ class Trading212AssetComputedTransformation(Transformation):
           "cumulative_return": record.get("cumulative_return", 0),
           "dca_bias": record.get("dca_bias", 0),
           "pct_drawdown": record.get("pct_drawdown", 0),
-          "recent_high_30d": record.get("recent_high_30d", 0),
-          "recent_low_30d": record.get("recent_low_30d", 0),
-          "high": record.get("high", 0),
-          "low": record.get("low", 0),
+          "recent_high_30d": record.get("recent_value_high_30d", 0),
+          "recent_low_30d": record.get("recent_value_low_30d", 0),
+          "high": record.get("value_high", 0),
+          "low": record.get("value_low", 0),
           "ma_20d": record.get("ma_20d", 0),
           "ma_30d": record.get("ma_30d", 0),
           "ma_50d": record.get("ma_50d", 0),
