@@ -76,7 +76,7 @@ class Trading212AssetSourceSilver(Source):
       FROM raw.v_bronze_asset t1
       WHERE NOT EXISTS (
             SELECT 1
-            FROM staging.asset_v2 x1
+            FROM staging.asset x1
             WHERE t1.business_key = x1.business_key
           )
           AND ticker IS NOT NULL
@@ -132,7 +132,7 @@ class Trading212AssetTransformationSilver(Transformation):
 class Trading212AssetDestination(Destination):
   def __init__(self):
       # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
-      self._repository = RepositoryFactory.get("asset_v2", schema_name="staging")
+      self._repository = RepositoryFactory.get("asset", schema_name="staging")
   
   def load(self, data: List[Dict]) -> None:
       self._repository.upsert(records=data, unique_key=['business_key'])
