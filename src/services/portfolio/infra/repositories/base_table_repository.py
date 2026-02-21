@@ -1,9 +1,9 @@
 from typing import Dict, Iterable
 from src.services.portfolio.infra.repositories.entity_repository import EntityRepositoryFactory
-from src.services.portfolio.app.interfaces import BaseRepositoryInterface
+from src.services.portfolio.app.interfaces import RepositoryInterface
 import logging
 
-class BaseTableRepository(BaseRepositoryInterface):
+class BaseTableRepository(RepositoryInterface):
     def __init__(self, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None):
         """
         :param entity_name: Table name in DB
@@ -33,7 +33,6 @@ class BaseTableRepository(BaseRepositoryInterface):
             db_data = self._to_db_fields(record)
             db_unique_key = [self._field_map.get(k, k) for k in unique_key]
             self._entity_repo.upsert([db_data], unique_key=db_unique_key)
-
 
     def select(self, params: Dict):
         db_params = self._to_db_fields(params)

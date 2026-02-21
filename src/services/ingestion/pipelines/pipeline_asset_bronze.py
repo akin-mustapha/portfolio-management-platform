@@ -71,7 +71,6 @@ class PipelineAssetBronze(Pipeline):
     self._destination = Trading212AssetDestination()
 
   def run(self):
-    
     try:
       # Extract raw data from source
       data: list[Dict] = self._source.extract()

@@ -1,10 +1,10 @@
 import os
 from src.services.portfolio.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
-from src.services.portfolio.infra.repositories.asset_snapshot_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
+from src.services.portfolio.infra.repositories.industry_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
 from src.services.portfolio.infra.repositories.tag_respository import PostgresTagRepository, SQLiteTagRepository
 from src.services.portfolio.infra.repositories.asset_tag_repository import PostgresAssetTagRepository, SQLiteAssetTagRepository
 
-from src.services.portfolio.infra.repositories.query_repository import SQLiteAssetQueryRepository, PostgresAssetQueryRepository, SQLiteSnapshotQueryRepository, PostgresSnapshotQueryRepository
+from src.services.portfolio.infra.repositories.sector_repository import SQLiteAssetQueryRepository, PostgresAssetQueryRepository, SQLiteSnapshotQueryRepository, PostgresSnapshotQueryRepository
 
 class TableRepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
@@ -13,7 +13,7 @@ class TableRepositoryFactory:
             "postgres": PostgresAssetRepository,
             "sqlite": SQLiteAssetRepository,
         },
-        "asset_snapshot": {
+        "industry": {
           "postgres": PostgresAssetSnapshotRepository, 
           "sqlite": SQLiteAssetSnapshotRepository
         },

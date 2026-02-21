@@ -128,7 +128,6 @@ class PipelineAccountSilver(Pipeline):
 
   def run(self):
     try:
-      
       # Fetch raw data from source
       # Copy to prevent mutating object
       data = self._source.extract()
@@ -172,7 +171,6 @@ class PipelineAccountSilver(Pipeline):
       # self._sink.save(data)
 
       raise e
-    
     
     
 if __name__ == "__main__":
