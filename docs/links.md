@@ -4,10 +4,6 @@
 
 - <>
 
-## Kafka
-
-- <>
-
 ## Yfinance
 
 - <https://algotrading101.com/learn/yfinance-guide/>
