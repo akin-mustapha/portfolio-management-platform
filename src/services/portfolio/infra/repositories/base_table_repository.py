@@ -60,7 +60,7 @@ class BaseTableRepository(RepositoryInterface):
 
       return res
 
-    def upsert(self, records: Dict, unique_key: list[str]):
+    def upsert(self, records: Iterable[Dict], unique_key: list[str]):
       for record in records:
         record = self._to_db_fields(record)
         db_unique_key = [self._field_map.get(k, k) for k in unique_key]

@@ -69,11 +69,26 @@ class PortfolioService:
     
     data_dict = industry.to_record()
     
-    repo_industry.insert(data_dict)
-    print(data_dict)
+    try:
+      repo_industry.upsert(records=[data_dict], unique_key=["name"])
+      
+    except Exception as e:
+      logging.error(e)
+      
+      raise e
   
   def create_sector(self, sector: Sector):
     repo_sector = self._repo_factory.get("sector")
+    
+    data_dict = sector.to_record()
+    
+    try:
+      repo_sector.insert(data_dict)
+      
+    except Exception as e:
+      logging.error(e)
+      
+      raise e
   
   def create_category(self, cateogry: Category):
     repo_category = self._repo_factory.get("category")
@@ -170,7 +185,9 @@ class PortfolioService:
    
    
 if __name__ == "__main__":
-  industry_1 = Industry(None, "Information Technology", datetime.now(UTC), datetime.now(UTC))
+  industry_1 = Industry(None, "Information Technology", "Information Technology", datetime.now(UTC), datetime.now(UTC))
+  sector_1 = Sector(None, "4b2ff3e9-72f9-4be0-8b33-a72775da4a0b", "Semiconductors & Equipment", "Semiconductors & Equipment", datetime.now(UTC), datetime.now(UTC))
   
   portfolio_service = PortfolioService()
   portfolio_service.create_industry(industry_1)
+  portfolio_service.create_sector(sector_1)

@@ -75,12 +75,14 @@ class AssetTag:
 class Industry:
     id: int | None
     name: str
+    description: str
     created_timestamp: str | None
     updated_timestamp: str | None
 
     to_record = lambda self: {
         "industry_id": self.id,
         "name": self.name,
+        "description": self.description,
         "created_timestamp": self.created_timestamp,
         "updated_timestamp": self.updated_timestamp,
     }
@@ -90,6 +92,7 @@ class Sector:
     id: int | None
     industry_id: int | None
     name: str
+    description: str
     created_timestamp: str | None
     updated_timestamp: str | None
 
@@ -97,6 +100,7 @@ class Sector:
         "sector_id": self.id,
         "industry_id": self.industry_id,
         "name": self.name,
+        "description": self.description,
         "created_timestamp": self.created_timestamp,
         "updated_timestamp": self.updated_timestamp,
     }

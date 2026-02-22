@@ -4,12 +4,12 @@ class PostgresSectorRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):
         # Domain name -> DB column mapping
         field_map = {
-            "id": "id",
+            # "id": "id",
             "name": "name",
             "description": "description",
             "industry_id": "industry_id",
             "is_active": "is_active",
-            "created_datetime": "created_timestamp",
+            "created_timestamp": "created_timestamp",
             "processed_timestamp": "updated_timestamp",
         }
 
