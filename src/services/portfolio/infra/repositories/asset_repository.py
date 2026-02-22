@@ -5,13 +5,13 @@ class PostgresAssetRepository(BaseTableRepository):
         # Domain name -> DB column mapping
         field_map = {
             "id": "id",
-            "external_id": "external_id",
+            "ticker": "ticker",
             "name": "name",
             "description": "description",
-            "source_name": "source_name",           # domain field = source, DB column = source_name
+            "broker": "broker",           # domain field = source, DB column = source_name
             "is_active": "is_active",
-            "created_datetime": "created_timestamp", # domain field = created_at, DB column = created_timestamp
-            "processed_timestamp": "updated_timestamp",
+            "created_datetime": "from_timestamp", # domain field = created_at, DB column = created_timestamp
+            "updated_timestamp": "updated_timestamp",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None
@@ -29,7 +29,7 @@ class SQLiteAssetRepository(BaseTableRepository):
             "source_name": "source_name",           # domain field = source, DB column = source_name
             "is_active": "is_active",
             "data_timestamp": "created_datetime", # domain field = created_at, DB column = created_timestamp
-            "processed_timestamp": "updated_datetime",
+            "updated_timestamp": "updated_datetime",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None

@@ -1,40 +1,39 @@
 import os
-from src.services.portfolio.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
-from src.services.portfolio.infra.repositories.industry_repository import PostgresAssetSnapshotRepository, SQLiteAssetSnapshotRepository
 from src.services.portfolio.infra.repositories.tag_respository import PostgresTagRepository, SQLiteTagRepository
+from src.services.portfolio.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
 from src.services.portfolio.infra.repositories.asset_tag_repository import PostgresAssetTagRepository, SQLiteAssetTagRepository
+from src.services.portfolio.infra.repositories.industry_repository import PostgresIndustryRepository, SQLiteIndustryRepository
+from src.services.portfolio.infra.repositories.sector_repository import PostgresSectorRepository, SQLiteSectorRepository
 
-from src.services.portfolio.infra.repositories.sector_repository import SQLiteAssetQueryRepository, PostgresAssetQueryRepository, SQLiteSnapshotQueryRepository, PostgresSnapshotQueryRepository
+from src.services.portfolio.infra.repositories.category_repository import PostgresCategoryRepository, SQLiteCategoryRepository
 
-class TableRepositoryFactory:
+class RepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
     registry = {
         "asset": {
             "postgres": PostgresAssetRepository,
             "sqlite": SQLiteAssetRepository,
         },
-        "industry": {
-          "postgres": PostgresAssetSnapshotRepository, 
-          "sqlite": SQLiteAssetSnapshotRepository
-        },
-        "tag": {
-            "postgres": PostgresTagRepository,
-            "sqlite": SQLiteTagRepository,
-        },
         "asset_tag": {
             "postgres": PostgresAssetTagRepository,
             "sqlite": SQLiteAssetTagRepository,
         },
-        "asset_query": {
-            "postgres": PostgresAssetQueryRepository,
-            "sqlite": SQLiteAssetQueryRepository,
-        },
-        "snapshot_query": {
-            "postgres": PostgresSnapshotQueryRepository,
-            "sqlite": SQLiteSnapshotQueryRepository,
+        "category": {
+            "postgres": PostgresCategoryRepository,
+            "sqlite": SQLiteCategoryRepository,
         }
-        
-        # Add more tables here
+        "industry": {
+          "postgres": PostgresIndustryRepository, 
+          "sqlite": SQLiteIndustryRepository
+        },
+        "sector": {
+            "postgres": PostgresSectorRepository,
+            "sqlite": SQLiteSectorRepository,
+        },
+        "tag": {
+            "postgres": PostgresTagRepository,
+            "sqlite": SQLiteTagRepository,
+        }
     }
 
     @classmethod

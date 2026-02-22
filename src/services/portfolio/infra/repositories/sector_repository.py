@@ -7,14 +7,14 @@ class PostgresSectorRepository(BaseTableRepository):
             "id": "id",
             "name": "name",
             "description": "description",
-            "category_id": "category_id",
+            "industry_id": "industry_id",
             "is_active": "is_active",
             "created_datetime": "created_timestamp",
             "processed_timestamp": "updated_timestamp",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("tag", schema_name=schema_name, field_map=field_map)
+        super().__init__("sector", schema_name=schema_name, field_map=field_map)
 
 
 class SQLiteSectorRepository(BaseTableRepository):
@@ -24,11 +24,11 @@ class SQLiteSectorRepository(BaseTableRepository):
             "id": "id",
             "name": "name",
             "description": "description",
-            "category_id": "category_id",
+            "industry_id": "industry_id",
             "is_active": "is_active",
-            "data_timestamp": "created_datetime",
-            "processed_timestamp": "updated_datetime",
+            "created_datetime": "created_timestamp",
+            "processed_timestamp": "updated_timestamp",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("tag", schema_name=schema_name, field_map=field_map)
+        super().__init__("sector", schema_name=schema_name, field_map=field_map)
