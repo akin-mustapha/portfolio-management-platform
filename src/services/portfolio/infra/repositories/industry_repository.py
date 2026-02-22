@@ -3,32 +3,30 @@ from src.services.portfolio.infra.repositories.base_table_repository import Base
 class PostgresIndustryRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):
         # Domain name -> DB column mapping
-        field_map = {
+        industry_dto = {
             "id": "id",
             "name": "name",
             "description": "description",
-            "category_id": "category_id",
             "is_active": "is_active",
-            "created_datetime": "created_timestamp",
-            "processed_timestamp": "updated_timestamp",
+            "created_timestamp": "created_timestamp",
+            "updated_timestamp": "updated_timestamp",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("tag", schema_name=schema_name, field_map=field_map)
+        super().__init__("industry", schema_name=schema_name, field_map=industry_dto)
 
 
 class SQLiteIndustryRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):
         # Domain name -> DB column mapping
-        field_map = {
+        industry_dto = {
             "id": "id",
             "name": "name",
             "description": "description",
-            "category_id": "category_id",
             "is_active": "is_active",
-            "data_timestamp": "created_datetime",
-            "processed_timestamp": "updated_datetime",
+            "created_timestamp": "created_timestamp",
+            "updated_timestamp": "updated_timestamp",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("tag", schema_name=schema_name, field_map=field_map)
+        super().__init__("industry", schema_name=schema_name, field_map=industry_dto)
