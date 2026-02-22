@@ -35,8 +35,8 @@ def upgrade() -> None:
         ALTER TABLE portfolio.sector_history
         ADD COLUMN is_active Boolean NOT NULL DEFAULT(True);
         
-        DROP IF EXISTS TABLE portfolio.asset;
-        DROP IF EXISTS TABLE portfolio.asset_v2;
+        DROP TABLE IF EXISTS portfolio.asset;
+        DROP TABLE IF EXISTS portfolio.asset_v2;
         CREATE TABLE IF NOT EXISTS portfolio.asset
         (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

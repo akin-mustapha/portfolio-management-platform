@@ -66,6 +66,11 @@ class PortfolioService:
 
   def create_industry(self, industry: Industry):
     repo_industry = self._repo_factory.get("industry")
+    
+    data_dict = industry.to_record()
+    
+    repo_industry.insert(data_dict)
+    print(data_dict)
   
   def create_sector(self, sector: Sector):
     repo_sector = self._repo_factory.get("sector")
@@ -165,5 +170,7 @@ class PortfolioService:
    
    
 if __name__ == "__main__":
-  industry_1 = Industry("", "Information Technology", datetime.now(UTC), datetime.now(UTC))
-  print(industry_1)
+  industry_1 = Industry(None, "Information Technology", datetime.now(UTC), datetime.now(UTC))
+  
+  portfolio_service = PortfolioService()
+  portfolio_service.create_industry(industry_1)
