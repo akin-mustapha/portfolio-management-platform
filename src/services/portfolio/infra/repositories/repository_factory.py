@@ -1,5 +1,5 @@
 import os
-from src.services.portfolio.infra.repositories.tag_respository import PostgresTagRepository, SQLiteTagRepository
+from src.services.portfolio.infra.repositories.tag_repository import PostgresTagRepository, SQLiteTagRepository
 from src.services.portfolio.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
 from src.services.portfolio.infra.repositories.asset_tag_repository import PostgresAssetTagRepository, SQLiteAssetTagRepository
 from src.services.portfolio.infra.repositories.industry_repository import PostgresIndustryRepository, SQLiteIndustryRepository
@@ -21,7 +21,7 @@ class RepositoryFactory:
         "category": {
             "postgres": PostgresCategoryRepository,
             "sqlite": SQLiteCategoryRepository,
-        }
+        },
         "industry": {
           "postgres": PostgresIndustryRepository, 
           "sqlite": SQLiteIndustryRepository

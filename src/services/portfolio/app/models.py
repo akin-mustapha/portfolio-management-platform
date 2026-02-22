@@ -70,3 +70,33 @@ class AssetTag:
         "created_datetime": self.created_datetime,
         "updated_datetime": self.updated_datetime,
     }
+    
+@dataclass
+class Industry:
+    id: int
+    name: str
+    created_datetime: str | None
+    updated_datetime: str | None
+
+    to_record = lambda self: {
+        "industry_id": self.id,
+        "name": self.name,
+        "created_datetime": self.created_datetime,
+        "updated_datetime": self.updated_datetime,
+    }
+    
+@dataclass
+class Sector:
+    id: int
+    industry_id: int
+    name: str
+    created_datetime: str | None
+    updated_datetime: str | None
+
+    to_record = lambda self: {
+        "sector_id": self.id,
+        "industry_id": self.industry_id,
+        "name": self.name,
+        "created_datetime": self.created_datetime,
+        "updated_datetime": self.updated_datetime,
+    }
