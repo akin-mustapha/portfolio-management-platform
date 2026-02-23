@@ -28,7 +28,7 @@ def upgrade() -> None:
             data_timestamp TIMESTAMPTZ NOT NULL,
             external_id TEXT NOT NULL,
             cash_in_pies FLOAT,
-            cash_available_to_trade FLOAt,
+            cash_available_to_trade FLOAT,
             cash_reserved_for_orders FLOAT,
             broker TEXT,
             currency TEXT,

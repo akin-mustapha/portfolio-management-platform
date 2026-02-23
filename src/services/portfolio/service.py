@@ -1,18 +1,19 @@
-""" Tagging Service Module """
+"""
+  Portfolio Service Module
+"""
 import logging
-from src.services.portfolio.app.models import Asset, AssetTag, Tag
-from src.services.portfolio.app.interfaces import BaseRepositoryInterface
+from src.services.portfolio.infra.repositories.repository_factory import RepositoryFactory
+
+from src.services.portfolio.app.models import Asset, AssetTag, Tag, Category
+from src.services.portfolio.app.models import Industry, Sector
+
 from src.shared.utils.custom_logger import customer_logger
+
+from datetime import datetime, UTC
+
 
 logging = customer_logger("tagging_service")
 
-# What can it do
-# Create a tag
-# Create a asset
-# Tag and asset
-# Delete tagged from asset
-# Get all asset by tag
-# Get all tag by asset
 
 class QueryRepositoryInterface:
   def select_asset_by_tag(self, tag_id: int):
@@ -26,57 +27,59 @@ class QueryRepositoryInterface:
 
 
 class PortfolioService:
-  def __init__(self
-               , asset_repository: BaseRepositoryInterface
-               , tag_repository: BaseRepositoryInterface
-               , asset_tag_repository: BaseRepositoryInterface
-               , query_repository: QueryRepositoryInterface):
-      """
-      Docstring for __init__
+  def __init__(self):
+    """
+    Docstring for __init__
+    
+      :param self: Description
       
-        :param self: Description
-        
-        :return: Description
-
-
-        USE CASE:
-        - AS A USER, I should be able to create an asset
-        - AS A USER, I WANT TO TAG ITEMS SO THAT I CAN ORGANIZE THEM BETTER.
-        - AS A USER, I WANT TO ASSIGN MULTIPLE TAGS TO AN asset FOR BETTER CATEGORIZATION.
-        - AS A USER, I WANT TO SEARCH FOR ASSETS BASED ON TAGS TO FIND RELATED CONTENT EASILY.
-        - AS A USER, I WANT TO REMOVE TAGS FROM ASSETS WHEN THEY ARE NO LONGER RELEVANT.
-        - AS A USER, I WANT TO VIEW ALL TAGS ASSOCIATED WITH AN ASSET TO UNDERSTAND ITS CATEGORIZATION.
-        - AS A USER, I WANT TO MANAGE MY TAGS (CREATE, EDIT, DELETE) TO KEEP THEM ORGANIZED.
-        - AS A USER I WANT TO BE ABLE TO ASSIGN CATEGORIES TO TAGS SO THAT I CAN BETTER ORGANIZE THEM.
-      """
-      logging.info("=" * 20)
-      logging.info("Initializing Tagging Service")
-      logging.info("=" * 20)
-
-      self._asset_repo = asset_repository
-      self._tag_repo = tag_repository
-      self._asset_tag_repo = asset_tag_repository
-      self._query_repo = query_repository
-
-  def create_asset(self, asset: Asset):
+      :return: Description
     """
-    Create a new asset with an optional category.
+    logging.info("=" * 20)
+    logging.info("Initializing Tagging Service")
+    logging.info("=" * 20)
 
-    :param self: Description
-    :param asset: The asset to create.
-    :return: Description
-    """
-    try :
-      logging.info(f"Creating asset: {asset.name}")
-      asset = self._asset_repo.insert(asset)
+    self._repo_factory = RepositoryFactory()
 
-      logging.info(f"Created asset with ID: {asset.id}")
-
-      return asset
+  def create_industry(self, industry: Industry):
+    repo_industry = self._repo_factory.get("industry")
+    
+    data_dict = industry.to_record()
+    
+    try:
+      repo_industry.upsert(records=[data_dict], unique_key=["name"])
+      
     except Exception as e:
-        logging.error(f"Error creating asset: {e}")
-        raise
-
+      logging.error(e)
+      
+      raise e
+  
+  def create_sector(self, sector: Sector):
+    repo_sector = self._repo_factory.get("sector")
+    
+    data_dict = sector.to_record()
+    
+    try:
+      repo_sector.insert(data_dict)
+      
+    except Exception as e:
+      logging.error(e)
+      
+      raise e
+  
+  def create_category(self, cateogry: Category):
+    repo_category = self._repo_factory.get("category")
+    
+    data_dict = cateogry.to_record()
+    
+    try:
+      repo_category.upsert(records=[data_dict], unique_key=["name"])
+      
+    except Exception as e:
+      logging.error(e)
+      
+      raise e
+  
 
   def create_tag(self, tag: Tag):
     """
@@ -86,9 +89,12 @@ class PortfolioService:
     :param tag: The tag to create.
     :return: Description
     """
+    repo_tag = self._repo_factory.get("tag")
+    data_dict = tag.to_record()
+    
     try:
       logging.info(f"Creating tag: {tag.name}")
-      tag = self._tag_repo.insert(tag)
+      tag = repo_tag.upsert(data_dict)
 
       logging.info(f"Created tag with ID: {tag.id}")
       return tag
@@ -106,16 +112,20 @@ class PortfolioService:
     :param tags: A list of tags to assign to the asset.
     :return: Description
     """
-    if not self._asset_repo.select(asset_tag.get("asset_id")):
+    asset_repo = self._repo_factory.get("asset")
+    tag_repo = self._repo_factory.get("tag")
+    asset_tag_repo = self._repo_factory.get("asset_tag")
+    
+    if not asset_repo.select(asset_tag.get("asset_id")):
         raise ValueError(f"Asset with ID {asset_tag.get("asset_id")} does not exist.")
     
-    if not self._tag_repo.select(asset_tag.get("tag_id")):
+    if not tag_repo.select(asset_tag.get("tag_id")):
         raise ValueError(f"Tag with ID {asset_tag.get("tag_id")} does not exist.")
 
     try:
       # logging.info(f"Tagging asset ID {asset_tag['asset_id']} with tag ID {asset_tag['tag_id']}")
       
-      self._asset_tag_repo.insert_2(asset_tag)
+      asset_tag_repo.insert_2(asset_tag)
 
       # logging.info(f"Tagged asset ID {asset_tag['asset_id']} with tag ID {asset_tag['tag_id']}")
       return asset_tag
@@ -163,3 +173,31 @@ class PortfolioService:
   def get_all_tags(self):
      result = self._query_repo.select_all_tag_item()
      return result
+   
+   
+if __name__ == "__main__":
+  industry_1 = Industry(
+    id=None,
+    name="Information Technology", 
+    description="Information Technology", 
+    created_timestamp=datetime.now(UTC))
+  
+  sector_1 = Sector(
+    id=None,
+    industry_id="4b2ff3e9-72f9-4be0-8b33-a72775da4a0b",
+    name="Semiconductors & Equipment",
+    description="Semiconductors & Equipment",
+    created_timestamp=datetime.now(UTC))
+  
+  category_1 = Category(
+    id=None,
+    name="Country",
+    # description="Country Category",
+    created_timestamp=datetime.now(UTC))
+  # tag_1 = Tag(None, "4b2ff3e9-72f9-4be0-8b33-a72775da4a0b", "Semiconductors & Equipment", "Semiconductors & Equipment", datetime.now(UTC), datetime.now(UTC))
+  
+  
+  portfolio_service = PortfolioService()
+  # portfolio_service.create_industry(industry_1)
+  # portfolio_service.create_sector(sector_1)
+  portfolio_service.create_category(category_1)
