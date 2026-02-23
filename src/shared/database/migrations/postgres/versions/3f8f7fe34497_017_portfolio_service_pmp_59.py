@@ -105,6 +105,17 @@ def upgrade() -> None:
                     $function$;
 
         CREATE OR REPLACE TRIGGER industry_versioning BEFORE DELETE OR UPDATE ON portfolio.industry FOR EACH ROW EXECUTE FUNCTION portfolio.industry_history();
+
+        ALTER TABLE portfolio.category
+        ADD COLUMN description varchar NULL;
+        
+        
+        ALTER TABLE portfolio.category
+        ADD COLUMN is_active boolean Default true;
+
+
+        -- ALTER TABLE portfolio.category
+        -- ALTER COLUMN is_active DROP NOT NULL;
     """)
 
 
@@ -126,8 +137,15 @@ def downgrade() -> None:
 
     CREATE OR REPLACE TRIGGER industry_versioning BEFORE DELETE OR UPDATE ON portfolio.industry FOR EACH ROW EXECUTE FUNCTION portfolio.record_history();
     
-    DROP FUNCTION portfolio.industry_history
+    DROP FUNCTION portfolio.industry_history;
     
+    ALTER TABLE portfolio.category
+    DROP COLUMN description;
     
-    
+    ALTER TABLE portfolio.category
+    DROP COLUMN is_active;
+
+
+    -- ALTER TABLE portfolio.category
+    -- ALTER COLUMN is_active SET NOT NULL;
     """)

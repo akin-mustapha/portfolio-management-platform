@@ -9,7 +9,6 @@ class Asset:
     source_name: str
     is_active: bool
     created_timestamp: str
-    updated_timestamp: str | None
 
     to_record = lambda self: {
         "external_id": self.external_id,
@@ -18,7 +17,6 @@ class Asset:
         "source_name": self.source_name,
         "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
-        "updated_timestamp": self.updated_timestamp,
     }
     
 @dataclass
@@ -29,7 +27,6 @@ class Tag:
     tag_type_id: int
     is_active: bool
     created_timestamp: str
-    updated_timestamp: str | None
 
     to_record = lambda self: {
         "name": self.name,
@@ -37,22 +34,21 @@ class Tag:
         "tag_type_id": self.tag_type_id,
         "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
-        "updated_timestamp": self.updated_timestamp,
     }
 
 @dataclass
 class Category:
     id: int | None
     name: str
-    is_active: bool
+    # description: str
+    # is_active: bool
     created_timestamp: str
-    updated_timestamp: str | None
 
     to_record = lambda self: {
         "name": self.name,
-        "is_active": self.is_active,
+        # "description": self.description,
+        # "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
-        "updated_timestamp": self.updated_timestamp,
     }
 
 @dataclass
@@ -61,14 +57,11 @@ class AssetTag:
     tag_id: int | None
     is_active: bool
     created_timestamp: str | None
-    updated_timestamp: str | None
-
     to_record = lambda self: {
         "asset_id": self.item_id,
         "tag_id": self.tag_id,
         "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
-        "updated_timestamp": self.updated_timestamp,
     }
     
 @dataclass
@@ -77,14 +70,12 @@ class Industry:
     name: str
     description: str
     created_timestamp: str | None
-    updated_timestamp: str | None
 
     to_record = lambda self: {
         "industry_id": self.id,
         "name": self.name,
         "description": self.description,
         "created_timestamp": self.created_timestamp,
-        "updated_timestamp": self.updated_timestamp,
     }
     
 @dataclass
@@ -94,7 +85,6 @@ class Sector:
     name: str
     description: str
     created_timestamp: str | None
-    updated_timestamp: str | None
 
     to_record = lambda self: {
         "sector_id": self.id,
@@ -102,5 +92,4 @@ class Sector:
         "name": self.name,
         "description": self.description,
         "created_timestamp": self.created_timestamp,
-        "updated_timestamp": self.updated_timestamp,
     }

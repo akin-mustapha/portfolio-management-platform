@@ -28,41 +28,18 @@ class QueryRepositoryInterface:
 
 class PortfolioService:
   def __init__(self):
-      """
-      Docstring for __init__
+    """
+    Docstring for __init__
+    
+      :param self: Description
       
-        :param self: Description
-        
-        :return: Description
-      """
-      logging.info("=" * 20)
-      logging.info("Initializing Tagging Service")
-      logging.info("=" * 20)
+      :return: Description
+    """
+    logging.info("=" * 20)
+    logging.info("Initializing Tagging Service")
+    logging.info("=" * 20)
 
-      # self._asset_repo = asset_repository
-      # self._tag_repo = tag_repository
-      # self._asset_tag_repo = asset_tag_repository
-      # self._query_repo = query_repository
-      self._repo_factory = RepositoryFactory()
-
-  # def create_asset(self, asset: Asset):
-  #   """
-  #   Create a new asset with an optional category.
-
-  #   :param self: Description
-  #   :param asset: The asset to create.
-  #   :return: Description
-  #   """
-  #   try :
-  #     logging.info(f"Creating asset: {asset.name}")
-  #     asset = self._asset_repo.insert(asset)
-
-  #     logging.info(f"Created asset with ID: {asset.id}")
-
-  #     return asset
-  #   except Exception as e:
-  #       logging.error(f"Error creating asset: {e}")
-  #       raise
+    self._repo_factory = RepositoryFactory()
 
   def create_industry(self, industry: Industry):
     repo_industry = self._repo_factory.get("industry")
@@ -92,6 +69,17 @@ class PortfolioService:
   
   def create_category(self, cateogry: Category):
     repo_category = self._repo_factory.get("category")
+    
+    data_dict = cateogry.to_record()
+    
+    try:
+      repo_category.upsert(records=[data_dict], unique_key=["name"])
+      
+    except Exception as e:
+      logging.error(e)
+      
+      raise e
+  
 
   def create_tag(self, tag: Tag):
     """
@@ -101,9 +89,12 @@ class PortfolioService:
     :param tag: The tag to create.
     :return: Description
     """
+    repo_tag = self._repo_factory.get("tag")
+    data_dict = tag.to_record()
+    
     try:
       logging.info(f"Creating tag: {tag.name}")
-      tag = self._tag_repo.insert(tag)
+      tag = repo_tag.upsert(data_dict)
 
       logging.info(f"Created tag with ID: {tag.id}")
       return tag
@@ -185,9 +176,28 @@ class PortfolioService:
    
    
 if __name__ == "__main__":
-  industry_1 = Industry(None, "Information Technology", "Information Technology", datetime.now(UTC), datetime.now(UTC))
-  sector_1 = Sector(None, "4b2ff3e9-72f9-4be0-8b33-a72775da4a0b", "Semiconductors & Equipment", "Semiconductors & Equipment", datetime.now(UTC), datetime.now(UTC))
+  industry_1 = Industry(
+    id=None,
+    name="Information Technology", 
+    description="Information Technology", 
+    created_timestamp=datetime.now(UTC))
+  
+  sector_1 = Sector(
+    id=None,
+    industry_id="4b2ff3e9-72f9-4be0-8b33-a72775da4a0b",
+    name="Semiconductors & Equipment",
+    description="Semiconductors & Equipment",
+    created_timestamp=datetime.now(UTC))
+  
+  category_1 = Category(
+    id=None,
+    name="Country",
+    # description="Country Category",
+    created_timestamp=datetime.now(UTC))
+  # tag_1 = Tag(None, "4b2ff3e9-72f9-4be0-8b33-a72775da4a0b", "Semiconductors & Equipment", "Semiconductors & Equipment", datetime.now(UTC), datetime.now(UTC))
+  
   
   portfolio_service = PortfolioService()
-  portfolio_service.create_industry(industry_1)
-  portfolio_service.create_sector(sector_1)
+  # portfolio_service.create_industry(industry_1)
+  # portfolio_service.create_sector(sector_1)
+  portfolio_service.create_category(category_1)

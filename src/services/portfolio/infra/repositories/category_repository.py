@@ -4,7 +4,6 @@ class PostgresCategoryRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):
         # Domain name -> DB column mapping
         industry_dto = {
-            "id": "id",
             "name": "name",
             "description": "description",
             "is_active": "is_active",
