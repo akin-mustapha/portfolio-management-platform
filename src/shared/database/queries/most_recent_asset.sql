@@ -32,4 +32,4 @@ FROM staging.asset t1
   INNER JOIN staging.asset_computed t3
     ON t1.id = t3.asset_id
 WHERE t2.rn = 1
-ORDER BY "recent_profit_high_30d" desc
+ORDER BY "profit" desc
