@@ -34,7 +34,8 @@ class Asset():
   
   
 def extract():
-  sql = """
+  table_name = "staging.asset"
+  sql = f"""
     SELECT ticker, name, broker, currency
     FROM (
         SELECT *,
@@ -42,7 +43,7 @@ def extract():
                   PARTITION BY ticker, broker, currency
                   ORDER BY data_timestamp DESC
               ) as rn
-        FROM staging.asset_v2
+        FROM {table_name}
     ) t
     WHERE rn = 1;
   """
@@ -72,8 +73,9 @@ def load(data):
       for r in data
     ])
   
+  destination_table_name = "portfolio.asset"
   asset_upsert_sql = f"""
-    MERGE INTO portfolio.asset_v2 AS tgt
+    MERGE INTO {destination_table_name} AS tgt
     USING 
       (
         VALUES
