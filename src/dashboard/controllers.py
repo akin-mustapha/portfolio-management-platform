@@ -1,10 +1,11 @@
 
-from src.services.portfolio.tagging_service_builder import build_portfolio_service
-from src.dashboard.services.asset_service import AssetService
-from src.dashboard.services.portfolio_service import PortfolioService
+from src.services.portfolio.portfolio_service_builder import build_portfolio_service
+# from src.dashboard.services.asset_service import AssetService
+# from src.dashboard.services.portfolio_service import PortfolioService
 from src.dashboard.services.local_portfolio_service import LocalPortfolioService
 from src.dashboard.services.local_asset_service import LocalAssetService
-
+from src.dashboard.services.asset_controller import AssetController
+from src.dashboard.services.portfolio_controller import PortfolioController
 
 from .presenters import PortfolioPresenter
 
@@ -12,8 +13,8 @@ class PortfolioController:
     def __init__(self):
         # self._dashboard_service = build_portfolio_service()
         # self._dashboard_service = AssetService.get_asset_data()
-        self._dashboard_service = LocalAssetService
-        self._dashboard_service_2 = LocalPortfolioService
+        self._dashboard_service = AssetController
+        self._dashboard_service_2 = PortfolioController
         self._presenter = PortfolioPresenter()
 
     def get_data(self):

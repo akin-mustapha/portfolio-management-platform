@@ -20,6 +20,8 @@
 SELECT 
     t1.ticker
   , t1.name
+  , t1.description as asset_description
+  , t1.value
   , t1.price
   , t1.avg_price
   , t1.cost
@@ -32,4 +34,6 @@ FROM staging.asset t1
   INNER JOIN staging.asset_computed t3
     ON t1.id = t3.asset_id
 WHERE t2.rn = 1
-ORDER BY "profit" desc
+ORDER BY "profit" 
+
+

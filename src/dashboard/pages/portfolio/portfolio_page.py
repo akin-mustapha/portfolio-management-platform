@@ -75,6 +75,8 @@ def load_portfolio_page(pathname, cached_data):
     view_model = cached_data.get("view_model", None)
     if view_model is None:
         view_model = PortfolioController().get_data()
+        
+        breakpoint()
         cached_data.update({"view_model": view_model})
     if view_model is None:
         raise PreventUpdate

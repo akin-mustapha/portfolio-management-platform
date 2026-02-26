@@ -171,9 +171,10 @@ class PortfolioService:
     return result
   
   def get_all_tags(self):
-     result = self._query_repo.select_all_tag_item()
-     return result
-   
+    tag_repo = self._repo_factory.get("tag")
+    result = tag_repo.select_all()
+    return result
+
    
 if __name__ == "__main__":
   industry_1 = Industry(

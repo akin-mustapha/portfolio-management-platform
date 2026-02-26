@@ -1,8 +1,8 @@
 from dash import dcc, html, callback, Input, Output, State, dash
 import dash_bootstrap_components as dbc
 from src.dashboard.components.cards import card
-from src.services.portfolio.tagging_service_builder import build_portfolio_service
-from src.dashboard.services.asset_service import AssetService
+from src.services.portfolio.portfolio_service_builder import build_portfolio_service
+# from src.dashboard.services.asset_service import AssetService
 from src.dashboard.services.local_asset_service import LocalAssetService
 from src.dashboard.styles.style import TAB_CONTENT_STYLE
 from src.dashboard.components.tables.table import create_table
@@ -16,7 +16,7 @@ create_dropdown_item_from_list = lambda ls: html.Div([dbc.DropdownMenuItem(item,
 
 
 portfolio_serivce = build_portfolio_service()
-asset_service = AssetService
+# asset_service = AssetService
 tag_df = pd.DataFrame(LocalAssetService.get_all_tag())
 asset_df = pd.DataFrame(LocalAssetService.get_all_asset())
 tags_df = pd.DataFrame(portfolio_serivce.get_all_tags())
