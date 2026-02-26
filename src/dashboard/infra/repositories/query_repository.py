@@ -69,6 +69,47 @@ class PostgresAssetQueryRepository:
       res = client.execute(sql, {"item_id": item_id})
     return res.fetchall()
 
+  def get_asset_data(self):
+    sql = """
+      ;WITH most_recent_asset AS
+      (
+      SELECT
+          ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) as rn
+          , id
+      FROM staging.asset
+      )
+      SELECT
+          a.ticker,
+          a.name,
+          a.description AS asset_description,
+          -- STRING_AGG(t.name, ',') AS tag_list,
+          a.value,
+          a.profit,
+          a.price,
+          a.cost,
+          ac.recent_profit_high_30d,
+          ac.recent_profit_low_30d,
+          ac.pct_drawdown,
+          ac.volatility_30d,
+          ac.volatility_50d,
+          ac.ma_30d,
+          ac.ma_50d,
+          ac.dca_bias,
+          CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
+          a.created_timestamp as data_date
+      FROM staging.asset a
+      INNER JOIN most_recent_asset lm
+          ON a.id = lm.id
+          AND lm.rn = 1               -- only take latest metric per asset
+      LEFT JOIN staging.asset_computed ac
+          ON a.id = ac.asset_id
+    """
+    with self.client as client:
+      res = client.execute(
+          sql
+      )
+      res = res.fetchall()
+    return res
 
 class PostgresSnapshotQueryRepository:
   def __init__(self):
@@ -100,19 +141,48 @@ class PostgresSnapshotQueryRepository:
       res = client.execute(sql)
     return res.fetchall()
 
-  def select_portfolio_unrealized_return(self):
+  def get_unrealized_profit(self):
     sql = """
-    SELECT data_date,
-           current_value AS portfolio_value,
-           unrealized_profit AS unrealized_return
-    FROM portfolio.portfolio_snapshot
+    SELECT created_timestamp as data_date,
+           total_value AS portfolio_value,
+           investments_unrealized_pnl AS unrealized_return
+    FROM staging.account
     WHERE external_id IS NOT NULL
-    GROUP BY data_date
+    -- GROUP BY created_timestamp
     ORDER BY data_date
     """
     with self.client as client:
       res = client.execute(sql)
     return res.fetchall()
+  
+  def get_asset_snapshot(self, start_date, end_date):
+    sql = f"""
+        SELECT
+            a.name,
+            a.description as asset_description,
+            ac.recent_value_high_30d,
+            ac.recent_value_low_30d,
+            ac.ma_30d,
+            ac.ma_50d,
+            ac.dca_bias,
+            a.value,
+            a.avg_price,
+            a.price,
+            a.profit,
+            ac.volatility_30d,
+            ac.pct_drawdown,
+            a.created_timestamp as data_date
+        FROM staging.asset a
+        INNER JOIN staging.asset_computed as ac
+            on a.id = ac.asset_id
+        WHERE date(a.created_timestamp) BETWEEN '{start_date}' AND '{end_date}'
+        AND ac.asset_id IS NOT NULL
+      """
+    with self._client as client:
+      res = client.execute(
+          sql
+      )
+    res = res.fetchall()
 
 
 # ===== SQLite Repos =====

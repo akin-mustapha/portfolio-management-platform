@@ -13,18 +13,21 @@ def asset_table(data=None):
     decimals = 6
     df["pct_drawdown"] = df["pct_drawdown"].round(decimals)
     df["volatility_30d"] = df["volatility_30d"].round(decimals)
-    df["price_vs_ma_50"] = df["price_vs_ma_50"].round(decimals)
+    df["volatility_50d"] = df["volatility_50d"].round(decimals)
+    df["recent_profit_low_30d"] = df["recent_profit_low_30d"].round(decimals)
+    df["recent_profit_high_30d"] = df["recent_profit_high_30d"].round(decimals)
+    # df["price_vs_ma_50"] = df["price_vs_ma_50"].round(decimals)
     df["dca_bias"] = df["dca_bias"].round(decimals)
 
     return dag.AgGrid(
         rowData=df.to_dict("records"),
         columnDefs=[
             {
-                "field": "name",
+                "field": "ticker",
                 "headerTooltip": "Asset name or ticker symbol."
             },
             {
-                "field": "asset_description",
+                "field": "name",
                 "headerTooltip": "Brief description of the asset. Context only — not a trading signal."
             },
             {
@@ -54,7 +57,7 @@ def asset_table(data=None):
                 "headerTooltip": "Latest market price of the asset."
             },
             {
-                "field": "recent_high_30d",
+                "field": "recent_profit_high_30d",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -63,7 +66,7 @@ def asset_table(data=None):
                 ),
             },
             {
-                "field": "recent_low_30d",
+                "field": "recent_profit_low_30d",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -102,12 +105,12 @@ def asset_table(data=None):
                 },
             },
             {
-                "field": "price_vs_ma_50",
+                "field": "volatility_50d",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
                 "headerTooltip": (
-                    "Distance from the 50-day moving average. "
-                    "Positive = above trend, negative = below trend."
+                    "30-day volatility measure. "
+                    "Higher values indicate larger price swings."
                 ),
                 "cellStyle": {
                     "styleConditions": [
