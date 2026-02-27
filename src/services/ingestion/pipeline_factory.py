@@ -1,11 +1,11 @@
-from src.services.ingestion.app.policies import Pipeline
+from .app.policies import Pipeline
 
-from src.services.ingestion.pipelines.pipeline_asset_bronze import PipelineAssetBronze
-from src.services.ingestion.pipelines.pipeline_asset_silver import PipelineAssetSilver
-from src.services.ingestion.pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
-from src.services.ingestion.pipelines.pipeline_account_bronze import PipelineAccountBronze
-from src.services.ingestion.pipelines.pipeline_account_silver import PipelineAccountSilver
-from src.services.ingestion.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
+from .pipelines.pipeline_asset_bronze import PipelineAssetBronze
+from .pipelines.pipeline_asset_silver import PipelineAssetSilver
+from .pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
+from .pipelines.pipeline_account_bronze import PipelineAccountBronze
+from .pipelines.pipeline_account_silver import PipelineAccountSilver
+from .pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
 
 class PipelineFactory:
   _registry = {

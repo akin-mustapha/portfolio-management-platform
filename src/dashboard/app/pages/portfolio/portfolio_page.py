@@ -5,7 +5,7 @@ from dash.exceptions import PreventUpdate
 # App imports
 # ─────────────────────────────────────────────
 from src.dashboard.app.pages.portfolio.kpis import kpi_row
-from src.dashboard.app.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
+from src.dashboard.app.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart, PortfolioPNLPlotlyLineChart
 from src.dashboard.app.pages.portfolio.tables import asset_table
 from src.dashboard.app.controllers.portfolio_controller import PortfolioController
 # ─────────────────────────────────────────────
@@ -30,6 +30,12 @@ def value_chart(data=None):
     if data is None:
         return html.P("NO DATA")
     return dcc.Graph(id="value_chart", figure=PortfolioPerformancePlotlyLineChart().render(data))
+
+
+def pnl_chart(data=None):
+    if data is None:
+        return html.P("NO DATA")
+    return dcc.Graph(id="pnl_char", figure=PortfolioPNLPlotlyLineChart().render(data))
 # ─────────────────────────────────────────────
 # Page layout
 # ─────────────────────────────────────────────
@@ -50,8 +56,14 @@ def portfolio_layout():
                 id="portfolio_page_value_chart_container",
                 children=value_chart(),
                 width="auto",
-                md=12,
+                md=6,
                 ),
+            dbc.Col(
+                id="portfolio_page_pnl_chart_container",
+                children=pnl_chart(),
+                width="auto",
+                md=6,
+            )
 
         ]),
         html.Div(
@@ -64,6 +76,7 @@ def portfolio_layout():
     Output("portfolio_page_charts_container", "children"),
     Output("portfolio_page_asset_table_container", "children"),
     Output("portfolio_page_value_chart_container", "children"),
+    Output("portfolio_page_pnl_chart_container", "children"),
     Input("portfolio_page_location", "pathname"),
     State("portfolio_page_asset_store", "data"),
 )
@@ -90,5 +103,6 @@ def load_portfolio_page(pathname, cached_data):
         cached_data,
         charts,
         table,
-        value_chart(view_model.get("portfolio_value_series", {}))
+        value_chart(view_model.get("portfolio_value_series", {})),
+        pnl_chart(view_model.get("portfolio_pnl_series", {}))
     )

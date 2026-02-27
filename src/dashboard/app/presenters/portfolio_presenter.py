@@ -16,6 +16,7 @@ class PortfolioPresenter:
             "portfolio_value_series": self._portfolio_value_series_vm(
                 data.get("portfolio_value", [])
             ),
+            "portfolio_pnl_series": self._portfolio_pnl_series_vm(data.get('portfolio_value', [])),
             "pnl_bar_series": self._pnl_bar_series_vm(
                 data.get("pnl", [])
             ),
@@ -40,9 +41,14 @@ class PortfolioPresenter:
     def _portfolio_value_series_vm(self, rows: list[dict]) -> dict:
         return {
             "dates": [r["data_date"] for r in rows],
+            "values": [r["portfolio_value"] for r in rows],
+        }
+        
+    def _portfolio_pnl_series_vm(self, rows: list[dict]) -> dict:
+        return {
+            "dates": [r["data_date"] for r in rows],
             "values": [r["unrealized_return"] for r in rows],
         }
-
     # ---------- Bar Chart ----------
 
     def _pnl_bar_series_vm(self, rows: list[dict]) -> dict:

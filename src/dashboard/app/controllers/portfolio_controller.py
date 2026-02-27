@@ -11,11 +11,9 @@ class PortfolioController:
     def get_data(self):
         # Fetch data from the service layer
         asset_data = self._query_factory.get("asset_query").get_asset_data()
-        
         portfolio_value = self._query_factory.get("snapshot_query").get_unrealized_profit()
         
         asset_data_df = pd.DataFrame([dict(r._mapping) for r in asset_data])
-        
         portfolio_value_df = pd.DataFrame([dict(r._mapping) for r in portfolio_value])
         
         data = {
@@ -25,5 +23,3 @@ class PortfolioController:
         view_model = self._presenter.present(data)
         
         return view_model
-        
-        

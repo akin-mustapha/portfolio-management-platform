@@ -148,7 +148,6 @@ class PostgresSnapshotQueryRepository:
            investments_unrealized_pnl AS unrealized_return
     FROM staging.account
     WHERE external_id IS NOT NULL
-    -- GROUP BY created_timestamp
     ORDER BY data_date
     """
     with self.client as client:
@@ -218,7 +217,6 @@ class SQLiteAssetQueryRepository(PostgresAssetQueryRepository):
     with self.client as client:
       res = client.execute(sql)
     return res.fetchall()
-
 
 class SQLiteSnapshotQueryRepository(PostgresSnapshotQueryRepository):
   def select_top_10_profit_asset_snapshot(self):
