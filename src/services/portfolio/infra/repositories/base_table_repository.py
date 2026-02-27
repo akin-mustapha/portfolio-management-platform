@@ -111,10 +111,9 @@ class BaseTableRepository(RepositoryInterface):
         result = client.execute(sql)
         
       results = result.fetchall()
-      
       logging.info(f"Count of records fetched: {result.rowcount}")
       
-      return [self._from_db_fields(dict(r)) for r in results]
+      return [self._from_db_fields(dict(r._mapping)) for r in results]
 
     def update(self, params: Dict, data: Dict):
       db_params = self._to_db_fields(params)

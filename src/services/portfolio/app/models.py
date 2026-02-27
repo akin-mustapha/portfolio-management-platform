@@ -7,7 +7,6 @@ class Asset:
     name: str
     description: str
     source_name: str
-    is_active: bool
     created_timestamp: str
 
     to_record = lambda self: {
@@ -15,7 +14,6 @@ class Asset:
         "name": self.name,
         "description": self.description,
         "source_name": self.source_name,
-        "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
     }
     
@@ -25,14 +23,12 @@ class Tag:
     name: str
     description: str
     tag_type_id: int
-    is_active: bool
     created_timestamp: str
 
     to_record = lambda self: {
         "name": self.name,
         "description": self.description,
         "tag_type_id": self.tag_type_id,
-        "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
     }
 
@@ -40,13 +36,13 @@ class Tag:
 class Category:
     id: int | None
     name: str
-    # description: str
+    description: str
     # is_active: bool
     created_timestamp: str
 
     to_record = lambda self: {
         "name": self.name,
-        # "description": self.description,
+        "description": self.description,
         # "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
     }
@@ -55,12 +51,11 @@ class Category:
 class AssetTag:
     item_id: int | None
     tag_id: int | None
-    is_active: bool
     created_timestamp: str | None
+    
     to_record = lambda self: {
         "asset_id": self.item_id,
         "tag_id": self.tag_id,
-        "is_active": self.is_active,
         "created_timestamp": self.created_timestamp,
     }
     

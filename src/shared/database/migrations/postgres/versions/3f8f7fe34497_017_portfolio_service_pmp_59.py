@@ -109,13 +109,17 @@ def upgrade() -> None:
         ALTER TABLE portfolio.category
         ADD COLUMN description varchar NULL;
         
-        
         ALTER TABLE portfolio.category
         ADD COLUMN is_active boolean Default true;
+        
+        ALTER TABLE portfolio.category_history
+        ADD COLUMN description varchar;
+        
+        ALTER TABLE portfolio.sector
+        ADD CONSTRAINT unq_sector_name UNIQUE(name);
 
-
-        -- ALTER TABLE portfolio.category
-        -- ALTER COLUMN is_active DROP NOT NULL;
+        ALTER TABLE portfolio.category_history
+        ALTER COLUMN is_active DROP NOT NULL;
     """)
 
 
@@ -144,8 +148,11 @@ def downgrade() -> None:
     
     ALTER TABLE portfolio.category
     DROP COLUMN is_active;
+    
+    ALTER TABLE portfolio.category_history
+    DROP COLUMN description;
+        
+    ALTER TABLE portfolio.sector
+    DROP CONSTRAINT unq_sector_name;
 
-
-    -- ALTER TABLE portfolio.category
-    -- ALTER COLUMN is_active SET NOT NULL;
     """)

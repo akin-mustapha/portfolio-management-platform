@@ -63,7 +63,7 @@ def portfolio_layout():
     Output("portfolio_page_asset_store", "data"),
     Output("portfolio_page_charts_container", "children"),
     Output("portfolio_page_asset_table_container", "children"),
-    # Output("portfolio_page_value_chart_container", "children"),
+    Output("portfolio_page_value_chart_container", "children"),
     Input("portfolio_page_location", "pathname"),
     State("portfolio_page_asset_store", "data"),
 )
@@ -85,9 +85,10 @@ def load_portfolio_page(pathname, cached_data):
     ]
     table = asset_table(view_model.get("asset_table", {}).get("rows", []))
     # Return state + UI
+    
     return (
         cached_data,
         charts,
         table,
-        # value_chart(view_model.get("asset_table", {}).get("rows", []))
+        value_chart(view_model.get("portfolio_value_series", {}))
     )

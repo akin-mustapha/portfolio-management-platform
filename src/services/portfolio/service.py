@@ -59,8 +59,9 @@ class PortfolioService:
     
     data_dict = sector.to_record()
     
+    # breakpoint()
     try:
-      repo_sector.insert(data_dict)
+      repo_sector.upsert(records=[data_dict], unique_key=["name"])
       
     except Exception as e:
       logging.error(e)
@@ -94,9 +95,8 @@ class PortfolioService:
     
     try:
       logging.info(f"Creating tag: {tag.name}")
-      tag = repo_tag.upsert(data_dict)
-
-      logging.info(f"Created tag with ID: {tag.id}")
+      res = repo_tag.upsert([data_dict], ["name", "tag_type_id"])
+      logging.info(f"Created tag")
       return tag
     except Exception as e:
         logging.error(f"Error creating tag: {e}")
@@ -171,9 +171,10 @@ class PortfolioService:
     return result
   
   def get_all_tags(self):
-     result = self._query_repo.select_all_tag_item()
-     return result
-   
+    tag_repo = self._repo_factory.get("tag")
+    result = tag_repo.select_all()
+    return result
+
    
 if __name__ == "__main__":
   industry_1 = Industry(
@@ -192,12 +193,15 @@ if __name__ == "__main__":
   category_1 = Category(
     id=None,
     name="Country",
-    # description="Country Category",
+    description="Country Category",
     created_timestamp=datetime.now(UTC))
-  # tag_1 = Tag(None, "4b2ff3e9-72f9-4be0-8b33-a72775da4a0b", "Semiconductors & Equipment", "Semiconductors & Equipment", datetime.now(UTC), datetime.now(UTC))
+  tag_1 = Tag(None, "Semiconductors & Equipment", "Semiconductors & Equipment", "02dae516-dafb-4d12-a0c3-b066e6baa0b3", datetime.now(UTC))
+  
+  
   
   
   portfolio_service = PortfolioService()
-  # portfolio_service.create_industry(industry_1)
-  # portfolio_service.create_sector(sector_1)
+  portfolio_service.create_industry(industry_1)
+  portfolio_service.create_sector(sector_1)
   portfolio_service.create_category(category_1)
+  portfolio_service.create_tag(tag_1)

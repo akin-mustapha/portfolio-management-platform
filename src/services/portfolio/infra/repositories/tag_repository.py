@@ -4,13 +4,10 @@ class PostgresTagRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):
         # Domain name -> DB column mapping
         field_map = {
-            "id": "id",
             "name": "name",
             "description": "description",
-            "category_id": "category_id",
-            "is_active": "is_active",
-            "created_datetime": "created_timestamp",
-            "processed_timestamp": "updated_timestamp",
+            "tag_type_id": "category_id",
+            "created_timestamp": "created_timestamp",
         }
 
         schema_name = "portfolio" if db_type == "postgres" else None

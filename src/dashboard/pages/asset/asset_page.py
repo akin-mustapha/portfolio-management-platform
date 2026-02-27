@@ -14,8 +14,8 @@ import dash_ag_grid as dag
 # ─────────────────────────────────────────────
 from src.dashboard.components.cards import card
 from src.dashboard.pages.asset.tables import asset_table
-# from src.dashboard.src.services.asset_service import AssetService
-from src.dashboard.services.local_asset_service import LocalAssetService
+from src.dashboard.services.asset_controller import AssetController
+# from src.dashboard.services.local_asset_service import LocalAssetController
 from src.dashboard.styles.style import TAB_CONTENT_STYLE
 # ─────────────────────────────────────────────
 # Figures
@@ -25,16 +25,16 @@ from src.dashboard.pages.asset.charts import PriceStructurePlotlyLineChart, Asse
 # Data prep
 # ─────────────────────────────────────────────
 # TODO - MOVE LOGIC TO SERVICE LAYER
-def prep_data(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    df["pct_drawdown"] = (df["price"] - df["recent_high_30d"]) / df["recent_high_30d"]
-    df["price_vs_ma_50"] = np.where(
-        df["ma_50"] != 0, (df["price"] - df["ma_50"]) / df["ma_50"], None
-    )
-    df["volatility_30d"] = df.groupby("asset_id")["price"].pct_change().rolling(30).std()
-    df["dca_bias"] = -0.5 * df["pct_drawdown"] - 0.4 * df["price_vs_ma_50"] + 0.1 * df["volatility_30d"]
-    df["trend"] = df[["ma_30", "ma_50"]].apply(lambda x: "Bullish" if x["ma_30"] > x["ma_50"] else "Bearish", axis=1)
-    return df
+# def prep_data(df: pd.DataFrame) -> pd.DataFrame:
+#     df = df.copy()
+#     df["pct_drawdown"] = (df["price"] - df["recent_high_30d"]) / df["recent_high_30d"]
+#     df["price_vs_ma_50"] = np.where(
+#         df["ma_50"] != 0, (df["price"] - df["ma_50"]) / df["ma_50"], None
+#     )
+#     df["volatility_30d"] = df.groupby("asset_id")["price"].pct_change().rolling(30).std()
+#     df["dca_bias"] = -0.5 * df["pct_drawdown"] - 0.4 * df["price_vs_ma_50"] + 0.1 * df["volatility_30d"]
+#     df["trend"] = df[["ma_30", "ma_50"]].apply(lambda x: "Bullish" if x["ma_30"] > x["ma_50"] else "Bearish", axis=1)
+#     return df
 
 # ─────────────────────────────────────────────
 # KPI logic
@@ -48,7 +48,6 @@ def compute_asset_kpis(df) -> dict:
         "trend": x["trend"],
         "dca_bias": round(x["dca_bias"], 3),
     }
-
 
 PALETTE = {
     "positive": "#2F6F6A",   # muted teal
@@ -286,10 +285,9 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
     asset_data_df = asset_data_df.to_dict("records")
 
     # TODO: UNCOMMENT TO CONNECT TO DB
-    # asset_snapshot = AssetService.get_asset_snapshot(start_date, end_date)
-    asset_snapshot = LocalAssetService.get_asset_snapshot(start_date, end_date)
-    asset_snapshot_df = prep_data(asset_snapshot)
-
+    asset_snapshot_df = AssetController.get_asset_snapshot(start_date, end_date)
+    # asset_snapshot = LocalAssetController.get_asset_snapshot(start_date, end_date)
+    # asset_snapshot_df = prep_data(asset_snapshot)
 
     if asset_snapshot_df.empty:
         raise PreventUpdate
@@ -328,8 +326,8 @@ def load_asset_page(pathname):
     if pathname != "/assets":
         raise PreventUpdate
     # TODO: UNCOMMENT TO CONNECT TO DB
-    # df = AssetService.get_asset_data()
-    df = LocalAssetService.get_asset_data()
+    df = AssetController.get_asset_data()
+    # df = LocalAssetController.get_asset_data()
     df['data_date'] = pd.to_datetime(df['data_date'])
     if df.empty:
         raise PreventUpdate

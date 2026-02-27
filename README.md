@@ -35,13 +35,13 @@ alembic downgrade -2
 ### Ingestion Service
 
 ```sh
-python3 -m scripts.run_ingestion_service
+python3 -m src.services.ingestion.pipelines.pipeline_asset_portfolio
 ```
 
-### Tagging Service
+### Portfolio Service
 
 ```sh
-python3 -m scripts.run_tagging_service
+python3 -m src.services.portfolio.service
 ```
 
 ## Util
