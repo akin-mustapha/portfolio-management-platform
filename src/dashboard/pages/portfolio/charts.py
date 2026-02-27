@@ -9,7 +9,7 @@ class WinnersPlotlyBarChart:
 
         fig = px.bar(
             df,
-            x="name",
+            x="ticker",
             y="profit",
             title="Top 10 Winners",
             text="profit",
@@ -49,7 +49,7 @@ class LosersPlotlyBarChart:
 
         fig = px.bar(
             df,
-            x="name",
+            x="ticker",
             y="profit",
             title="Top 10 Losers",
             text="profit",
@@ -85,12 +85,13 @@ class LosersPlotlyBarChart:
 class PortfolioPerformancePlotlyLineChart:
     def render(self, data):
         df = pd.DataFrame(data)
-        df = df.sort_values("data_date")
+        df = df.sort_values("dates")
+        
 
         fig = px.line(
             df,
-            x="data_date",
-            y="portfolio_value",
+            x="dates",
+            y="values",
         )
 
         fig.update_traces(

@@ -7,11 +7,11 @@ import plotly.express as px
 class PriceStructurePlotlyLineChart:
     def render(self, data):
         df = pd.DataFrame(data).sort_values("data_date")
-
+        
         fig = px.line(
             df,
             x="data_date",
-            y=["price", "ma_30", "ma_50"],
+            y=["price", "ma_30d", "ma_50d"],
         )
 
         fig.update_traces(line=dict(width=1))
@@ -58,7 +58,7 @@ class AssetValuePlotlyLineChart:
 class RiskContextPlotlyLineChart:
     def render(self, data):
         df = pd.DataFrame(data).sort_values("data_date")
-
+        
         fig = px.line(
             df,
             x="data_date",
@@ -146,7 +146,7 @@ class MovingAveragePriceOverTimePlotlyLineChart:
       df = pd.DataFrame(data)
       df = df.sort_values("data_date")
 
-      fig = px.line(df, x="data_date", y=["ma_30", "ma_50"], title="Moving Averages")
+      fig = px.line(df, x="data_date", y=["ma_30d", "ma_50d"], title="Moving Averages")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
