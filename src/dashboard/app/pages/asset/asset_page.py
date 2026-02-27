@@ -12,15 +12,15 @@ import dash_ag_grid as dag
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from src.dashboard.components.cards import card
-from src.dashboard.pages.asset.tables import asset_table
-from src.dashboard.services.asset_controller import AssetController
+from src.dashboard.app.components.cards import card
+from src.dashboard.app.pages.asset.tables import asset_table
+from src.dashboard.app.controllers.asset_controller import AssetController
 # from src.dashboard.services.local_asset_service import LocalAssetController
-from src.dashboard.styles.style import TAB_CONTENT_STYLE
+from src.dashboard.app.styles.style import TAB_CONTENT_STYLE
 # ─────────────────────────────────────────────
 # Figures
 # ─────────────────────────────────────────────
-from src.dashboard.pages.asset.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
+from src.dashboard.app.pages.asset.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
 # ─────────────────────────────────────────────
 # Data prep
 # ─────────────────────────────────────────────
@@ -321,20 +321,25 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
     # Depreciated: Moved to portfolio page
     # Output("asset_tab", "children"),
     Input("asset_page_location", "pathname"),
+    State("asset_page_asset_store", "data"),
 )
-def load_asset_page(pathname):
+def load_asset_page(pathname, cached_data):
     if pathname != "/assets":
         raise PreventUpdate
-    # TODO: UNCOMMENT TO CONNECT TO DB
-    df = AssetController.get_asset_data()
-    # df = LocalAssetController.get_asset_data()
-    df['data_date'] = pd.to_datetime(df['data_date'])
-    if df.empty:
+    
+    cached_data = cached_data or {}
+    view_model =  cached_data.get("view_model", None)
+    if view_model is None:
+        view_model = AssetController.get_data()
+        cached_data.update({"view_model": view_model})
+
+    if view_model is None:
         raise PreventUpdate
-    data = df.to_dict("records")
+    
     return (
-        data,
-        asset_page_filter(data),
+        cached_data,
+        # data,
+        # asset_page_filter(data),
         # Depreciated: Moved to portfolio page
         # asset_table(df),
     )

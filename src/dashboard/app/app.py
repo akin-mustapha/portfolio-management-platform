@@ -1,6 +1,6 @@
 from dash import Dash
 import dash_bootstrap_components as dbc
-from src.dashboard.layouts.layout import layout
+from src.dashboard.app.layouts.layout import layout
 
 import plotly.express as px
 import plotly.graph_objects as go

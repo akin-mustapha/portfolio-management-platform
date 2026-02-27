@@ -4,10 +4,10 @@ from dash.exceptions import PreventUpdate
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from src.dashboard.pages.portfolio.kpis import kpi_row
-from src.dashboard.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
-from src.dashboard.pages.portfolio.tables import asset_table
-from src.dashboard.controllers import PortfolioController
+from src.dashboard.app.pages.portfolio.kpis import kpi_row
+from src.dashboard.app.pages.portfolio.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart, PortfolioPerformancePlotlyLineChart
+from src.dashboard.app.pages.portfolio.tables import asset_table
+from src.dashboard.app.controllers.portfolio_controller import PortfolioController
 # ─────────────────────────────────────────────
 # Section builders
 # ─────────────────────────────────────────────

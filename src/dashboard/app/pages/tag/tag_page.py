@@ -1,12 +1,12 @@
 from dash import dcc, html, callback, Input, Output, State, dash
 import dash_bootstrap_components as dbc
-from src.dashboard.components.cards import card
+from src.dashboard.app.components.cards import card
 from src.services.portfolio.portfolio_service_builder import build_portfolio_service
 # from src.dashboard.services.asset_service import AssetService
-from src.dashboard.services.local_asset_service import LocalAssetService
-from src.dashboard.styles.style import TAB_CONTENT_STYLE
-from src.dashboard.components.tables.table import create_table
-from src.dashboard.components.select import create_select
+from src.dashboard.app.controllers.local_asset_service import LocalAssetService
+from src.dashboard.app.styles.style import TAB_CONTENT_STYLE
+from src.dashboard.app.components.tables.table import create_table
+from src.dashboard.app.components.select import create_select
 import pandas as pd
 
 def create_table_from_df(df, table_name: str):
