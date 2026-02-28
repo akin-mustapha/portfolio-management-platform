@@ -1,5 +1,7 @@
 import pandas as pd
 import plotly.express as px
+import dash_bootstrap_components as dbc
+from dash import dcc, html
 
 
 class WinnersPlotlyBarChart:
@@ -154,3 +156,25 @@ class PortfolioPNLPlotlyLineChart:
         fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
 
         return fig
+    
+    
+# Duplicate logic. Needed
+# Might want to move graphs - Open/Close Principle
+def performance_chart(data=None):
+    if data is None:
+        return html.P("NO DATA")
+    return dbc.Row([
+        dbc.Col(dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data)), md=6),
+        dbc.Col(dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data)), md=6)
+    ],  id="portfolio_page_charts")
+
+def value_chart(data=None):
+    if data is None:
+        return html.P("NO DATA")
+    return dcc.Graph(id="value_chart", figure=PortfolioPerformancePlotlyLineChart().render(data))
+
+
+def pnl_chart(data=None):
+    if data is None:
+        return html.P("NO DATA")
+    return dcc.Graph(id="pnl_char", figure=PortfolioPNLPlotlyLineChart().render(data))
