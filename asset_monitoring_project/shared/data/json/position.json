@@ -1,0 +1,1241 @@
+[
+    {
+        "instrument": {
+            "ticker": "AMDd_EQ",
+            "name": "Advanced Micro Devices",
+            "isin": "US0079031078",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-24T10:04:03.000+03:00",
+        "quantity": 0.07156316,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.07156316,
+        "currentPrice": 203.7,
+        "averagePricePaid": 149.37853499,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 10.69,
+            "currentValue": 14.58,
+            "unrealizedProfitLoss": 3.89,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "CBUKd_EQ",
+            "name": "iShares MSCI China Tech (Acc)",
+            "isin": "IE000NFR7C63",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-24T10:04:18.000+03:00",
+        "quantity": 27.99316787,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 27.99316787,
+        "currentPrice": 4.8015,
+        "averagePricePaid": 4.6439903,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 130.0,
+            "currentValue": 134.41,
+            "unrealizedProfitLoss": 4.41,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "CHVd_EQ",
+            "name": "Chevron",
+            "isin": "US1667641005",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-29T16:30:41.000+03:00",
+        "quantity": 0.17652218,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.17652218,
+        "currentPrice": 144.18,
+        "averagePricePaid": 133.69424737,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 23.6,
+            "currentValue": 25.45,
+            "unrealizedProfitLoss": 1.85,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "ISFEl_EQ",
+            "name": "iShares MSCI AC Far East ex-Japan Small Cap (Dist)",
+            "isin": "IE00B2QWDR12",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-07-24T10:01:13.000+03:00",
+        "quantity": 2.80776151,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.80776151,
+        "currentPrice": 3114.5,
+        "averagePricePaid": 2852.41106535,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 92.34,
+            "currentValue": 100.8,
+            "unrealizedProfitLoss": 8.46,
+            "fxImpact": -0.02
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SNII_US_EQ",
+            "name": "Rigetti Computing",
+            "isin": "US76655K1034",
+            "currency": "USD"
+        },
+        "createdAt": "2025-02-05T16:31:18.000+02:00",
+        "quantity": 0.27367703,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.27367703,
+        "currentPrice": 24.99,
+        "averagePricePaid": 29.67000921,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 7.06,
+            "currentValue": 5.89,
+            "unrealizedProfitLoss": -1.17,
+            "fxImpact": -0.07
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "ANRJl_EQ",
+            "name": "Amundi Global Hydrogen",
+            "isin": "FR0010930644",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-07-31T10:04:25.000+03:00",
+        "quantity": 0.02527116,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.02527116,
+        "currentPrice": 56610.0,
+        "averagePricePaid": 46821.35683522,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 13.65,
+            "currentValue": 16.49,
+            "unrealizedProfitLoss": 2.84,
+            "fxImpact": -0.01
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IUS3_EQ",
+            "name": "iShares S&P Small Cap 600 (Dist)",
+            "isin": "IE00B2QWCY14",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-24T10:04:10.000+03:00",
+        "quantity": 2.30643056,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.30643056,
+        "currentPrice": 90.29,
+        "averagePricePaid": 81.32046256,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 187.56,
+            "currentValue": 208.25,
+            "unrealizedProfitLoss": 20.69,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "ADBE_US_EQ",
+            "name": "Adobe",
+            "isin": "US00724F1012",
+            "currency": "USD"
+        },
+        "createdAt": "2024-12-23T16:31:05.000+02:00",
+        "quantity": 0.05007082,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.05007082,
+        "currentPrice": 304.0,
+        "averagePricePaid": 366.68063355,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 16.36,
+            "currentValue": 13.11,
+            "unrealizedProfitLoss": -3.25,
+            "fxImpact": -0.55
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "PFE_US_EQ",
+            "name": "Pfizer",
+            "isin": "US7170811035",
+            "currency": "USD"
+        },
+        "createdAt": "2023-01-27T16:30:19.000+02:00",
+        "quantity": 1.19239485,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.19239485,
+        "currentPrice": 25.81,
+        "averagePricePaid": 25.10074578,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 25.79,
+            "currentValue": 26.51,
+            "unrealizedProfitLoss": 0.72,
+            "fxImpact": -0.01
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "EUNYd_EQ",
+            "name": "iShares EM Dividend (Dist)",
+            "isin": "IE00B652H904",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-31T10:04:23.000+03:00",
+        "quantity": 4.96382333,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 4.96382333,
+        "currentPrice": 15.854,
+        "averagePricePaid": 14.52106475,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 72.08,
+            "currentValue": 78.7,
+            "unrealizedProfitLoss": 6.62,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SMCI_US_EQ",
+            "name": "Super Micro Computer",
+            "isin": "US86800U3023",
+            "currency": "USD"
+        },
+        "createdAt": "2025-02-11T21:11:28.000+02:00",
+        "quantity": 0.46378941,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.46378941,
+        "currentPrice": 29.62,
+        "averagePricePaid": 44.63232569,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 18.08,
+            "currentValue": 11.83,
+            "unrealizedProfitLoss": -6.25,
+            "fxImpact": -0.25
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VJPBl_EQ",
+            "name": "Vanguard FTSE Japan (Acc)",
+            "isin": "IE00BFMXYX26",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-05-28T10:00:45.000+03:00",
+        "quantity": 3.50734838,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.50734838,
+        "currentPrice": 32.64,
+        "averagePricePaid": 28.53722789,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 116.53,
+            "currentValue": 131.97,
+            "unrealizedProfitLoss": 15.44,
+            "fxImpact": -1.15
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VERGl_EQ",
+            "name": "Vanguard FTSE Developed Europe ex UK",
+            "isin": "IE00BK5BQY34",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-07-15T18:25:56.000+03:00",
+        "quantity": 3.2725242,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.2725242,
+        "currentPrice": 49.05,
+        "averagePricePaid": 45.16696928,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 170.03,
+            "currentValue": 185.03,
+            "unrealizedProfitLoss": 15.0,
+            "fxImpact": 0.35
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SHELl_EQ",
+            "name": "Shell",
+            "isin": "GB00BP6MXD84",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-01-27T16:33:17.000+02:00",
+        "quantity": 0.8339843,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.8339843,
+        "currentPrice": 2746.5,
+        "averagePricePaid": 2687.11293486,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 25.92,
+            "currentValue": 26.4,
+            "unrealizedProfitLoss": 0.48,
+            "fxImpact": -0.09
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SEMIl_EQ",
+            "name": "iShares MSCI Global Semiconductors (Acc)",
+            "isin": "IE000I8KRLL9",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-07-29T16:30:06.000+03:00",
+        "quantity": 25.50734942,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 25.50734942,
+        "currentPrice": 9.484,
+        "averagePricePaid": 7.17126648,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 210.29,
+            "currentValue": 278.86,
+            "unrealizedProfitLoss": 68.57,
+            "fxImpact": 0.57
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IUSZl_EQ",
+            "name": "iShares MSCI USA Mid-Cap Equal Weight (Acc)",
+            "isin": "IE00BD1F4K20",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-17T16:37:05.000+03:00",
+        "quantity": 18.64666312,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 18.64666312,
+        "currentPrice": 12.84,
+        "averagePricePaid": 12.15928011,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 194.02,
+            "currentValue": 206.25,
+            "unrealizedProfitLoss": 12.23,
+            "fxImpact": 1.3
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "EXH1d_EQ",
+            "name": "iShares STOXX Europe 600 Oil & Gas DE (Dist)",
+            "isin": "DE000A0H08M3",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-31T10:04:08.000+03:00",
+        "quantity": 1.49839594,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.49839594,
+        "currentPrice": 41.945,
+        "averagePricePaid": 38.80149328,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 58.14,
+            "currentValue": 62.85,
+            "unrealizedProfitLoss": 4.71,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IDVYa_EQ",
+            "name": "iShares Euro Dividend (Dist)",
+            "isin": "IE00B0M62S72",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-31T10:04:16.000+03:00",
+        "quantity": 3.25638222,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.25638222,
+        "currentPrice": 24.11,
+        "averagePricePaid": 22.85358259,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 74.42,
+            "currentValue": 78.51,
+            "unrealizedProfitLoss": 4.09,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "GOOGL_US_EQ",
+            "name": "Alphabet (Class A)",
+            "isin": "US02079K3059",
+            "currency": "USD"
+        },
+        "createdAt": "2023-07-17T16:30:17.000+03:00",
+        "quantity": 0.18253842,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.18253842,
+        "currentPrice": 332.85,
+        "averagePricePaid": 206.75099522,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 33.53,
+            "currentValue": 52.34,
+            "unrealizedProfitLoss": 18.81,
+            "fxImpact": -1.02
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "ISLNl_EQ",
+            "name": "iShares Physical Silver",
+            "isin": "IE00B4NCWG09",
+            "currency": "USD"
+        },
+        "createdAt": "2025-08-15T13:31:17.000+03:00",
+        "quantity": 2.04350792,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.04350792,
+        "currentPrice": 87.065,
+        "averagePricePaid": 48.44121182,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 84.76,
+            "currentValue": 153.27,
+            "unrealizedProfitLoss": 68.51,
+            "fxImpact": 0.52
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "WCBRl_EQ",
+            "name": "WisdomTree Cybersecurity (Acc)",
+            "isin": "IE00BLPK3577",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-29T14:36:46.000+03:00",
+        "quantity": 3.96699947,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.96699947,
+        "currentPrice": 27.555,
+        "averagePricePaid": 30.66549439,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 104.31,
+            "currentValue": 94.17,
+            "unrealizedProfitLoss": -10.14,
+            "fxImpact": 0.49
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "EXXWd_EQ",
+            "name": "iShares Dow Jones Asia Pacific Select Dividend 50 DE (Dist)",
+            "isin": "DE000A0H0744",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-31T10:04:14.000+03:00",
+        "quantity": 2.68202582,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.68202582,
+        "currentPrice": 29.435,
+        "averagePricePaid": 26.85283619,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 72.02,
+            "currentValue": 78.95,
+            "unrealizedProfitLoss": 6.93,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "CEMXl_EQ",
+            "name": "iShares MSCI EM Consumer Growth (Acc)",
+            "isin": "IE00BKM4H197",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-07-29T14:39:48.000+03:00",
+        "quantity": 2.83105667,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.83105667,
+        "currentPrice": 28.542,
+        "averagePricePaid": 28.51938672,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 92.77,
+            "currentValue": 93.15,
+            "unrealizedProfitLoss": 0.38,
+            "fxImpact": 0.31
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IUSNd_EQ",
+            "name": "iShares MSCI World Small Cap (Acc)",
+            "isin": "IE00BF4RFH31",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-24T10:04:29.000+03:00",
+        "quantity": 9.74563684,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 9.74563684,
+        "currentPrice": 8.293,
+        "averagePricePaid": 7.41152181,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 72.23,
+            "currentValue": 80.82,
+            "unrealizedProfitLoss": 8.59,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SNE_US_EQ",
+            "name": "Sony",
+            "isin": "US8356993076",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-30T16:30:48.000+03:00",
+        "quantity": 1.09786688,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.09786688,
+        "currentPrice": 24.16,
+        "averagePricePaid": 26.83385439,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 25.36,
+            "currentValue": 22.85,
+            "unrealizedProfitLoss": -2.51,
+            "fxImpact": 0.02
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "EQQQl_EQ",
+            "name": "Invesco EQQQ Nasdaq-100 (Dist)",
+            "isin": "IE0032077012",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-09-29T10:14:43.000+03:00",
+        "quantity": 0.62521226,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.62521226,
+        "currentPrice": 46987.0,
+        "averagePricePaid": 45654.07914426,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 326.4,
+            "currentValue": 338.64,
+            "unrealizedProfitLoss": 12.24,
+            "fxImpact": 2.63
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "LYPUd_EQ",
+            "name": "Amundi Australia S&P/ASX 200 (Dist)",
+            "isin": "LU0496786905",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-02-12T10:00:34.000+02:00",
+        "quantity": 1.26100938,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.26100938,
+        "currentPrice": 51.87,
+        "averagePricePaid": 50.76885312,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 64.02,
+            "currentValue": 65.41,
+            "unrealizedProfitLoss": 1.39,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IH2Ol_EQ",
+            "name": "iShares Global Water (Dist)",
+            "isin": "IE00B1TXK627",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-07-31T10:04:26.000+03:00",
+        "quantity": 0.47536692,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.47536692,
+        "currentPrice": 5760.0,
+        "averagePricePaid": 5558.40107679,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 30.46,
+            "currentValue": 31.56,
+            "unrealizedProfitLoss": 1.1,
+            "fxImpact": 0
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "UNH_US_EQ",
+            "name": "UnitedHealth",
+            "isin": "US91324P1021",
+            "currency": "USD"
+        },
+        "createdAt": "2025-01-23T21:58:36.000+02:00",
+        "quantity": 0.09094056,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.09094056,
+        "currentPrice": 338.39,
+        "averagePricePaid": 330.87546415,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 25.97,
+            "currentValue": 26.51,
+            "unrealizedProfitLoss": 0.54,
+            "fxImpact": -0.05
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "AAPL_US_EQ",
+            "name": "Apple",
+            "isin": "US0378331005",
+            "currency": "USD"
+        },
+        "createdAt": "2023-01-27T16:30:09.000+02:00",
+        "quantity": 0.05855225,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.05855225,
+        "currentPrice": 258.18,
+        "averagePricePaid": 232.2711766,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 11.96,
+            "currentValue": 13.02,
+            "unrealizedProfitLoss": 1.06,
+            "fxImpact": -0.25
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "MSFT_US_EQ",
+            "name": "Microsoft",
+            "isin": "US5949181045",
+            "currency": "USD"
+        },
+        "createdAt": "2025-01-02T18:16:20.000+02:00",
+        "quantity": 0.03952535,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.03952535,
+        "currentPrice": 457.38,
+        "averagePricePaid": 484.24618631,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 16.73,
+            "currentValue": 15.57,
+            "unrealizedProfitLoss": -1.16,
+            "fxImpact": -0.25
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VUSAl_EQ",
+            "name": "Vanguard S&P 500 (Dist)",
+            "isin": "IE00B3XXRP09",
+            "currency": "GBP"
+        },
+        "createdAt": "2023-01-27T16:06:48.000+02:00",
+        "quantity": 4.29557618,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 4.29557618,
+        "currentPrice": 98.675,
+        "averagePricePaid": 92.83504314,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 461.68,
+            "currentValue": 488.61,
+            "unrealizedProfitLoss": 26.93,
+            "fxImpact": -1.99
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "WQTMd_EQ",
+            "name": "WisdomTree Quantum Computing (Acc)",
+            "isin": "IE000W8WMSL2",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-10-27T17:10:22.000+02:00",
+        "quantity": 2.30737273,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.30737273,
+        "currentPrice": 28.67,
+        "averagePricePaid": 28.1662339,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 64.99,
+            "currentValue": 66.15,
+            "unrealizedProfitLoss": 1.16,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IWDPl_EQ",
+            "name": "iShares Developed Markets Property Yield (Dist)",
+            "isin": "IE00B1FZS350",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-05-28T10:03:47.000+03:00",
+        "quantity": 2.98344605,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.98344605,
+        "currentPrice": 1858.0,
+        "averagePricePaid": 1805.88484246,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 62.04,
+            "currentValue": 63.9,
+            "unrealizedProfitLoss": 1.86,
+            "fxImpact": 0.07
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VUKGl_EQ",
+            "name": "Vanguard FTSE 100 (Acc)",
+            "isin": "IE00BFMXYP42",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-02-12T10:00:34.000+02:00",
+        "quantity": 2.99380564,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.99380564,
+        "currentPrice": 53.98,
+        "averagePricePaid": 48.51016314,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 168.01,
+            "currentValue": 186.29,
+            "unrealizedProfitLoss": 18.28,
+            "fxImpact": -0.6
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "PLTR_US_EQ",
+            "name": "Palantir",
+            "isin": "US69608A1088",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-15T18:25:21.000+03:00",
+        "quantity": 0.08155737,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.08155737,
+        "currentPrice": 177.41,
+        "averagePricePaid": 162.83016483,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 11.42,
+            "currentValue": 12.46,
+            "unrealizedProfitLoss": 1.04,
+            "fxImpact": 0.02
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VWRPl_EQ",
+            "name": "Vanguard FTSE All-World (Acc)",
+            "isin": "IE00BK5BQT80",
+            "currency": "GBP"
+        },
+        "createdAt": "2024-12-31T10:00:38.000+02:00",
+        "quantity": 2.16643197,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 2.16643197,
+        "currentPrice": 130.2,
+        "averagePricePaid": 124.12575318,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 308.98,
+            "currentValue": 325.15,
+            "unrealizedProfitLoss": 16.17,
+            "fxImpact": 1.0
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "TSM_US_EQ",
+            "name": "Taiwan Semiconductor Manufacturing",
+            "isin": "US8740391003",
+            "currency": "USD"
+        },
+        "createdAt": "2025-02-05T16:31:19.000+02:00",
+        "quantity": 0.12525566,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.12525566,
+        "currentPrice": 343.34,
+        "averagePricePaid": 257.63306824,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 28.01,
+            "currentValue": 37.05,
+            "unrealizedProfitLoss": 9.04,
+            "fxImpact": -0.21
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "AIAIl_EQ",
+            "name": "L&G Artificial Intelligence (Acc)",
+            "isin": "IE00BK5BCD43",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-29T16:30:06.000+03:00",
+        "quantity": 4.06429875,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 4.06429875,
+        "currentPrice": 29.175,
+        "averagePricePaid": 27.47091365,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 95.78,
+            "currentValue": 102.15,
+            "unrealizedProfitLoss": 6.37,
+            "fxImpact": 0.4
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "INTLl_EQ",
+            "name": "WisdomTree Artificial Intelligence (Acc)",
+            "isin": "IE00BDVPNG13",
+            "currency": "GBX"
+        },
+        "createdAt": "2025-07-31T10:02:26.000+03:00",
+        "quantity": 3.26165456,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.26165456,
+        "currentPrice": 6874.0,
+        "averagePricePaid": 6149.84806975,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 230.9,
+            "currentValue": 258.45,
+            "unrealizedProfitLoss": 27.55,
+            "fxImpact": 0.32
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "BMT1d_EQ",
+            "name": "British American Tobacco",
+            "isin": "GB0002875804",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-29T16:31:03.000+03:00",
+        "quantity": 0.52439177,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.52439177,
+        "currentPrice": 50.0,
+        "averagePricePaid": 46.22498175,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 24.24,
+            "currentValue": 26.22,
+            "unrealizedProfitLoss": 1.98,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "IWSZl_EQ",
+            "name": "iShares MSCI World Mid-Cap Equal Weight (Acc)",
+            "isin": "IE00BP3QZD73",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-17T12:57:26.000+03:00",
+        "quantity": 1.94530881,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.94530881,
+        "currentPrice": 56.82,
+        "averagePricePaid": 53.30773164,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 88.91,
+            "currentValue": 95.22,
+            "unrealizedProfitLoss": 6.31,
+            "fxImpact": 0.42
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "NVDd_EQ",
+            "name": "Nvidia",
+            "isin": "US67066G1040",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-05-28T10:04:11.000+03:00",
+        "quantity": 0.50014991,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.50014991,
+        "currentPrice": 161.48,
+        "averagePricePaid": 148.27554403,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 74.16,
+            "currentValue": 80.76,
+            "unrealizedProfitLoss": 6.6,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "ASMLa_EQ",
+            "name": "ASML",
+            "isin": "NL0010273215",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-10-01T16:52:23.000+03:00",
+        "quantity": 0.00848977,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.00848977,
+        "currentPrice": 1149.4,
+        "averagePricePaid": 844.54584753,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 7.17,
+            "currentValue": 9.76,
+            "unrealizedProfitLoss": 2.59,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VGWEd_EQ",
+            "name": "Vanguard FTSE All-World High Dividend Yield (Acc)",
+            "isin": "IE00BK5BR626",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-31T10:04:13.000+03:00",
+        "quantity": 1.27450604,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.27450604,
+        "currentPrice": 82.48,
+        "averagePricePaid": 75.75483911,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 96.55,
+            "currentValue": 105.12,
+            "unrealizedProfitLoss": 8.57,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "AIRp_EQ",
+            "name": "Airbus",
+            "isin": "NL0000235190",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-10-01T16:52:23.000+03:00",
+        "quantity": 0.04497954,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.04497954,
+        "currentPrice": 214.85,
+        "averagePricePaid": 199.64632809,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 8.98,
+            "currentValue": 9.66,
+            "unrealizedProfitLoss": 0.68,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SFGYY_US_EQ",
+            "name": "Sony Financial Group",
+            "isin": "US83571B1008",
+            "currency": "USD"
+        },
+        "createdAt": "2025-10-06T17:39:24.000+03:00",
+        "quantity": 1.24632074,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 1.24632074,
+        "currentPrice": 5.37,
+        "averagePricePaid": 4.28461136,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 4.59,
+            "currentValue": 5.77,
+            "unrealizedProfitLoss": 1.18,
+            "fxImpact": 0.01
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "TSLA_US_EQ",
+            "name": "Tesla",
+            "isin": "US88160R1014",
+            "currency": "USD"
+        },
+        "createdAt": "2024-11-18T16:39:20.000+02:00",
+        "quantity": 0.03449026,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.03449026,
+        "currentPrice": 439.25,
+        "averagePricePaid": 365.32052817,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 11.55,
+            "currentValue": 13.05,
+            "unrealizedProfitLoss": 1.5,
+            "fxImpact": -0.7
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "SC0Ud_EQ",
+            "name": "Invesco STOXX Europe 600 Optimised Banks (Acc)",
+            "isin": "IE00B5MTWD60",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-31T10:04:12.000+03:00",
+        "quantity": 0.15363121,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.15363121,
+        "currentPrice": 211.4,
+        "averagePricePaid": 177.50299565,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 27.27,
+            "currentValue": 32.48,
+            "unrealizedProfitLoss": 5.21,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "FB_US_EQ",
+            "name": "Meta Platforms",
+            "isin": "US30303M1027",
+            "currency": "USD"
+        },
+        "createdAt": "2025-01-02T18:16:21.000+02:00",
+        "quantity": 0.0229596,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.0229596,
+        "currentPrice": 620.12,
+        "averagePricePaid": 676.40551229,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 13.53,
+            "currentValue": 12.27,
+            "unrealizedProfitLoss": -1.26,
+            "fxImpact": -0.15
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "ALVd_EQ",
+            "name": "Allianz",
+            "isin": "DE0008404005",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-10-01T16:52:23.000+03:00",
+        "quantity": 0.02505879,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.02505879,
+        "currentPrice": 382.1,
+        "averagePricePaid": 367.93476461,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 9.22,
+            "currentValue": 9.57,
+            "unrealizedProfitLoss": 0.35,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "EA_US_EQ",
+            "name": "Electronic Arts",
+            "isin": "US2855121099",
+            "currency": "USD"
+        },
+        "createdAt": "2023-01-27T16:30:03.000+02:00",
+        "quantity": 0.07460437,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.07460437,
+        "currentPrice": 204.01,
+        "averagePricePaid": 161.65272892,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 10.73,
+            "currentValue": 13.11,
+            "unrealizedProfitLoss": 2.38,
+            "fxImpact": -0.34
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "AMZN_US_EQ",
+            "name": "Amazon",
+            "isin": "US0231351067",
+            "currency": "USD"
+        },
+        "createdAt": "2023-01-27T16:30:03.000+02:00",
+        "quantity": 0.06207561,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.06207561,
+        "currentPrice": 237.65,
+        "averagePricePaid": 218.92656391,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 11.88,
+            "currentValue": 12.71,
+            "unrealizedProfitLoss": 0.83,
+            "fxImpact": -0.17
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "KO_US_EQ",
+            "name": "Coca-Cola",
+            "isin": "US1912161007",
+            "currency": "USD"
+        },
+        "createdAt": "2025-01-02T18:16:21.000+02:00",
+        "quantity": 0.42751302,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.42751302,
+        "currentPrice": 70.5,
+        "averagePricePaid": 69.26104847,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 25.51,
+            "currentValue": 25.96,
+            "unrealizedProfitLoss": 0.45,
+            "fxImpact": -0.01
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "WCLDm_EQ",
+            "name": "WisdomTree Cloud Computing (Acc)",
+            "isin": "IE00BJGWQN72",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-29T16:30:22.000+03:00",
+        "quantity": 3.4093772,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.4093772,
+        "currentPrice": 28.1,
+        "averagePricePaid": 30.20786318,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 102.99,
+            "currentValue": 95.8,
+            "unrealizedProfitLoss": -7.19,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "VAGSl_EQ",
+            "name": "Vanguard Global Aggregate Bond (Acc)",
+            "isin": "IE00BG47K971",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-05-28T10:12:47.000+03:00",
+        "quantity": 3.11729909,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 3.11729909,
+        "currentPrice": 25.925,
+        "averagePricePaid": 25.48359901,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 92.03,
+            "currentValue": 93.16,
+            "unrealizedProfitLoss": 1.13,
+            "fxImpact": -0.46
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "HCHSl_EQ",
+            "name": "HSBC MSCI CHINA (Acc)",
+            "isin": "IE0007P4PBU1",
+            "currency": "GBP"
+        },
+        "createdAt": "2025-07-15T18:26:31.000+03:00",
+        "quantity": 19.86295648,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 19.86295648,
+        "currentPrice": 7.287,
+        "averagePricePaid": 6.8876957,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 157.42,
+            "currentValue": 166.85,
+            "unrealizedProfitLoss": 9.43,
+            "fxImpact": 0.29
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "EMIDl_EQ",
+            "name": "iShares MSCI Europe Mid Cap (Dist)",
+            "isin": "IE00BYXYX745",
+            "currency": "EUR"
+        },
+        "createdAt": "2025-07-17T16:38:02.000+03:00",
+        "quantity": 15.95653848,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 15.95653848,
+        "currentPrice": 7.702,
+        "averagePricePaid": 7.29920215,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 116.47,
+            "currentValue": 122.9,
+            "unrealizedProfitLoss": 6.43,
+            "fxImpact": null
+        }
+    },
+    {
+        "instrument": {
+            "ticker": "NKE_US_EQ",
+            "name": "Nike",
+            "isin": "US6541061031",
+            "currency": "USD"
+        },
+        "createdAt": "2025-07-29T16:30:39.000+03:00",
+        "quantity": 0.46374772,
+        "quantityAvailableForTrading": 0,
+        "quantityInPies": 0.46374772,
+        "currentPrice": 64.52,
+        "averagePricePaid": 70.40465881,
+        "walletImpact": {
+            "currency": "EUR",
+            "totalCost": 28.08,
+            "currentValue": 25.78,
+            "unrealizedProfitLoss": -2.3,
+            "fxImpact": 0.05
+        }
+    }
+]	1	2026-01-16 00: 05: 50.392130+00: 00	2026-01-16 00: 05: 50.488091+00: 00

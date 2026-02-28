@@ -41,10 +41,10 @@
 
 ## Services
 
-### Ingestion Service
+### Ingestion Pipeline
 
 ```sh
-  python3 -m scripts.run_ingestion_service
+  python3 -m ingestion.pipelines.pipeline_account_bronze
 ```
 
 ### Tagging Service
