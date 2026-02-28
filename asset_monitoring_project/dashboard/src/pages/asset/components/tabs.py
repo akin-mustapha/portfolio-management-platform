@@ -1,0 +1,55 @@
+from dashboard.src.pages.asset.components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
+
+from dashboard.src.components.cards import card
+
+from dash import dcc, html, Input, Output, callback, State
+
+from dashboard.src.pages.asset.components.tables import asset_table
+
+import dash_bootstrap_components as dbc
+
+
+# ─────────────────────────────────────────────
+# Tabs
+# ─────────────────────────────────────────────
+def assets_tab(df):
+    return card("Assets", asset_table(df), className='mb-4')
+
+# Duplicate logic. Needed
+# Might want to move graphs
+def chart_tab(data):
+    return html.Div([
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="price_graph", figure=PriceStructurePlotlyLineChart
+().render(data)), md=6),
+            dbc.Col(dcc.Graph(id="value_graph", figure=AssetValuePlotlyLineChart().render(data)), md=6)
+        ], className="mb-3"),
+
+
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="risk_graph", figure=RiskContextPlotlyLineChart().render(data)), md=6),
+            dbc.Col(dcc.Graph(id="dca_graph", figure=DCABiasPlotlyLineChart().render(data)), md=6)
+        ], className="mb-3"),
+
+        # dbc.Row([
+        #     dbc.Col(dcc.Graph(id="drawdown_graph", figure=RecentHeighDrawdownOverTimePlotlyLineChart().render(data)), md=6),
+        # ])
+    ], id="asset_page_chart_tab")
+
+def chart_tab_empty():
+    return html.Div([
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="price_graph"), md=6),
+            dbc.Col(dcc.Graph(id="value_graph"), md=6)
+        ], className="mb-3"),
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="risk_graph"), md=6),
+            dbc.Col(dcc.Graph(id="dca_graph"), md=6)
+        ], className="mb-3"),
+
+        # dbc.Row([
+        #     dbc.Col(dcc.Graph(id="drawdown_graph"), md=6),
+        #     dbc.Col(dcc.Graph(id="dca_graph"), md=6)
+        # ])
+    ], id="asset_page_chart_tab")
