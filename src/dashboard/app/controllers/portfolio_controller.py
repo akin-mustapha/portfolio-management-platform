@@ -11,14 +11,17 @@ class PortfolioController:
     def get_data(self):
         # Fetch data from the service layer
         asset_data = self._query_factory.get("asset_query").get_asset_data()
-        portfolio_value = self._query_factory.get("snapshot_query").get_unrealized_profit()
+        portfolio_history = self._query_factory.get("snapshot_query").get_unrealized_profit()
         
-        asset_data_df = pd.DataFrame([dict(r._mapping) for r in asset_data])
-        portfolio_value_df = pd.DataFrame([dict(r._mapping) for r in portfolio_value])
+        df_asset_data = pd.DataFrame([dict(r._mapping) for r in asset_data])
+        df_portfolio_history = pd.DataFrame([dict(r._mapping) for r in portfolio_history])
+        
+        portfolio_snapshot = df_portfolio_history.sort_values(by='data_date', ascending=False).head(1).to_dict("records")
         
         data = {
-            "assets": asset_data_df.to_dict(orient="records"),
-            "portfolio_value": portfolio_value_df.to_dict(orient="records")
+            "assets": df_asset_data.to_dict(orient="records"),
+            "portfolio_history": df_portfolio_history.to_dict(orient="records"),
+            "portfolio_current_snapshot": portfolio_snapshot[0]
         }
         view_model = self._presenter.present(data)
         

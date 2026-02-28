@@ -44,7 +44,12 @@ def portfolio_layout():
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
         # KPIs
-        kpi_row(),
+        dbc.Row([
+            dbc.Col(
+                id="portfolio_kpi_container",
+                children=kpi_row(),
+            )
+        ]),
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
@@ -77,6 +82,7 @@ def portfolio_layout():
     Output("portfolio_page_asset_table_container", "children"),
     Output("portfolio_page_value_chart_container", "children"),
     Output("portfolio_page_pnl_chart_container", "children"),
+    Output("portfolio_kpi_container", "children"),
     Input("portfolio_page_location", "pathname"),
     State("portfolio_page_asset_store", "data"),
 )
@@ -104,5 +110,6 @@ def load_portfolio_page(pathname, cached_data):
         charts,
         table,
         value_chart(view_model.get("portfolio_value_series", {})),
-        pnl_chart(view_model.get("portfolio_pnl_series", {}))
+        pnl_chart(view_model.get("portfolio_pnl_series", {})),
+        kpi_row(view_model.get("kpi", {}))
     )

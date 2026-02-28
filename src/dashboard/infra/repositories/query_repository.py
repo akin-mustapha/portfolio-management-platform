@@ -69,7 +69,7 @@ class PostgresAssetQueryRepository:
       res = client.execute(sql, {"item_id": item_id})
     return res.fetchall()
 
-  def get_asset_data(self):
+  def get_most_recent_asset_data(self):
     sql = """
       ;WITH most_recent_asset AS
       (
@@ -144,8 +144,11 @@ class PostgresSnapshotQueryRepository:
   def get_unrealized_profit(self):
     sql = """
     SELECT created_timestamp as data_date,
-           total_value AS portfolio_value,
-           investments_unrealized_pnl AS unrealized_return
+           total_value,
+           investments_total_cost,
+           investments_realized_pnl,
+           investments_unrealized_pnl,
+           currency
     FROM staging.account
     WHERE external_id IS NOT NULL
     ORDER BY data_date
@@ -154,11 +157,13 @@ class PostgresSnapshotQueryRepository:
       res = client.execute(sql)
     return res.fetchall()
   
-  def get_asset_snapshot(self, start_date, end_date):
+  def get_asset_snapshot(self, ticker, start_date, end_date):
+    
+    ticker = ticker.lower()
     sql = f"""
         SELECT
-            a.name,
-            a.description as asset_description,
+            a.ticker,
+            a.name as asset_description,
             ac.recent_value_high_30d,
             ac.recent_value_low_30d,
             ac.ma_30d,
@@ -175,13 +180,16 @@ class PostgresSnapshotQueryRepository:
         INNER JOIN staging.asset_computed as ac
             on a.id = ac.asset_id
         WHERE date(a.created_timestamp) BETWEEN '{start_date}' AND '{end_date}'
+          AND lower(a.ticker) = '{ticker}'
         AND ac.asset_id IS NOT NULL
       """
-    with self._client as client:
+    with self.client as client:
       res = client.execute(
           sql
       )
     res = res.fetchall()
+    
+    return res
 
 
 # ===== SQLite Repos =====

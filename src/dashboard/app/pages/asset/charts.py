@@ -6,12 +6,20 @@ import plotly.express as px
 # ─────────────────────────────────────────────
 class PriceStructurePlotlyLineChart:
     def render(self, data):
-        df = pd.DataFrame(data).sort_values("data_date")
+        asset_data: dict = data.get("asset_price")
+        
+        df = pd.DataFrame(
+            data={
+                "dates": asset_data.get("dates", []),
+                "values": asset_data.get("values", [])
+            })
+        
+        df = df.sort_values("dates")
         
         fig = px.line(
             df,
-            x="data_date",
-            y=["price", "ma_30d", "ma_50d"],
+            x="dates",
+            y="values",
         )
 
         fig.update_traces(line=dict(width=1))
@@ -29,12 +37,20 @@ class PriceStructurePlotlyLineChart:
     
 class AssetValuePlotlyLineChart:
     def render(self, data):
-        df = pd.DataFrame(data).sort_values("data_date")
+        asset_data: dict = data.get("asset_value")
+        
+        df = pd.DataFrame(
+            data={
+                "dates": asset_data.get("dates", []),
+                "values": asset_data.get("values", [])
+            })
+        
+        df = df.sort_values("dates")
 
         fig = px.line(
             df,
-            x="data_date",
-            y="value",
+            x="dates",
+            y="values",
         )
 
         fig.update_traces(
@@ -57,12 +73,19 @@ class AssetValuePlotlyLineChart:
     
 class RiskContextPlotlyLineChart:
     def render(self, data):
-        df = pd.DataFrame(data).sort_values("data_date")
+        asset_data: dict = data.get("asset_risk")
         
+        df = pd.DataFrame(
+            data={
+                "dates": asset_data.get("dates", []),
+                "values": asset_data.get("values", [])
+            })
+        
+        df = df.sort_values("dates")
         fig = px.line(
             df,
-            x="data_date",
-            y=["volatility_30d", "pct_drawdown"],
+            x="dates",
+            y="values",
         )
 
         fig.update_traces(line=dict(width=1))
@@ -82,12 +105,20 @@ class RiskContextPlotlyLineChart:
 
 class DCABiasPlotlyLineChart:
     def render(self, data):
-        df = pd.DataFrame(data).sort_values("data_date")
+        asset_data: dict = data.get("asset_dca_bias")
+        
+        df = pd.DataFrame(
+            data={
+                "dates": asset_data.get("dates", []),
+                "values": asset_data.get("values", [])
+            })
+        
+        df = df.sort_values("dates")
 
         fig = px.line(
             df,
-            x="data_date",
-            y="dca_bias",
+            x="dates",
+            y="values",
         )
 
         fig.update_traces(
@@ -113,9 +144,9 @@ class DCABiasPlotlyLineChart:
 class PriceOverTimePlotlyLineChart:
     def render (self, data):
       df = pd.DataFrame(data)
-      df = df.sort_values("data_date")
+      df = df.sort_values("dates")
 
-      fig = px.line(df, x="data_date", y=["price", "value"], title="price over time")
+      fig = px.line(df, x="dates", y=["price", "value"], title="price over time")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
@@ -123,9 +154,9 @@ class PriceOverTimePlotlyLineChart:
 class VolatilityOverTimePlotlyLineChart:
     def render (self, data):
       df = pd.DataFrame(data)
-      df = df.sort_values("data_date")
+      df = df.sort_values("dates")
 
-      fig = px.line(df, x="data_date", y="volatility_30d", title="volatility_30d over time")
+      fig = px.line(df, x="dates", y="volatility_30d", title="volatility_30d over time")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
@@ -134,9 +165,9 @@ class VolatilityOverTimePlotlyLineChart:
 class ProfitOverTimePlotlyLineChart:
     def render (self, data):
       df = pd.DataFrame(data)
-      df = df.sort_values("data_date")
+      df = df.sort_values("dates")
 
-      fig = px.line(df, x="data_date", y="profit", title="Profit over time")
+      fig = px.line(df, x="dates", y="profit", title="Profit over time")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
@@ -144,9 +175,9 @@ class ProfitOverTimePlotlyLineChart:
 class MovingAveragePriceOverTimePlotlyLineChart:
     def render (self, data):
       df = pd.DataFrame(data)
-      df = df.sort_values("data_date")
+      df = df.sort_values("dates")
 
-      fig = px.line(df, x="data_date", y=["ma_30d", "ma_50d"], title="Moving Averages")
+      fig = px.line(df, x="dates", y=["ma_30d", "ma_50d"], title="Moving Averages")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
@@ -154,9 +185,9 @@ class MovingAveragePriceOverTimePlotlyLineChart:
 class RecentHeighDrawdownOverTimePlotlyLineChart:
     def render (self, data):
       df = pd.DataFrame(data)
-      df = df.sort_values("data_date")
+      df = df.sort_values("dates")
 
-      fig = px.line(df, x="data_date", y="pct_drawdown", title="Drawdown vs Recent High")
+      fig = px.line(df, x="dates", y="pct_drawdown", title="Drawdown vs Recent High")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
@@ -165,9 +196,9 @@ class RecentHeighDrawdownOverTimePlotlyLineChart:
 class DollarCostAVGBiasOverTimePlotlyLineChart:
     def render (self, data):
       df = pd.DataFrame(data)
-      df = df.sort_values("data_date")
+      df = df.sort_values("dates")
 
-      fig = px.line(df, x="data_date", y="dca_bias", title="DCA Bias over Time")
+      fig = px.line(df, x="dates", y="dca_bias", title="DCA Bias over Time")
       fig.update_layout(template="plotly_white", height=350)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig

@@ -24,19 +24,6 @@ from src.dashboard.app.pages.asset.charts import PriceStructurePlotlyLineChart, 
 # ─────────────────────────────────────────────
 # Data prep
 # ─────────────────────────────────────────────
-# TODO - MOVE LOGIC TO SERVICE LAYER
-# def prep_data(df: pd.DataFrame) -> pd.DataFrame:
-#     df = df.copy()
-#     df["pct_drawdown"] = (df["price"] - df["recent_high_30d"]) / df["recent_high_30d"]
-#     df["price_vs_ma_50"] = np.where(
-#         df["ma_50"] != 0, (df["price"] - df["ma_50"]) / df["ma_50"], None
-#     )
-#     df["volatility_30d"] = df.groupby("asset_id")["price"].pct_change().rolling(30).std()
-#     df["dca_bias"] = -0.5 * df["pct_drawdown"] - 0.4 * df["price_vs_ma_50"] + 0.1 * df["volatility_30d"]
-#     df["trend"] = df[["ma_30", "ma_50"]].apply(lambda x: "Bullish" if x["ma_30"] > x["ma_50"] else "Bearish", axis=1)
-#     return df
-
-# ─────────────────────────────────────────────
 # KPI logic
 # ─────────────────────────────────────────────
 def compute_asset_kpis(df) -> dict:
@@ -82,18 +69,25 @@ def kpi_color(value, kind):
     return PALETTE["neutral"]
 
 def asset_kpi_section(data):
-    df = pd.DataFrame(data)
-    k = compute_asset_kpis(df)
+    if isinstance(data, list):
+        data = data[-1]
+    
+    price: float = data.get("price", 0)
+    drawdown: float = data.get("pct_drawdown", 0)
+    trend: str = data.get("trend", "")
+    volatility: float = data.get("volatility_30d", 0)
+    dca_bias: float = data.get("dca_bias", 0)
+    
     return dbc.Row([
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4(k["price"])])), md=2),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("30D Drawdown"), html.H4(f"{k['drawdown']}%")]),
-                         color=kpi_color(k["drawdown"], "drawdown"), inverse=True), md=2),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Trend"), html.H4(k["trend"])]),
-                         color=kpi_color(k["trend"], "trend"), inverse=True), md=2),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Volatility (30D)"), html.H4(k["volatility"])]),
-                         color=kpi_color(k["volatility"], "volatility"), inverse=True), md=3),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("DCA Bias"), html.H4(k["dca_bias"])]),
-                         color=kpi_color(k["dca_bias"], "dca"), inverse=True), md=3),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4(price)])), md=2),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("30D Drawdown"), html.H4(f"{drawdown}%")]),
+                         color=kpi_color(drawdown, "drawdown"), inverse=True), md=2),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Trend"), html.H4(trend)]),
+                         color=kpi_color(trend, "trend"), inverse=True), md=2),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Volatility (30D)"), html.H4(volatility)]),
+                         color=kpi_color(volatility, "volatility"), inverse=True), md=3),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("DCA Bias"), html.H4(dca_bias)]),
+                         color=kpi_color(dca_bias, "dca"), inverse=True), md=3),
     ], className="mb-4")
 
 def asset_kpi_section_empty():
@@ -115,10 +109,7 @@ def assets_tab(df):
     return card("Assets", asset_table(df), className='mb-4')
 
 def asset_page_filter(data):
-    df = pd.DataFrame(data)
-    ASSET_NAMES = sorted(df["asset_description"].unique())
-    # get unique, sorted dates
-    dates = sorted(df['data_date'].dt.date.unique())
+    
     TIMEFRAMES = {
         0: ("1D", 0),
         1: ("1W", 7),
@@ -130,15 +121,11 @@ def asset_page_filter(data):
     }
     return dbc.Row(
         dbc.Row([
-            # dbc.Col(dbc.Select(id="assetpage_asset_select",
-            #                     options=[{"label": a, "value": a} for a in ASSET_NAMES],
-            #                     value=ASSET_NAMES[0]), md=4),
             dbc.Col(dcc.Dropdown(
-                                ASSET_NAMES,
+                                data.get("rows", []),
                                 # options=[{"label": a, "value": a} for a in ASSET_NAMES],
                                 multi=True,
-                                id="assetpage_asset_select",
-                                value=ASSET_NAMES[0]), md=4),
+                                id="assetpage_asset_select"), md=4),
             dbc.Col([
                 dcc.DatePickerRange(
                     id="asset_page_date_picker_filter",
@@ -151,24 +138,8 @@ def asset_page_filter(data):
                 )
             ], md=2),
             dbc.Col([
-                # dcc.Slider(1, 30, 7, value=1, id='my-slider', marks={
-                #     1: "1D",
-                #     7: "1W",
-                #     14: "2W",
-                #     30: "1M",
-                # }),
                 html.Div([
                     html.Label("Timeframe"),
-                    # dcc.Slider(
-                    #     id='date-slider',
-                    #     min=0,
-                    #     max=len(df)-1,
-                    #     value=len(df)-1,
-                    #     marks={
-                    #         i: dates[i].strftime('%b %d')
-                    #         for i in range(0, len(dates), max(1, len(dates)//10))},
-                    #     step=1
-                    # )
                     dcc.Slider(
                         id="date-slider",
                         className="timeframe-slider",
@@ -267,52 +238,29 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
     # normalize the selected value once
     if isinstance(asset_name, str):
         asset_name = [asset_name]
-    asset_key = [name.strip().lower() for name in asset_name]
+    asset_key = [name.strip().upper() for name in asset_name]
+    
+    view_model = data.get("view_model")
+    
+    asset_data = pd.DataFrame(view_model.get("asset_data"))
+    
+    mask = asset_data["ticker"].isin(asset_key)
+    df_asset_data = asset_data[mask]
 
-    asset_data = pd.DataFrame(data)
-
-    # normalize description column
-    asset_data["asset_description_norm"] = (
-        asset_data["asset_description"]
-        .astype(str)
-        .str.strip()
-        .str.lower()
-    )
-
-    mask = asset_data["asset_description_norm"].isin(asset_key)
-    asset_data_df = asset_data[mask]
-
-    asset_data_df = asset_data_df.to_dict("records")
+    df_asset_data = df_asset_data.to_dict("records")
 
     # TODO: UNCOMMENT TO CONNECT TO DB
-    asset_snapshot_df = AssetController.get_asset_snapshot(start_date, end_date)
-    # asset_snapshot = LocalAssetController.get_asset_snapshot(start_date, end_date)
-    # asset_snapshot_df = prep_data(asset_snapshot)
+    df_asset_data_history = AssetController().get_asset_snapshot(asset_key[0], start_date, end_date)
 
-    if asset_snapshot_df.empty:
-        raise PreventUpdate
+    # if df_asset_data_history.empty:
+    #     raise PreventUpdate
 
-    asset_snapshot_df["asset_description_norm"] = (
-        asset_snapshot_df["asset_description"]
-        .astype(str)
-        .str.strip()
-        .str.lower()
-    )
-
-    mask = asset_snapshot_df["asset_description_norm"].isin(asset_key)
-    asset_snapshot_df = asset_snapshot_df[mask]
-    asset_snapshot_data = asset_snapshot_df.to_dict("records")
-
-
-    # asset_snapshot_data = asset_snapshot_df[
-    #     any(asset_snapshot_df["asset_description_norm"]) in asset_key
-    # ].to_dict("records")
-
-    if len(asset_snapshot_data) == 0 or len(asset_data_df) == 0:
-        raise PreventUpdate
+    # if len(df_asset_data) == 0 or len(df_asset_data) == 0:
+    #     raise PreventUpdate
+    
     return (
-        asset_kpi_section(asset_data_df),
-        chart_tab(asset_snapshot_data)
+        asset_kpi_section(df_asset_data),
+        chart_tab(df_asset_data_history)
     )
 
 @callback(
@@ -330,16 +278,17 @@ def load_asset_page(pathname, cached_data):
     cached_data = cached_data or {}
     view_model =  cached_data.get("view_model", None)
     if view_model is None:
-        view_model = AssetController.get_data()
+        view_model = AssetController().get_data()
         cached_data.update({"view_model": view_model})
 
     if view_model is None:
         raise PreventUpdate
     
+    data = view_model.get('asset_filter')
+    
     return (
         cached_data,
-        # data,
-        # asset_page_filter(data),
+        asset_page_filter(data),
         # Depreciated: Moved to portfolio page
         # asset_table(df),
     )
