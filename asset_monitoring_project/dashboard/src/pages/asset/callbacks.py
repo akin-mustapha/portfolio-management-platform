@@ -12,6 +12,18 @@ from .components.filters import asset_page_filter
 # ─────────────────────────────────────────────
 # Callbacks
 # ─────────────────────────────────────────────
+
+
+@callback(
+    Output("collapse", "is_open"),
+    [Input("collapse-button", "n_clicks")],
+    [State("collapse", "is_open")],
+)
+def toggle_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
 @callback(
     Output("asset_kpi_container", "children"),
     Output("asset_page_chart_tab", "children"),
