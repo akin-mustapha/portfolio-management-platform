@@ -1,4 +1,4 @@
-name: ci_test_event_producer
+name: ci_test_asset_monitoring
 on: [push, pull_request]
 
 jobs:
@@ -17,4 +17,4 @@ jobs:
           pip install -r requirements.txt
       - name: Run tests
         run: |
-          pytest tests/test_event_producer/
+          pytest tests/asset_monitoring_test/
