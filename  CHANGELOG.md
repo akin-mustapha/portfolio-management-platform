@@ -12,3 +12,10 @@
 - Ingestion pipeline refactor
 - Analytics pipeline enabling derived insights
 - Dash-based UI: Portfolio view and Asset view
+
+## v0.3.0
+
+- Remove kafka
+- Setup siler layer ingestion
+- Account data ingestion
+- AI coding assistant integration start.

@@ -6,6 +6,7 @@ uvicorn
 # Relation DB
 sqlmodel
 alembic
+psycopg2-binary
 # Notebook
 ipykernel
 # orchestration
@@ -23,3 +24,5 @@ pandas
 dash_design_kit
 dash-bootstrap-components
 nbformat>=4.2.0
+# KAFKA
+confluent-kafka
