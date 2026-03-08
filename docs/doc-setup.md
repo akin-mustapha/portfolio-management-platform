@@ -1,4 +1,14 @@
+---
+name: Setup
+description: Project setup documentation
+---
+
+
 # Setup
+
+## Overview
+
+Documenation of project set-up
 
 ## Create .env
 
@@ -26,3 +36,5 @@ Add the following variables to env file
 - Start Consumer
 
 ### Set Alembic ini
+
+Section on alembic setup
