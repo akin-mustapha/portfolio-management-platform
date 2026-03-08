@@ -1,7 +1,7 @@
 import logging
 from prefect import flow, task
 from datetime import timedelta
-from asset_monitoring_project.ingestion.factories.pipeline_factory import PipelineFactory
+from src.ingestion.factories.pipeline_factory import PipelineFactory
 from prefect.cache_policies import NO_CACHE
 
 from shared.utils.custom_logger import customer_logger

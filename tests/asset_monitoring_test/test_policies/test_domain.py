@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime, UTC
 
-from asset_monitoring_project.event_producer.app.domain import Event
+from src.event_producer.app.domain import Event
 
 class TestEventDomain:
   @pytest.fixture
