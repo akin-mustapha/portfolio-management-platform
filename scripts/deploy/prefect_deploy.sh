@@ -10,8 +10,8 @@ source venv/bin/activate
 echo -e "${GREEN}Installing dependencies...${NC}"
 pip install -r requirements.txt
 
-echo -e "${GREEN}Changing directory to asset_monitoring_project...${NC}"
-cd asset_monitoring_project
+echo -e "${GREEN}Changing directory to src...${NC}"
+cd src
 
 mkdir -p logs
 
