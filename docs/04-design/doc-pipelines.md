@@ -1,5 +1,5 @@
 ---
-name: how to implement a pipeline
+name: Pipeline Design
 description: The documentation covers the workflow followed to create a new pipeline in this project
 ---
 
