@@ -6,7 +6,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from dataclasses import dataclass
 
-from .policies import FullLoader
+from ..app.policies import FullLoader
 
 from shared.database.client import SQLModelClient
 
@@ -18,8 +18,6 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Create exposition abstraction - view
 # Extract
 # Load
-
-
 
 @dataclass
 class AccountRaw:
@@ -93,4 +91,3 @@ class PostgresAccountFullLoader(FullLoader):
     """
     with self._client as client:
       client.execute(sql)
-    

@@ -1,3 +1,8 @@
+---
+name: Asset-data-pipeline
+description: Documentation on asset data ingestion pipeline
+---
+
 # Asset Data Pipeline
 
 ## Overview
@@ -36,7 +41,7 @@ Pipeline to ingest Trading 212 Asset API
 
 #### Silver Layer Tables
 
-- `asset_v2`
+- `asset`
 - `asset_computed`
 
 #### Silver Issues

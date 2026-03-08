@@ -10,6 +10,7 @@ class Source(Protocol):
   def extract(self) -> Data:
     raise NotImplementedError
   
+  # Deprecated, to be removed
   def _to_data(self, data) -> Data:
     raw_data = Data(
           source = self._endpoint,
