@@ -27,3 +27,13 @@ asset_monitoring_project renamed to src
 ## Fix
 
 Update `/scripts/deploy/prefect_deploy.sh`
+
+* updated flow scripts
+
+## Commands
+
+* prefect server stop
+* prefect config view
+* rm -rf ~/.prefect
+* lsof -i :4200
+* lsof -nP -iTCP:4200 -sTCP:LISTEN
