@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] Fix failing github action. 
+- [x] Fix failing github action. 
 
 ```txt
 ModuleNotFoundError: No module named 'asset_monitoring_project'
