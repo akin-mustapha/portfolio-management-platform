@@ -3,7 +3,7 @@ from prefect import flow, task
 from prefect.logging import loggers
 from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
-from asset_monitoring_project.ingestion.factories.pipeline_factory import PipelineFactory
+from src.ingestion.factories.pipeline_factory import PipelineFactory
 
 logger = loggers.get_logger(__name__)
 
