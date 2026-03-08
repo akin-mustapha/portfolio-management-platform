@@ -28,5 +28,5 @@ Additional data required: <any extra inputs beyond price/volume needed to comput
 
 # Input
 
-* Raw Column Example: {raw_data}
-* Existing Computed Fields: {computed_fields}
+* Raw Column Example: {{raw_data}}
+* Existing Computed Fields: {{computed_fields}}
