@@ -2,8 +2,8 @@
 
 import pytest
 from traitlets import Any
-from asset_monitoring_project.event_producer.app.policies import Destination
-from asset_monitoring_project.event_producer.app.domain import Event
+from src.event_producer.app.policies import Destination
+from src.event_producer.app.domain import Event
 
 class TestDestination:
   @pytest.fixture
