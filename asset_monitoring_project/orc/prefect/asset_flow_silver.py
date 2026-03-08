@@ -2,7 +2,7 @@ import logging
 from prefect import flow, task
 from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
-from ingestion.pipeline_factory import PipelineFactory
+from asset_monitoring_project.ingestion.factories.pipeline_factory import PipelineFactory
 
 from shared.utils.custom_logger import customer_logger
 
