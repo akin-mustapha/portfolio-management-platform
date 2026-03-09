@@ -41,12 +41,12 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
     # normalize the selected value once
     if isinstance(asset_name, str):
         asset_name = [asset_name]
-    asset_key = [name.strip().upper() for name in asset_name]
-    
+    asset_key = [name.strip().lower() for name in asset_name]
+
     view_model = data.get("view_model")
     asset_data = pd.DataFrame(view_model.get("asset_data"))
-    
-    mask = asset_data["ticker"].isin(asset_key)
+
+    mask = asset_data["ticker"].str.lower().isin(asset_key)
     df_asset_data = asset_data[mask]
 
     df_asset_data = df_asset_data.to_dict("records")
