@@ -17,7 +17,7 @@ def tag_layout():
       dcc.Location(id="tag_page_location"),
       dbc.Row(
         [
-          html.p('empty')
+          html.P('empty')
           ],
           className="mt-4"
       ),

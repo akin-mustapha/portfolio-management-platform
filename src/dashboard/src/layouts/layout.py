@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-from dash import Input, Output, dcc, html, callback
+from dash import Input, Output, dcc, html, callback, State
 from ..pages.portfolio.portfolio_page import portfolio_layout
 from ..pages.asset.asset_page import asset_layout
 from ..pages.tag.tag_page import tag_layout
@@ -28,7 +28,6 @@ def render_page_content(pathname):
     className="p-3 bg-light rounded-3",
   )
 
-from dash import callback, Input, Output, State, no_update
 @callback(
     Output("tag-create-status", "value"),
     Input("btn-create-tag-name", "n_clicks"),
