@@ -5,8 +5,7 @@ from .callbacks import load_portfolio_page
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from dashboard.src.pages.portfolio.components.kpis import kpi_row
-
+from .components.kpis import kpi_row
 from .components.charts import performance_chart, value_chart, pnl_chart
 from .components.tables import asset_table
 

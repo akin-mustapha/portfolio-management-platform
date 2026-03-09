@@ -2,12 +2,11 @@
   Portfolio Service Module
 """
 import logging
-from services.portfolio.infra.repositories.repository_factory import RepositoryFactory
+from .infra.repositories.repository_factory import RepositoryFactory
+from .app.models import Asset, AssetTag, Tag, Category
+from .app.models import Industry, Sector
 
-from services.portfolio.app.models import Asset, AssetTag, Tag, Category
-from services.portfolio.app.models import Industry, Sector
-
-from shared.utils.custom_logger import customer_logger
+from src.shared.utils.custom_logger import customer_logger
 
 from datetime import datetime, UTC
 

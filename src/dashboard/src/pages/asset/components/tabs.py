@@ -1,10 +1,10 @@
-from dashboard.src.pages.asset.components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
+from ..components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
 
-from dashboard.src.components.cards import card
+from .....src.components.cards import card
 
 from dash import dcc, html, Input, Output, callback, State
 
-from dashboard.src.pages.asset.components.tables import asset_table
+from ..components.tables import asset_table
 
 import dash_bootstrap_components as dbc
 

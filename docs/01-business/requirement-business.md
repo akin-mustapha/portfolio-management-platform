@@ -1,25 +1,25 @@
 ---
 name: Business Requirements
-description: Project business requirements
+description: Project business requirements, talks about why project exists
 ---
 
 # Project Metadata
 
 | Field | Value |
-|-------|-------|
+| ------- | ------- |
 | **Project** | Asset Monitoring System |
 | **Version** | 0.1.0 |
 | **Author** | Akinkunmi Mustapha |
 | **Created** | 2026-03-08 |
 | **Description** | A monitoring system for tracking and analyzing stock market investments with advanced metrics, correlations, and statistical comparisons. |
 
-# Business Requirements
+## Business Requirements
 
-## BN1: Stock Market Investment Tracking
+### BN1: Stock Market Investment Tracking
 
 **Type:** Business Need
 
-Enable monitoring and management of stock market investments, to maintain oversight of portfolio performance.
+Enable monitoring and management of stock investment portfolio, to maintain oversight of performance, return and risk.
 
 **Rationale:** Personal portfolio management and oversight needs
 
@@ -27,7 +27,7 @@ Enable monitoring and management of stock market investments, to maintain oversi
 
 ---
 
-## BN2: Advanced Metrics Dashboard
+### BN2: Advanced Metrics Dashboard
 
 **Type:** Business Need
 
@@ -39,7 +39,7 @@ Provide a dashboard that calculates and displays key financial metrics not avail
 
 ---
 
-## BN3: Asset Correlation Tracking
+### BN3: Asset Correlation Tracking
 
 **Type:** Business Need
 
@@ -51,7 +51,7 @@ Implement functionality to track and visualize correlations between different as
 
 ---
 
-## BN4: Statistical Comparisons of Assets
+### BN4: Statistical Comparisons of Assets
 
 **Type:** Business Need
 

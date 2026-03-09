@@ -160,8 +160,7 @@ class PipelineAccountSilver(Pipeline):
         
         for row in transformed_data
       ]
-      
-      # print(data)
+
       # Save to Destination Table
       self._destination.load(data)
       return None

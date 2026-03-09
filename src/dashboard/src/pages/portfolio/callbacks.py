@@ -2,8 +2,8 @@
 from dash import Output, Input, callback, State
 from dash.exceptions import PreventUpdate
 
-from dashboard.src.pages.portfolio.components.kpis import kpi_row
-from dashboard.src.controllers.portfolio_controller import PortfolioController
+from .components.kpis import kpi_row
+from ...controllers.portfolio_controller import PortfolioController
 from .components.charts import performance_chart, value_chart, pnl_chart
 from .components.tables import asset_table
 
