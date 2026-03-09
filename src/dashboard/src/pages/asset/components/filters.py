@@ -38,7 +38,7 @@ x = dbc.Row (
 advance_filter = html.Div(
     [
         dbc.Button(
-            "Advance Filter",
+            "Advanced Filter",
             id="collapse-button",
             className="mb-3",
             size="sm",
@@ -61,6 +61,7 @@ def asset_page_filter(data):
                     data.get("rows", []),
                     # options=[{"label": a, "value": a} for a in ASSET_NAMES],
                     multi=True,
+                    placeholder="Select an asset...",
                     id="assetpage_asset_select"),
                 md=4),
             dbc.Col([
@@ -76,7 +77,7 @@ def asset_page_filter(data):
                         marks={k: v[0] for k, v in TIMEFRAMES.items()},
                     )
                 ]),
-            ], md=2),
+            ], md=5),
         ], className="mb-6"),
         
         dbc.Row([

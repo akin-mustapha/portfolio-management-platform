@@ -68,7 +68,8 @@ def asset_kpi_section(data):
     dca_bias: float = data.get("dca_bias", 0)
     
     return dbc.Row([
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4(price)])), md=2),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4(price)]),
+                         color=PALETTE["neutral"], inverse=True), md=2),
         dbc.Col(dbc.Card(dbc.CardBody([html.Small("30D Drawdown"), html.H4(f"{drawdown}%")]),
                          color=kpi_color(drawdown, "drawdown"), inverse=True), md=2),
         dbc.Col(dbc.Card(dbc.CardBody([html.Small("Trend"), html.H4(trend)]),
@@ -81,7 +82,8 @@ def asset_kpi_section(data):
 
 def asset_kpi_section_empty():
     return dbc.Row([
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4("—")])), md=2),
+        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4("—")]),
+                         color=PALETTE["neutral"], inverse=True), md=2),
         dbc.Col(dbc.Card(dbc.CardBody([html.Small("30D Drawdown"), html.H4("—")]),
                          color=PALETTE["neutral"], inverse=True), md=2),
         dbc.Col(dbc.Card(dbc.CardBody([html.Small("Trend"), html.H4("—")]),

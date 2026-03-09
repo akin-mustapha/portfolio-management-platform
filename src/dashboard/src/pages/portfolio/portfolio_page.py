@@ -32,12 +32,16 @@ def portfolio_layout():
                 children=kpi_row(),
             )
         ]),
+        html.Hr(className="my-3"),
+        html.H6("Holdings", className="text-muted mb-2"),
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
             ),
         ]),
         # Main content
+        html.Hr(className="my-3"),
+        html.H6("Performance", className="text-muted mb-2"),
         dbc.Row([
             dbc.Col(
                 id="portfolio_page_value_chart_container",

@@ -39,17 +39,9 @@ def chart_tab(data):
 
 def chart_tab_empty():
     return html.Div([
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="price_graph"), md=6),
-            dbc.Col(dcc.Graph(id="value_graph"), md=6)
-        ], className="mb-3"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="risk_graph"), md=6),
-            dbc.Col(dcc.Graph(id="dca_graph"), md=6)
-        ], className="mb-3"),
-
-        # dbc.Row([
-        #     dbc.Col(dcc.Graph(id="drawdown_graph"), md=6),
-        #     dbc.Col(dcc.Graph(id="dca_graph"), md=6)
-        # ])
+        html.Div(
+            "Select an asset to view charts.",
+            className="text-muted text-center py-5",
+            style={"fontSize": "1rem"}
+        )
     ], id="asset_page_chart_tab")

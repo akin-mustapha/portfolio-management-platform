@@ -58,6 +58,7 @@ def asset_table(data=None):
             },
             {
                 "field": "recent_profit_high_30d",
+                "headerName": "30D High",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -67,6 +68,7 @@ def asset_table(data=None):
             },
             {
                 "field": "recent_profit_low_30d",
+                "headerName": "30D Low",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -76,6 +78,7 @@ def asset_table(data=None):
             },
             {
                 "field": "pct_drawdown",
+                "headerName": "% Drawdown",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
                 "headerTooltip": (
@@ -91,6 +94,7 @@ def asset_table(data=None):
             },
             {
                 "field": "volatility_30d",
+                "headerName": "Volatility 30D",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
                 "headerTooltip": (
@@ -106,10 +110,11 @@ def asset_table(data=None):
             },
             {
                 "field": "volatility_50d",
+                "headerName": "Volatility 50D",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
                 "headerTooltip": (
-                    "30-day volatility measure. "
+                    "50-day volatility measure. "
                     "Higher values indicate larger price swings."
                 ),
                 "cellStyle": {
@@ -121,6 +126,7 @@ def asset_table(data=None):
             },
             {
                 "field": "dca_bias",
+                "headerName": "DCA Bias",
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.4f')(params.value)"},
                 "headerTooltip": (
@@ -136,13 +142,13 @@ def asset_table(data=None):
             },
             {
                 "field": "data_date",
+                "headerName": "Date",
                 "headerTooltip": "Date this data snapshot was generated."
             },
         ],
         columnSize="responsiveSizeToFit",
         dashGridOptions={
             "rowSelection": {"mode": "multiRow"},
-            "columnSize": "autoSize",
             "tooltipInteraction": True,
             "suppressBrowserTooltip": True,
             "theme": {

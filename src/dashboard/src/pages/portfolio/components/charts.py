@@ -11,8 +11,9 @@ class WinnersPlotlyBarChart:
 
         fig = px.bar(
             df,
-            x="ticker",
-            y="profit",
+            x="profit",
+            y="ticker",
+            orientation="h",
             title="Top 10 Winners",
             text="profit",
         )
@@ -22,7 +23,6 @@ class WinnersPlotlyBarChart:
                 color="#33985D",
                 line=dict(width=0),
             ),
-            width=0.35,
             texttemplate="%{text:.2f}",
             textposition="outside",
         )
@@ -30,16 +30,16 @@ class WinnersPlotlyBarChart:
         fig.update_layout(
             template="plotly_white",
             height=350,
-            margin=dict(l=20, r=20, t=40, b=20),
-            xaxis_title=None,
-            yaxis_title="Profit",
+            margin=dict(l=20, r=60, t=40, b=20),
+            xaxis_title="Profit",
+            yaxis_title=None,
+            yaxis=dict(autorange="reversed"),
             font=dict(size=12),
-            bargap=0.45,        # 👈 more air between bars
-            bargroupgap=0.1,
+            bargap=0.35,
         )
 
-        fig.update_xaxes(showgrid=False)
-        fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+        fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+        fig.update_yaxes(showgrid=False)
 
         return fig
 
@@ -51,8 +51,9 @@ class LosersPlotlyBarChart:
 
         fig = px.bar(
             df,
-            x="ticker",
-            y="profit",
+            x="profit",
+            y="ticker",
+            orientation="h",
             title="Top 10 Losers",
             text="profit",
         )
@@ -62,7 +63,6 @@ class LosersPlotlyBarChart:
                 color="#A73528",
                 line=dict(width=0),
             ),
-            width=0.35,
             texttemplate="%{text:.2f}",
             textposition="outside",
         )
@@ -70,16 +70,16 @@ class LosersPlotlyBarChart:
         fig.update_layout(
             template="plotly_white",
             height=350,
-            margin=dict(l=20, r=20, t=40, b=20),
-            xaxis_title=None,
-            yaxis_title="Profit",
+            margin=dict(l=20, r=60, t=40, b=20),
+            xaxis_title="Profit",
+            yaxis_title=None,
+            yaxis=dict(autorange="reversed"),
             font=dict(size=12),
-            bargap=0.45,
-            bargroupgap=0.1,
+            bargap=0.35,
         )
 
-        fig.update_xaxes(showgrid=False)
-        fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+        fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+        fig.update_yaxes(showgrid=False)
 
         return fig
 
