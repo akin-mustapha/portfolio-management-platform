@@ -108,6 +108,10 @@ class XYZPipeline(Pipeline):
 - Write an integration test for the full `run` method using a test database or fixture data
 - *(Link to test directory or testing guide here)*
 
+## Naming
+
+PipelineExampleSilver
+
 ## Storage
 
 Specify any required database tables using DDL migrations. See the database migration reference below.

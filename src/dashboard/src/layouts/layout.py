@@ -1,12 +1,12 @@
 import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html, callback
-from dashboard.src.pages.portfolio.portfolio_page import portfolio_layout
-from dashboard.src.pages.asset.asset_page import asset_layout
-from dashboard.src.pages.tag.tag_page import tag_layout
-from dashboard.src.layouts.horizontal_sidebar import horizontal_sidebar
-from services.portfolio.portfolio_service_builder import build_portfolio_service
+from ..pages.portfolio.portfolio_page import portfolio_layout
+from ..pages.asset.asset_page import asset_layout
+from ..pages.tag.tag_page import tag_layout
+from ..layouts.horizontal_sidebar import horizontal_sidebar
+from src.services.portfolio.portfolio_service_builder import build_portfolio_service
 
-from dashboard.src.components.buttons import btn_side_toggle
+from ..components.buttons import btn_side_toggle
 
 porfoltio_serivce = build_portfolio_service()
 

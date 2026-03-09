@@ -1,11 +1,10 @@
 import os
-from services.portfolio.infra.repositories.tag_repository import PostgresTagRepository, SQLiteTagRepository
-from services.portfolio.infra.repositories.asset_repository import PostgresAssetRepository, SQLiteAssetRepository
-from services.portfolio.infra.repositories.asset_tag_repository import PostgresAssetTagRepository, SQLiteAssetTagRepository
-from services.portfolio.infra.repositories.industry_repository import PostgresIndustryRepository, SQLiteIndustryRepository
-from services.portfolio.infra.repositories.sector_repository import PostgresSectorRepository, SQLiteSectorRepository
-
-from services.portfolio.infra.repositories.category_repository import PostgresCategoryRepository, SQLiteCategoryRepository
+from .tag_repository import PostgresTagRepository, SQLiteTagRepository
+from .asset_repository import PostgresAssetRepository, SQLiteAssetRepository
+from .asset_tag_repository import PostgresAssetTagRepository, SQLiteAssetTagRepository
+from .industry_repository import PostgresIndustryRepository, SQLiteIndustryRepository
+from .sector_repository import PostgresSectorRepository, SQLiteSectorRepository
+from .category_repository import PostgresCategoryRepository, SQLiteCategoryRepository
 
 class RepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
