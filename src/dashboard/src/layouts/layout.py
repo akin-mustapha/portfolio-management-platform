@@ -3,10 +3,8 @@ from dash import Input, Output, dcc, html, callback, State
 from ..pages.portfolio.portfolio_page import portfolio_layout
 from ..pages.asset.asset_page import asset_layout
 from ..pages.tag.tag_page import tag_layout
-from ..layouts.horizontal_sidebar import horizontal_sidebar
+from ..layouts.sidebar import vertical_sidebar
 from src.services.portfolio.portfolio_service_builder import build_portfolio_service
-
-from ..components.buttons import btn_side_toggle
 
 porfoltio_serivce = build_portfolio_service()
 
@@ -46,30 +44,22 @@ layout = dbc.Container(
     [
         dcc.Location(id="url"),
         dbc.Row(
-            dbc.Col(
-                horizontal_sidebar,
-                width=12,
-                lg=12,
-                # className="px-0"
-            ),
-            className="mb-2"
-        ),
-        dbc.Row(
-            dbc.Col(
-                dcc.Loading(
-                    type="circle",
-                    children=dbc.Card(
-                        dbc.CardBody(html.Div(id="page-content")),
-                        className="shadow-sm border-0"
-                    )
+            [
+                dbc.Col(vertical_sidebar, width="auto", className="px-0"),
+                dbc.Col(
+                    dcc.Loading(
+                        type="circle",
+                        children=dbc.Card(
+                            dbc.CardBody(html.Div(id="page-content")),
+                            className="shadow-sm border-0"
+                        )
+                    ),
+                    className="px-3 py-2"
                 ),
-                width=12,
-                lg=12,
-                # className="mx-auto"
-                className="mx-auto px-2 px-md-4"
-            )
+            ],
+            className="g-0"
         ),
     ],
     fluid=True,
-    className="py-2",
+    className="py-0",
 )

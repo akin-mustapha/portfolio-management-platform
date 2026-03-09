@@ -15,7 +15,7 @@ plotly_config = {
 app = Dash(
     __name__,
     suppress_callback_exceptions=True,
-    external_stylesheets=[dbc.themes.FLATLY, dbc.icons.FONT_AWESOME]
+    external_stylesheets=[dbc.themes.COSMO, dbc.icons.FONT_AWESOME]
     )
 
 app.layout = layout
