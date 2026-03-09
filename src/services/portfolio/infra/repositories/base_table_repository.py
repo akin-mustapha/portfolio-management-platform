@@ -2,8 +2,8 @@ import os
 import logging
 from dotenv import load_dotenv
 from typing import Dict, Iterable
-from services.portfolio.app.interfaces import RepositoryInterface
-from shared.database.client import SQLModelClient
+from ...app.interfaces import RepositoryInterface
+from src.shared.database.client import SQLModelClient
 
 logging.basicConfig(
     level=logging.INFO,

@@ -3,7 +3,7 @@ import pandas as pd
 from dash import Input, Output, callback, State
 from dash.exceptions import PreventUpdate
 
-from dashboard.src.controllers.asset_controller import AssetController
+from ...controllers.asset_controller import AssetController
 
 from .components.tabs import chart_tab
 from .components.kpi import asset_kpi_section

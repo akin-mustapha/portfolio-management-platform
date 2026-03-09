@@ -1,6 +1,6 @@
 from dash import Dash
 import dash_bootstrap_components as dbc
-from dashboard.src.layouts.layout import layout
+from .src.layouts.layout import layout
 
 
 plotly_config = {
