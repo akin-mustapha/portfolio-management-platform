@@ -15,17 +15,18 @@ TIMEFRAMES = {
 }
 
 
-def asset_page_filter(data):
+def asset_page_filter(data, default_value=None):
     return dbc.Card([
         dbc.Row([
             dbc.Col(
                 dcc.Dropdown(
-                    data.get("rows", []),
+                    options=data.get("rows", []),
+                    value=default_value,
                     # options=[{"label": a, "value": a} for a in ASSET_NAMES],
-                    multi=True,
+                    multi=False,
                     placeholder="Select an asset...",
                     id="assetpage_asset_select"),
-                md=4),
+                md=2),
             dbc.Col([
                 html.Div([
                     html.Label("Timeframe"),
@@ -39,7 +40,7 @@ def asset_page_filter(data):
                         marks={k: v[0] for k, v in TIMEFRAMES.items()},
                     )
                 ]),
-            ], md=5),
+            ], md=3),
         ], className="mb-3"),
 
         dbc.Row([
@@ -65,7 +66,7 @@ def asset_page_filter(data):
                         initial_visible_month=datetime.now(),
                         start_date_placeholder_text="Start date",
                         end_date_placeholder_text="End date",
-                    ), md=4
+                    ), md=2
                 ),
                 dbc.Col(
                     dbc.Button("Submit", id="asset_page_filter_btn", size="sm"),

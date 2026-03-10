@@ -21,7 +21,6 @@ def page_content():
 # ─────────────────────────────────────────────
 def asset_layout():
     return html.Div([
-        dcc.Location(id="asset_page_location"),
         dcc.Store(id="asset_page_asset_store"),
 
         dbc.Row([
