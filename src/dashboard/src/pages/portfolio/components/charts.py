@@ -106,7 +106,7 @@ class PortfolioPerformancePlotlyLineChart:
 
         fig.update_layout(
             template="plotly_white",
-            height=550,
+            height=350,
             hovermode="x unified",
             margin=dict(l=20, r=20, t=20, b=20),
             xaxis_title=None,
@@ -143,7 +143,7 @@ class PortfolioPNLPlotlyLineChart:
 
         fig.update_layout(
             template="plotly_white",
-            height=550,
+            height=350,
             hovermode="x unified",
             margin=dict(l=20, r=20, t=20, b=20),
             xaxis_title=None,
