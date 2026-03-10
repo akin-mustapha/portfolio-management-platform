@@ -9,7 +9,7 @@
     border: 1px solid #e2e4e9;
     border-radius: 6px;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                  "Helvetica Neue", Arial, sans-serif;
     font-size: 13px;
 }
@@ -23,7 +23,7 @@
 .finance-grid .ag-header-row {
     background-color: transparent;
     color: #0d6efd;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -58,7 +58,7 @@
 .finance-grid .ag-row {
     border-bottom: 1px solid #e8eaed;
     color: #131722;
-    font-size: 13px;
+    font-size: 12.5px;
 }
 
 /* Zebra striping */
@@ -141,37 +141,37 @@
 .kpi-card {
     background-color: #f8f9fa;
     border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 12px 16px;
+    border-radius: 8px;
+    padding: 10px 14px;
     height: 100%;
 }
 
 .kpi-card .kpi-label {
-    font-size: 0.65rem;
-    color: #6c757d;
+    font-size: 0.72rem;           /* ~11.5px — TV label size */
+    color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    font-weight: 500;
 }
 
 .kpi-card .kpi-value {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    line-height: 1.2;
+    font-size: 1.125rem;          /* 18px */
+    font-weight: 600;
+    color: #131722;
+    line-height: 1.25;
 }
 
 .kpi-card .kpi-unit {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;         /* 11px */
     color: #adb5bd;
-    margin-left: 4px;
+    margin-left: 3px;
     font-weight: 400;
     vertical-align: baseline;
 }
 
 .kpi-card .kpi-change {
-    font-size: 0.8rem;
+    font-size: 0.75rem;           /* 12px */
     font-weight: 500;
     white-space: nowrap;
 }

@@ -52,7 +52,7 @@ layout = dbc.Container(
                         type="circle",
                         children=dbc.Card(
                             dbc.CardBody(html.Div(id="page-content")),
-                            className="shadow-sm border-0"
+                            className="shadow-sm border-0 bg-white"
                         )
                     ),
                     className="px-3 py-3"

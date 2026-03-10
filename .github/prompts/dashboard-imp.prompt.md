@@ -13,7 +13,7 @@ You are being tasked to recommend the steps required to implement the following 
 
 # Input
 
-User wants the asset page to load up with the first item on the list and the last 1 day date selected by default.
+User wants the portfolio page table to have the look and feel of the attached screenshot
 
 # Acceptance Criteria
 
