@@ -80,9 +80,13 @@ vertical_sidebar = html.Div(
     className="d-flex flex-column",
     style={
         "width": "190px",
-        "minHeight": "100vh",
+        "height": "100vh",
+        "position": "sticky",
+        "top": "0",
+        "overflowY": "auto",
         "background": "#f8f9fa",
         "boxShadow": "1px 0 0 #e9ecef",
         "paddingBottom": "1rem",
+        "flexShrink": "0",
     },
 )

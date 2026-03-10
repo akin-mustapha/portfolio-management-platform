@@ -1,8 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from datetime import date, datetime, timedelta
-import dash_bootstrap_components as dbc
-from dash import html
 
 TIMEFRAMES = {
     0: ("1D", 0),
@@ -14,69 +12,152 @@ TIMEFRAMES = {
     6: ("ALL", None),
 }
 
+_FONT = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+_BORDER = "1px solid #e0e3eb"
+_RADIUS = "4px"
+
 
 def asset_page_filter(data, default_value=None):
-    return dbc.Card([
-        dbc.Row([
-            dbc.Col(
-                dcc.Dropdown(
-                    options=data.get("rows", []),
-                    value=default_value,
-                    # options=[{"label": a, "value": a} for a in ASSET_NAMES],
-                    multi=False,
-                    placeholder="Select an asset...",
-                    id="assetpage_asset_select"),
-                md=2),
-            dbc.Col([
-                html.Div([
-                    html.Label("Timeframe"),
-                    dcc.Slider(
-                        id="date-slider",
-                        className="timeframe-slider",
-                        min=0,
-                        max=len(TIMEFRAMES) - 1,
-                        value=0,  # default = 1Y
-                        step=1,
-                        marks={k: v[0] for k, v in TIMEFRAMES.items()},
-                    )
-                ]),
-            ], md=3),
-        ], className="mb-3"),
+    today = date.today()
 
-        dbc.Row([
-            dbc.Col([
-                dbc.Button(
-                    "Advanced Filter",
-                    id="collapse-button",
-                    className="mb-2",
-                    size="sm",
-                    color="primary",
-                    n_clicks=0,
+    return html.Div(
+        [
+            # ── Filter bar (single horizontal row) ────────────────────────────
+            html.Div(
+                [
+                    # Symbol dropdown
+                    html.Div(
+                        dcc.Dropdown(
+                            options=data.get("rows", []),
+                            value=default_value,
+                            multi=False,
+                            placeholder="Search symbol…",
+                            id="assetpage_asset_select",
+                            searchable=True,
+                            clearable=True,
+                            style={"width": "100%", "fontFamily": _FONT},
+                        ),
+                        style={"width": "160px", "flexShrink": "0"},
+                    ),
+
+                    # Vertical divider
+                    html.Div(style={
+                        "width": "1px", "height": "20px",
+                        "background": "#e0e3eb",
+                        "margin": "0 16px", "flexShrink": "0",
+                        "alignSelf": "center",
+                    }),
+
+                    # "Timeframe" label
+                    html.Span(
+                        "Timeframe",
+                        style={
+                            "fontSize": "11px", "fontWeight": "600",
+                            "color": "#868993", "textTransform": "uppercase",
+                            "letterSpacing": "0.5px", "whiteSpace": "nowrap",
+                            "flexShrink": "0", "fontFamily": _FONT,
+                            "marginRight": "6px",
+                        },
+                    ),
+
+                    # Timeframe buttons — no color/background inline so CSS hover works
+                    dcc.RadioItems(
+                        id="date-slider",
+                        options=[
+                            {"label": label, "value": key}
+                            for key, (label, _) in TIMEFRAMES.items()
+                        ],
+                        value=0,
+                        inline=True,
+                        className="tv-timeframe-strip",
+                        inputStyle={
+                            "position": "absolute",
+                            "opacity": "0",
+                            "width": "0",
+                            "height": "0",
+                            "margin": "0",
+                            "pointerEvents": "none",
+                        },
+                        labelStyle={
+                            "display": "inline-block",
+                            "padding": "3px 10px",
+                            "borderRadius": _RADIUS,
+                            "fontSize": "13px",
+                            "fontWeight": "500",
+                            "cursor": "pointer",
+                            "userSelect": "none",
+                            "fontFamily": _FONT,
+                            "margin": "0 1px",
+                            "lineHeight": "1.6",
+                        },
+                    ),
+
+                    # Advanced Filter — right-aligned
+                    html.Div(
+                        dbc.Button(
+                            "Advanced Filter",
+                            id="collapse-button",
+                            n_clicks=0,
+                            className="tv-adv-btn",
+                            color="link",
+                        ),
+                        style={"marginLeft": "auto", "flexShrink": "0"},
+                    ),
+                ],
+                style={
+                    "display": "flex",
+                    "flexDirection": "row",
+                    "alignItems": "center",
+                    "padding": "6px 14px",
+                    "minHeight": "48px",
+                },
+            ),
+
+            # ── Collapsible date range ─────────────────────────────────────────
+            dbc.Collapse(
+                html.Div(
+                    [
+                        html.Span("From", className="tv-date-label"),
+                        dcc.DatePickerSingle(
+                            id="asset_page_date_picker_filter",
+                            min_date_allowed=date(2020, 1, 1),
+                            max_date_allowed=date(2049, 12, 31),
+                            date=str(today - timedelta(days=1)),
+                            display_format="YYYY-MM-DD",
+                            className="tv-single-picker",
+                        ),
+                        html.Span("→", style={
+                            "color": "#b0b8c4", "fontFamily": _FONT,
+                            "fontSize": "14px", "flexShrink": "0",
+                        }),
+                        html.Span("To", className="tv-date-label"),
+                        dcc.DatePickerSingle(
+                            id="asset_page_end_date_picker_filter",
+                            min_date_allowed=date(2020, 1, 1),
+                            max_date_allowed=date(2049, 12, 31),
+                            date=str(today),
+                            display_format="YYYY-MM-DD",
+                            className="tv-single-picker",
+                        ),
+                        dbc.Button(
+                            "Apply",
+                            id="asset_page_filter_btn",
+                            n_clicks=0,
+                            className="tv-apply-btn",
+                            color="link",
+                        ),
+                    ],
+                    className="tv-collapse-body",
                 ),
-            ], md=12),
-        ]),
-        dbc.Collapse(
-            dbc.Row([
-                dbc.Col(
-                    dcc.DatePickerRange(
-                        id="asset_page_date_picker_filter",
-                        className="asset-date-picker",
-                        min_date_allowed=date(2020, 1, 1),
-                        max_date_allowed=date(2049, 12, 31),
-                        initial_visible_month=datetime.now(),
-                        start_date=date.today() - timedelta(days=1),
-                        end_date=date.today(),
-                        start_date_placeholder_text="Start date",
-                        end_date_placeholder_text="End date",
-                    ), md=2
-                ),
-                dbc.Col(
-                    dbc.Button("Submit", id="asset_page_filter_btn", size="sm"),
-                    md=1
-                ),
-            ], className="mt-2"),
-            id="collapse",
-            is_open=False,
-        ),
-    ], body=True, className="mb-3")
-    
+                id="collapse",
+                is_open=False,
+            ),
+        ],
+        style={
+            "background": "#fff",
+            "border": _BORDER,
+            "borderRadius": "6px",
+            "marginBottom": "16px",
+            "fontFamily": _FONT,
+        },
+    )
