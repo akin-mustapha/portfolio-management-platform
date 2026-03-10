@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import date, timedelta
 
-from dash import Input, Output, callback, State
+from dash import Input, Output, callback, State, no_update
 from dash.exceptions import PreventUpdate
 
 from ...controllers.asset_controller import AssetController
@@ -26,8 +26,8 @@ def toggle_collapse(n, is_open):
     return is_open
 
 @callback(
-    Output("asset_kpi_container", "children"),
-    Output("asset_page_chart_tab", "children"),
+    Output("asset_kpi_container", "children", allow_duplicate=True),
+    Output("asset_page_chart_tab", "children", allow_duplicate=True),
     Input("asset_page_filter_btn", "n_clicks"),
     State("asset_page_asset_store", "data"),
     State("assetpage_asset_select", "value"),
