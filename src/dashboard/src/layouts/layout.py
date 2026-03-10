@@ -55,12 +55,13 @@ layout = dbc.Container(
                             className="shadow-sm border-0"
                         )
                     ),
-                    className="px-3 py-2"
+                    className="px-3 py-3"
                 ),
             ],
-            className="g-0"
+            className="g-0",
+            style={"minHeight": "100vh"}
         ),
     ],
     fluid=True,
-    className="py-0",
+    className="py-0 px-0",
 )

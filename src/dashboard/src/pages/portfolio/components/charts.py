@@ -21,26 +21,28 @@ class WinnersPlotlyBarChart:
 
         fig.update_traces(
             marker=dict(
-                color="#33985D",
+                color="#1a9e6e",
                 line=dict(width=0),
             ),
-            texttemplate="%{text:.2f}",
+            texttemplate="%{text:+.2f}",
             textposition="outside",
+            textfont=dict(color="#555", size=11),
         )
 
         fig.update_layout(
             template="plotly_white",
             height=350,
-            margin=dict(l=20, r=60, t=40, b=20),
-            xaxis_title="Profit",
+            margin=dict(l=60, r=20, t=10, b=20),
+            xaxis_title=None,
             yaxis_title=None,
-            yaxis=dict(autorange="reversed"),
-            font=dict(size=12),
-            bargap=0.35,
+            yaxis=dict(autorange="reversed", side="right", showgrid=False, zeroline=False),
+            xaxis=dict(autorange="reversed", showgrid=False, zeroline=False),
+            font=dict(size=11, color="#555"),
+            bargap=0.3,
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            title=None,
         )
-
-        fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
-        fig.update_yaxes(showgrid=False)
 
         return fig
 
@@ -61,26 +63,28 @@ class LosersPlotlyBarChart:
 
         fig.update_traces(
             marker=dict(
-                color="#A73528",
+                color="#ef5350",
                 line=dict(width=0),
             ),
-            texttemplate="%{text:.2f}",
+            texttemplate="%{text:+.2f}",
             textposition="outside",
+            textfont=dict(color="#555", size=11),
         )
 
         fig.update_layout(
             template="plotly_white",
             height=350,
-            margin=dict(l=20, r=60, t=40, b=20),
-            xaxis_title="Profit",
+            margin=dict(l=20, r=60, t=10, b=20),
+            xaxis_title=None,
             yaxis_title=None,
-            yaxis=dict(autorange="reversed"),
-            font=dict(size=12),
-            bargap=0.35,
+            yaxis=dict(autorange="reversed", showgrid=False, zeroline=False),
+            xaxis=dict(showgrid=False, zeroline=False),
+            font=dict(size=11, color="#555"),
+            bargap=0.3,
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            title=None,
         )
-
-        fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
-        fig.update_yaxes(showgrid=False)
 
         return fig
 
@@ -262,9 +266,15 @@ def performance_chart(data=None):
     if data is None:
         return html.P("NO DATA")
     return dbc.Row([
-        dbc.Col(dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data)), md=6),
-        dbc.Col(dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data)), md=6)
-    ],  id="portfolio_page_charts")
+        dbc.Col([
+            html.H6("Winners", className="text-muted mb-2"),
+            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data), config={"displayModeBar": False}),
+        ], md=6),
+        dbc.Col([
+            html.H6("Losers", className="text-muted mb-2"),
+            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data), config={"displayModeBar": False}),
+        ], md=6),
+    ], id="portfolio_page_charts")
 
 def value_chart(data=None):
     if data is None:

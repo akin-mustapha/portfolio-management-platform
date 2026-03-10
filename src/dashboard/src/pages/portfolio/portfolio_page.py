@@ -57,8 +57,23 @@ def portfolio_layout():
             )
 
         ]),
+        html.Hr(className="my-3"),
+        dbc.Row([
+            dbc.Col(html.H6("Winners & Losers", className="text-muted mb-2"), width="auto"),
+            dbc.Col(
+                dbc.Select(
+                    id="winners_losers_count",
+                    options=[{"label": f"Top {n}", "value": n} for n in [5, 10, 15, 20]],
+                    value=10,
+                    size="sm",
+                    style={"width": "90px"},
+                ),
+                width="auto",
+                className="ms-2",
+            ),
+        ], align="center", className="mb-2"),
         html.Div(
             id="portfolio_page_charts_container",
             children=performance_chart(),
-            ),
+        ),
     ])
