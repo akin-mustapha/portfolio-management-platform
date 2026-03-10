@@ -36,7 +36,7 @@ def toggle_collapse(n, is_open):
     prevent_initial_call=True
 )
 def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
-    if not all([data, asset_name, start_date, end_date]):
+    if not all([data, asset_name]):
         raise PreventUpdate
 
     # normalize the selected value once
@@ -52,6 +52,12 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
 
     df_asset_data = df_asset_data.to_dict("records")
 
+    # Fall back to a 1-year window when the user hasn't set custom dates
+    if not start_date:
+        start_date = str(date.today() - timedelta(days=365))
+    if not end_date:
+        end_date = str(date.today())
+
     # TODO: UNCOMMENT TO CONNECT TO DB
     df_asset_data_history = AssetController().get_asset_snapshot(asset_key[0], start_date, end_date)
 
@@ -60,7 +66,7 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
 
     # if len(df_asset_data) == 0 or len(df_asset_data) == 0:
     #     raise PreventUpdate
-    
+
     return (
         asset_kpi_section(df_asset_data),
         chart_tab(df_asset_data_history)
@@ -69,12 +75,13 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
 @callback(
     Output("asset_page_asset_store", "data"),
     Output("asset_page_filter_container", "children"),
-    Output("asset_kpi_container", "children"),
-    Output("asset_page_chart_tab", "children"),
+    Output("asset_kpi_container", "children", allow_duplicate=True),
+    Output("asset_page_chart_tab", "children", allow_duplicate=True),
     # Depreciated: Moved to portfolio page
     # Output("asset_tab", "children"),
-    Input("asset_page_location", "pathname"),
+    Input("active-page", "data"),
     State("asset_page_asset_store", "data"),
+    prevent_initial_call=True,
 )
 def load_asset_page(pathname, cached_data):
     if pathname != "/assets":
@@ -89,31 +96,30 @@ def load_asset_page(pathname, cached_data):
     if view_model is None:
         raise PreventUpdate
 
-    data = view_model.get('asset_filter')
-    rows = data.get("rows", [])
+    filter_data = view_model.get('asset_filter')
+    asset_tickers = filter_data.get("rows", [])
+    default_asset = asset_tickers[0] if asset_tickers else None
 
-    default_asset = rows[0] if rows else None
-    default_end = date.today()
-    default_start = default_end - timedelta(days=1)
-
-    kpi_section = no_update
-    chart_section = no_update
-    
     if default_asset:
         asset_data = pd.DataFrame(view_model.get("asset_data"))
-        mask = asset_data["ticker"].str.lower() == default_asset.strip().lower()
+        mask = asset_data["ticker"].str.lower() == default_asset.lower()
         df_asset_data = asset_data[mask].to_dict("records")
-        df_history = AssetController().get_asset_snapshot(
-            default_asset, str(default_start), str(default_end)
-        )
-        kpi_section = asset_kpi_section(df_asset_data)
-        chart_section = chart_tab(df_history)
+
+        start_date = str(date.today() - timedelta(days=365))
+        end_date = str(date.today())
+        df_asset_data_history = AssetController().get_asset_snapshot(default_asset.lower(), start_date, end_date)
+
+        kpi = asset_kpi_section(df_asset_data)
+        charts = chart_tab(df_asset_data_history)
+    else:
+        from .components.kpi import asset_kpi_section_empty
+        from .components.tabs import chart_tab_empty
+        kpi = asset_kpi_section_empty()
+        charts = chart_tab_empty()
 
     return (
         cached_data,
-        asset_page_filter(data),
-        kpi_section,
-        chart_section,
-        # Depreciated: Moved to portfolio page
-        # asset_table(df),
+        asset_page_filter(filter_data, default_value=default_asset),
+        kpi,
+        charts,
     )

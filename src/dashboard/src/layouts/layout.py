@@ -8,14 +8,14 @@ from src.services.portfolio.portfolio_service_builder import build_portfolio_ser
 
 porfoltio_serivce = build_portfolio_service()
 
-@callback(Output("page-content", "children"), [Input("url", "pathname")])
+@callback(Output("page-content", "children"), Output("active-page", "data"), [Input("url", "pathname")])
 def render_page_content(pathname):
   if pathname == "/portfolio":
-    return portfolio_layout()
+    return portfolio_layout(), pathname
   elif pathname == "/assets":
-    return asset_layout()
+    return asset_layout(), pathname
   elif pathname == "/tag":
-    return tag_layout()
+    return tag_layout(), pathname
   # If the user tries to reach a different page, return a 404 message
   return html.Div(
     [
@@ -24,7 +24,7 @@ def render_page_content(pathname):
       html.P(f"The pathname {pathname} was not recognised..."),
     ],
     className="p-3 bg-light rounded-3",
-  )
+  ), pathname
 
 @callback(
     Output("tag-create-status", "value"),
@@ -43,6 +43,7 @@ def create_new_tag(n_clicks, value):
 layout = dbc.Container(
     [
         dcc.Location(id="url"),
+        dcc.Store(id="active-page"),
         dbc.Row(
             [
                 dbc.Col(vertical_sidebar, width="auto", className="px-0"),
