@@ -36,30 +36,65 @@
 }
 
 /* ── Advanced Filter button ───────────────────────────────────── */
-.tv-adv-btn {
-    background: transparent;
-    border: 1px solid #e0e3eb;
-    border-radius: 4px;
-    color: #6b7280;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 4px 12px;
-    cursor: pointer;
-    font-family: Inter, system-ui, sans-serif;
-    white-space: nowrap;
-    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-    line-height: 1.6;
+.tv-adv-btn,
+.tv-adv-btn:visited {
+    background: transparent !important;
+    border: 1px solid #e0e3eb !important;
+    border-radius: 4px !important;
+    color: #6b7280 !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    padding: 4px 12px !important;
+    cursor: pointer !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    white-space: nowrap !important;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease !important;
+    line-height: 1.6 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
 }
 
 .tv-adv-btn:hover {
-    background: #eef2ff;
-    border-color: #a5b4fc;
-    color: #2962ff;
+    background: #eef2ff !important;
+    border-color: #a5b4fc !important;
+    color: #2962ff !important;
+    text-decoration: none !important;
 }
 
 .tv-adv-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.15);
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Apply button ─────────────────────────────────────────────── */
+.tv-apply-btn,
+.tv-apply-btn:visited {
+    background: #2962ff !important;
+    border: 1px solid #2962ff !important;
+    border-radius: 4px !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 4px 16px !important;
+    cursor: pointer !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    transition: background 0.12s ease, border-color 0.12s ease !important;
+    line-height: 1.6 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+.tv-apply-btn:hover {
+    background: #eef2ff !important;
+    border-color: #a5b4fc !important;
+    color: #2962ff !important;
+    text-decoration: none !important;
+}
+
+.tv-apply-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* ── Collapse body — right-aligned, single row ────────────────── */
@@ -135,7 +170,6 @@
     box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.12) !important;
 }
 
-/* Hide the calendar icon to save space */
 .tv-single-picker .SingleDatePickerInput_calendarIcon {
     display: none !important;
 }
@@ -145,7 +179,6 @@
     display: none !important;
 }
 
-/* Calendar popup z-index */
 .tv-single-picker .SingleDatePicker_picker {
     z-index: 9999 !important;
 }

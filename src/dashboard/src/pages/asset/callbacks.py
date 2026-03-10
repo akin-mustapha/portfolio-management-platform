@@ -31,8 +31,8 @@ def toggle_collapse(n, is_open):
     Input("asset_page_filter_btn", "n_clicks"),
     State("asset_page_asset_store", "data"),
     State("assetpage_asset_select", "value"),
-    State("asset_page_date_picker_filter", "start_date"),
-    State("asset_page_date_picker_filter", "end_date"),
+    State("asset_page_date_picker_filter", "date"),
+    State("asset_page_end_date_picker_filter", "date"),
     prevent_initial_call=True
 )
 def update_asset_page(n_clicks, data, asset_name, start_date, end_date):

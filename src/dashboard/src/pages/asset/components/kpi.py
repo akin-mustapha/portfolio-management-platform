@@ -37,7 +37,7 @@ def kpi_color(value, kind):
         elif value <= -4:
             return PALETTE["warning"]
         else:
-            return PALETTE["neutral"]
+            return PALETTE["positive"]
 
     if kind == "trend":
         return PALETTE["positive"] if value == "Bullish" else PALETTE["neutral"]
