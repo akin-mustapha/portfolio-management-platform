@@ -5,6 +5,7 @@ from ..pages.asset.asset_page import asset_layout
 from ..pages.tag.tag_page import tag_layout
 from ..layouts.sidebar import vertical_sidebar
 from src.services.portfolio.portfolio_service_builder import build_portfolio_service
+from ..pages.portfolio import theme_callbacks  # noqa: F401
 
 porfoltio_serivce = build_portfolio_service()
 
@@ -44,6 +45,7 @@ layout = dbc.Container(
     [
         dcc.Location(id="url"),
         dcc.Store(id="active-page"),
+        dcc.Store(id="theme-store", storage_type="local", data="light"),
         dbc.Row(
             [
                 dbc.Col(vertical_sidebar, width="auto", className="px-0"),

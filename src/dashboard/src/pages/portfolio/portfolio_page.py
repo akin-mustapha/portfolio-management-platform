@@ -9,6 +9,20 @@ from .components.kpis import kpi_row
 from .components.charts import performance_chart, value_chart, pnl_chart
 from .components.tables import asset_table
 
+
+# ─────────────────────────────────────────────
+# Shared helpers
+# ─────────────────────────────────────────────
+def _section_header(title):
+    return html.Div([
+        html.Hr(className="tv-divider"),
+        html.Div([
+            html.Span(title),
+            html.Span("›", className="tv-chevron"),
+        ], className="tv-section-header"),
+    ])
+
+
 # ─────────────────────────────────────────────
 # Section builders
 # ─────────────────────────────────────────────
@@ -17,7 +31,8 @@ def asset_section():
         id="portfolio_page_asset_table_container",
         children=[asset_table(None)],
     )
-    
+
+
 # ─────────────────────────────────────────────
 # Page layout
 # ─────────────────────────────────────────────
@@ -32,16 +47,13 @@ def portfolio_layout():
                 children=kpi_row(),
             )
         ]),
-        html.Hr(className="my-3"),
-        html.H6("Holdings", className="text-muted mb-2"),
+        _section_header("Holdings"),
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
             ),
         ]),
-        # Main content
-        html.Hr(className="my-3"),
-        html.H6("Performance", className="text-muted mb-2"),
+        _section_header("Performance"),
         dbc.Row([
             dbc.Col(
                 id="portfolio_page_value_chart_container",
@@ -55,11 +67,16 @@ def portfolio_layout():
                 width="auto",
                 md=6,
             )
-
         ]),
-        html.Hr(className="my-3"),
+        html.Hr(className="tv-divider"),
         dbc.Row([
-            dbc.Col(html.H6("Winners & Losers", className="text-muted mb-2"), width="auto"),
+            dbc.Col(
+                html.Div([
+                    html.Span("Winners & Losers"),
+                    html.Span("›", className="tv-chevron"),
+                ], className="tv-section-header mb-0"),
+                width="auto",
+            ),
             dbc.Col(
                 dbc.Select(
                     id="winners_losers_count",

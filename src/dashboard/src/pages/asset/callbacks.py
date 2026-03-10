@@ -33,9 +33,10 @@ def toggle_collapse(n, is_open):
     State("assetpage_asset_select", "value"),
     State("asset_page_date_picker_filter", "date"),
     State("asset_page_end_date_picker_filter", "date"),
+    State("theme-store", "data"),
     prevent_initial_call=True
 )
-def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
+def update_asset_page(n_clicks, data, asset_name, start_date, end_date, theme):
     if not all([data, asset_name]):
         raise PreventUpdate
 
@@ -69,7 +70,7 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
 
     return (
         asset_kpi_section(df_asset_data),
-        chart_tab(df_asset_data_history)
+        chart_tab(df_asset_data_history, theme=theme or "light")
     )
 
 @callback(
@@ -81,9 +82,10 @@ def update_asset_page(n_clicks, data, asset_name, start_date, end_date):
     # Output("asset_tab", "children"),
     Input("active-page", "data"),
     State("asset_page_asset_store", "data"),
+    State("theme-store", "data"),
     prevent_initial_call=True,
 )
-def load_asset_page(pathname, cached_data):
+def load_asset_page(pathname, cached_data, theme):
     if pathname != "/assets":
         raise PreventUpdate
 
@@ -110,7 +112,7 @@ def load_asset_page(pathname, cached_data):
         df_asset_data_history = AssetController().get_asset_snapshot(default_asset.lower(), start_date, end_date)
 
         kpi = asset_kpi_section(df_asset_data)
-        charts = chart_tab(df_asset_data_history)
+        charts = chart_tab(df_asset_data_history, theme=theme or "light")
     else:
         from .components.kpi import asset_kpi_section_empty
         from .components.tabs import chart_tab_empty

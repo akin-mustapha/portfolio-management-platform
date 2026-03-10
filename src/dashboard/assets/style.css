@@ -1,4 +1,38 @@
 /* ══════════════════════════════════════════════════════════════
+   Global typography — Inter font, TradingView scale
+   ══════════════════════════════════════════════════════════════ */
+
+body, * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── TradingView section header ───────────────────────────────── */
+.tv-section-header {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 10px;
+    cursor: default;
+    user-select: none;
+}
+
+.tv-section-header .tv-chevron {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* ── TradingView thin divider — replaces Bootstrap hr ─────────── */
+.tv-divider {
+    border: none;
+    border-top: 1px solid var(--border-tv);
+    margin: 16px 0 12px 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
    TradingView-style filter
    Layout is in Python inline styles; CSS owns color/hover/active
    ══════════════════════════════════════════════════════════════ */
@@ -20,17 +54,17 @@
 
 /* Base label color (no inline color set in Python, so CSS wins) */
 .tv-timeframe-strip label {
-    color: #6b7280;
+    color: var(--text-secondary);
     transition: background 0.12s ease, color 0.12s ease;
 }
 
 .tv-timeframe-strip label:hover {
-    background: #f0f3fa;
-    color: #131722;
+    background: var(--bg-strip-hover);
+    color: var(--text-primary);
 }
 
 .tv-timeframe-strip input[type="radio"]:checked + label {
-    background: #eef2ff;
+    background: var(--bg-strip-active);
     color: #2962ff;
     font-weight: 700;
 }
@@ -39,9 +73,9 @@
 .tv-adv-btn,
 .tv-adv-btn:visited {
     background: transparent !important;
-    border: 1px solid #e0e3eb !important;
+    border: 1px solid var(--border-tv) !important;
     border-radius: 4px !important;
-    color: #6b7280 !important;
+    color: var(--text-secondary) !important;
     font-size: 12px !important;
     font-weight: 500 !important;
     padding: 4px 12px !important;
@@ -106,15 +140,19 @@
     flex-wrap: nowrap;
     gap: 8px;
     padding: 7px 14px;
-    border-top: 1px solid #e0e3eb;
-    background: #fafbfd;
+    border-top: 1px solid var(--border-tv);
+    background: var(--bg-filter-bar);
     border-radius: 0 0 6px 6px;
+}
+
+.tv-filter-label {
+    color: var(--text-secondary);
 }
 
 .tv-date-label {
     font-size: 11px;
     font-weight: 600;
-    color: #868993;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-family: Inter, system-ui, sans-serif;
@@ -129,24 +167,24 @@
     flex-shrink: 0 !important;  /* prevent flex container from squishing the picker */
 }
 
-.tv-single-picker .SingleDatePickerInput {
-    border: 1px solid #e0e3eb !important;
+.tv-single-picker [class*="SingleDatePickerInput"] {
+    border: 1px solid var(--border-tv) !important;
     border-radius: 4px !important;
-    background: #fff !important;
+    background: var(--bg-picker) !important;
     display: inline-flex !important;
     align-items: center !important;
     width: auto !important;
 }
 
-.tv-single-picker .DateInput {
+.tv-single-picker [class*="DateInput"]:not(input) {
     width: 84px !important;
     background: transparent !important;
 }
 
-.tv-single-picker .DateInput_input {
+.tv-single-picker input {
     font-size: 12px !important;
     font-family: Inter, system-ui, sans-serif !important;
-    color: #131722 !important;
+    color: var(--text-primary) !important;
     padding: 3px 5px !important;
     border: none !important;
     border-bottom: none !important;
@@ -156,31 +194,75 @@
     line-height: 1.4 !important;
 }
 
-.tv-single-picker .DateInput_input::placeholder {
-    color: #b0b8c4 !important;
+.tv-single-picker input::placeholder {
+    color: var(--text-muted) !important;
 }
 
-.tv-single-picker .DateInput_input:focus {
+.tv-single-picker input:focus {
     outline: none !important;
     border-bottom: none !important;
 }
 
-.tv-single-picker .SingleDatePickerInput__withBorder:focus-within {
+.tv-single-picker [class*="SingleDatePickerInput"]:focus-within {
     border-color: #2962ff !important;
     box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.12) !important;
 }
 
-.tv-single-picker .SingleDatePickerInput_calendarIcon {
-    display: none !important;
-}
-
-/* Hide the fang (arrow connecting input to calendar popup) */
-.tv-single-picker .DateInput_fang {
+/* Hide calendar icon button and fang — match all suffixed class variants */
+.tv-single-picker [class*="calendarIcon"],
+.tv-single-picker [class*="DateInput_fang"] {
     display: none !important;
 }
 
 .tv-single-picker .SingleDatePicker_picker {
     z-index: 9999 !important;
+}
+
+/* ── Asset page filter bar dark mode ──────────────────────────── */
+html[data-theme="dark"] .asset-filter-bar {
+    background: var(--bg-filter-bar) !important;
+    border-color: var(--border-tv) !important;
+}
+
+html[data-theme="dark"] .tv-vert-divider {
+    background: var(--border-tv) !important;
+}
+
+/* ── Date picker dark mode ────────────────────────────────────── */
+/* react-dates adds numeric suffixes to class names (e.g. DateInput_1).
+   Use [class*=] attribute selectors to match all variants. */
+
+/* Outer wrapper */
+html[data-theme="dark"] .tv-single-picker [class*="SingleDatePickerInput"] {
+    background-color: var(--bg-kpi-card) !important;
+    border-color: var(--border-main) !important;
+}
+
+/* Inner DateInput container */
+html[data-theme="dark"] .tv-single-picker [class*="DateInput"] {
+    background-color: var(--bg-kpi-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* The actual text input */
+html[data-theme="dark"] .tv-single-picker input {
+    background-color: var(--bg-kpi-card) !important;
+    color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .tv-single-picker input::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Calendar icon button — hide using attribute selector for all suffixed variants */
+.tv-single-picker [class*="calendarIcon"] {
+    display: none !important;
+}
+
+/* Collapse section (Advanced Filter row) */
+html[data-theme="dark"] .tv-collapse-body {
+    background: var(--bg-filter-bar) !important;
+    border-color: var(--border-tv) !important;
 }
 
 /* ── Apply button ─────────────────────────────────────────────── */
