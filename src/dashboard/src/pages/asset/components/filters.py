@@ -1,6 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -22,6 +22,7 @@ def asset_page_filter(data):
                 dcc.Dropdown(
                     data.get("rows", []),
                     # options=[{"label": a, "value": a} for a in ASSET_NAMES],
+                    value=data.get("rows", [None])[0],
                     multi=True,
                     placeholder="Select an asset...",
                     id="assetpage_asset_select"),
@@ -63,6 +64,8 @@ def asset_page_filter(data):
                         min_date_allowed=date(2020, 1, 1),
                         max_date_allowed=date(2049, 12, 31),
                         initial_visible_month=datetime.now(),
+                        start_date=date.today() - timedelta(days=1),
+                        end_date=date.today(),
                         start_date_placeholder_text="Start date",
                         end_date_placeholder_text="End date",
                     ), md=4
