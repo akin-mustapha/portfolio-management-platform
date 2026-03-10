@@ -18,10 +18,8 @@ def kpi_row(data={}):
   
   currency_sign = '€' if currency == 'EUR' else '$'
   value = data.get("value", 0)
-  value = 100
   realized_pnl = data.get("realized_pnl", 0)
   total_invested = data.get("total_cost", 0)
-  total_invested = 200
   unrealized_pnl = data.get("unrealized_pnl", 0)
   
   value_str = f'{currency_sign}{value}'

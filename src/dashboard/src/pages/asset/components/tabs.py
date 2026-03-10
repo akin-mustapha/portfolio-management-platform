@@ -21,15 +21,14 @@ def chart_tab(data):
     return html.Div([
 
         dbc.Row([
-            dbc.Col(dcc.Graph(id="price_graph", figure=PriceStructurePlotlyLineChart
-().render(data)), md=6),
-            dbc.Col(dcc.Graph(id="value_graph", figure=AssetValuePlotlyLineChart().render(data)), md=6)
+            dbc.Col(dcc.Graph(id="price_graph", figure=PriceStructurePlotlyLineChart().render(data), config={"displayModeBar": False}), md=6),
+            dbc.Col(dcc.Graph(id="value_graph", figure=AssetValuePlotlyLineChart().render(data), config={"displayModeBar": False}), md=6)
         ], className="mb-3"),
 
 
         dbc.Row([
-            dbc.Col(dcc.Graph(id="risk_graph", figure=RiskContextPlotlyLineChart().render(data)), md=6),
-            dbc.Col(dcc.Graph(id="dca_graph", figure=DCABiasPlotlyLineChart().render(data)), md=6)
+            dbc.Col(dcc.Graph(id="risk_graph", figure=RiskContextPlotlyLineChart().render(data), config={"displayModeBar": False}), md=6),
+            dbc.Col(dcc.Graph(id="dca_graph", figure=DCABiasPlotlyLineChart().render(data), config={"displayModeBar": False}), md=6)
         ], className="mb-3"),
 
         # dbc.Row([
