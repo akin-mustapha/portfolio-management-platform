@@ -1,0 +1,181 @@
+/* ============================================================
+   ag-grid-finance.css
+   Finance-grade skin for the portfolio AG Grid table.
+   All rules scoped under .finance-grid to avoid Bootstrap conflicts.
+   ============================================================ */
+
+/* ── Wrapper / container ────────────────────────────────── */
+.finance-grid .ag-root-wrapper {
+    border: 1px solid #e2e4e9;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.finance-grid .ag-header {
+    background-color: rgba(13, 110, 253, 0.07);
+    border-bottom: 2px solid rgba(13, 110, 253, 0.25);
+}
+
+.finance-grid .ag-header-row {
+    background-color: transparent;
+    color: #0d6efd;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.finance-grid .ag-header-cell {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-right: 1px solid rgba(13, 110, 253, 0.12);
+}
+
+.finance-grid .ag-header-cell:last-child {
+    border-right: none;
+}
+
+.finance-grid .ag-header-cell-text {
+    color: #0d6efd;
+}
+
+/* Sort arrow icons */
+.finance-grid .ag-sort-indicator-icon {
+    color: rgba(13, 110, 253, 0.4);
+}
+
+.finance-grid .ag-header-cell:hover .ag-sort-indicator-icon,
+.finance-grid .ag-sort-indicator-icon.ag-sort-ascending-icon,
+.finance-grid .ag-sort-indicator-icon.ag-sort-descending-icon {
+    color: #0d6efd;
+}
+
+/* ── Body rows ──────────────────────────────────────────── */
+.finance-grid .ag-row {
+    border-bottom: 1px solid #e8eaed;
+    color: #131722;
+    font-size: 13px;
+}
+
+/* Zebra striping */
+.finance-grid .ag-row-even {
+    background-color: #ffffff;
+}
+
+.finance-grid .ag-row-odd {
+    background-color: #f8f9fb;
+}
+
+/* Hover */
+.finance-grid .ag-row:hover {
+    background-color: #eaf2ff !important;
+}
+
+/* Selected */
+.finance-grid .ag-row-selected {
+    background-color: #dbeafe !important;
+    border-bottom-color: #bdd6fc !important;
+}
+
+.finance-grid .ag-row-selected:hover {
+    background-color: #c7dafd !important;
+}
+
+/* ── Cells ──────────────────────────────────────────────── */
+.finance-grid .ag-cell {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-right: 1px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.finance-grid .ag-cell.ag-right-aligned-cell {
+    text-align: right;
+    justify-content: flex-end;
+}
+
+/* ── Checkbox ───────────────────────────────────────────── */
+.finance-grid .ag-checkbox-input-wrapper {
+    accent-color: #3b82f6;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+.finance-grid .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
+.finance-grid .ag-body-viewport::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.finance-grid .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
+.finance-grid .ag-body-viewport::-webkit-scrollbar-thumb {
+    background: #c8cbd4;
+    border-radius: 3px;
+}
+
+/* ── No rows overlay ────────────────────────────────────── */
+.finance-grid .ag-overlay-no-rows-wrapper {
+    color: #7b8196;
+    font-size: 13px;
+}
+
+/* ── Tooltip ────────────────────────────────────────────── */
+.finance-grid .ag-tooltip {
+    background: #1a1a2e;
+    color: #e8f0fe;
+    border: 1px solid rgba(13, 110, 253, 0.3);
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 10px;
+    max-width: 280px;
+}
+
+/* ============================================================
+   KPI Cards — light card style matching sidebar (#f8f9fa)
+   ============================================================ */
+.kpi-card {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 12px 16px;
+    height: 100%;
+}
+
+.kpi-card .kpi-label {
+    font-size: 0.65rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.kpi-card .kpi-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.2;
+}
+
+.kpi-card .kpi-unit {
+    font-size: 0.75rem;
+    color: #adb5bd;
+    margin-left: 4px;
+    font-weight: 400;
+    vertical-align: baseline;
+}
+
+.kpi-card .kpi-change {
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.kpi-change-positive { color: #26a69a; }
+.kpi-change-negative { color: #ef5350; }
+.kpi-change-neutral  { color: #adb5bd; }

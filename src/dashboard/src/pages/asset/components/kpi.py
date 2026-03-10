@@ -3,35 +3,33 @@ from dash import html
 
 
 PALETTE = {
-    "positive": "#2F6F6A",   # muted teal
-    "neutral":  "#6B7280",   # slate gray
+    "positive": "#26a69a",   # teal green
+    "neutral":  "#9ca3af",   # slate gray
     "warning":  "#B08900",   # soft amber
-    "risk":     "#4B5563",   # charcoal
+    "risk":     "#ef5350",   # red
 }
 
 
+def _fmt_pct(value):
+    prefix = "+" if value > 0 else ""
+    return f"{prefix}{value:.2f}%"
 
-# kpi
-def kpi(title, value, color="primary"):
-    return dbc.Card(
-        dbc.CardBody([
-            html.H6(title, className="text-muted"),
-            html.H3(value, className=f"text-{color}")
-        ]),
-        className="shadow-sm"
-    )
 
-def asset_kpi_row(df):
-  return dbc.Row(
-          [
-            dbc.Col(kpi("Total Assets", len(df), "white")),
-            dbc.Col(kpi("Average Price", df['price'].mean().round(decimals=2), "success")),
-            dbc.Col(kpi("Volatity", df['volatility_30d'].mean().round(decimals=4), "success"))
-          ],
-          className="mb-4"
-        )
-  
-  
+def _dark_kpi_card(label, value_str, unit="", change_str="", change_color=None):
+    if change_color is None:
+        change_color = PALETTE["neutral"]
+    return html.Div([
+        html.Div(label, className="kpi-label"),
+        html.Div([
+            html.Div([
+                html.Span(value_str, className="kpi-value"),
+                html.Span(unit, className="kpi-unit") if unit else None,
+            ], className="d-flex align-items-baseline"),
+            html.Span(change_str, className="kpi-change", style={"color": change_color}) if change_str else None,
+        ], className="d-flex align-items-baseline justify-content-between"),
+    ], className="kpi-card")
+
+
 def kpi_color(value, kind):
     if kind == "drawdown":
         if value <= -8:
@@ -54,8 +52,20 @@ def kpi_color(value, kind):
 
     if kind == "dca":
         return PALETTE["positive"] if value > 0 else PALETTE["neutral"]
-    
+
     return PALETTE["neutral"]
+
+
+def asset_kpi_row(df):
+    return dbc.Row(
+        [
+            dbc.Col(_dark_kpi_card("Total Assets", str(len(df)))),
+            dbc.Col(_dark_kpi_card("Average Price", f"${df['price'].mean().round(decimals=2):,.2f}", unit="USD")),
+            dbc.Col(_dark_kpi_card("Volatility", f"{df['volatility_30d'].mean().round(decimals=4):.4f}")),
+        ],
+        className="mb-4 g-3"
+    )
+
 
 def asset_kpi_section(data):
     if isinstance(data, list):
@@ -68,33 +78,36 @@ def asset_kpi_section(data):
     dca_bias: float = data.get("dca_bias", 0)
 
     price_fmt      = f"${price:,.2f}"
-    drawdown_fmt   = f"{drawdown:.2f}%"
+    drawdown_fmt   = _fmt_pct(drawdown)
     volatility_fmt = f"{volatility:.4f}"
     dca_bias_fmt   = f"{dca_bias:.4f}"
 
     return dbc.Row([
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4(price_fmt)]),
-                         color=PALETTE["neutral"], inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("30D Drawdown"), html.H4(drawdown_fmt)]),
-                         color=kpi_color(drawdown, "drawdown"), inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Trend"), html.H4(trend)]),
-                         color=kpi_color(trend, "trend"), inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Volatility (30D)"), html.H4(volatility_fmt)]),
-                         color=kpi_color(volatility, "volatility"), inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("DCA Bias"), html.H4(dca_bias_fmt)]),
-                         color=kpi_color(dca_bias, "dca"), inverse=True)),
-    ], className="mb-4 g-2 row-cols-2 row-cols-md-5")
+        dbc.Col(_dark_kpi_card("Price", price_fmt, unit="USD")),
+        dbc.Col(_dark_kpi_card(
+            "30D Drawdown", drawdown_fmt,
+            change_color=kpi_color(drawdown, "drawdown"),
+        )),
+        dbc.Col(_dark_kpi_card(
+            "Trend", trend,
+            change_color=kpi_color(trend, "trend"),
+        )),
+        dbc.Col(_dark_kpi_card(
+            "Volatility (30D)", volatility_fmt,
+            change_color=kpi_color(volatility, "volatility"),
+        )),
+        dbc.Col(_dark_kpi_card(
+            "DCA Bias", dca_bias_fmt,
+            change_color=kpi_color(dca_bias, "dca"),
+        )),
+    ], className="mb-4 g-3 row-cols-2 row-cols-md-5")
+
 
 def asset_kpi_section_empty():
     return dbc.Row([
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Price"), html.H4("—")]),
-                         color=PALETTE["neutral"], inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("30D Drawdown"), html.H4("—")]),
-                         color=PALETTE["neutral"], inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Trend"), html.H4("—")]),
-                         color=PALETTE["neutral"], inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("Volatility (30D)"), html.H4("—")]),
-                         color=PALETTE["neutral"], inverse=True)),
-        dbc.Col(dbc.Card(dbc.CardBody([html.Small("DCA Bias"), html.H4("—")]),
-                         color=PALETTE["neutral"], inverse=True)),
-    ], className="mb-4 g-2 row-cols-2 row-cols-md-5")
+        dbc.Col(_dark_kpi_card("Price", "—", unit="USD")),
+        dbc.Col(_dark_kpi_card("30D Drawdown", "—")),
+        dbc.Col(_dark_kpi_card("Trend", "—")),
+        dbc.Col(_dark_kpi_card("Volatility (30D)", "—")),
+        dbc.Col(_dark_kpi_card("DCA Bias", "—")),
+    ], className="mb-4 g-3 row-cols-2 row-cols-md-5")
