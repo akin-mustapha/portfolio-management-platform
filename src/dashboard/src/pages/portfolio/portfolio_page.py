@@ -5,8 +5,7 @@ from .callbacks import load_portfolio_page
 # ─────────────────────────────────────────────
 # App imports
 # ─────────────────────────────────────────────
-from dashboard.src.pages.portfolio.components.kpis import kpi_row
-
+from .components.kpis import kpi_row
 from .components.charts import performance_chart, value_chart, pnl_chart
 from .components.tables import asset_table
 
@@ -33,12 +32,16 @@ def portfolio_layout():
                 children=kpi_row(),
             )
         ]),
+        html.Hr(className="my-3"),
+        html.H6("Holdings", className="text-muted mb-2"),
         dbc.Row([
             dbc.Col(
                 children=asset_section(),
             ),
         ]),
         # Main content
+        html.Hr(className="my-3"),
+        html.H6("Performance", className="text-muted mb-2"),
         dbc.Row([
             dbc.Col(
                 id="portfolio_page_value_chart_container",

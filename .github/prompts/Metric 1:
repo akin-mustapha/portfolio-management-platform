@@ -1,0 +1,19 @@
+Metric 1:
+
+Name: Sharpe Ratio
+What: Measures the risk-adjusted return of an investment by comparing its excess return to its volatility.
+Why: For DCA investors, it helps evaluate whether the returns from dollar-cost averaging justify the risk taken, ensuring the strategy isn't exposing the portfolio to unnecessary volatility.
+How: A Sharpe Ratio above 1 is generally considered good, indicating strong returns relative to risk; below 0 suggests poor risk-adjusted performance. Use it to compare assets or the overall portfolio against benchmarks—higher values signal better efficiency in generating returns per unit of risk. In DCA contexts, monitor it over time to confirm that averaging down isn't amplifying downside volatility without commensurate upside.
+Drawbacks: Assumes returns are normally distributed and is sensitive to the chosen risk-free rate benchmark; it may not capture tail risks or non-linear payoffs.
+Formula: (Average Annual Return - Risk-Free Rate) / Standard Deviation of Returns
+Additional data required: Risk-free rate (e.g., 10-year Treasury yield) and a time series of returns (beyond basic price data, requiring historical price sequences to compute averages and volatility).
+
+Metric 2:
+
+Name: Sortino Ratio
+What: Quantifies the return per unit of downside risk, focusing only on negative volatility rather than total volatility.
+Why: DCA strategies benefit from metrics that emphasize loss protection, as averaging purchases can lead to periods of underperformance; this ratio highlights how well the portfolio avoids painful drawdowns while capturing gains.
+How: Values above 1 indicate acceptable risk-adjusted performance, with higher numbers being preferable; compare across assets to prioritize those with smoother downside profiles. For DCA monitoring, track it quarterly to ensure the strategy isn't accumulating excessive downside risk from market dips—act by reducing exposure if the ratio falls below 0.5 consistently. It complements Sharpe by ignoring upside volatility, making it more relevant for risk-averse DCA investors.
+Drawbacks: Still relies on historical data and a risk-free benchmark; it may overlook upside potential and requires sufficient negative return periods for accurate calculation.
+Formula: (Average Annual Return - Risk-Free Rate) / Downside Deviation (standard deviation of negative returns only)
+Additional data required: Risk-free rate and historical return series (needing price histories to isolate and measure only negative deviations, going beyond simple price/volume data).

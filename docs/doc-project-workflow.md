@@ -26,16 +26,34 @@ When making documentation changes or adding new documentation:
 
 ## Task
 
-- A task should be a single unit of work, covering just one intent and problem.
-- It should be focused on just one architectural layer (e.g. do not make database changes and pipeline changes in the same task).
-- **Layers in this project:** *(define your architectural layers here, e.g. database, API, pipeline, UI)*
+When working on a task:
+
+- Identify the task and confirm it covers a single intent and problem
+- Confirm the work belongs to a single architectural layer — do not mix changes across layers in one task
+- Create a Git issue describing the task
+- Set up a branch named after the issue (e.g. `feature/issue-123-branch-name`)
+- Implement the change, limited to that layer
+- Open a PR linked to the issue
+
+**Layers in this project:**
+
+| Layer | Responsibility |
+|-------|---------------|
+| `event_producer` | External data ingestion from Trading212 API via Kafka |
+| `event_consumer` | Kafka event consumption and processing |
+| `ingestion` | ETL pipelines — Bronze, Silver, and Gold transformations |
+| `orchestration` | Prefect workflow scheduling and management |
+| `services` | Portfolio domain business logic |
+| `dashboard` | Analytics UI and frontend |
+| `shared` | Cross-cutting infrastructure (database client, repos, utils) |
+| `config` | Application configuration |
 
 ## Bug
 
 When you encounter a bug:
 
 - **Document the bug**
-  - Document bugs in *(specify location, e.g. `/docs/bugs` or the project wiki)*
+  - Document bugs in `docs/bugs/`
   - Name bug docs using the format: `bug-<issue-number>-<short-description>` (e.g. `bug-42-null-pointer-login`)
   - Include the error code, steps to reproduce, and how to generate the bug
 - Create a TODO for the bug
@@ -53,8 +71,19 @@ When you encounter a bug:
 
 **Commit messages:** Use clear, imperative commit messages referencing the issue number (e.g. `fix: resolve null pointer on login (#42)`).
 
+**Merge strategy:**
+
+- Squash merge feature and bug branches into `dev`
+- Rebase-merge `dev` into `main` for releases
+
+**Branch cleanup:**
+
+- Delete the branch after the PR is merged (locally and remote)
+- Any branch with no commits in 30 days should be reviewed and deleted or revived
+
 **Pull Requests:**
 
+- Use the PR template (`.github/pull_request_template.md`) to confirm readiness before requesting review
 - Open a PR when the branch is ready for review
 - Assign a reviewer before merging
 - PRs should be linked to their corresponding issue

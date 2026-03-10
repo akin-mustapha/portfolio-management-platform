@@ -1,10 +1,10 @@
-from dashboard.src.pages.asset.components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
+from ..components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
 
-from dashboard.src.components.cards import card
+from .....src.components.cards import card
 
 from dash import dcc, html, Input, Output, callback, State
 
-from dashboard.src.pages.asset.components.tables import asset_table
+from ..components.tables import asset_table
 
 import dash_bootstrap_components as dbc
 
@@ -39,17 +39,9 @@ def chart_tab(data):
 
 def chart_tab_empty():
     return html.Div([
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="price_graph"), md=6),
-            dbc.Col(dcc.Graph(id="value_graph"), md=6)
-        ], className="mb-3"),
-        dbc.Row([
-            dbc.Col(dcc.Graph(id="risk_graph"), md=6),
-            dbc.Col(dcc.Graph(id="dca_graph"), md=6)
-        ], className="mb-3"),
-
-        # dbc.Row([
-        #     dbc.Col(dcc.Graph(id="drawdown_graph"), md=6),
-        #     dbc.Col(dcc.Graph(id="dca_graph"), md=6)
-        # ])
+        html.Div(
+            "Select an asset to view charts.",
+            className="text-muted text-center py-5",
+            style={"fontSize": "1rem"}
+        )
     ], id="asset_page_chart_tab")

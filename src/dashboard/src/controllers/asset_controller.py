@@ -3,7 +3,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from ..presenters.asset_presenter import AssetPresenter
 
-from dashboard.infra.repositories.repository_factory import RepositoryFactory
+from ...infra.repositories.repository_factory import RepositoryFactory
 
 load_dotenv()
 

@@ -29,6 +29,8 @@ class PriceStructurePlotlyLineChart:
             title="Price & Moving Averages",
             hovermode="x unified",
             margin=dict(l=20, r=20, t=40, b=20),
+            xaxis_title="Date",
+            yaxis_title="Price (USD)",
         )
 
         fig.update_xaxes(showgrid=False)
@@ -63,7 +65,9 @@ class AssetValuePlotlyLineChart:
             height=350,
             title="Asset Value Over Time",
             hovermode="x unified",
-            margin=dict(l=20, r=20, t=20, b=20),
+            margin=dict(l=20, r=20, t=40, b=20),
+            xaxis_title="Date",
+            yaxis_title="Value",
         )
 
         fig.update_xaxes(showgrid=False)
@@ -95,6 +99,8 @@ class RiskContextPlotlyLineChart:
             title="Risk Context (Volatility & Drawdown)",
             hovermode="x unified",
             margin=dict(l=20, r=20, t=40, b=20),
+            xaxis_title="Date",
+            yaxis_title="Drawdown (%)",
         )
 
         fig.update_xaxes(showgrid=False)
@@ -131,6 +137,8 @@ class DCABiasPlotlyLineChart:
             title="Dollar Cost Averaging Bias",
             hovermode="x unified",
             margin=dict(l=20, r=20, t=40, b=20),
+            xaxis_title="Date",
+            yaxis_title="DCA Bias",
         )
 
         fig.update_xaxes(showgrid=False)

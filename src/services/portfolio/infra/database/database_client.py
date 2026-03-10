@@ -4,7 +4,7 @@ from functools import wraps
 from dotenv import load_dotenv
 from typing import Iterable, Dict
 from abc import ABC, abstractmethod
-from services.portfolio.app.interfaces import Repostiory
+from ...app.interfaces import Repostiory
 
 from shared.database.client import SQLModelClient
 logging.basicConfig(

@@ -5,7 +5,7 @@ from .callbacks import update_asset_page, load_asset_page
 
 from .components.kpi import asset_kpi_section_empty
 from .components.tabs import chart_tab_empty
-from dashboard.src.styles.style import TAB_CONTENT_STYLE
+from ...styles.style import TAB_CONTENT_STYLE
 
 
 def page_content():
@@ -21,7 +21,6 @@ def page_content():
 # ─────────────────────────────────────────────
 def asset_layout():
     return html.Div([
-        dcc.Location(id="asset_page_location"),
         dcc.Store(id="asset_page_asset_store"),
 
         dbc.Row([

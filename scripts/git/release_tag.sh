@@ -17,6 +17,7 @@ if [ "$create_release_tag" == "y" ]; then
 
 
   echo "Checkout main branch"
+  
   git checkout main
 
   read -p "Enter the new release tag (vx.1.x): " release_tag
