@@ -5,8 +5,27 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 
+CHART_THEMES = {
+    "light": {
+        "paper_bgcolor": "white",
+        "plot_bgcolor": "white",
+        "font_color": "#555555",
+        "rs_bg": "white",
+        "rs_active": "#f0f0f0",
+    },
+    "dark": {
+        "paper_bgcolor": "#1e222d",
+        "plot_bgcolor": "#1e222d",
+        "font_color": "#9598a1",
+        "rs_bg": "#252d3d",
+        "rs_active": "#1c2a4a",
+    },
+}
+
+
 class WinnersPlotlyBarChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data)
         df = df.sort_values("profit", ascending=False).head(10)
 
@@ -26,7 +45,7 @@ class WinnersPlotlyBarChart:
             ),
             texttemplate="%{text:+.2f}",
             textposition="outside",
-            textfont=dict(color="#555", size=11),
+            textfont=dict(color=ct["font_color"], size=11),
         )
 
         fig.update_layout(
@@ -37,10 +56,10 @@ class WinnersPlotlyBarChart:
             yaxis_title=None,
             yaxis=dict(autorange="reversed", side="right", showgrid=False, zeroline=False),
             xaxis=dict(autorange="reversed", showgrid=False, zeroline=False),
-            font=dict(size=11, color="#555"),
+            font=dict(size=11, color=ct["font_color"]),
             bargap=0.3,
-            paper_bgcolor="white",
-            plot_bgcolor="white",
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
             title=None,
         )
 
@@ -48,7 +67,8 @@ class WinnersPlotlyBarChart:
 
 
 class LosersPlotlyBarChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data)
         df = df.sort_values("profit", ascending=True).head(10)
 
@@ -68,7 +88,7 @@ class LosersPlotlyBarChart:
             ),
             texttemplate="%{text:+.2f}",
             textposition="outside",
-            textfont=dict(color="#555", size=11),
+            textfont=dict(color=ct["font_color"], size=11),
         )
 
         fig.update_layout(
@@ -79,10 +99,10 @@ class LosersPlotlyBarChart:
             yaxis_title=None,
             yaxis=dict(autorange="reversed", showgrid=False, zeroline=False),
             xaxis=dict(showgrid=False, zeroline=False),
-            font=dict(size=11, color="#555"),
+            font=dict(size=11, color=ct["font_color"]),
             bargap=0.3,
-            paper_bgcolor="white",
-            plot_bgcolor="white",
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
             title=None,
         )
 
@@ -90,7 +110,8 @@ class LosersPlotlyBarChart:
 
 
 class PortfolioPerformancePlotlyLineChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data).sort_values("dates")
 
         is_positive = df["values"].iloc[-1] >= df["values"].iloc[0]
@@ -133,9 +154,9 @@ class PortfolioPerformancePlotlyLineChart:
             xaxis_title=None,
             yaxis_title=None,
             title=None,
-            font=dict(size=11, color="#555"),
-            paper_bgcolor="white",
-            plot_bgcolor="white",
+            font=dict(size=11, color=ct["font_color"]),
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
             yaxis=dict(
                 side="right",
                 tickformat=",.0f",
@@ -153,8 +174,8 @@ class PortfolioPerformancePlotlyLineChart:
                         dict(count=1, label="1Y", step="year", stepmode="backward"),
                         dict(step="all", label="All"),
                     ],
-                    bgcolor="white",
-                    activecolor="#f0f0f0",
+                    bgcolor=ct["rs_bg"],
+                    activecolor=ct["rs_active"],
                     borderwidth=0,
                     font=dict(size=11),
                     y=-0.25,
@@ -176,7 +197,8 @@ class PortfolioPerformancePlotlyLineChart:
 
 
 class PortfolioPNLPlotlyLineChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data).sort_values("dates")
 
         is_positive = df["values"].iloc[-1] >= 0
@@ -218,9 +240,9 @@ class PortfolioPNLPlotlyLineChart:
             xaxis_title=None,
             yaxis_title=None,
             title=None,
-            font=dict(size=11, color="#555"),
-            paper_bgcolor="white",
-            plot_bgcolor="white",
+            font=dict(size=11, color=ct["font_color"]),
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
             yaxis=dict(
                 side="right",
                 tickformat=",.0f",
@@ -238,8 +260,8 @@ class PortfolioPNLPlotlyLineChart:
                         dict(count=1, label="1Y", step="year", stepmode="backward"),
                         dict(step="all", label="All"),
                     ],
-                    bgcolor="white",
-                    activecolor="#f0f0f0",
+                    bgcolor=ct["rs_bg"],
+                    activecolor=ct["rs_active"],
                     borderwidth=0,
                     font=dict(size=11),
                     y=-0.25,
@@ -258,39 +280,39 @@ class PortfolioPNLPlotlyLineChart:
         )
 
         return fig
-    
-    
+
+
 # Duplicate logic. Needed
 # Might want to move graphs - Open/Close Principle
-def performance_chart(data=None):
+def performance_chart(data=None, theme="light"):
     if data is None:
         return html.P("NO DATA")
     return dbc.Row([
         dbc.Col([
             html.H6("Winners", className="text-muted mb-2"),
-            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data), config={"displayModeBar": False}),
+            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data, theme=theme), config={"displayModeBar": False}),
         ], md=6),
         dbc.Col([
             html.H6("Losers", className="text-muted mb-2"),
-            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data), config={"displayModeBar": False}),
+            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data, theme=theme), config={"displayModeBar": False}),
         ], md=6),
     ], id="portfolio_page_charts")
 
-def value_chart(data=None):
+def value_chart(data=None, theme="light"):
     if data is None:
         return html.P("NO DATA")
     return dcc.Graph(
         id="value_chart",
-        figure=PortfolioPerformancePlotlyLineChart().render(data),
+        figure=PortfolioPerformancePlotlyLineChart().render(data, theme=theme),
         config={"displayModeBar": False},
     )
 
 
-def pnl_chart(data=None):
+def pnl_chart(data=None, theme="light"):
     if data is None:
         return html.P("NO DATA")
     return dcc.Graph(
         id="pnl_char",
-        figure=PortfolioPNLPlotlyLineChart().render(data),
+        figure=PortfolioPNLPlotlyLineChart().render(data, theme=theme),
         config={"displayModeBar": False},
     )

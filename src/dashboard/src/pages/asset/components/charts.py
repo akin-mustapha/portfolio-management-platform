@@ -2,11 +2,16 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+CHART_THEMES = {
+    "light": {"paper_bgcolor": "white",   "plot_bgcolor": "white",   "font_color": "#555555", "rs_bg": "white",   "rs_active": "#f0f0f0"},
+    "dark":  {"paper_bgcolor": "#1e222d", "plot_bgcolor": "#1e222d", "font_color": "#9598a1", "rs_bg": "#252d3d", "rs_active": "#1c2a4a"},
+}
+
 # ─────────────────────────────────────────────
 # Figures
 # ─────────────────────────────────────────────
 class PriceStructurePlotlyLineChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
         asset_data: dict = data.get("asset_price")
 
         df = pd.DataFrame({
@@ -35,14 +40,15 @@ class PriceStructurePlotlyLineChart:
         ))
         fig.add_hline(y=ref_value, line_dash="dot",
                       line_color="rgba(0,0,0,0.25)", line_width=1)
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
             template="plotly_white", height=350,
             title="Price & Moving Averages",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
-            font=dict(size=11, color="#555"),
-            paper_bgcolor="white", plot_bgcolor="white",
+            font=dict(size=11, color=t["font_color"]),
+            paper_bgcolor=t["paper_bgcolor"], plot_bgcolor=t["plot_bgcolor"],
             yaxis=dict(side="right", tickformat=",.2f", showgrid=False, zeroline=False),
             xaxis=dict(
                 showgrid=False, type="date",
@@ -54,7 +60,7 @@ class PriceStructurePlotlyLineChart:
                         dict(count=1, label="1Y", step="year", stepmode="backward"),
                         dict(step="all", label="All"),
                     ],
-                    bgcolor="white", activecolor="#f0f0f0",
+                    bgcolor=t["rs_bg"], activecolor=t["rs_active"],
                     borderwidth=0, font=dict(size=11), y=-0.25, x=0,
                 ),
             ),
@@ -66,7 +72,7 @@ class PriceStructurePlotlyLineChart:
         return fig
     
 class AssetValuePlotlyLineChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
         asset_data: dict = data.get("asset_value")
 
         df = pd.DataFrame({
@@ -95,14 +101,15 @@ class AssetValuePlotlyLineChart:
         ))
         fig.add_hline(y=ref_value, line_dash="dot",
                       line_color="rgba(0,0,0,0.25)", line_width=1)
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
             template="plotly_white", height=350,
             title="Asset Value Over Time",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
-            font=dict(size=11, color="#555"),
-            paper_bgcolor="white", plot_bgcolor="white",
+            font=dict(size=11, color=t["font_color"]),
+            paper_bgcolor=t["paper_bgcolor"], plot_bgcolor=t["plot_bgcolor"],
             yaxis=dict(side="right", tickformat=",.2f", showgrid=False, zeroline=False),
             xaxis=dict(
                 showgrid=False, type="date",
@@ -114,7 +121,7 @@ class AssetValuePlotlyLineChart:
                         dict(count=1, label="1Y", step="year", stepmode="backward"),
                         dict(step="all", label="All"),
                     ],
-                    bgcolor="white", activecolor="#f0f0f0",
+                    bgcolor=t["rs_bg"], activecolor=t["rs_active"],
                     borderwidth=0, font=dict(size=11), y=-0.25, x=0,
                 ),
             ),
@@ -126,7 +133,7 @@ class AssetValuePlotlyLineChart:
         return fig
     
 class RiskContextPlotlyLineChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
         asset_data: dict = data.get("asset_risk")
 
         df = pd.DataFrame({
@@ -150,14 +157,15 @@ class RiskContextPlotlyLineChart:
         ))
         fig.add_hline(y=0, line_dash="dot",
                       line_color="rgba(0,0,0,0.25)", line_width=1)
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
             template="plotly_white", height=350,
             title="Risk Context (Volatility & Drawdown)",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
-            font=dict(size=11, color="#555"),
-            paper_bgcolor="white", plot_bgcolor="white",
+            font=dict(size=11, color=t["font_color"]),
+            paper_bgcolor=t["paper_bgcolor"], plot_bgcolor=t["plot_bgcolor"],
             yaxis=dict(side="right", tickformat=",.2f", showgrid=False, zeroline=False),
             xaxis=dict(
                 showgrid=False, type="date",
@@ -169,7 +177,7 @@ class RiskContextPlotlyLineChart:
                         dict(count=1, label="1Y", step="year", stepmode="backward"),
                         dict(step="all", label="All"),
                     ],
-                    bgcolor="white", activecolor="#f0f0f0",
+                    bgcolor=t["rs_bg"], activecolor=t["rs_active"],
                     borderwidth=0, font=dict(size=11), y=-0.25, x=0,
                 ),
             ),
@@ -182,7 +190,7 @@ class RiskContextPlotlyLineChart:
     
 
 class DCABiasPlotlyLineChart:
-    def render(self, data):
+    def render(self, data, theme="light"):
         asset_data: dict = data.get("asset_dca_bias")
 
         df = pd.DataFrame({
@@ -210,14 +218,15 @@ class DCABiasPlotlyLineChart:
         ))
         fig.add_hline(y=0, line_dash="dot",
                       line_color="rgba(0,0,0,0.25)", line_width=1)
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
             template="plotly_white", height=350,
             title="Dollar Cost Averaging Bias",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
-            font=dict(size=11, color="#555"),
-            paper_bgcolor="white", plot_bgcolor="white",
+            font=dict(size=11, color=t["font_color"]),
+            paper_bgcolor=t["paper_bgcolor"], plot_bgcolor=t["plot_bgcolor"],
             yaxis=dict(side="right", tickformat=",.2f", showgrid=False, zeroline=False),
             xaxis=dict(
                 showgrid=False, type="date",
@@ -229,7 +238,7 @@ class DCABiasPlotlyLineChart:
                         dict(count=1, label="1Y", step="year", stepmode="backward"),
                         dict(step="all", label="All"),
                     ],
-                    bgcolor="white", activecolor="#f0f0f0",
+                    bgcolor=t["rs_bg"], activecolor=t["rs_active"],
                     borderwidth=0, font=dict(size=11), y=-0.25, x=0,
                 ),
             ),

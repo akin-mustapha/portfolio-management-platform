@@ -17,8 +17,9 @@ from .components.tables import asset_table
     Output("portfolio_kpi_container", "children"),
     Input("portfolio_page_location", "pathname"),
     State("portfolio_page_asset_store", "data"),
+    State("theme-store", "data"),
 )
-def load_portfolio_page(pathname, cached_data):
+def load_portfolio_page(pathname, cached_data, theme):
     if pathname != "/portfolio":
         raise PreventUpdate
     # Decide data source
@@ -29,19 +30,21 @@ def load_portfolio_page(pathname, cached_data):
         cached_data.update({"view_model": view_model})
     if view_model is None:
         raise PreventUpdate
+
+    current_theme = theme or "light"
+
     # Compose UI (policy layer)
     charts = [
-        performance_chart(view_model.get("asset_table", {}).get("rows", []))
+        performance_chart(view_model.get("asset_table", {}).get("rows", []), theme=current_theme)
         # other charts go here
     ]
     table = asset_table(view_model.get("asset_table", {}).get("rows", []))
     # Return state + UI
-    
     return (
         cached_data,
         charts,
         table,
-        value_chart(view_model.get("portfolio_value_series", {})),
-        pnl_chart(view_model.get("portfolio_pnl_series", {})),
+        value_chart(view_model.get("portfolio_value_series", {}), theme=current_theme),
+        pnl_chart(view_model.get("portfolio_pnl_series", {}), theme=current_theme),
         kpi_row(view_model.get("kpi", {}))
     )

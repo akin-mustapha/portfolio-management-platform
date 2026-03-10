@@ -1,6 +1,6 @@
 .sidebar-nav-item {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: #495057;
+    color: var(--text-nav);
     font-size: 0.8125rem;         /* 13px — TV sidebar label size */
     font-weight: 500;
     transition: background 0.15s ease, color 0.15s ease;

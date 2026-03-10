@@ -41,7 +41,7 @@ def asset_page_filter(data, default_value=None):
                     ),
 
                     # Vertical divider
-                    html.Div(style={
+                    html.Div(className="tv-vert-divider", style={
                         "width": "1px", "height": "20px",
                         "background": "#e0e3eb",
                         "margin": "0 16px", "flexShrink": "0",
@@ -51,9 +51,10 @@ def asset_page_filter(data, default_value=None):
                     # "Timeframe" label
                     html.Span(
                         "Timeframe",
+                        className="tv-filter-label",
                         style={
                             "fontSize": "11px", "fontWeight": "600",
-                            "color": "#868993", "textTransform": "uppercase",
+                            "textTransform": "uppercase",
                             "letterSpacing": "0.5px", "whiteSpace": "nowrap",
                             "flexShrink": "0", "fontFamily": _FONT,
                             "marginRight": "6px",
@@ -126,8 +127,8 @@ def asset_page_filter(data, default_value=None):
                             display_format="YYYY-MM-DD",
                             className="tv-single-picker",
                         ),
-                        html.Span("→", style={
-                            "color": "#b0b8c4", "fontFamily": _FONT,
+                        html.Span("→", className="tv-filter-label", style={
+                            "fontFamily": _FONT,
                             "fontSize": "14px", "flexShrink": "0",
                         }),
                         html.Span("To", className="tv-date-label"),
@@ -153,6 +154,7 @@ def asset_page_filter(data, default_value=None):
                 is_open=False,
             ),
         ],
+        className="asset-filter-bar",
         style={
             "background": "#fff",
             "border": _BORDER,

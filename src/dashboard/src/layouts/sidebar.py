@@ -34,18 +34,18 @@ vertical_sidebar = html.Div(
                     }
                 ),
                 html.Div([
-                    html.Span("Asset", className="fw-bold", style={"fontSize": "0.85rem", "color": "#1a1a2e", "lineHeight": "1.1"}),
+                    html.Span("Asset", className="sidebar-brand-title fw-bold", style={"fontSize": "0.85rem", "lineHeight": "1.1"}),
                     html.Br(),
-                    html.Span("Monitor", style={"fontSize": "0.75rem", "color": "#6c757d", "lineHeight": "1.1"}),
+                    html.Span("Monitor", className="sidebar-brand-subtitle", style={"fontSize": "0.75rem", "lineHeight": "1.1"}),
                 ]),
             ],
             className="d-flex align-items-center gap-2 px-3 py-3",
         ),
 
-        html.Div(style={"height": "1px", "background": "#e9ecef", "margin": "0 12px 8px"}),
+        html.Div(className="sidebar-divider", style={"height": "1px", "background": "#e9ecef", "margin": "0 12px 8px"}),
 
         # Navigation section label
-        html.Div("MENU", style={
+        html.Div("MENU", className="sidebar-menu-label", style={
             "fontSize": "0.65rem",
             "fontWeight": "700",
             "letterSpacing": "0.08em",
@@ -66,14 +66,25 @@ vertical_sidebar = html.Div(
         ),
 
         # Bottom utility icons
-        html.Div(style={"height": "1px", "background": "#e9ecef", "margin": "8px 12px"}),
+        html.Div(className="sidebar-divider", style={"height": "1px", "background": "#e9ecef", "margin": "8px 12px"}),
         html.Div(
             [
                 html.Div(
                     html.I(className="fa-solid fa-circle-question", style={"color": "#adb5bd", "fontSize": "1rem"}),
                     className="px-3 py-2",
                 ),
+                html.Div(
+                    html.Button(
+                        html.I(id="theme-toggle-icon", className="fa-solid fa-moon"),
+                        id="theme-toggle-btn",
+                        n_clicks=0,
+                        className="theme-toggle-btn",
+                        title="Toggle dark/light mode",
+                    ),
+                    className="px-3 py-2",
+                ),
             ],
+            className="d-flex align-items-center",
         ),
     ],
     id="sidebar",

@@ -1,0 +1,184 @@
+/* ============================================================
+   theme.css — CSS custom properties for light/dark mode
+   Toggle via [data-theme="dark"] on <html>
+   ============================================================ */
+
+:root {
+  --bg-app: #ffffff;
+  --bg-sidebar: #f8f9fa;
+  --bg-kpi-card: #f8f9fa;
+  --bg-filter-bar: #fafbfd;
+  --bg-strip-hover: #f0f3fa;
+  --bg-strip-active: #eef2ff;
+  --bg-picker: #ffffff;
+  --bg-row-even: #ffffff;
+  --bg-row-odd: #f8f9fb;
+  --bg-row-hover: #eaf2ff;
+  --bg-row-selected: #dbeafe;
+  --border-main: #e9ecef;
+  --border-grid: #e2e4e9;
+  --border-row: #e8eaed;
+  --border-tv: #e0e3eb;
+  --text-primary: #131722;
+  --text-secondary: #6b7280;
+  --text-muted: #adb5bd;
+  --text-nav: #495057;
+  --scrollbar-thumb: #c8cbd4;
+  --sidebar-shadow: #e9ecef;
+  --chart-bg: #ffffff;
+  --chart-font: #555555;
+}
+
+html[data-theme="dark"] {
+  --bg-app: #1e222d;
+  --bg-sidebar: #161b27;
+  --bg-kpi-card: #252d3d;
+  --bg-filter-bar: #1a1f2e;
+  --bg-strip-hover: #252d3d;
+  --bg-strip-active: #1c2a4a;
+  --bg-picker: #252d3d;
+  --bg-row-even: #1e222d;
+  --bg-row-odd: #222839;
+  --bg-row-hover: #1c2a4a;
+  --bg-row-selected: #1a3158;
+  --border-main: #2a3042;
+  --border-grid: #2a3042;
+  --border-row: #2a3042;
+  --border-tv: #2a3042;
+  --text-primary: #d1d4dc;
+  --text-secondary: #9598a1;
+  --text-muted: #6b7280;
+  --text-nav: #9598a1;
+  --scrollbar-thumb: #3d4460;
+  --sidebar-shadow: #0d1117;
+  --chart-bg: #1e222d;
+  --chart-font: #9598a1;
+}
+
+/* ── Body and page background ──────────────────────────────── */
+html[data-theme="dark"] body {
+  background-color: #161b27 !important;
+  color: var(--text-primary);
+}
+
+/* ── Bootstrap card override ───────────────────────────────── */
+html[data-theme="dark"] .card {
+  background-color: var(--bg-app) !important;
+  border-color: var(--border-main) !important;
+}
+
+/* ── Dark overrides for inline-styled sidebar elements ─────── */
+html[data-theme="dark"] #sidebar {
+  background: var(--bg-sidebar) !important;
+  box-shadow: 1px 0 0 var(--sidebar-shadow) !important;
+}
+
+html[data-theme="dark"] .sidebar-divider {
+  background: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .sidebar-brand-title {
+  color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .sidebar-brand-subtitle {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="dark"] .sidebar-menu-label {
+  color: var(--text-muted) !important;
+}
+
+/* ── Bootstrap form-select (dropdown) dark mode ───────────── */
+html[data-theme="dark"] .form-select {
+  background-color: var(--bg-kpi-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-main) !important;
+  /* Light chevron arrow for dark background */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d1d4dc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
+html[data-theme="dark"] .form-select:focus {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+html[data-theme="dark"] .form-select option {
+  background-color: var(--bg-kpi-card);
+  color: var(--text-primary);
+}
+
+/* ── text-muted override for dark mode ─────────────────────── */
+html[data-theme="dark"] .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* ── Theme toggle button ───────────────────────────────────── */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+  color: #0d6efd;
+}
+
+.theme-toggle-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ── Bootstrap Tabs dark mode ───────────────────────────────── */
+html[data-theme="dark"] .nav-tabs {
+  border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="dark"] .nav-tabs .nav-link.active {
+  background-color: var(--bg-app) !important;
+  border-color: var(--border-main) var(--border-main) var(--bg-app) !important;
+  color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .tab-content {
+  background-color: transparent !important;
+}
+
+/* ── Dash dcc.Dropdown dark mode ────────────────────────────── */
+html[data-theme="dark"] .dash-dropdown .Select-control {
+  background-color: var(--bg-kpi-card) !important;
+  border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown .Select-value-label,
+html[data-theme="dark"] .dash-dropdown .Select-placeholder,
+html[data-theme="dark"] .dash-dropdown .Select-input input {
+  color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown .Select-arrow {
+  border-top-color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown .Select-menu-outer {
+  background-color: var(--bg-kpi-card) !important;
+  border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown .Select-option {
+  background-color: var(--bg-kpi-card) !important;
+  color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown .Select-option.is-focused {
+  background-color: var(--bg-row-hover) !important;
+}

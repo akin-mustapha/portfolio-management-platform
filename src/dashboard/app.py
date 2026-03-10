@@ -24,6 +24,38 @@ app = Dash(
 
 app.layout = layout
 
+# Anti-FOUC: read stored theme from localStorage and apply before first paint
+app.index_string = '''<!DOCTYPE html>
+<html>
+<head>
+    {%metas%}
+    <title>{%title%}</title>
+    {%favicon%}
+    {%css%}
+    <script>
+        (function() {
+            try {
+                var raw = localStorage.getItem('theme-store');
+                if (raw) {
+                    var theme = JSON.parse(raw);
+                    if (typeof theme === 'string' && (theme === 'dark' || theme === 'light')) {
+                        document.documentElement.setAttribute('data-theme', theme);
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+</head>
+<body>
+    {%app_entry%}
+    <footer>
+        {%config%}
+        {%scripts%}
+        {%renderer%}
+    </footer>
+</body>
+</html>'''
+
 
 if __name__ == "__main__":
     app.run(

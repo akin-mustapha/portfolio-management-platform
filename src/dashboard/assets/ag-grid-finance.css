@@ -6,7 +6,7 @@
 
 /* ── Wrapper / container ────────────────────────────────── */
 .finance-grid .ag-root-wrapper {
-    border: 1px solid #e2e4e9;
+    border: 1px solid var(--border-grid);
     border-radius: 6px;
     overflow: hidden;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -56,33 +56,33 @@
 
 /* ── Body rows ──────────────────────────────────────────── */
 .finance-grid .ag-row {
-    border-bottom: 1px solid #e8eaed;
-    color: #131722;
+    border-bottom: 1px solid var(--border-row);
+    color: var(--text-primary);
     font-size: 12.5px;
 }
 
 /* Zebra striping */
 .finance-grid .ag-row-even {
-    background-color: #ffffff;
+    background-color: var(--bg-row-even);
 }
 
 .finance-grid .ag-row-odd {
-    background-color: #f8f9fb;
+    background-color: var(--bg-row-odd);
 }
 
 /* Hover */
 .finance-grid .ag-row:hover {
-    background-color: #eaf2ff !important;
+    background-color: var(--bg-row-hover) !important;
 }
 
 /* Selected */
 .finance-grid .ag-row-selected {
-    background-color: #dbeafe !important;
-    border-bottom-color: #bdd6fc !important;
+    background-color: var(--bg-row-selected) !important;
+    border-bottom-color: var(--border-grid) !important;
 }
 
 .finance-grid .ag-row-selected:hover {
-    background-color: #c7dafd !important;
+    background-color: var(--bg-row-hover) !important;
 }
 
 /* ── Cells ──────────────────────────────────────────────── */
@@ -105,6 +105,11 @@
     accent-color: #3b82f6;
 }
 
+html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="checkbox"] {
+    color-scheme: dark;
+    accent-color: #3b82f6;
+}
+
 /* ── Scrollbar ──────────────────────────────────────────── */
 .finance-grid .ag-body-horizontal-scroll-viewport::-webkit-scrollbar,
 .finance-grid .ag-body-viewport::-webkit-scrollbar {
@@ -114,13 +119,13 @@
 
 .finance-grid .ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb,
 .finance-grid .ag-body-viewport::-webkit-scrollbar-thumb {
-    background: #c8cbd4;
+    background: var(--scrollbar-thumb);
     border-radius: 3px;
 }
 
 /* ── No rows overlay ────────────────────────────────────── */
 .finance-grid .ag-overlay-no-rows-wrapper {
-    color: #7b8196;
+    color: var(--text-muted);
     font-size: 13px;
 }
 
@@ -135,12 +140,21 @@
     max-width: 280px;
 }
 
+/* ── AG Grid dark mode background ───────────────────────── */
+[data-theme="dark"] .finance-grid .ag-root-wrapper {
+    background-color: var(--bg-row-even);
+}
+
+[data-theme="dark"] .finance-grid .ag-body-viewport {
+    background-color: var(--bg-row-even);
+}
+
 /* ============================================================
    KPI Cards — light card style matching sidebar (#f8f9fa)
    ============================================================ */
 .kpi-card {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
+    background-color: var(--bg-kpi-card);
+    border: 1px solid var(--border-main);
     border-radius: 8px;
     padding: 10px 14px;
     height: 100%;
@@ -148,7 +162,7 @@
 
 .kpi-card .kpi-label {
     font-size: 0.72rem;           /* ~11.5px — TV label size */
-    color: #6b7280;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 4px;
@@ -158,13 +172,13 @@
 .kpi-card .kpi-value {
     font-size: 1.125rem;          /* 18px */
     font-weight: 600;
-    color: #131722;
+    color: var(--text-primary);
     line-height: 1.25;
 }
 
 .kpi-card .kpi-unit {
     font-size: 0.6875rem;         /* 11px */
-    color: #adb5bd;
+    color: var(--text-muted);
     margin-left: 3px;
     font-weight: 400;
     vertical-align: baseline;
@@ -178,4 +192,4 @@
 
 .kpi-change-positive { color: #26a69a; }
 .kpi-change-negative { color: #ef5350; }
-.kpi-change-neutral  { color: #adb5bd; }
+.kpi-change-neutral  { color: var(--text-muted); }
