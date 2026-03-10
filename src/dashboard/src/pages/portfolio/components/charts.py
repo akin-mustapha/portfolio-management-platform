@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
@@ -86,74 +87,171 @@ class LosersPlotlyBarChart:
 
 class PortfolioPerformancePlotlyLineChart:
     def render(self, data):
-        df = pd.DataFrame(data)
-        df = df.sort_values("dates")
-        
+        df = pd.DataFrame(data).sort_values("dates")
 
-        fig = px.line(
-            df,
-            x="dates",
-            y="values",
-        )
+        is_positive = df["values"].iloc[-1] >= df["values"].iloc[0]
+        line_color = "#1a9e6e" if is_positive else "#e04040"
+        fill_color = "rgba(26,158,110,0.08)" if is_positive else "rgba(224,64,64,0.08)"
+        ref_value = df["values"].iloc[0]
 
-        fig.update_traces(
-            line=dict(
-                width=1.5,
-                color="#2483cc",
-            ),
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df["dates"],
+            y=[ref_value] * len(df),
             mode="lines",
+            line=dict(color="rgba(0,0,0,0)", width=0),
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        fig.add_trace(go.Scatter(
+            x=df["dates"],
+            y=df["values"],
+            mode="lines",
+            line=dict(color=line_color, width=1.5),
+            fill="tonexty",
+            fillcolor=fill_color,
+            hovertemplate="%{y:,.2f}<extra></extra>",
+            showlegend=False,
+        ))
+
+        fig.add_hline(
+            y=ref_value,
+            line_dash="dot",
+            line_color="rgba(0,0,0,0.25)",
+            line_width=1,
         )
 
         fig.update_layout(
             template="plotly_white",
-            height=550,
+            height=350,
             hovermode="x unified",
-            margin=dict(l=20, r=20, t=20, b=20),
+            margin=dict(l=20, r=60, t=20, b=65),
             xaxis_title=None,
-            yaxis_title="Portfolio Value",
+            yaxis_title=None,
             title=None,
-            font=dict(size=12),
+            font=dict(size=11, color="#555"),
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            yaxis=dict(
+                side="right",
+                tickformat=",.0f",
+                showgrid=False,
+                zeroline=False,
+            ),
+            xaxis=dict(
+                showgrid=False,
+                type="date",
+                rangeselector=dict(
+                    buttons=[
+                        dict(count=1, label="1M", step="month", stepmode="backward"),
+                        dict(count=3, label="3M", step="month", stepmode="backward"),
+                        dict(count=6, label="6M", step="month", stepmode="backward"),
+                        dict(count=1, label="1Y", step="year", stepmode="backward"),
+                        dict(step="all", label="All"),
+                    ],
+                    bgcolor="white",
+                    activecolor="#f0f0f0",
+                    borderwidth=0,
+                    font=dict(size=11),
+                    y=-0.25,
+                    x=0,
+                ),
+            ),
         )
 
-        fig.update_xaxes(showgrid=False)
-        fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+        fig.update_xaxes(
+            showspikes=True, spikemode="across", spikesnap="cursor",
+            spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1,
+        )
+        fig.update_yaxes(
+            showspikes=True, spikesnap="cursor",
+            spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1,
+        )
 
         return fig
-    
-    
+
+
 class PortfolioPNLPlotlyLineChart:
     def render(self, data):
-        df = pd.DataFrame(data)
-        df = df.sort_values("dates")
-        
+        df = pd.DataFrame(data).sort_values("dates")
 
-        fig = px.line(
-            df,
-            x="dates",
-            y="values",
-        )
+        is_positive = df["values"].iloc[-1] >= 0
+        line_color = "#1a9e6e" if is_positive else "#e04040"
+        fill_color = "rgba(26,158,110,0.08)" if is_positive else "rgba(224,64,64,0.08)"
 
-        fig.update_traces(
-            line=dict(
-                width=1.5,
-                color="#2483cc",
-            ),
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df["dates"],
+            y=[0] * len(df),
             mode="lines",
+            line=dict(color="rgba(0,0,0,0)", width=0),
+            showlegend=False,
+            hoverinfo="skip",
+        ))
+        fig.add_trace(go.Scatter(
+            x=df["dates"],
+            y=df["values"],
+            mode="lines",
+            line=dict(color=line_color, width=1.5),
+            fill="tonexty",
+            fillcolor=fill_color,
+            hovertemplate="%{y:,.2f}<extra></extra>",
+            showlegend=False,
+        ))
+
+        fig.add_hline(
+            y=0,
+            line_dash="dot",
+            line_color="rgba(0,0,0,0.25)",
+            line_width=1,
         )
 
         fig.update_layout(
             template="plotly_white",
-            height=550,
+            height=350,
             hovermode="x unified",
-            margin=dict(l=20, r=20, t=20, b=20),
+            margin=dict(l=20, r=60, t=20, b=65),
             xaxis_title=None,
-            yaxis_title="Portfolio Unrealized PnL",
+            yaxis_title=None,
             title=None,
-            font=dict(size=12),
+            font=dict(size=11, color="#555"),
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+            yaxis=dict(
+                side="right",
+                tickformat=",.0f",
+                showgrid=False,
+                zeroline=False,
+            ),
+            xaxis=dict(
+                showgrid=False,
+                type="date",
+                rangeselector=dict(
+                    buttons=[
+                        dict(count=1, label="1M", step="month", stepmode="backward"),
+                        dict(count=3, label="3M", step="month", stepmode="backward"),
+                        dict(count=6, label="6M", step="month", stepmode="backward"),
+                        dict(count=1, label="1Y", step="year", stepmode="backward"),
+                        dict(step="all", label="All"),
+                    ],
+                    bgcolor="white",
+                    activecolor="#f0f0f0",
+                    borderwidth=0,
+                    font=dict(size=11),
+                    y=-0.25,
+                    x=0,
+                ),
+            ),
         )
 
-        fig.update_xaxes(showgrid=False)
-        fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+        fig.update_xaxes(
+            showspikes=True, spikemode="across", spikesnap="cursor",
+            spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1,
+        )
+        fig.update_yaxes(
+            showspikes=True, spikesnap="cursor",
+            spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1,
+        )
 
         return fig
     
@@ -171,10 +269,18 @@ def performance_chart(data=None):
 def value_chart(data=None):
     if data is None:
         return html.P("NO DATA")
-    return dcc.Graph(id="value_chart", figure=PortfolioPerformancePlotlyLineChart().render(data))
+    return dcc.Graph(
+        id="value_chart",
+        figure=PortfolioPerformancePlotlyLineChart().render(data),
+        config={"displayModeBar": False},
+    )
 
 
 def pnl_chart(data=None):
     if data is None:
         return html.P("NO DATA")
-    return dcc.Graph(id="pnl_char", figure=PortfolioPNLPlotlyLineChart().render(data))
+    return dcc.Graph(
+        id="pnl_char",
+        figure=PortfolioPNLPlotlyLineChart().render(data),
+        config={"displayModeBar": False},
+    )
