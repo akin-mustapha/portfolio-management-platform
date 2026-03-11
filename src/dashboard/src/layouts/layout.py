@@ -46,6 +46,7 @@ layout = dbc.Container(
         dcc.Location(id="url"),
         dcc.Store(id="active-page"),
         dcc.Store(id="theme-store", storage_type="local", data="light"),
+        dcc.Store(id="privacy-store", storage_type="local", data=False),
         dbc.Row(
             [
                 dbc.Col(vertical_sidebar, width="auto", className="px-0"),

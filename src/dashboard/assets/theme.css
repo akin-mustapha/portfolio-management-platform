@@ -182,3 +182,11 @@ html[data-theme="dark"] .dash-dropdown .Select-option {
 html[data-theme="dark"] .dash-dropdown .Select-option.is-focused {
   background-color: var(--bg-row-hover) !important;
 }
+
+/* ── Privacy mode — blur sensitive KPI values ───────────────── */
+html[data-privacy="true"] .kpi-value,
+html[data-privacy="true"] .kpi-change,
+html[data-privacy="true"] .kpi-unit {
+  filter: blur(8px);
+  user-select: none;
+}

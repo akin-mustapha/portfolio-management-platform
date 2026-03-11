@@ -1,6 +1,35 @@
 from dash import Output, Input, State, callback, clientside_callback, Patch
 
 
+# ── Privacy toggle ───────────────────────────────────────────────────────────
+
+# 1. Toggle privacy-store on button click
+@callback(
+    Output("privacy-store", "data"),
+    Input("privacy-toggle-btn", "n_clicks"),
+    State("privacy-store", "data"),
+    prevent_initial_call=True,
+)
+def toggle_privacy(n_clicks, current):
+    return not bool(current)
+
+
+# 2. Swap eye icon and highlight button blue when privacy is on (clientside)
+clientside_callback(
+    """
+    function(privacy) {
+        var on = privacy === true;
+        document.documentElement.setAttribute('data-privacy', on ? 'true' : 'false');
+        var btn = document.getElementById('privacy-toggle-btn');
+        if (btn) btn.style.color = on ? 'var(--bs-primary, #0d6efd)' : '';
+        return on ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    }
+    """,
+    Output("privacy-toggle-icon", "className"),
+    Input("privacy-store", "data"),
+)
+
+
 # 1. Toggle theme store value on button click
 @callback(
     Output("theme-store", "data"),

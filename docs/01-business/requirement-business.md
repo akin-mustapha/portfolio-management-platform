@@ -21,7 +21,7 @@ description: Project business requirements, talks about why project exists
 
 Enable monitoring and management of stock investment portfolio, to maintain oversight of performance, return and risk.
 
-**Rationale:** Personal portfolio management and oversight needs
+**Rationale:** Personal portfolio management and oversight needs. I find it very difficult to understand my portfolio and how it is really performing.
 
 **Derived Requirement**: `placeholder`
 
@@ -33,7 +33,9 @@ Enable monitoring and management of stock investment portfolio, to maintain over
 
 Provide a dashboard that calculates and displays key financial metrics not available on Trading212, including beta, historical daily returns, and asset-level daily returns.
 
-**Rationale:** Trading212 lacks comprehensive financial metrics
+**Rationale:** Trading212 lacks comprehensive financial metrics. I need a single decision making point for my portfolio. A dashboard that removes the thinking and analysis, I should be able to get a clear sense of which assets are performing well, returns, the risk, the valuation, the opportunities.
+
+For example, USER wants to analyse APPLE stock, user should be able to `UNDERSTAND` how much they have spent on the asset, what its return is (is it giving me good returns or not), what is risk are if user were to buy now (more like the cons of buying/selling now), what opportunities are there right now, how valuable is the asset (is it a an unvalued asset, how valuable is it in regards to my portfolio)
 
 **Derived Requirement**: `placeholder`
 
