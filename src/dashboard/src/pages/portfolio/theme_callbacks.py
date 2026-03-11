@@ -3,7 +3,6 @@ from dash import Output, Input, State, callback, clientside_callback, Patch
 
 # ── Privacy toggle ───────────────────────────────────────────────────────────
 
-# 1. Toggle privacy-store on button click
 @callback(
     Output("privacy-store", "data"),
     Input("privacy-toggle-btn", "n_clicks"),
@@ -14,7 +13,6 @@ def toggle_privacy(n_clicks, current):
     return not bool(current)
 
 
-# 2. Swap eye icon and highlight button blue when privacy is on (clientside)
 clientside_callback(
     """
     function(privacy) {
@@ -30,7 +28,8 @@ clientside_callback(
 )
 
 
-# 1. Toggle theme store value on button click
+# ── Theme toggle ─────────────────────────────────────────────────────────────
+
 @callback(
     Output("theme-store", "data"),
     Input("theme-toggle-btn", "n_clicks"),
@@ -41,7 +40,6 @@ def toggle_theme(n_clicks, current_theme):
     return "dark" if current_theme == "light" else "light"
 
 
-# 2. Apply data-theme to <html> and swap moon/sun icon (clientside — DOM access required)
 clientside_callback(
     """
     function(theme) {
@@ -55,8 +53,9 @@ clientside_callback(
 )
 
 
-# 3. Patch Plotly chart backgrounds on theme change (no data refetch)
+# ── Patch portfolio chart backgrounds on theme change ────────────────────────
 # Note: "pnl_char" is the exact (typo'd) id used in the existing chart code
+
 @callback(
     Output("winners_chart", "figure"),
     Output("losers_chart", "figure"),
@@ -91,16 +90,17 @@ def update_chart_theme(theme):
     return bar_patch(), bar_patch(), line_patch(), line_patch()
 
 
-# 4. Patch asset page chart backgrounds on theme change
+# ── Patch workspace (asset) chart backgrounds on theme change ────────────────
+
 @callback(
-    Output("price_graph", "figure"),
-    Output("value_graph", "figure"),
-    Output("risk_graph", "figure"),
-    Output("dca_graph", "figure"),
+    Output("workspace-price-graph", "figure"),
+    Output("workspace-value-graph", "figure"),
+    Output("workspace-risk-graph", "figure"),
+    Output("workspace-dca-graph", "figure"),
     Input("theme-store", "data"),
     prevent_initial_call=True,
 )
-def update_asset_chart_theme(theme):
+def update_workspace_chart_theme(theme):
     is_dark = theme == "dark"
     bg    = "#1e222d" if is_dark else "white"
     fc    = "#9598a1" if is_dark else "#555555"
@@ -117,3 +117,84 @@ def update_asset_chart_theme(theme):
         return p
 
     return line_patch(), line_patch(), line_patch(), line_patch()
+
+
+# ── Clientside: drag-to-resize split panel ───────────────────────────────────
+
+clientside_callback(
+    """
+    function(_) {
+        var divider = document.getElementById('split-divider');
+        var left    = document.getElementById('workspace-left');
+        var split   = document.getElementById('workspace-split');
+        if (!divider || !left || !split) return window.dash_clientside.no_update;
+
+        var isDragging = false;
+        var startX = 0;
+        var startWidth = 0;
+
+        divider.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startWidth = left.getBoundingClientRect().width;
+            divider.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            var newWidth = startWidth + (e.clientX - startX);
+            var minW = 280;
+            var maxW = split.getBoundingClientRect().width * 0.6;
+            newWidth = Math.max(minW, Math.min(newWidth, maxW));
+            left.style.width = newWidth + 'px';
+            left.style.flex  = 'none';
+        });
+
+        document.addEventListener('mouseup', function() {
+            if (!isDragging) return;
+            isDragging = false;
+            divider.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
+
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("workspace-split", "data-initialized"),
+    Input("workspace-split", "id"),
+)
+
+
+# ── Clientside: ResizeObserver for responsive chart grid ────────────────────
+
+clientside_callback(
+    """
+    function(_) {
+        var rightPanel = document.getElementById('workspace-right');
+        if (!rightPanel || typeof ResizeObserver === 'undefined')
+            return window.dash_clientside.no_update;
+
+        var observer = new ResizeObserver(function(entries) {
+            for (var entry of entries) {
+                var width = entry.contentRect.width;
+                var grids = rightPanel.querySelectorAll('.workspace-chart-grid');
+                grids.forEach(function(g) {
+                    if (width < 600) {
+                        g.classList.add('chart-grid-single');
+                    } else {
+                        g.classList.remove('chart-grid-single');
+                    }
+                });
+            }
+        });
+        observer.observe(rightPanel);
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("workspace-right", "data-observer"),
+    Input("workspace-right", "id"),
+)

@@ -265,6 +265,126 @@ html[data-theme="dark"] .tv-collapse-body {
     border-color: var(--border-tv) !important;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Workspace Split Panel
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-split {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+    overflow: hidden;
+}
+
+.workspace-panel-left {
+    width: var(--left-panel-width, 420px);
+    min-width: 280px;
+    max-width: 60%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.workspace-panel-left .finance-grid {
+    flex: 1;
+    min-height: 0;
+}
+
+.workspace-table-footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-split);
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-app);
+}
+
+.split-divider {
+    width: 5px;
+    background: var(--border-split);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.1s;
+}
+
+.split-divider:hover,
+.split-divider.dragging {
+    background: #0d6efd;
+}
+
+.workspace-panel-right {
+    flex: 1;
+    min-width: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Workspace filter bar ──────────────────────────────────────── */
+.workspace-filter-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 7px 0;
+    border-top: 1px solid var(--border-tv);
+    border-bottom: 1px solid var(--border-tv);
+    background: var(--bg-filter-bar);
+    margin-bottom: 8px;
+}
+
+.workspace-filter-bar .tv-vert-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border-tv);
+    flex-shrink: 0;
+}
+
+/* ── Workspace chart header ────────────────────────────────────── */
+.workspace-chart-header {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px 4px 12px;
+    min-height: 24px;
+}
+
+/* ── Asset ticker tag ──────────────────────────────────────────── */
+.asset-ticker-tag {
+    display: inline-block;
+    background: rgba(13, 110, 253, 0.08);
+    color: #0d6efd;
+    border: 1px solid rgba(13, 110, 253, 0.2);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    letter-spacing: 0.04em;
+}
+
+html[data-theme="dark"] .asset-ticker-tag {
+    background: rgba(99, 154, 255, 0.12);
+    color: #639aff;
+    border-color: rgba(99, 154, 255, 0.25);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace Chart Grid — responsive 2-col → 1-col
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 8px 12px;
+}
+
+.workspace-chart-grid.chart-grid-single {
+    grid-template-columns: 1fr;
+}
+
 /* ── Apply button ─────────────────────────────────────────────── */
 .tv-apply-btn {
     background: #2962ff;
@@ -290,4 +410,196 @@ html[data-theme="dark"] .tv-collapse-body {
 .tv-apply-btn:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Top navbar (replaces sidebar)
+   ══════════════════════════════════════════════════════════════ */
+
+.top-navbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 16px;
+    height: 48px;
+    background: var(--bg-app, #f8f9fa);
+    border-bottom: 1px solid var(--border-tv, #e9ecef);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.top-nav-brand {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary, #212529);
+    white-space: nowrap;
+}
+
+.top-nav-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted, #6c757d) !important;
+    padding: 4px 10px !important;
+    border-radius: 6px;
+    transition: background 0.12s, color 0.12s;
+}
+
+.top-nav-link:hover {
+    background: var(--bg-hover, rgba(13, 110, 253, 0.06));
+    color: var(--text-primary, #212529) !important;
+}
+
+.top-nav-link.active {
+    background: rgba(13, 110, 253, 0.1);
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+
+.top-util-btn {
+    padding: 4px 8px;
+    color: var(--text-muted, #adb5bd);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.12s;
+}
+
+.top-util-btn:hover {
+    color: var(--text-primary, #212529);
+}
+
+html[data-theme="dark"] .top-navbar {
+    background: var(--bg-sidebar);
+    border-bottom-color: var(--border-main);
+}
+
+html[data-theme="dark"] .top-nav-brand {
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .top-nav-link {
+    color: var(--text-nav) !important;
+}
+
+html[data-theme="dark"] .top-nav-link:hover {
+    background: var(--bg-strip-hover);
+    color: var(--text-primary) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Table utility bar (below asset table, left panel)
+   ══════════════════════════════════════════════════════════════ */
+
+.table-util-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 6px;
+    border-top: 1px solid var(--border-split, #dee2e6);
+    background: var(--bg-app, #f8f9fa);
+    flex-shrink: 0;
+}
+
+.table-util-btn {
+    padding: 4px 8px;
+    color: var(--text-muted, #adb5bd);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.12s;
+}
+
+.table-util-btn:hover {
+    color: var(--text-primary, #212529);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace tab bar — overrides Bootstrap .nav-tabs
+   ══════════════════════════════════════════════════════════════ */
+
+/* Tab strip */
+.workspace-tab-bar .nav-tabs,
+.workspace-tab-bar.nav-tabs {
+    border-bottom: 1px solid var(--border-split, #dee2e6) !important;
+    gap: 2px;
+    padding: 0 8px;
+}
+
+/* All nav-links inside our tab items */
+.workspace-tab .nav-link {
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted, #6c757d) !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 7px 12px !important;
+    margin-bottom: -1px;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.workspace-tab .nav-link:hover {
+    color: var(--text-primary, #212529) !important;
+    background: rgba(13, 110, 253, 0.05) !important;
+    border-radius: 4px 4px 0 0 !important;
+    border-bottom: 2px solid transparent !important;
+}
+
+/* Active tab — blue text + blue 2px underline, no box */
+.workspace-tab .nav-link.active,
+.workspace-tab--active .nav-link {
+    color: #0d6efd !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid #0d6efd !important;
+    border-radius: 0 !important;
+}
+
+/* Remove Bootstrap tab-content/tab-pane padding */
+.workspace-tab-bar .tab-content,
+.workspace-tab-bar + .tab-content {
+    padding: 0 !important;
+}
+
+.workspace-tab-bar .tab-pane,
+.workspace-tab-bar + .tab-content .tab-pane {
+    padding: 0 !important;
+}
+
+/* Also zero out margin/padding on the content wrappers */
+#tab-valuation-content,
+#tab-portfolio-content,
+#tab-risk-content,
+#tab-opportunities-content {
+    margin: 0;
+    padding: 0;
+}
+
+/* Tab icons via CSS ::before (Font Awesome unicode) */
+.workspace-tab:nth-child(1) .nav-link::before { content: "\f0b1\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.workspace-tab:nth-child(2) .nav-link::before { content: "\f201\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.workspace-tab:nth-child(3) .nav-link::before { content: "\e23f\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.workspace-tab:nth-child(4) .nav-link::before { content: "\f002\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+/* Dark theme */
+html[data-theme="dark"] .workspace-tab-bar .nav-tabs,
+html[data-theme="dark"] .workspace-tab-bar.nav-tabs {
+    border-bottom-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .workspace-tab .nav-link {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .workspace-tab .nav-link:hover {
+    color: var(--text-primary) !important;
+    background: var(--bg-strip-hover) !important;
+}
+
+html[data-theme="dark"] .workspace-tab .nav-link.active,
+html[data-theme="dark"] .workspace-tab--active .nav-link {
+    color: #639aff !important;
+    border-bottom-color: #639aff !important;
 }
