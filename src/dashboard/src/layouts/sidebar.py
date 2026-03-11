@@ -1,6 +1,7 @@
 
 from dash import html
 import dash_bootstrap_components as dbc
+from ..components.buttons import privacy_toggle_btn
 
 
 def _nav_item(icon_class, label, href):
@@ -73,6 +74,7 @@ vertical_sidebar = html.Div(
                     html.I(className="fa-solid fa-circle-question", style={"color": "#adb5bd", "fontSize": "1rem"}),
                     className="px-3 py-2",
                 ),
+                privacy_toggle_btn(),
                 html.Div(
                     html.Button(
                         html.I(id="theme-toggle-icon", className="fa-solid fa-moon"),
