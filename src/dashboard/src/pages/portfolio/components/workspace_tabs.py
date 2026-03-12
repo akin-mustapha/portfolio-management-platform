@@ -14,6 +14,15 @@ from ...asset.components.charts import (
     DCABiasPlotlyLineChart,
 )
 
+_GRAPH_CONFIG = {"displayModeBar": False}
+
+
+def _chart_section(title, chart):
+    return html.Div([
+        html.Div([title, html.Span("›", className="tv-chevron")], className="tv-section-header"),
+        chart,
+    ])
+
 
 # ─────────────────────────────────────────────
 # Portfolio tab content
@@ -22,8 +31,7 @@ from ...asset.components.charts import (
 def portfolio_tab_content(view_model=None, theme="light"):
     if view_model is None:
         return html.Div(
-            "Loading portfolio charts…",
-            className="text-muted text-center py-5",
+            html.P("Loading portfolio charts…", className="text-muted text-center py-5"),
             id="tab-portfolio-content",
         )
 
@@ -33,26 +41,30 @@ def portfolio_tab_content(view_model=None, theme="light"):
 
     return html.Div([
         html.Div([
-            dcc.Graph(
+            _chart_section("Portfolio Value", dcc.Graph(
                 id="value_chart",
                 figure=PortfolioPerformancePlotlyLineChart().render(value_series, theme=theme),
-                config={"displayModeBar": False},
-            ),
-            dcc.Graph(
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Profit & Loss", dcc.Graph(
                 id="pnl_char",
                 figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
-                config={"displayModeBar": False},
-            ),
-            dcc.Graph(
+                config=_GRAPH_CONFIG,
+            )),
+            
+        ], className="workspace-chart-grid"),
+        html.Hr(className="tv-divider"),
+        html.Div([
+            _chart_section("Top Winners", dcc.Graph(
                 id="winners_chart",
                 figure=WinnersPlotlyBarChart().render(rows, theme=theme),
-                config={"displayModeBar": False},
-            ),
-            dcc.Graph(
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Top Losers", dcc.Graph(
                 id="losers_chart",
                 figure=LosersPlotlyBarChart().render(rows, theme=theme),
-                config={"displayModeBar": False},
-            ),
+                config=_GRAPH_CONFIG,
+            )),
         ], className="workspace-chart-grid"),
     ], id="tab-portfolio-content")
 
@@ -64,8 +76,10 @@ def portfolio_tab_content(view_model=None, theme="light"):
 def valuation_tab_content(asset_history=None, theme="light"):
     if asset_history is None:
         return html.Div(
-            "Select an asset from the table to view valuation charts.",
-            className="text-muted text-center py-5",
+            html.P(
+                "Select an asset from the table to view valuation charts.",
+                className="text-muted text-center py-5",
+            ),
             id="tab-valuation-content",
         )
 
@@ -74,22 +88,22 @@ def valuation_tab_content(asset_history=None, theme="light"):
             dcc.Graph(
                 id="workspace-price-graph",
                 figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
-                config={"displayModeBar": False},
+                config=_GRAPH_CONFIG,
             ),
             dcc.Graph(
                 id="workspace-value-graph",
                 figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
-                config={"displayModeBar": False},
+                config=_GRAPH_CONFIG,
             ),
             dcc.Graph(
                 id="workspace-risk-graph",
                 figure=RiskContextPlotlyLineChart().render(asset_history, theme=theme),
-                config={"displayModeBar": False},
+                config=_GRAPH_CONFIG,
             ),
             dcc.Graph(
                 id="workspace-dca-graph",
                 figure=DCABiasPlotlyLineChart().render(asset_history, theme=theme),
-                config={"displayModeBar": False},
+                config=_GRAPH_CONFIG,
             ),
         ], className="workspace-chart-grid"),
     ], id="tab-valuation-content")
@@ -146,7 +160,7 @@ def workspace_tabs(view_model=None, theme="light"):
                 tab_id="tab-valuation",
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
-                children=valuation_tab_content(),
+                children=valuation_tab_content(theme=theme),
             ),
             dbc.Tab(
                 label="Risk",

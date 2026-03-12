@@ -8,14 +8,15 @@ body, * {
 
 /* ── TradingView section header ───────────────────────────────── */
 .tv-section-header {
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 4px;
     margin-bottom: 10px;
     cursor: default;
+    padding: 6px;
     user-select: none;
 }
 
@@ -347,8 +348,9 @@ html[data-theme="dark"] .tv-collapse-body {
 .workspace-chart-header {
     display: flex;
     align-items: center;
-    padding: 6px 12px 4px 12px;
-    min-height: 24px;
+    padding: 4px 12px;
+    flex-shrink: 0;
+    min-height: 0;
 }
 
 /* ── Asset ticker tag ──────────────────────────────────────────── */
@@ -515,14 +517,18 @@ html[data-theme="dark"] .top-nav-link:hover {
 
 /* ══════════════════════════════════════════════════════════════
    Workspace tab bar — overrides Bootstrap .nav-tabs
+   NOTE: dbc.Tabs 2.0.x puts id + className directly on the <ul>
+   so .workspace-tab-bar IS the <ul class="nav nav-tabs"> element.
+   The .tab-content div is a SIBLING to this <ul>, not a child.
    ══════════════════════════════════════════════════════════════ */
 
-/* Tab strip */
-.workspace-tab-bar .nav-tabs,
-.workspace-tab-bar.nav-tabs {
+/* Style the nav-tabs <ul> itself — do NOT override display/flex-direction */
+#workspace-tabs,
+.workspace-tab-bar {
     border-bottom: 1px solid var(--border-split, #dee2e6) !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
     gap: 2px;
-    padding: 0 8px;
 }
 
 /* All nav-links inside our tab items */
@@ -557,18 +563,20 @@ html[data-theme="dark"] .top-nav-link:hover {
     border-radius: 0 !important;
 }
 
-/* Remove Bootstrap tab-content/tab-pane padding */
-.workspace-tab-bar .tab-content,
+/* tab-content is a SIBLING to the <ul>, so use + selector */
+#workspace-tabs + .tab-content,
 .workspace-tab-bar + .tab-content {
     padding: 0 !important;
+    margin: 0 !important;
 }
 
-.workspace-tab-bar .tab-pane,
+#workspace-tabs + .tab-content .tab-pane,
 .workspace-tab-bar + .tab-content .tab-pane {
     padding: 0 !important;
+    margin: 0 !important;
 }
 
-/* Also zero out margin/padding on the content wrappers */
+/* Zero out margin/padding on the tab content wrappers */
 #tab-valuation-content,
 #tab-portfolio-content,
 #tab-risk-content,
@@ -584,8 +592,8 @@ html[data-theme="dark"] .top-nav-link:hover {
 .workspace-tab:nth-child(4) .nav-link::before { content: "\f002\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
 
 /* Dark theme */
-html[data-theme="dark"] .workspace-tab-bar .nav-tabs,
-html[data-theme="dark"] .workspace-tab-bar.nav-tabs {
+html[data-theme="dark"] #workspace-tabs,
+html[data-theme="dark"] .workspace-tab-bar {
     border-bottom-color: var(--border-main) !important;
 }
 

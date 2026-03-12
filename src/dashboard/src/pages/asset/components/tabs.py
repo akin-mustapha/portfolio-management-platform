@@ -1,5 +1,7 @@
 from ..components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyLineChart, RiskContextPlotlyLineChart, DCABiasPlotlyLineChart
 
+_GRAPH_CONFIG = {"displayModeBar": False}
+
 from .....src.components.cards import card
 
 from dash import dcc, html, Input, Output, callback, State
@@ -21,14 +23,14 @@ def chart_tab(data, theme="light"):
     return html.Div([
 
         dbc.Row([
-            dbc.Col(dcc.Graph(id="price_graph", figure=PriceStructurePlotlyLineChart().render(data, theme=theme), config={"displayModeBar": False}), md=6),
-            dbc.Col(dcc.Graph(id="value_graph", figure=AssetValuePlotlyLineChart().render(data, theme=theme), config={"displayModeBar": False}), md=6)
+            dbc.Col(dcc.Graph(id="price_graph", figure=PriceStructurePlotlyLineChart().render(data, theme=theme), config=_GRAPH_CONFIG), md=6),
+            dbc.Col(dcc.Graph(id="value_graph", figure=AssetValuePlotlyLineChart().render(data, theme=theme), config=_GRAPH_CONFIG), md=6)
         ], className="mb-3"),
 
 
         dbc.Row([
-            dbc.Col(dcc.Graph(id="risk_graph", figure=RiskContextPlotlyLineChart().render(data, theme=theme), config={"displayModeBar": False}), md=6),
-            dbc.Col(dcc.Graph(id="dca_graph", figure=DCABiasPlotlyLineChart().render(data, theme=theme), config={"displayModeBar": False}), md=6)
+            dbc.Col(dcc.Graph(id="risk_graph", figure=RiskContextPlotlyLineChart().render(data, theme=theme), config=_GRAPH_CONFIG), md=6),
+            dbc.Col(dcc.Graph(id="dca_graph", figure=DCABiasPlotlyLineChart().render(data, theme=theme), config=_GRAPH_CONFIG), md=6)
         ], className="mb-3"),
 
         # dbc.Row([
