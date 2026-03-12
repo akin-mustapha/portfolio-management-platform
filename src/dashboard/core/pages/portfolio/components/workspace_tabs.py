@@ -12,6 +12,8 @@ from ...asset.components.charts import (
     AssetValuePlotlyLineChart,
     RiskContextPlotlyLineChart,
     DCABiasPlotlyLineChart,
+    AssetCategoryPlotlyPieChart,
+    AssetTagsPlotlyPieChart,
 )
 
 _GRAPH_CONFIG = {"displayModeBar": False}
@@ -53,6 +55,21 @@ def portfolio_tab_content(view_model=None, theme="light"):
             )),
             
         ], className="workspace-chart-grid"),
+        
+        html.Hr(className="tv-divider"),
+        html.Div([
+            _chart_section("Asset Category", dcc.Graph(
+                id="asset_category_chart",
+                figure=AssetCategoryPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="asset_tags_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+        ], className="workspace-chart-grid"),
+        
         html.Hr(className="tv-divider"),
         html.Div([
             _chart_section("Top Winners", dcc.Graph(
@@ -85,26 +102,42 @@ def valuation_tab_content(asset_history=None, theme="light"):
 
     return html.Div([
         html.Div([
-            dcc.Graph(
-                id="workspace-price-graph",
-                figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
+            _chart_section("Profit Over Time", 
+                dcc.Graph(
+                    id="workspace-price-graph",
+                    figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                ),
             ),
-            dcc.Graph(
-                id="workspace-value-graph",
-                figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
+                
+            _chart_section("Asset Value Over Time", 
+                dcc.Graph(
+                    id="workspace-value-graph",
+                    figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
+        ),
+            
+        ], className="workspace-chart-grid"),
+        
+        
+        html.Div([
+            
+            _chart_section("Risk Context - Drawdown", 
+                dcc.Graph(
+                    id="workspace-risk-graph",
+                    figure=RiskContextPlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
             ),
-            dcc.Graph(
-                id="workspace-risk-graph",
-                figure=RiskContextPlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
-            ),
-            dcc.Graph(
-                id="workspace-dca-graph",
-                figure=DCABiasPlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
-            ),
+            _chart_section("Opportunity - DCA Bias", 
+                dcc.Graph(
+                    id="workspace-dca-graph",
+                    figure=DCABiasPlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
+            )
+            
         ], className="workspace-chart-grid"),
     ], id="tab-valuation-content")
 

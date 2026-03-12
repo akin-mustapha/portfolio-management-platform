@@ -36,6 +36,13 @@ def asset_table(data=None):
         rowData=df.to_dict("records"),
         columnDefs=[
             {
+                "field": "trend",
+                "minWidth": 116, "width": 116,
+                "cellRenderer": "TrendSparkline",
+                "cellStyle": {"padding": "0", "overflow": "hidden"},
+                "headerTooltip": "30-day price trend. Green = Bullish (MA30 > MA50), Red = Bearish."
+            },
+            {
                 "field": "ticker",
                 "minWidth": 70, "width": 70,
                 "headerTooltip": "Asset name or ticker symbol."

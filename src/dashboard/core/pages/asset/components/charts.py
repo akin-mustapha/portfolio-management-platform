@@ -7,9 +7,57 @@ CHART_THEMES = {
     "dark":  {"paper_bgcolor": "#1e222d", "plot_bgcolor": "#1e222d", "font_color": "#9598a1", "rs_bg": "#252d3d", "rs_active": "#1c2a4a"},
 }
 
+
+CHART_HEIGHT = 300
+
+
+def _donut_chart(labels, values, colors, theme):
+    t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
+    fig = go.Figure(go.Pie(
+        labels=labels,
+        values=values,
+        hole=0.4,
+        marker=dict(colors=colors, line=dict(width=0)),
+        textinfo="percent+label",
+        textfont=dict(color="#ffffff", size=12),
+        hovertemplate="%{label}: %{percent}<extra></extra>",
+    ))
+    fig.update_layout(
+        height=CHART_HEIGHT,
+        margin=dict(l=20, r=20, t=20, b=20),
+        paper_bgcolor=t["paper_bgcolor"],
+        plot_bgcolor=t["plot_bgcolor"],
+        font=dict(size=11, color=t["font_color"]),
+        showlegend=True,
+        legend=dict(font=dict(color=t["font_color"], size=11)),
+    )
+    return fig
+
+
 # ─────────────────────────────────────────────
 # Figures
 # ─────────────────────────────────────────────
+
+class AssetCategoryPlotlyPieChart:
+    # Placeholder — replace with real asset-type breakdown when data is wired in
+    _LABELS = ["Stocks", "ETFs"]
+    _VALUES = [60, 40]
+    _COLORS = ["#5b8db8", "#1a9e6e"]
+
+    def render(self, data, theme="light"):
+        return _donut_chart(self._LABELS, self._VALUES, self._COLORS, theme)
+
+
+class AssetTagsPlotlyPieChart:
+    # Placeholder — replace with real tag breakdown when data is wired in
+    _LABELS = ["Growth", "Income", "Speculative"]
+    _VALUES = [50, 30, 20]
+    _COLORS = ["#1a9e6e", "#5b8db8", "#e8a838"]
+
+    def render(self, data, theme="light"):
+        return _donut_chart(self._LABELS, self._VALUES, self._COLORS, theme)
+
+
 class PriceStructurePlotlyLineChart:
     def render(self, data, theme="light"):
         asset_data: dict = data.get("asset_price")
@@ -42,8 +90,8 @@ class PriceStructurePlotlyLineChart:
                       line_color="rgba(0,0,0,0.25)", line_width=1)
         t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
-            template="plotly_white", height=350,
-            title="Price & Moving Averages",
+            template="plotly_white", height=CHART_HEIGHT,
+            # title="Price & Moving Averages",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
@@ -103,8 +151,8 @@ class AssetValuePlotlyLineChart:
                       line_color="rgba(0,0,0,0.25)", line_width=1)
         t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
-            template="plotly_white", height=350,
-            title="Asset Value Over Time",
+            template="plotly_white", height=CHART_HEIGHT,
+            # title="Asset Value Over Time",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
@@ -159,8 +207,8 @@ class RiskContextPlotlyLineChart:
                       line_color="rgba(0,0,0,0.25)", line_width=1)
         t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
-            template="plotly_white", height=350,
-            title="Risk Context (Volatility & Drawdown)",
+            template="plotly_white", height=CHART_HEIGHT,
+            # title="Risk Context (Volatility & Drawdown)",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
@@ -220,8 +268,8 @@ class DCABiasPlotlyLineChart:
                       line_color="rgba(0,0,0,0.25)", line_width=1)
         t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
         fig.update_layout(
-            template="plotly_white", height=350,
-            title="Dollar Cost Averaging Bias",
+            template="plotly_white", height=CHART_HEIGHT,
+            # title="Dollar Cost Averaging Bias",
             hovermode="x unified",
             margin=dict(l=20, r=60, t=40, b=65),
             xaxis_title=None, yaxis_title=None,
@@ -259,7 +307,7 @@ class PriceOverTimePlotlyLineChart:
       df = df.sort_values("dates")
 
       fig = px.line(df, x="dates", y=["price", "value"], title="price over time")
-      fig.update_layout(template="plotly_white", height=350)
+      fig.update_layout(template="plotly_white", height=CHART_HEIGHT)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
     
@@ -269,7 +317,7 @@ class VolatilityOverTimePlotlyLineChart:
       df = df.sort_values("dates")
 
       fig = px.line(df, x="dates", y="volatility_30d", title="volatility_30d over time")
-      fig.update_layout(template="plotly_white", height=350)
+      fig.update_layout(template="plotly_white", height=CHART_HEIGHT)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
     
@@ -280,7 +328,7 @@ class ProfitOverTimePlotlyLineChart:
       df = df.sort_values("dates")
 
       fig = px.line(df, x="dates", y="profit", title="Profit over time")
-      fig.update_layout(template="plotly_white", height=350)
+      fig.update_layout(template="plotly_white", height=CHART_HEIGHT)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
 
@@ -290,7 +338,7 @@ class MovingAveragePriceOverTimePlotlyLineChart:
       df = df.sort_values("dates")
 
       fig = px.line(df, x="dates", y=["ma_30d", "ma_50d"], title="Moving Averages")
-      fig.update_layout(template="plotly_white", height=350)
+      fig.update_layout(template="plotly_white", height=CHART_HEIGHT)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
 
@@ -300,7 +348,7 @@ class RecentHeighDrawdownOverTimePlotlyLineChart:
       df = df.sort_values("dates")
 
       fig = px.line(df, x="dates", y="pct_drawdown", title="Drawdown vs Recent High")
-      fig.update_layout(template="plotly_white", height=350)
+      fig.update_layout(template="plotly_white", height=CHART_HEIGHT)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig
 
@@ -311,6 +359,6 @@ class DollarCostAVGBiasOverTimePlotlyLineChart:
       df = df.sort_values("dates")
 
       fig = px.line(df, x="dates", y="dca_bias", title="DCA Bias over Time")
-      fig.update_layout(template="plotly_white", height=350)
+      fig.update_layout(template="plotly_white", height=CHART_HEIGHT)
       fig.update_traces(connectgaps=False, line=dict(color="#1f77b4", width=2))
       return fig

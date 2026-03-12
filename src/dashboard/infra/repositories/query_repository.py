@@ -81,6 +81,7 @@ class PostgresAssetQueryRepository:
       SELECT
           a.ticker,
           a.name,
+          CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
           a.description AS asset_description,
           -- STRING_AGG(t.name, ',') AS tag_list,
           a.value,
@@ -95,7 +96,6 @@ class PostgresAssetQueryRepository:
           ac.ma_30d,
           ac.ma_50d,
           ac.dca_bias,
-          CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
           a.created_timestamp as data_date
       FROM staging.asset a
       INNER JOIN most_recent_asset lm
@@ -110,6 +110,21 @@ class PostgresAssetQueryRepository:
       )
       res = res.fetchall()
     return res
+
+  def get_portfolio_price_history(self, tickers: list):
+    if not tickers:
+      return []
+    ticker_list = "', '".join(tickers)
+    sql = f"""
+      SELECT ticker, price, created_timestamp as data_date
+      FROM staging.asset
+      WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
+        AND ticker IN ('{ticker_list}')
+      ORDER BY ticker, created_timestamp ASC
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
 
 class PostgresSnapshotQueryRepository:
   def __init__(self):
@@ -194,6 +209,21 @@ class PostgresSnapshotQueryRepository:
 
 # ===== SQLite Repos =====
 class SQLiteAssetQueryRepository(PostgresAssetQueryRepository):
+  def get_portfolio_price_history(self, tickers: list):
+    if not tickers:
+      return []
+    ticker_list = "', '".join(tickers)
+    sql = f"""
+      SELECT ticker, price, created_timestamp as data_date
+      FROM asset
+      WHERE created_timestamp >= datetime('now', '-30 days')
+        AND ticker IN ('{ticker_list}')
+      ORDER BY ticker, created_timestamp ASC
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
+
   def select_all_asset(self):
     sql = """
     SELECT a.id as asset_id, a.name as asset_name
