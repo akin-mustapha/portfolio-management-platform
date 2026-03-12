@@ -48,6 +48,36 @@ def portfolio_tab_content(view_model=None, theme="light"):
 
     return html.Div([
         html.Div([
+            _chart_section("Asset Category", dcc.Graph(
+                id="asset_category_chart",
+                figure=AssetCategoryPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="portfolio_value_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="portfolio_holding_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            
+            _chart_section("Asset Tags", dcc.Graph(
+                id="portfolio_value_2_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="asset_tags_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+        ], className="workspace-chart-grid workspace-chart-grid-kpi"),
+
+        html.Hr(className="tv-divider"),
+        html.Div([
             _chart_section("Portfolio Value", dcc.Graph(
                 id="value_chart",
                 figure=PortfolioPerformancePlotlyLineChart().render(value_series, theme=theme),
@@ -58,19 +88,13 @@ def portfolio_tab_content(view_model=None, theme="light"):
                 figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
                 config=_GRAPH_CONFIG,
             )),
-            
         ], className="workspace-chart-grid"),
-        
+
         html.Hr(className="tv-divider"),
         html.Div([
-            _chart_section("Asset Category", dcc.Graph(
-                id="asset_category_chart",
-                figure=AssetCategoryPlotlyPieChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-            _chart_section("Asset Tags", dcc.Graph(
-                id="asset_tags_chart",
-                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+            _chart_section("Position Weight", dcc.Graph(
+                id="position_weight_chart",
+                figure=PositionWeightPlotlyBarChart().render(position_weight_series, theme=theme),
                 config=_GRAPH_CONFIG,
             )),
         ], className="workspace-chart-grid"),
@@ -85,15 +109,6 @@ def portfolio_tab_content(view_model=None, theme="light"):
             _chart_section("Top Losers", dcc.Graph(
                 id="losers_chart",
                 figure=LosersPlotlyBarChart().render(rows, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-        ], className="workspace-chart-grid"),
-
-        html.Hr(className="tv-divider"),
-        html.Div([
-            _chart_section("Position Weight", dcc.Graph(
-                id="position_weight_chart",
-                figure=PositionWeightPlotlyBarChart().render(position_weight_series, theme=theme),
                 config=_GRAPH_CONFIG,
             )),
         ], className="workspace-chart-grid"),
@@ -116,7 +131,7 @@ def valuation_tab_content(asset_history=None, theme="light"):
 
     return html.Div([
         html.Div([
-            _chart_section("Profit Over Time", 
+            _chart_section("Price", 
                 dcc.Graph(
                     id="workspace-price-graph",
                     figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
@@ -124,7 +139,7 @@ def valuation_tab_content(asset_history=None, theme="light"):
                 ),
             ),
                 
-            _chart_section("Asset Value Over Time", 
+            _chart_section("Asset Value", 
                 dcc.Graph(
                     id="workspace-value-graph",
                     figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),

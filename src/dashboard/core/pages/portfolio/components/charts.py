@@ -87,7 +87,7 @@ class LosersPlotlyBarChart:
 
         fig.update_traces(
             marker=dict(
-                color="#ef5350",
+                color="#d34b49",
                 line=dict(width=0),
             ),
             texttemplate="%{text:+.2f}",
@@ -152,7 +152,7 @@ class PositionWeightPlotlyBarChart:
         fig.update_layout(
             template="plotly_white",
             margin=dict(l=80, r=60, t=10, b=20),
-            height=450,
+            height=350,
             xaxis_title=None,
             yaxis_title=None,
             yaxis=dict(showgrid=False, zeroline=False),

@@ -388,6 +388,12 @@ html[data-theme="dark"] .asset-ticker-tag {
     grid-template-columns: 1fr;
 }
 
+.workspace-chart-grid-kpi {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    padding: 4px 12px;
+}
+
 /* ── Apply button ─────────────────────────────────────────────── */
 .tv-apply-btn {
     background: #2962ff;

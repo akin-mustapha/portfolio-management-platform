@@ -9,6 +9,7 @@ CHART_THEMES = {
 
 
 CHART_HEIGHT = 300
+DONUT_CHART_HEIGHT = 80
 
 
 def _donut_chart(labels, values, colors, theme):
@@ -19,17 +20,17 @@ def _donut_chart(labels, values, colors, theme):
         hole=0.4,
         marker=dict(colors=colors, line=dict(width=0)),
         textinfo="percent+label",
-        textfont=dict(color="#ffffff", size=12),
+        textfont=dict(color="#ffffff", size=10),
         hovertemplate="%{label}: %{percent}<extra></extra>",
     ))
     fig.update_layout(
-        height=CHART_HEIGHT,
-        margin=dict(l=20, r=20, t=20, b=20),
+        height=DONUT_CHART_HEIGHT,
+        margin=dict(l=10, r=10, t=10, b=10),
         paper_bgcolor=t["paper_bgcolor"],
         plot_bgcolor=t["plot_bgcolor"],
-        font=dict(size=11, color=t["font_color"]),
-        showlegend=True,
-        legend=dict(font=dict(color=t["font_color"], size=11)),
+        font=dict(size=10, color=t["font_color"]),
+        showlegend=False,
+        legend=dict(font=dict(color=t["font_color"], size=9)),
     )
     return fig
 
