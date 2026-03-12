@@ -37,19 +37,23 @@ def asset_table(data=None):
         columnDefs=[
             {
                 "field": "ticker",
+                "minWidth": 70, "width": 70,
                 "headerTooltip": "Asset name or ticker symbol."
             },
             {
                 "field": "name",
+                "minWidth": 100, "width": 130,
                 "headerTooltip": "Brief description of the asset. Context only — not a trading signal."
             },
             {
                 "field": "value",
+                "minWidth": 90, "width": 90,
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": "Current total value of your position (price × quantity)."
             },
             {
                 "field": "profit",
+                "minWidth": 80, "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": (
@@ -61,12 +65,14 @@ def asset_table(data=None):
             },
             {
                 "field": "price",
+                "minWidth": 80, "width": 80,
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": "Latest market price of the asset."
             },
             {
                 "field": "recent_profit_high_30d",
                 "headerName": "30D High",
+                "minWidth": 88, "width": 88,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": (
@@ -77,6 +83,7 @@ def asset_table(data=None):
             {
                 "field": "recent_profit_low_30d",
                 "headerName": "30D Low",
+                "minWidth": 88, "width": 88,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": (
@@ -86,33 +93,36 @@ def asset_table(data=None):
             },
             {
                 "field": "pct_drawdown",
-                "headerName": "% Drawdown",
+                "headerName": "% DD",
+                "minWidth": 72, "width": 72,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
                 "headerTooltip": (
-                    "Percentage decline from the recent high. "
+                    "% Drawdown: Percentage decline from the recent high. "
                     "More negative = deeper drawdown."
                 ),
                 "cellStyle": pnl_style(),
             },
             {
                 "field": "volatility_30d",
-                "headerName": "Volatility 30D",
+                "headerName": "Vol 30D",
+                "minWidth": 80, "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘,.4f’)(params.value)"},
                 "headerTooltip": (
-                    "30-day volatility measure. "
+                    "Volatility 30D: 30-day volatility measure. "
                     "Higher values indicate larger price swings."
                 ),
                 "cellStyle": pnl_style(),
             },
             {
                 "field": "volatility_50d",
-                "headerName": "Volatility 50D",
+                "headerName": "Vol 50D",
+                "minWidth": 80, "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘,.4f’)(params.value)"},
                 "headerTooltip": (
-                    "50-day volatility measure. "
+                    "Volatility 50D: 50-day volatility measure. "
                     "Higher values indicate larger price swings."
                 ),
                 "cellStyle": pnl_style(),
@@ -120,6 +130,7 @@ def asset_table(data=None):
             {
                 "field": "dca_bias",
                 "headerName": "DCA Bias",
+                "minWidth": 84, "width": 84,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘.4f’)(params.value)"},
                 "headerTooltip": (
@@ -131,7 +142,8 @@ def asset_table(data=None):
             {
                 "field": "data_date",
                 "headerName": "Date",
-                "valueFormatter": {"function": "params.value ? new Date(params.value).toLocaleDateString('en-GB', {year: 'numeric', month: 'short', day: 'numeric'}) : ''"},
+                "minWidth": 100, "width": 100,
+                "valueFormatter": {"function": "params.value ? new Date(params.value).toLocaleDateString(‘en-GB’, {year: ‘numeric’, month: ‘short’, day: ‘numeric’}) : ‘’"},
                 "headerTooltip": "Date this data snapshot was generated."
             },
         ],
@@ -140,13 +152,15 @@ def asset_table(data=None):
             "sortable": True,
             "cellStyle": {"display": "flex", "alignItems": "center"},
         },
-        columnSize="responsiveSizeToFit",
+        columnSize="autoSize",
         dashGridOptions={
-            "rowSelection": {"mode": "multiRow"},
+            "rowSelection": {"mode": "singleRow"},
+            "selectionColumnDef": {"width": 36, "minWidth": 36, "maxWidth": 36},
             "tooltipInteraction": True,
             "enableBrowserTooltips": False,
             "rowBuffer": 10,
             "rowHeight": 32,
             "headerHeight": 36,
         },
+        style={"height": "100%"},
     )

@@ -5,6 +5,10 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 
+_GRAPH_CONFIG = {"displayModeBar": False}
+
+CHART_HEIGHT = 300
+
 CHART_THEMES = {
     "light": {
         "paper_bgcolor": "white",
@@ -50,11 +54,11 @@ class WinnersPlotlyBarChart:
 
         fig.update_layout(
             template="plotly_white",
-            height=350,
             margin=dict(l=60, r=20, t=10, b=20),
+            height=CHART_HEIGHT,
             xaxis_title=None,
             yaxis_title=None,
-            yaxis=dict(autorange="reversed", side="right", showgrid=False, zeroline=False),
+            yaxis=dict(autorange="reversed", side="left", showgrid=False, zeroline=False),
             xaxis=dict(autorange="reversed", showgrid=False, zeroline=False),
             font=dict(size=11, color=ct["font_color"]),
             bargap=0.3,
@@ -93,7 +97,8 @@ class LosersPlotlyBarChart:
 
         fig.update_layout(
             template="plotly_white",
-            height=350,
+            # height=350,
+            height=CHART_HEIGHT,
             margin=dict(l=20, r=60, t=10, b=20),
             xaxis_title=None,
             yaxis_title=None,
@@ -148,7 +153,8 @@ class PortfolioPerformancePlotlyLineChart:
 
         fig.update_layout(
             template="plotly_white",
-            height=350,
+            # height=350,
+            height=CHART_HEIGHT,
             hovermode="x unified",
             margin=dict(l=20, r=60, t=20, b=65),
             xaxis_title=None,
@@ -234,7 +240,8 @@ class PortfolioPNLPlotlyLineChart:
 
         fig.update_layout(
             template="plotly_white",
-            height=350,
+            # height=350,
+            height=CHART_HEIGHT,
             hovermode="x unified",
             margin=dict(l=20, r=60, t=20, b=65),
             xaxis_title=None,
@@ -290,11 +297,11 @@ def performance_chart(data=None, theme="light"):
     return dbc.Row([
         dbc.Col([
             html.H6("Winners", className="text-muted mb-2"),
-            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data, theme=theme), config={"displayModeBar": False}),
+            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data, theme=theme), config=_GRAPH_CONFIG),
         ], md=6),
         dbc.Col([
             html.H6("Losers", className="text-muted mb-2"),
-            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data, theme=theme), config={"displayModeBar": False}),
+            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data, theme=theme), config=_GRAPH_CONFIG),
         ], md=6),
     ], id="portfolio_page_charts")
 
@@ -304,7 +311,7 @@ def value_chart(data=None, theme="light"):
     return dcc.Graph(
         id="value_chart",
         figure=PortfolioPerformancePlotlyLineChart().render(data, theme=theme),
-        config={"displayModeBar": False},
+        config=_GRAPH_CONFIG,
     )
 
 
@@ -314,5 +321,5 @@ def pnl_chart(data=None, theme="light"):
     return dcc.Graph(
         id="pnl_char",
         figure=PortfolioPNLPlotlyLineChart().render(data, theme=theme),
-        config={"displayModeBar": False},
+        config=_GRAPH_CONFIG,
     )

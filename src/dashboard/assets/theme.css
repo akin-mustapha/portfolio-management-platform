@@ -7,6 +7,8 @@
   --bg-app: #ffffff;
   --bg-sidebar: #f8f9fa;
   --bg-kpi-card: #f8f9fa;
+  --bg-panel: #f8f9fa;
+  --border-split: #dee2e6;
   --bg-filter-bar: #fafbfd;
   --bg-strip-hover: #f0f3fa;
   --bg-strip-active: #eef2ff;
@@ -33,6 +35,8 @@ html[data-theme="dark"] {
   --bg-app: #1e222d;
   --bg-sidebar: #161b27;
   --bg-kpi-card: #252d3d;
+  --bg-panel: #1a1f2e;
+  --border-split: #2a3042;
   --bg-filter-bar: #1a1f2e;
   --bg-strip-hover: #252d3d;
   --bg-strip-active: #1c2a4a;
