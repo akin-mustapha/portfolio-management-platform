@@ -29,16 +29,13 @@ class PortfolioPresenter:
         }
         
     def _kpi(self, rows: dict) -> dict:
-        total_value = rows.get('total_value', 0)
-        cash = rows.get('cash_available_to_trade', 0)
         return {
-            "value": total_value,
+            "value": rows.get('total_value', 0),
             "currency": rows.get('currency', "#"),
             "realized_pnl": rows.get('investments_realized_pnl', 0),
             "unrealized_pnl": rows.get('investments_unrealized_pnl', 0),
             "total_cost": rows.get('investments_total_cost', 0),
-            "cash": cash,
-            "cash_pct": (cash / total_value * 100) if total_value else 0,
+            "cash": rows.get('cash_available_to_trade', 0),
         }
 
     # ---------- Table ----------
@@ -83,6 +80,7 @@ class PortfolioPresenter:
         rest = sum(i["weight_pct"] for i in items[15:])
         if rest > 0:
             top.append({"ticker": "Other", "weight_pct": rest})
+        top.sort(key=lambda x: x["weight_pct"])
         return top
 
     # ---------- Bar Chart ----------

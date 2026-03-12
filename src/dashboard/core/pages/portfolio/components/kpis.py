@@ -36,7 +36,8 @@ def _pnl_pct(pnl, total_invested):
     return None
 
 
-def kpi_row(data={}):
+def kpi_row(data=None):
+    data = data or {}
     currency = data.get("currency", "#")
     unit = "EUR" if currency == "EUR" else "USD"
     currency_sign = "€" if currency == "EUR" else "$"
@@ -47,7 +48,7 @@ def kpi_row(data={}):
     unrealized_pnl = data.get("unrealized_pnl", 0)
     beta = data.get("beta", 1)
     cash = data.get("cash", 0)
-    cash_pct = data.get("cash_pct", 0)
+    cash_pct = (cash / value * 100) if value else 0
 
     unrealized_pct = _pnl_pct(unrealized_pnl, total_invested)
     realized_pct = _pnl_pct(realized_pnl, total_invested)

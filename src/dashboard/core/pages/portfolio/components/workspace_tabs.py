@@ -18,6 +18,9 @@ from ...asset.components.charts import (
 )
 
 _GRAPH_CONFIG = {"displayModeBar": False}
+_CENTERED_LOADER_STYLE = {
+    "position": "absolute", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)"
+}
 
 
 def _chart_section(title, chart):
@@ -200,7 +203,7 @@ def workspace_tabs(view_model=None, theme="light"):
                 children=dcc.Loading(
                     id="loading-portfolio-tab",
                     type="circle",
-                    style={"position": "absolute", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)"},
+                    style=_CENTERED_LOADER_STYLE,
                     children=portfolio_tab_content(view_model, theme),
                 ),
             ),
@@ -212,7 +215,7 @@ def workspace_tabs(view_model=None, theme="light"):
                 children=dcc.Loading(
                     id="loading-valuation-tab",
                     type="circle",
-                    style={"position": "absolute", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)"},
+                    style=_CENTERED_LOADER_STYLE,
                     children=valuation_tab_content(theme=theme),
                 ),
             ),

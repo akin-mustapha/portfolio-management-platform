@@ -120,7 +120,6 @@ class PositionWeightPlotlyBarChart:
             return go.Figure()
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data)
-        df = df.sort_values("weight_pct", ascending=True)
 
         fig = px.bar(
             df,
