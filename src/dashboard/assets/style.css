@@ -321,6 +321,7 @@ html[data-theme="dark"] .tv-collapse-body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 /* ── Workspace filter bar ──────────────────────────────────────── */

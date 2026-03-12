@@ -114,6 +114,60 @@ class LosersPlotlyBarChart:
         return fig
 
 
+class PositionWeightPlotlyBarChart:
+    def render(self, data, theme="light"):
+        if not data:
+            return go.Figure()
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        df = pd.DataFrame(data)
+        df = df.sort_values("weight_pct", ascending=True)
+
+        fig = px.bar(
+            df,
+            x="weight_pct",
+            y="ticker",
+            orientation="h",
+            text="weight_pct",
+        )
+
+        fig.update_traces(
+            marker=dict(
+                color="#5b7fcf",
+                line=dict(width=0),
+            ),
+            texttemplate="%{text:.1f}%",
+            textposition="outside",
+            textfont=dict(color=ct["font_color"], size=11),
+        )
+
+        fig.add_vline(
+            x=5,
+            line_dash="dot",
+            line_color="rgba(200,80,80,0.5)",
+            line_width=1.5,
+            annotation_text="5%",
+            annotation_font_size=10,
+            annotation_font_color="rgba(200,80,80,0.7)",
+        )
+
+        fig.update_layout(
+            template="plotly_white",
+            margin=dict(l=80, r=60, t=10, b=20),
+            height=450,
+            xaxis_title=None,
+            yaxis_title=None,
+            yaxis=dict(showgrid=False, zeroline=False),
+            xaxis=dict(showgrid=False, zeroline=False),
+            font=dict(size=11, color=ct["font_color"]),
+            bargap=0.3,
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
+            title=None,
+        )
+
+        return fig
+
+
 class PortfolioPerformancePlotlyLineChart:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])

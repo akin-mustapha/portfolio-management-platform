@@ -1,11 +1,12 @@
 import dash_ag_grid as dag
 import pandas as pd
+from dash import html
 
 
 def asset_table(data=None):
 
     if data is None:
-        return dag.AgGrid()
+        return html.Div()
 
     df = pd.DataFrame(data)
 

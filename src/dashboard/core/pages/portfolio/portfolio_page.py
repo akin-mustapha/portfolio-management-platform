@@ -21,9 +21,12 @@ def portfolio_layout():
 
         # ── Row 1: KPI Summary (always portfolio-scoped) ──────────
         dbc.Row([
-            dbc.Col(
-                id="portfolio_kpi_container",
-                children=kpi_row(),
+            dcc.Loading(
+                type="dot",
+                children=dbc.Col(
+                    id="portfolio_kpi_container",
+                    children=kpi_row(),
+                ),
             )
         ], className="mb-0"),
 
@@ -69,10 +72,7 @@ def portfolio_layout():
                             className="workspace-chart-header",
                         ),
                         
-                        dcc.Loading(
-                            type="circle",
-                            children=workspace_tabs()
-                        ),
+                        workspace_tabs(),
                         
                     ],
                 ),
