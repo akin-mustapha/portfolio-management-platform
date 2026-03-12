@@ -58,7 +58,7 @@ class WinnersPlotlyBarChart:
             height=CHART_HEIGHT,
             xaxis_title=None,
             yaxis_title=None,
-            yaxis=dict(autorange="reversed", side="right", showgrid=False, zeroline=False),
+            yaxis=dict(autorange="reversed", side="left", showgrid=False, zeroline=False),
             xaxis=dict(autorange="reversed", showgrid=False, zeroline=False),
             font=dict(size=11, color=ct["font_color"]),
             bargap=0.3,

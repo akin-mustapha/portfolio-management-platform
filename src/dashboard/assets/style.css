@@ -330,7 +330,7 @@ html[data-theme="dark"] .tv-collapse-body {
     align-items: center;
     flex-wrap: nowrap;
     gap: 8px;
-    padding: 7px 0;
+    padding: 7px;
     border-top: 1px solid var(--border-tv);
     border-bottom: 1px solid var(--border-tv);
     background: var(--bg-filter-bar);
@@ -378,7 +378,7 @@ html[data-theme="dark"] .asset-ticker-tag {
 
 .workspace-chart-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
     gap: 8px;
     padding: 8px 12px;
 }

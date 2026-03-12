@@ -3,6 +3,8 @@ from dash import dcc, html
 
 
 TIMEFRAMES = [
+    {"label": "1D", "value": "1D"},
+    {"label": "1W", "value": "1W"},
     {"label": "1M", "value": "1M"},
     {"label": "3M", "value": "3M"},
     {"label": "6M", "value": "6M"},
@@ -13,6 +15,26 @@ TIMEFRAMES = [
 
 def workspace_filter_bar():
     return html.Div([
+        
+        # Tag buttons
+        dbc.Button(
+            [html.I(className="fa-solid fa-tag me-1"), "Add Tag"],
+            id="btn-add-tag",
+            className="tv-adv-btn",
+            size="sm",
+            n_clicks=0,
+        ),
+        dbc.Button(
+            [html.I(className="fa-solid fa-plus me-1"), "Create Tag"],
+            id="btn-create-tag",
+            className="tv-adv-btn",
+            size="sm",
+            n_clicks=0,
+        ),
+        
+        # Vertical divider
+        html.Div(className="tv-vert-divider"),
+        
         # Timeframe strip
         dcc.RadioItems(
             id="workspace-timeframe-selector",
@@ -29,23 +51,7 @@ def workspace_filter_bar():
                 "userSelect": "none",
             },
         ),
-        # Vertical divider
-        html.Div(className="tv-vert-divider"),
-        # Tag buttons
-        dbc.Button(
-            [html.I(className="fa-solid fa-tag me-1"), "Add Tag"],
-            id="btn-add-tag",
-            className="tv-adv-btn",
-            size="sm",
-            n_clicks=0,
-        ),
-        dbc.Button(
-            [html.I(className="fa-solid fa-plus me-1"), "Create Tag"],
-            id="btn-create-tag",
-            className="tv-adv-btn",
-            size="sm",
-            n_clicks=0,
-        ),
+
         # Spacer pushes advanced filter to the right
         html.Div(style={"marginLeft": "auto"}),
         # Advanced filter toggle
