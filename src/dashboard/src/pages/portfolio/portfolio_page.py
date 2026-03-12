@@ -68,7 +68,12 @@ def portfolio_layout():
                             id="workspace-chart-header",
                             className="workspace-chart-header",
                         ),
-                        workspace_tabs(),
+                        
+                        dcc.Loading(
+                            type="circle",
+                            children=workspace_tabs()
+                        ),
+                        
                     ],
                 ),
             ],

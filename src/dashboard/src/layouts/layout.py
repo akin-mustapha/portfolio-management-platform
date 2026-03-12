@@ -108,12 +108,9 @@ layout = dbc.Container(
         dcc.Store(id="theme-store", storage_type="local", data="light"),
         dcc.Store(id="privacy-store", storage_type="local", data=False),
         _top_navbar(),
-        dcc.Loading(
-            type="circle",
-            children=dbc.Card(
-                dbc.CardBody(html.Div(id="page-content")),
-                className="shadow-sm border-0 rounded-0"
-            )
+        dbc.Card(
+            dbc.CardBody(html.Div(id="page-content")),
+            className="shadow-sm border-0 rounded-0"
         ),
     ],
     fluid=True,

@@ -16,25 +16,6 @@ TIMEFRAMES = [
 def workspace_filter_bar():
     return html.Div([
         
-        # Tag buttons
-        dbc.Button(
-            [html.I(className="fa-solid fa-tag me-1"), "Add Tag"],
-            id="btn-add-tag",
-            className="tv-adv-btn",
-            size="sm",
-            n_clicks=0,
-        ),
-        dbc.Button(
-            [html.I(className="fa-solid fa-plus me-1"), "Create Tag"],
-            id="btn-create-tag",
-            className="tv-adv-btn",
-            size="sm",
-            n_clicks=0,
-        ),
-        
-        # Vertical divider
-        html.Div(className="tv-vert-divider"),
-        
         # Timeframe strip
         dcc.RadioItems(
             id="workspace-timeframe-selector",
@@ -51,10 +32,35 @@ def workspace_filter_bar():
                 "userSelect": "none",
             },
         ),
-
+        html.Div(className="tv-vert-divider"),
+        
         # Spacer pushes advanced filter to the right
         html.Div(style={"marginLeft": "auto"}),
-        # Advanced filter toggle
+        
+        # Tag buttons
+        dbc.Button(
+            [html.I(className="fa-solid fa-tag me-1"), "Add Tag"],
+            id="btn-add-tag",
+            className="tv-adv-btn",
+            size="sm",
+            n_clicks=0,
+        ),
+        
+        html.Div(className="tv-vert-divider"),
+       
+        dbc.Button(
+            [html.I(className="fa-solid fa-plus me-1"), "Create Tag"],
+            id="btn-create-tag",
+            className="tv-adv-btn",
+            size="sm",
+            n_clicks=0,
+        ),
+        
+        
+        # Vertical divider
+        html.Div(className="tv-vert-divider"),
+        
+         # Advanced filter toggle
         dbc.Button(
             [html.I(className="fa-solid fa-sliders me-1"), "Advanced Filter"],
             id="workspace-adv-filter-btn",
@@ -62,6 +68,7 @@ def workspace_filter_bar():
             size="sm",
             n_clicks=0,
         ),
+
     ], className="workspace-filter-bar")
 
 
