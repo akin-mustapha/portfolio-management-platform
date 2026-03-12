@@ -2,7 +2,7 @@ from ..components.charts import PriceStructurePlotlyLineChart, AssetValuePlotlyL
 
 _GRAPH_CONFIG = {"displayModeBar": False}
 
-from .....src.components.cards import card
+from .....core.components.cards import card
 
 from dash import dcc, html, Input, Output, callback, State
 
