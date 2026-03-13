@@ -6,15 +6,21 @@ from .charts import (
     LosersPlotlyBarChart,
     PortfolioPerformancePlotlyLineChart,
     PortfolioPNLPlotlyLineChart,
+    PositionWeightPlotlyBarChart,
 )
 from ...asset.components.charts import (
     PriceStructurePlotlyLineChart,
     AssetValuePlotlyLineChart,
     RiskContextPlotlyLineChart,
     DCABiasPlotlyLineChart,
+    AssetCategoryPlotlyPieChart,
+    AssetTagsPlotlyPieChart,
 )
 
 _GRAPH_CONFIG = {"displayModeBar": False}
+_CENTERED_LOADER_STYLE = {
+    "position": "absolute", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)"
+}
 
 
 def _chart_section(title, chart):
@@ -38,8 +44,39 @@ def portfolio_tab_content(view_model=None, theme="light"):
     rows = view_model.get("asset_table", {}).get("rows", [])
     value_series = view_model.get("portfolio_value_series", {})
     pnl_series = view_model.get("portfolio_pnl_series", {})
+    position_weight_series = view_model.get("position_weight_series", [])
 
     return html.Div([
+        html.Div([
+            _chart_section("Asset Category", dcc.Graph(
+                id="asset_category_chart",
+                figure=AssetCategoryPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="portfolio_value_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="portfolio_holding_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            
+            _chart_section("Asset Tags", dcc.Graph(
+                id="portfolio_value_2_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+            _chart_section("Asset Tags", dcc.Graph(
+                id="asset_tags_chart",
+                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+        ], className="workspace-chart-grid workspace-chart-grid-kpi"),
+
+        html.Hr(className="tv-divider"),
         html.Div([
             _chart_section("Portfolio Value", dcc.Graph(
                 id="value_chart",
@@ -51,8 +88,17 @@ def portfolio_tab_content(view_model=None, theme="light"):
                 figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
                 config=_GRAPH_CONFIG,
             )),
-            
         ], className="workspace-chart-grid"),
+
+        html.Hr(className="tv-divider"),
+        html.Div([
+            _chart_section("Position Weight", dcc.Graph(
+                id="position_weight_chart",
+                figure=PositionWeightPlotlyBarChart().render(position_weight_series, theme=theme),
+                config=_GRAPH_CONFIG,
+            )),
+        ], className="workspace-chart-grid"),
+        
         html.Hr(className="tv-divider"),
         html.Div([
             _chart_section("Top Winners", dcc.Graph(
@@ -85,26 +131,42 @@ def valuation_tab_content(asset_history=None, theme="light"):
 
     return html.Div([
         html.Div([
-            dcc.Graph(
-                id="workspace-price-graph",
-                figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
+            _chart_section("Price", 
+                dcc.Graph(
+                    id="workspace-price-graph",
+                    figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                ),
             ),
-            dcc.Graph(
-                id="workspace-value-graph",
-                figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
+                
+            _chart_section("Asset Value", 
+                dcc.Graph(
+                    id="workspace-value-graph",
+                    figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
+        ),
+            
+        ], className="workspace-chart-grid"),
+        
+        
+        html.Div([
+            
+            _chart_section("Risk Context - Drawdown", 
+                dcc.Graph(
+                    id="workspace-risk-graph",
+                    figure=RiskContextPlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
             ),
-            dcc.Graph(
-                id="workspace-risk-graph",
-                figure=RiskContextPlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
-            ),
-            dcc.Graph(
-                id="workspace-dca-graph",
-                figure=DCABiasPlotlyLineChart().render(asset_history, theme=theme),
-                config=_GRAPH_CONFIG,
-            ),
+            _chart_section("Opportunity - DCA Bias", 
+                dcc.Graph(
+                    id="workspace-dca-graph",
+                    figure=DCABiasPlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
+            )
+            
         ], className="workspace-chart-grid"),
     ], id="tab-valuation-content")
 
@@ -153,14 +215,24 @@ def workspace_tabs(view_model=None, theme="light"):
                 tab_id="tab-portfolio",
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
-                children=portfolio_tab_content(view_model, theme),
+                children=dcc.Loading(
+                    id="loading-portfolio-tab",
+                    type="circle",
+                    style=_CENTERED_LOADER_STYLE,
+                    children=portfolio_tab_content(view_model, theme),
+                ),
             ),
             dbc.Tab(
                 label="Valuation",
                 tab_id="tab-valuation",
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
-                children=valuation_tab_content(theme=theme),
+                children=dcc.Loading(
+                    id="loading-valuation-tab",
+                    type="circle",
+                    style=_CENTERED_LOADER_STYLE,
+                    children=valuation_tab_content(theme=theme),
+                ),
             ),
             dbc.Tab(
                 label="Risk",

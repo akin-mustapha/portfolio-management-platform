@@ -321,6 +321,7 @@ html[data-theme="dark"] .tv-collapse-body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 /* ── Workspace filter bar ──────────────────────────────────────── */
@@ -385,6 +386,12 @@ html[data-theme="dark"] .asset-ticker-tag {
 
 .workspace-chart-grid.chart-grid-single {
     grid-template-columns: 1fr;
+}
+
+.workspace-chart-grid-kpi {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    padding: 4px 12px;
 }
 
 /* ── Apply button ─────────────────────────────────────────────── */

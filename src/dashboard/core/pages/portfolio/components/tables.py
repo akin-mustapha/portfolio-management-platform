@@ -1,11 +1,12 @@
 import dash_ag_grid as dag
 import pandas as pd
+from dash import html
 
 
 def asset_table(data=None):
 
     if data is None:
-        return dag.AgGrid()
+        return html.Div()
 
     df = pd.DataFrame(data)
 
@@ -35,6 +36,13 @@ def asset_table(data=None):
         className="finance-grid",
         rowData=df.to_dict("records"),
         columnDefs=[
+            {
+                "field": "trend",
+                "minWidth": 116, "width": 116,
+                "cellRenderer": "TrendSparkline",
+                "cellStyle": {"padding": "0", "overflow": "hidden"},
+                "headerTooltip": "30-day price trend. Green = Bullish (MA30 > MA50), Red = Bearish."
+            },
             {
                 "field": "ticker",
                 "minWidth": 70, "width": 70,
