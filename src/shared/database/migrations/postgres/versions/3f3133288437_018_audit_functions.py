@@ -126,5 +126,8 @@ def downgrade() -> None:
     CREATE OR REPLACE TRIGGER sector_versioning BEFORE DELETE OR UPDATE ON portfolio.sector FOR EACH ROW EXECUTE FUNCTION portfolio.record_history();
     
     DROP FUNCTION portfolio.sector_history;
+    
+    ALTER TABLE portfolio.tag
+    DROP CONSTRAINT idx_portfolio_tag_name_category_unique;
                
     """)
