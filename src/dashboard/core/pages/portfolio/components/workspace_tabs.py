@@ -7,6 +7,8 @@ from .charts import (
     PortfolioPerformancePlotlyLineChart,
     PortfolioPNLPlotlyLineChart,
     PositionWeightPlotlyBarChart,
+    PositionWeightPlotlyDonutChart,
+    PortfolioPerformanceScatterPlot,
 )
 from ...asset.components.charts import (
     PriceStructurePlotlyLineChart,
@@ -45,74 +47,134 @@ def portfolio_tab_content(view_model=None, theme="light"):
     value_series = view_model.get("portfolio_value_series", {})
     pnl_series = view_model.get("portfolio_pnl_series", {})
     position_weight_series = view_model.get("position_weight_series", [])
+    position_distribution = view_model.get("position_distribution", [])
+    winners = view_model.get("winners", [])
+    losers = view_model.get("losers", [])
 
     return html.Div([
-        html.Div([
-            _chart_section("Asset Category", dcc.Graph(
-                id="asset_category_chart",
-                figure=AssetCategoryPlotlyPieChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-            _chart_section("Asset Tags", dcc.Graph(
-                id="portfolio_value_chart",
-                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-            _chart_section("Asset Tags", dcc.Graph(
-                id="portfolio_holding_chart",
-                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
+        # ─────────────────────────────────────────────
+        # Row 1, Performance (Value, PNL)
+        # ─────────────────────────────────────────────
+        html.Hr(className="tv-divider"),
+                dbc.Row([
             
-            _chart_section("Asset Tags", dcc.Graph(
-                id="portfolio_value_2_chart",
-                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-            _chart_section("Asset Tags", dcc.Graph(
-                id="asset_tags_chart",
-                figure=AssetTagsPlotlyPieChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-        ], className="workspace-chart-grid workspace-chart-grid-kpi"),
-
-        html.Hr(className="tv-divider"),
-        html.Div([
-            _chart_section("Portfolio Value", dcc.Graph(
-                id="value_chart",
-                figure=PortfolioPerformancePlotlyLineChart().render(value_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-            _chart_section("Profit & Loss", dcc.Graph(
-                id="pnl_char",
-                figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-        ], className="workspace-chart-grid"),
-
-        html.Hr(className="tv-divider"),
-        html.Div([
-            _chart_section("Position Weight", dcc.Graph(
-                id="position_weight_chart",
-                figure=PositionWeightPlotlyBarChart().render(position_weight_series, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-        ], className="workspace-chart-grid"),
+            dbc.Col
+            (
+                _chart_section
+                (
+                    "Portfolio Value",
+                    dcc.Graph
+                    (
+                        id="value_chart",
+                        figure=PortfolioPerformancePlotlyLineChart().render(value_series, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    )
+                ),
+                # lg=6,
+                # md=12,
+            ),
+            
+            dbc.Col(
+                _chart_section("Profit & Loss", dcc.Graph(
+                    id="pnl_char",
+                    figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )),
+                # lg=6,
+                # md=12,
+            ),
+        ], className="mb-6 workspace-chart-grid"),
         
+        # ─────────────────────────────────────────────
+        # Section 3, Performance Map, Portolio Asset Weight
+        # ─────────────────────────────────────────────   
+        # html.Div([
+        dbc.Row([
+
+            dbc.Col(
+                _chart_section("Position Performance Map", dcc.Graph(
+                    id="portfolio_performance_map",
+                    figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme),
+                    config=_GRAPH_CONFIG,
+                ))
+                ,className='workpspace-chart-performance-map'
+            ),
+
+            dbc.Col(
+                _chart_section(
+                    "Position Weight",
+                    dcc.Graph(
+                        id="position_weight_donut_chart",
+                        figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    ),
+                )
+            ),
+
+        ], className="mb-6 workspace-chart-grid-thirds"),
+
         html.Hr(className="tv-divider"),
-        html.Div([
-            _chart_section("Top Winners", dcc.Graph(
-                id="winners_chart",
-                figure=WinnersPlotlyBarChart().render(rows, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-            _chart_section("Top Losers", dcc.Graph(
-                id="losers_chart",
-                figure=LosersPlotlyBarChart().render(rows, theme=theme),
-                config=_GRAPH_CONFIG,
-            )),
-        ], className="workspace-chart-grid"),
-    ], id="tab-portfolio-content")
+
+        # ─────────────────────────────────────────────
+        # Row 2, Winners | Losers
+        # ─────────────────────────────────────────────
+
+        dbc.Row([
+
+            dbc.Col
+            (
+                _chart_section
+                (
+                    "Top Losers",
+                    dcc.Graph
+                    (
+                        id="losers_chart",
+                        figure=LosersPlotlyBarChart().render(losers, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    )
+                ),
+                # lg=6,
+                # md=12,
+                # width=6,
+                
+            ),
+            
+            dbc.Col(
+                _chart_section
+                (
+                    "Top Winners",
+                    dcc.Graph
+                    (
+                        id="winners_chart",
+                        figure=WinnersPlotlyBarChart().render(winners, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    )
+                ),
+                # width=6
+                # , lg=6
+                # , md=12
+            ),
+
+        ], className="mb-6 workspace-chart-grid"),
+
+
+# ─────────────────────────────────────────────
+# Section 3, Performance Winners vs Losers
+# ─────────────────────────────────────────────   
+        # html.Hr(className="tv-divider"),
+        # html.Div([
+        #     _chart_section("Top Losers", dcc.Graph(
+        #         id="losers_chart",
+        #         figure=LosersPlotlyBarChart().render(losers, theme=theme),
+        #         config=_GRAPH_CONFIG,
+        #     )),
+        #     _chart_section("Top Winners", dcc.Graph(
+        #         id="winners_chart",
+        #         figure=WinnersPlotlyBarChart().render(winners, theme=theme),
+        #         config=_GRAPH_CONFIG,
+        #     )),
+        # ], className="workspace-chart-grid"),
+    ], id="tab-portfolio-content", className='workspace-wrapper')
 
 
 # ─────────────────────────────────────────────
@@ -221,6 +283,7 @@ def workspace_tabs(view_model=None, theme="light"):
                     style=_CENTERED_LOADER_STYLE,
                     children=portfolio_tab_content(view_model, theme),
                 ),
+                className="workspace-wrapper",
             ),
             dbc.Tab(
                 label="Valuation",

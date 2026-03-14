@@ -9,7 +9,7 @@ CHART_THEMES = {
 
 
 CHART_HEIGHT = 300
-DONUT_CHART_HEIGHT = 80
+DONUT_CHART_HEIGHT = 300
 
 
 def _donut_chart(labels, values, colors, theme):

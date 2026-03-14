@@ -23,9 +23,10 @@ class PortfolioPresenter:
             "pnl_bar_series": self._pnl_bar_series_vm(
                 data.get("pnl", [])
             ),
-            "position_weight_series": self._position_weight_series_vm(
-                assets, snapshot.get("total_value", 0)
-            ),
+            "position_weight_series": self._position_weight_series_vm(assets),
+            "position_distribution": self._position_weight_distribution_vm(assets),
+            "winners": self._top_winner_bar_vm(assets),
+            "losers": self._top_losers_bar_vm(assets),
         }
         
     def _kpi(self, rows: dict) -> dict:
@@ -68,21 +69,36 @@ class PortfolioPresenter:
         
     # ---------- Position Weight ----------
 
-    def _position_weight_series_vm(self, assets: list[dict], total_value: float) -> list[dict]:
-        if not assets or total_value == 0:
-            return []
+    def _position_weight_series_vm(self, assets: list[dict]) -> list[dict]:
         items = sorted(
-            [{"ticker": a["ticker"], "weight_pct": a["value"] / total_value * 100} for a in assets],
+            [{"ticker": a["ticker"], "weight_pct": a["weight_pct"]} for a in assets],
             key=lambda x: x["weight_pct"],
             reverse=True,
         )
-        top = items[:15]
-        rest = sum(i["weight_pct"] for i in items[15:])
+        top = items[:10]
+        rest = sum(i["weight_pct"] for i in items[10:])
         if rest > 0:
             top.append({"ticker": "Other", "weight_pct": rest})
         top.sort(key=lambda x: x["weight_pct"])
         return top
 
+    # ---------- Position Distribution ----------
+
+    def _position_weight_distribution_vm(self, assets: list[dict]) -> list[dict]:
+
+        items = sorted(
+            [{"ticker": a["ticker"]
+              , "weight_pct": a["weight_pct"]
+              , "profit": a["profit"]
+              , "value": a["value"]
+              , "name": a["name"]
+              } for a in assets],
+            key=lambda x: x["weight_pct"],
+            reverse=True,
+        )
+        
+        return items
+    
     # ---------- Bar Chart ----------
 
     def _pnl_bar_series_vm(self, rows: list[dict]) -> dict:
@@ -90,3 +106,36 @@ class PortfolioPresenter:
             "labels": [r["asset"] for r in rows],
             "values": [r["pnl"] for r in rows],
         }
+        
+        
+    def _top_winner_bar_vm(self, assets: list[dict]) -> dict:
+        
+        items = sorted(
+            [{"ticker": a["ticker"]
+              , "weight_pct": a["weight_pct"]
+              , "profit": a["profit"]
+              , "value": a["value"]
+              , "name": a["name"]
+              } for a in assets],
+            key=lambda x: x["profit"],
+            reverse=True,
+        )
+        
+        top = items[:10]
+        return top
+        
+    def _top_losers_bar_vm(self, assets: list[dict]) -> dict:
+        
+        items = sorted(
+            [{"ticker": a["ticker"]
+              , "weight_pct": a["weight_pct"]
+              , "profit": a["profit"]
+              , "value": a["value"]
+              , "name": a["name"]
+              } for a in assets],
+            key=lambda x: x["profit"],
+            reverse=False,
+        )
+        
+        top = items[:10]
+        return top

@@ -71,13 +71,21 @@ class PostgresAssetQueryRepository:
 
   def get_most_recent_asset_data(self):
     sql = """
-      ;WITH most_recent_asset AS
+      WITH most_recent_asset AS
       (
-      SELECT
-          ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) as rn
-          , id
-      FROM staging.asset
+          SELECT
+              ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) AS rn,
+              id
+          FROM staging.asset
+      ),
+      portfolio_value AS
+      (
+          SELECT total_value
+          FROM staging.account
+          ORDER BY created_timestamp DESC
+          LIMIT 1
       )
+
       SELECT
           a.ticker,
           a.name,
@@ -88,6 +96,9 @@ class PostgresAssetQueryRepository:
           a.profit,
           a.price,
           a.cost,
+
+          a.value / pv.total_value * 100 AS weight_pct,
+
           ac.recent_profit_high_30d,
           ac.recent_profit_low_30d,
           ac.pct_drawdown,
@@ -96,13 +107,17 @@ class PostgresAssetQueryRepository:
           ac.ma_30d,
           ac.ma_50d,
           ac.dca_bias,
-          a.created_timestamp as data_date
+          a.created_timestamp AS data_date
+
       FROM staging.asset a
       INNER JOIN most_recent_asset lm
           ON a.id = lm.id
-          AND lm.rn = 1               -- only take latest metric per asset
+          AND lm.rn = 1
+
       LEFT JOIN staging.asset_computed ac
           ON a.id = ac.asset_id
+
+      CROSS JOIN portfolio_value pv
     """
     with self.client as client:
       res = client.execute(

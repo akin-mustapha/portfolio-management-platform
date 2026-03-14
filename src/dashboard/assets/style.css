@@ -394,6 +394,71 @@ html[data-theme="dark"] .asset-ticker-tag {
     padding: 4px 12px;
 }
 
+
+/* 1. Define the Parent Container */
+/* Wrap your Row in a div with this class or apply to a wrapper */
+.workspace-wrapper {
+    container-type: inline-size;
+    container-name: chart-area;
+    width: 100%; 
+}
+
+/* 2. Default Stacked State (Mobile-First for the container) */
+.workspace-chart-grid-thirds {
+    display: grid;
+    grid-template-columns: 1fr; /* Stacked by default */
+    gap: 8px;
+    max-width: 100%;
+    padding: 8px 12px;
+}
+
+
+/* Target the graph containers within your grid */
+.workspace-chart-grid-thirds #portfolio_performance_map {
+    max-width: 100%;
+    width: 100% !important;
+}
+
+/* Ensure the Grid items (the columns) are flexible */
+.workspace-chart-grid-thirds > div {
+    /* display: flex; */
+    flex-direction: column;
+    /* align-items: center;  */
+    /* Default: Center everything when stacked! */
+    /* justify-content: center; */
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    /* margin-bottom: 2rem; */
+}
+
+/* 2. The Container Query: Revert to Left-Align when Side-by-Side */
+@container chart-area (min-width: 900px) {
+    .workspace-chart-grid-thirds {
+        grid-template-columns: 1fr 30%;
+        max-width: 100%;
+
+    }
+
+    /* When wide, maybe you want the left chart left-aligned 
+       and the right chart right-aligned? */
+    .workspace-chart-grid-thirds > div:first-child {
+        align-items: flex-start; 
+        max-width: 100%;
+
+    }
+    
+    .workspace-chart-grid-thirds > div:last-child {
+        align-items: flex-end; 
+        max-width: 100%;
+
+    }
+}
+
+/* .workspace-chart-grid-thirds.chart-grid-single{
+    grid-template-columns: 1fr;
+} */
+
 /* ── Apply button ─────────────────────────────────────────────── */
 .tv-apply-btn {
     background: #2962ff;

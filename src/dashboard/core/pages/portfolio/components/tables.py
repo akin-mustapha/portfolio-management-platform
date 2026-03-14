@@ -12,6 +12,7 @@ def asset_table(data=None):
 
     # precision control
     decimals = 6
+    df["weight_pct"] = df["weight_pct"].round(decimals)
     df["pct_drawdown"] = df["pct_drawdown"].round(decimals)
     df["volatility_30d"] = df["volatility_30d"].round(decimals)
     df["volatility_50d"] = df["volatility_50d"].round(decimals)
@@ -20,7 +21,7 @@ def asset_table(data=None):
     # df["price_vs_ma_50"] = df["price_vs_ma_50"].round(decimals)
     df["dca_bias"] = df["dca_bias"].round(decimals)
 
-    POSITIVE_COLOR = "#26a69a"
+    POSITIVE_COLOR = "#26a671"
     NEGATIVE_COLOR = "#ef5350"
 
     def pnl_style(positive_color=POSITIVE_COLOR, negative_color=NEGATIVE_COLOR):
@@ -76,6 +77,13 @@ def asset_table(data=None):
                 "minWidth": 80, "width": 80,
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": "Latest market price of the asset."
+            },
+            {
+                "field": "weight_pct",
+                "minWidth": 80, "width": 80,
+                "type": "numericColumn",
+                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "headerTooltip": "Weight in relation to portfolio value"
             },
             {
                 "field": "recent_profit_high_30d",
