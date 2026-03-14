@@ -7,7 +7,7 @@ from dash import dcc, html
 
 _GRAPH_CONFIG = {"displayModeBar": False}
 
-CHART_HEIGHT = 250
+CHART_HEIGHT = 200
 
 CHART_THEMES = {
     "light": {
@@ -199,14 +199,14 @@ class WinnersPlotlyBarChart:
             ),
             texttemplate="%{text:+.2f}",
             textposition="inside",
-            textfont=dict(color=ct["font_color"], size=11),
+            textfont=dict(color=ct["font_color"], size=13),
         )
 
         fig.update_layout(
             template="plotly_white",
             colorway=px.colors.sequential.Bluyl_r,
-            margin=dict(l=5, r=5, t=5, b=5),
-            height=250,
+            margin=dict(l=2, r=2, t=2, b=2),
+            height=CHART_HEIGHT,
             xaxis_title=None,
             yaxis_title=None,
             yaxis=dict(side="left", showgrid=False, zeroline=False),
@@ -248,15 +248,15 @@ class LosersPlotlyBarChart:
             ),
             texttemplate="%{text:+.2f}",
             textposition="inside",
-            textfont=dict(color=ct["font_color"], size=11),
+            textfont=dict(color=ct["font_color"], size=13),
         )
 
         fig.update_layout(
             template="plotly_white",
             colorway=px.colors.sequential.Bluyl_r,
             # height=350,
-            height=250,
-            margin=dict(l=5, r=5, t=5, b=5),
+            height=200,
+            margin=dict(l=2, r=2, t=2, b=2),
             xaxis_title=None,
             yaxis_title=None,
             yaxis=dict(side="right", showgrid=False, zeroline=False),
@@ -406,7 +406,7 @@ class PortfolioPerformancePlotlyLineChart:
             colorway=px.colors.sequential.Bluyl_r,
             height=CHART_HEIGHT,
             hovermode="x unified",
-            margin=dict(l=5, r=5, t=5, b=5),
+            margin=dict(l=2, r=2, t=2, b=2),
             xaxis_title=None,
             yaxis_title=None,
             title=None,

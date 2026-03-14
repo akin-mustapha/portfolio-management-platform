@@ -55,8 +55,7 @@ def portfolio_tab_content(view_model=None, theme="light"):
         # ─────────────────────────────────────────────
         # Row 1, Performance (Value, PNL)
         # ─────────────────────────────────────────────
-        html.Hr(className="tv-divider"),
-                dbc.Row([
+        dbc.Row([
             
             dbc.Col
             (
@@ -85,34 +84,6 @@ def portfolio_tab_content(view_model=None, theme="light"):
             ),
         ], className="mb-6 workspace-chart-grid"),
         
-        # ─────────────────────────────────────────────
-        # Section 3, Performance Map, Portolio Asset Weight
-        # ─────────────────────────────────────────────   
-        # html.Div([
-        dbc.Row([
-
-            dbc.Col(
-                _chart_section("Position Performance Map", dcc.Graph(
-                    id="portfolio_performance_map",
-                    figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme),
-                    config=_GRAPH_CONFIG,
-                ))
-                ,className='workpspace-chart-performance-map'
-            ),
-
-            dbc.Col(
-                _chart_section(
-                    "Position Weight",
-                    dcc.Graph(
-                        id="position_weight_donut_chart",
-                        figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    ),
-                )
-            ),
-
-        ], className="mb-6 workspace-chart-grid-thirds"),
-
         html.Hr(className="tv-divider"),
 
         # ─────────────────────────────────────────────
@@ -156,6 +127,37 @@ def portfolio_tab_content(view_model=None, theme="light"):
             ),
 
         ], className="mb-6 workspace-chart-grid"),
+        
+        html.Hr(className="tv-divider"),
+        # ─────────────────────────────────────────────
+        # Section 3, Performance Map, Portolio Asset Weight
+        # ─────────────────────────────────────────────   
+        # html.Div([
+        dbc.Row([
+
+            dbc.Col(
+                _chart_section("Position Performance Map", dcc.Graph(
+                    id="portfolio_performance_map",
+                    figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme),
+                    config=_GRAPH_CONFIG,
+                ))
+                ,className='workpspace-chart-performance-map'
+            ),
+
+            dbc.Col(
+                _chart_section(
+                    "Position Weight",
+                    dcc.Graph(
+                        id="position_weight_donut_chart",
+                        figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    ),
+                )
+            ),
+
+        ], className="mb-6 workspace-chart-grid-thirds"),
+
+       
 
 
 # ─────────────────────────────────────────────
@@ -283,7 +285,7 @@ def workspace_tabs(view_model=None, theme="light"):
                     style=_CENTERED_LOADER_STYLE,
                     children=portfolio_tab_content(view_model, theme),
                 ),
-                className="workspace-wrapper",
+                
             ),
             dbc.Tab(
                 label="Valuation",
