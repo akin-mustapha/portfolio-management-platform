@@ -523,33 +523,36 @@ class PortfolioPerformancePlotlyLineChart:
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data).sort_values("dates")
 
-        ref_value = df["values"].iloc[0]
+        ref_value = df["costs"].iloc[0]
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=df["dates"],
-            y=[ref_value] * len(df),
+            y=df["costs"],
+            name="Invested",
             mode="lines",
-            line=dict(color="rgba(0,0,0,0)", width=0.8),
+            line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False,
-            # hoverinfo="skip",
+            hoverinfo="skip",
         ))
         fig.add_trace(go.Scatter(
             x=df["dates"],
             y=df["values"],
+            name="Portfolio Value",
             mode="lines",
             line=dict(width=1),
-            fill="toself",
-            hovertemplate="%{y:,.2f}<extra></extra>",
-            showlegend=False,
+            fill="tonexty",
+            hovertemplate="Portfolio Value: %{y:,.2f}<extra></extra>",
+            showlegend=True,
         ))
         fig.add_trace(go.Scatter(
             x=df["dates"],
             y=df["costs"],
+            name="Invested",
             mode="lines",
             line=dict(width=1, dash="dot", color="rgba(150,150,150,0.6)"),
-            hovertemplate="Cost basis: %{y:,.2f}<extra></extra>",
-            showlegend=False,
+            hovertemplate="Invested: %{y:,.2f}<extra></extra>",
+            showlegend=True,
         ))
 
         fig.add_hline(
@@ -569,6 +572,15 @@ class PortfolioPerformancePlotlyLineChart:
             xaxis_title=None,
             yaxis_title=None,
             title=None,
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                x=1, y=1,
+                xanchor="right", yanchor="bottom",
+                font=dict(size=9, color=ct["font_color"]),
+                bgcolor="rgba(0,0,0,0)",
+                borderwidth=0,
+            ),
             font=dict(size=11, color=ct["font_color"]),
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
