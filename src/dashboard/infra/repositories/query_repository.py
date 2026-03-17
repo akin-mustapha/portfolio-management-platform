@@ -72,16 +72,17 @@ class PostgresAssetQueryRepository:
   def get_portfolio_price_history(self, tickers: list):
     if not tickers:
       return []
-    ticker_list = "', '".join(tickers)
+    placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
+    params = {f"t{i}": t for i, t in enumerate(tickers)}
     sql = f"""
       SELECT ticker, price, created_timestamp as data_date
       FROM staging.asset
       WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
-        AND ticker IN ('{ticker_list}')
+        AND ticker IN ({placeholders})
       ORDER BY ticker, created_timestamp ASC
     """
     with self.client as client:
-      res = client.execute(sql)
+      res = client.execute(sql, params)
     return res.fetchall()
   
   def get_asset_history(self):
@@ -156,9 +157,7 @@ class PostgresSnapshotQueryRepository:
     return res.fetchall()
   
   def get_asset_snapshot(self, ticker, start_date, end_date):
-    
-    ticker = ticker.lower()
-    sql = f"""
+    sql = """
         SELECT
             a.ticker,
             a.name as asset_description,
@@ -177,17 +176,13 @@ class PostgresSnapshotQueryRepository:
         FROM staging.asset a
         INNER JOIN staging.asset_computed as ac
             on a.id = ac.asset_id
-        WHERE date(a.created_timestamp) BETWEEN '{start_date}' AND '{end_date}'
-          AND lower(a.ticker) = '{ticker}'
+        WHERE date(a.created_timestamp) BETWEEN :start_date AND :end_date
+          AND lower(a.ticker) = :ticker
         AND ac.asset_id IS NOT NULL
       """
     with self.client as client:
-      res = client.execute(
-          sql
-      )
-    res = res.fetchall()
-    
-    return res
+      res = client.execute(sql, {"ticker": ticker.lower(), "start_date": start_date, "end_date": end_date})
+    return res.fetchall()
 
 
 # ===== SQLite Repos =====
@@ -195,16 +190,17 @@ class SQLiteAssetQueryRepository(PostgresAssetQueryRepository):
   def get_portfolio_price_history(self, tickers: list):
     if not tickers:
       return []
-    ticker_list = "', '".join(tickers)
+    placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
+    params = {f"t{i}": t for i, t in enumerate(tickers)}
     sql = f"""
       SELECT ticker, price, created_timestamp as data_date
       FROM asset
       WHERE created_timestamp >= datetime('now', '-30 days')
-        AND ticker IN ('{ticker_list}')
+        AND ticker IN ({placeholders})
       ORDER BY ticker, created_timestamp ASC
     """
     with self.client as client:
-      res = client.execute(sql)
+      res = client.execute(sql, params)
     return res.fetchall()
 
 class SQLiteSnapshotQueryRepository(PostgresSnapshotQueryRepository):

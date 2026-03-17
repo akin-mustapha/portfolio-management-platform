@@ -78,9 +78,9 @@ def portfolio_tab_content(view_model=None, theme="light"):
 
             dbc.Col(
                 _chart_section(
-                    "Profit & Loss",
+                    "Portfolio P&L",
                     dcc.Graph(
-                        id="pnl_char",
+                        id="pnl_chart",
                         figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
                         config=_GRAPH_CONFIG,
                     )

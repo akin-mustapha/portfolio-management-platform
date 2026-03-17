@@ -523,33 +523,36 @@ class PortfolioPerformancePlotlyLineChart:
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data).sort_values("dates")
 
-        ref_value = df["values"].iloc[0]
+        ref_value = df["costs"].iloc[0]
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=df["dates"],
-            y=[ref_value] * len(df),
+            y=df["costs"],
+            name="Invested",
             mode="lines",
-            line=dict(color="rgba(0,0,0,0)", width=0.8),
+            line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False,
-            # hoverinfo="skip",
+            hoverinfo="skip",
         ))
         fig.add_trace(go.Scatter(
             x=df["dates"],
             y=df["values"],
+            name="Portfolio Value",
             mode="lines",
             line=dict(width=1),
-            fill="toself",
-            hovertemplate="%{y:,.2f}<extra></extra>",
-            showlegend=False,
+            fill="tonexty",
+            hovertemplate="Portfolio Value: %{y:,.2f}<extra></extra>",
+            showlegend=True,
         ))
         fig.add_trace(go.Scatter(
             x=df["dates"],
             y=df["costs"],
+            name="Invested",
             mode="lines",
             line=dict(width=1, dash="dot", color="rgba(150,150,150,0.6)"),
-            hovertemplate="Cost basis: %{y:,.2f}<extra></extra>",
-            showlegend=False,
+            hovertemplate="Invested: %{y:,.2f}<extra></extra>",
+            showlegend=True,
         ))
 
         fig.add_hline(
@@ -569,6 +572,15 @@ class PortfolioPerformancePlotlyLineChart:
             xaxis_title=None,
             yaxis_title=None,
             title=None,
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                x=1, y=1,
+                xanchor="right", yanchor="bottom",
+                font=dict(size=9, color=ct["font_color"]),
+                bgcolor="rgba(0,0,0,0)",
+                borderwidth=0,
+            ),
             font=dict(size=11, color=ct["font_color"]),
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
@@ -705,37 +717,3 @@ class PortfolioPNLPlotlyLineChart:
         _apply_spike_config(fig)
         return fig
 
-
-# Duplicate logic. Needed
-# Might want to move graphs - Open/Close Principle
-def performance_chart(data=None, theme="light"):
-    if data is None:
-        return html.P("NO DATA")
-    return dbc.Row([
-        dbc.Col([
-            html.H6("Winners", className="text-muted mb-2"),
-            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data, theme=theme), config=_GRAPH_CONFIG),
-        ], md=6),
-        dbc.Col([
-            html.H6("Losers", className="text-muted mb-2"),
-            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data, theme=theme), config=_GRAPH_CONFIG),
-        ], md=6),
-    ], id="portfolio_page_charts")
-
-def value_chart(data=None, theme="light"):
-    if data is None:
-        return html.P("NO DATA")
-    return dcc.Graph(
-        id="value_chart",
-        figure=PortfolioPerformancePlotlyLineChart().render(data, theme=theme),
-        config=_GRAPH_CONFIG,
-    )
-
-def pnl_chart(data=None, theme="light"):
-    if data is None:
-        return html.P("NO DATA")
-    return dcc.Graph(
-        id="pnl_char",
-        figure=PortfolioPNLPlotlyLineChart().render(data, theme=theme),
-        config=_GRAPH_CONFIG,
-    )
