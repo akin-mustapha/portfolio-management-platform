@@ -16,13 +16,3 @@ class TestDestination:
 
   def test_destination_is_created_correctly(self, fixture_destination: Destination):
     assert fixture_destination.destination_name == "test_destination"
-
-# class TestEventProducer:
-#   @pytest.fixture
-#   def fixture_event_producer(self):
-#     event_producer = EventProducer(name="test_event_producer", destination_name="test_destination")
-#     return event_producer
-  
-#   def test_event_producer_is_created_correctly(self, fixture_event_producer: EventProducer):
-#     assert fixture_event_producer.name == "test_event_producer"
-#     assert fixture_event_producer.destination_name == "test_destination"
