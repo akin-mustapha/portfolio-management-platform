@@ -107,6 +107,7 @@ class PostgresAssetQueryRepository:
           ac.ma_30d,
           ac.ma_50d,
           ac.dca_bias,
+          ac.cumulative_return,
           a.created_timestamp AS data_date
 
       FROM staging.asset a
@@ -140,6 +141,31 @@ class PostgresAssetQueryRepository:
     with self.client as client:
       res = client.execute(sql)
     return res.fetchall()
+  
+  def get_asset_history(self):
+    try:
+    
+      sql = f"""
+          ;WITH cte AS (
+          SELECT  *
+                , CAST(created_timestamp AS date) AS created_date
+                , ROW_NUMBER()OVER(PARTITION BY ticker, CAST(created_timestamp AS date) ORDER BY created_timestamp DESC) AS rn
+            FROM staging.asset
+            WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
+            ORDER BY ticker, created_timestamp ASC
+        )
+        SELECT
+          *
+         , CASE WHEN profit > 0 THEN 1 ELSE 0 END AS is_profitable
+          
+        FROM cte
+        WHERE rn = 1
+      """
+      with self.client as client:
+        res = client.execute(sql)
+      return res.fetchall()
+    except Exception as e:
+      raise e
 
 class PostgresSnapshotQueryRepository:
   def __init__(self):

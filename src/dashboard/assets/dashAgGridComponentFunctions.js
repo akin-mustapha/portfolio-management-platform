@@ -5,7 +5,16 @@ dashAgGridComponentFunctions.TrendSparkline = function(props) {
     var trend = props.data.trend;
     var color = trend === "Bullish" ? "#26a69a" : "#ef5350";
 
-    var w = 108;
+    // Compute % change over the series
+    var pctChange = "";
+    if (prices && prices.length >= 2) {
+        var first = prices[0];
+        var last = prices[prices.length - 1];
+        var chg = first !== 0 ? ((last - first) / Math.abs(first)) * 100 : 0;
+        pctChange = (chg >= 0 ? "+" : "") + chg.toFixed(1) + "%";
+    }
+
+    var w = 72;
     var h = 28;
     var pad = 2;
 
@@ -47,12 +56,17 @@ dashAgGridComponentFunctions.TrendSparkline = function(props) {
 
     return React.createElement(
         "div",
-        { style: { width: "100%", height: "100%", display: "flex", alignItems: "center", padding: "0 2px" } },
+        { style: { width: "100%", height: "100%", display: "flex", alignItems: "center", padding: "0 2px", gap: "4px" } },
         React.createElement(
             "svg",
-            { width: w, height: h, viewBox: "0 0 " + w + " " + h, style: { display: "block", overflow: "visible" } },
+            { width: w, height: h, viewBox: "0 0 " + w + " " + h, style: { display: "block", overflow: "visible", flexShrink: "0" } },
             React.createElement("path", { d: areaPath, fill: color, fillOpacity: "0.25", stroke: "none" }),
             React.createElement("path", { d: linePath, fill: "none", stroke: color, strokeWidth: "1.5", strokeLinejoin: "round", strokeLinecap: "round" })
+        ),
+        React.createElement(
+            "span",
+            { style: { fontSize: "10px", color: color, fontWeight: "600", whiteSpace: "nowrap" } },
+            pctChange
         )
     );
 };

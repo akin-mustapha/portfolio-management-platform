@@ -249,4 +249,4 @@ fact_valuation:
 
 References
 
-**analytics_star_schema:** `docs/03-architecture/analytics_star_schema_vx.x.x_latest.png`
+**analytics_star_schema:** `docs/02-architecture/assets/analytics_star_schema_vx.x.x_latest.png`

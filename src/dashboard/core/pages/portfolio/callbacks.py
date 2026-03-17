@@ -9,13 +9,17 @@ from .components.workspace_tabs import (
     portfolio_tab_content,
     valuation_tab_content,
 )
+from .components.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart
 from ...controllers.portfolio_controller import PortfolioController
 from ...controllers.asset_controller import AssetController
+from ...presenters.portfolio_presenter import PortfolioPresenter
 
 
 # ── Timeframe → date window helper ───────────────────────────────
 
 _TIMEFRAME_DAYS = {
+    "1D": 1,
+    "1W": 7,
     "1M": 30,
     "3M": 90,
     "6M": 180,
@@ -29,6 +33,17 @@ def _date_window(timeframe):
     end = str(date.today())
     start = str(date.today() - timedelta(days=days)) if days else "2000-01-01"
     return start, end
+
+
+def _filter_vm_by_timeframe(view_model: dict, start: str, end: str) -> dict:
+    vm = dict(view_model)
+    for key in ("portfolio_value_series", "portfolio_pnl_series", "portfolio_drawdown"):
+        series = vm.get(key)
+        if not series or not series.get("dates"):
+            continue
+        mask = [start <= d <= end for d in series["dates"]]
+        vm[key] = {k: [v for v, m in zip(vals, mask) if m] for k, vals in series.items()}
+    return vm
 
 
 # ── 1. Initial page load ──────────────────────────────────────────
@@ -106,6 +121,7 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
 @callback(
     Output("portfolio_kpi_container", "children", allow_duplicate=True),
     Output("tab-valuation-content", "children", allow_duplicate=True),
+    Output("tab-portfolio-content", "children", allow_duplicate=True),
     Output("workspace-timeframe", "data"),
     Input("workspace-timeframe-selector", "value"),
     State("portfolio_page_asset_store", "data"),
@@ -118,28 +134,59 @@ def on_timeframe_change(timeframe, cached_data, selected_asset, theme):
         raise PreventUpdate
 
     current_theme = theme or "light"
-
-    # Update KPIs from cached portfolio data
+    start_date, end_date = _date_window(timeframe)
     kpi_children = no_update
+    portfolio_tab = no_update
+
     if cached_data:
         view_model = cached_data.get("view_model", {})
         kpi_children = kpi_row(view_model.get("kpi", {}))
+        filtered_vm = _filter_vm_by_timeframe(view_model, start_date, end_date)
+        portfolio_tab = portfolio_tab_content(filtered_vm, current_theme)
 
-    # Update asset charts only if an asset is selected
     if not selected_asset:
-        return kpi_children, no_update, timeframe
+        return kpi_children, no_update, portfolio_tab, timeframe
 
-    start_date, end_date = _date_window(timeframe)
     asset_history = AssetController().get_asset_snapshot(selected_asset.lower(), start_date, end_date)
 
     return (
         kpi_children,
         valuation_tab_content(asset_history, current_theme),
+        portfolio_tab,
         timeframe,
     )
 
 
-# ── 4. Advanced filter toggle ────────────────────────────────────
+# ── 4. Winners/Losers sort toggle ────────────────────────────────
+
+@callback(
+    Output("winners_chart", "figure", allow_duplicate=True),
+    Output("losers_chart", "figure", allow_duplicate=True),
+    Input("winners-losers-sort-toggle", "value"),
+    State("portfolio_page_asset_store", "data"),
+    State("theme-store", "data"),
+    prevent_initial_call=True,
+)
+def on_winners_losers_sort_change(sort_by, cached_data, theme):
+    if not cached_data:
+        raise PreventUpdate
+
+    assets = cached_data.get("view_model", {}).get("asset_table", {}).get("rows", [])
+    if not assets:
+        raise PreventUpdate
+
+    current_theme = theme or "light"
+    presenter = PortfolioPresenter()
+    winners = presenter._top_winner_bar_vm(assets, sort_by=sort_by)
+    losers = presenter._top_losers_bar_vm(assets, sort_by=sort_by)
+
+    return (
+        WinnersPlotlyBarChart().render(winners, theme=current_theme, x_col=sort_by),
+        LosersPlotlyBarChart().render(losers, theme=current_theme, x_col=sort_by),
+    )
+
+
+# ── 5. Advanced filter toggle ─────────────────────────────────────
 
 @callback(
     Output("workspace-adv-filter-collapse", "is_open"),

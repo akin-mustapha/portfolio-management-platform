@@ -52,6 +52,7 @@ def asset_table(data=None):
             {
                 "field": "name",
                 "minWidth": 100, "width": 130,
+                "tooltipField": "name",
                 "headerTooltip": "Brief description of the asset. Context only — not a trading signal."
             },
             {

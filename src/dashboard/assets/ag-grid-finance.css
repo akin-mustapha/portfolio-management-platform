@@ -193,3 +193,31 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
 .kpi-change-positive { color: #26a69a; }
 .kpi-change-negative { color: #ef5350; }
 .kpi-change-neutral  { color: var(--text-muted); }
+
+/* KPI group labels (Performance / Risk) */
+.kpi-group-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Visual separator before the Risk group */
+.kpi-group-separator-col {
+    position: relative;
+}
+.kpi-group-separator-col::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--border-main);
+}
+
+/* Zero-value cash card — dimmed subtle indicator */
+.kpi-card-zero {
+    opacity: 0.38;
+}

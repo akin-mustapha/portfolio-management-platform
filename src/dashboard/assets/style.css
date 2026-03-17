@@ -68,6 +68,9 @@ body, * {
     background: var(--bg-strip-active);
     color: #2962ff;
     font-weight: 700;
+    border-bottom: 2px solid #2962ff;
+    border-radius: 4px 4px 0 0;
+    padding-bottom: 3px;
 }
 
 /* ── Advanced Filter button ───────────────────────────────────── */
@@ -386,6 +389,10 @@ html[data-theme="dark"] .asset-ticker-tag {
 
 .workspace-chart-grid.chart-grid-single {
     grid-template-columns: 1fr;
+}
+
+.workspace-chart-grid-thirds .workspace-chart-grid {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .workspace-chart-grid-kpi {
