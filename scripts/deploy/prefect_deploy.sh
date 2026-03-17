@@ -10,9 +10,6 @@ source venv/bin/activate
 echo -e "${GREEN}Installing dependencies...${NC}"
 pip install -r requirements.txt
 
-echo -e "${GREEN}Changing directory to src...${NC}"
-cd src
-
 mkdir -p logs
 
 echo -e "${GREEN}Starting Prefect Orion server...${NC}"
@@ -34,27 +31,27 @@ sleep 5
 # ==============================
 # asset ingestion flow
 echo -e "${GREEN}Starting Asset Pipeline Bronze...${NC}"
-python3 -m orc.prefect.asset_flow_bronze > logs/asset_flow_bronze.log 2>&1 & ASSET_FLOW_BRONZE_PID=$!
+python3 -m orchestration.prefect.asset_flow_bronze > logs/asset_flow_bronze.log 2>&1 & ASSET_FLOW_BRONZE_PID=$!
 
 echo -e "${GREEN}Starting Asset Pipeline Silver...${NC}"
-python3 -m orc.prefect.asset_flow_silver > logs/asset_flow_silver.log 2>&1 & ASSET_FLOW_SILVER_PID=$!
+python3 -m orchestration.prefect.asset_flow_silver > logs/asset_flow_silver.log 2>&1 & ASSET_FLOW_SILVER_PID=$!
 
 echo -e "${GREEN}Starting Portfolio Asset Pipeline...${NC}"
-python3 -m orc.prefect.asset_flow_portfolio > logs/asset_flow_portfolio.log 2>&1 & ASSET_FLOW_PORTFOLIO_PID=$!
+python3 -m orchestration.prefect.asset_flow_portfolio > logs/asset_flow_portfolio.log 2>&1 & ASSET_FLOW_PORTFOLIO_PID=$!
 
 
 # Account ingetion
 echo -e "${GREEN}Starting Account Pipeline Bronze...${NC}"
-python3 -m orc.prefect.account_flow_bronze > logs/account_flow_bronze.log 2>&1 & ACCOUNT_FLOW_BRONZE_PID=$!
+python3 -m orchestration.prefect.account_flow_bronze > logs/account_flow_bronze.log 2>&1 & ACCOUNT_FLOW_BRONZE_PID=$!
 
 echo -e "${GREEN}Starting Account Pipeline Silver...${NC}"
-python3 -m orc.prefect.account_flow_silver > logs/account_flow_silver.log 2>&1 & ACCOUNT_FLOW_SILVER_PID=$!
+python3 -m orchestration.prefect.account_flow_silver > logs/account_flow_silver.log 2>&1 & ACCOUNT_FLOW_SILVER_PID=$!
 
 echo -e "${GREEN}Starting Enrichment Sync...${NC}"
-python3 -m orc.prefect.enrichment_synchronization > logs/enrichment_sync.log 2>&1 & ENRICHMENT_SYNC_PID=$!
+python3 -m orchestration.prefect.enrichment_synchronization > logs/enrichment_sync.log 2>&1 & ENRICHMENT_SYNC_PID=$!
 
 # echo -e "${GREEN}Starting the Asset Ingestion Event Producer${NC}"
-# python3 -m orc.prefect.asset_flow_event_producer > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
+# python3 -m orchestration.prefect.asset_flow_event_producer > logs/asset_flow_event_producer.log 2>&1 & asset_flow_event_producer_PID=$!
 
 
 

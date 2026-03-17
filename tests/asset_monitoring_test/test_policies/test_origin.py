@@ -2,8 +2,8 @@
 
 import pytest
 from traitlets import Any
-from src.event_producer.app.policies import Origin
-from src.event_producer.app.domain import Event
+from backend.ingestion.event_producer.app.policies import Origin
+from backend.ingestion.event_producer.app.domain import Event
 
 class TestOrigin:
   @pytest.fixture

@@ -3,7 +3,7 @@
 import pytest
 from datetime import datetime, UTC
 
-from src.event_producer.app.domain import Event
+from backend.ingestion.event_producer.app.domain import Event
 
 class TestEventDomain:
   @pytest.fixture
