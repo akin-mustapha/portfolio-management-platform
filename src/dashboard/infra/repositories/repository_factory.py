@@ -5,7 +5,7 @@ from .query_repository import PostgresSnapshotQueryRepository, SQLiteSnapshotQue
 class RepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
     registry = {
-        "asset_query": {
+        "asset_analytics": {
             "postgres": PostgresAssetQueryRepository,
             "sqlite": SQLiteAssetQueryRepository,
         },

@@ -3,7 +3,7 @@ from dash import Input, Output, dcc, html, callback, State
 from ..pages.portfolio.portfolio_page import portfolio_layout
 from ..pages.asset.asset_page import asset_layout
 from ..pages.tag.tag_page import tag_layout
-from src.services.portfolio.portfolio_service_builder import build_portfolio_service
+from backend.services.portfolio.portfolio_service_builder import build_portfolio_service
 from ..pages.portfolio import theme_callbacks  # noqa: F401
 from ..components.buttons import privacy_toggle_btn
 
