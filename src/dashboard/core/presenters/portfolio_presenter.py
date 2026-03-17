@@ -86,7 +86,7 @@ class PortfolioPresenter:
     def _portfolio_value_series_vm(self, rows: list[dict]) -> dict:
         return {
             "dates":  [r["data_date"] for r in rows],
-            "values": [r["total_value"] for r in rows],
+            "values": [r["investments_total_cost"] + r["investments_unrealized_pnl"] for r in rows],
             "costs":  [r["investments_total_cost"] for r in rows],
         }
         

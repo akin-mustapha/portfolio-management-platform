@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
-from .callbacks import update_asset_page, load_asset_page
+from . import callbacks  # noqa: F401 — registers Dash callbacks
 
 from .components.kpi import asset_kpi_section_empty
 from .components.tabs import chart_tab_empty

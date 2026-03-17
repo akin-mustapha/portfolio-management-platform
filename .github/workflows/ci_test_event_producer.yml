@@ -17,4 +17,4 @@ jobs:
           pip install -e .
       - name: Run tests
         run: |
-          pytest tests/asset_monitoring_test/
+          pytest tests/
