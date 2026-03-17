@@ -7,7 +7,7 @@ from dash import dcc, html
 
 _GRAPH_CONFIG = {"displayModeBar": False}
 
-CHART_HEIGHT_1 = 150
+CHART_HEIGHT_1 = 200
 CHART_HEIGHT = 230
 
 

@@ -5,7 +5,7 @@ from .core.layouts.layout import layout
 
 plotly_config = {
   "staticPlot": True,
-#   "scrollZoom": True,
+  "scrollZoom": True,
   "displayModeBar": False,
   "editable": True,
 }
