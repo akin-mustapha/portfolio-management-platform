@@ -19,7 +19,7 @@ class TestOrigin:
   def test_origin_is_created_correctly(self, fixture_origin: Origin):
     assert fixture_origin.origin_name == "test_origin"
     assert fixture_origin.event is None
-    
+
   def test_origin_fetches_data_and_creates_event(self, fixture_origin: Origin):
     event = fixture_origin.fetch()
     assert event.metadata.get('origin_name') == "test_origin"
