@@ -54,13 +54,12 @@ clientside_callback(
 
 
 # ── Patch portfolio chart backgrounds on theme change ────────────────────────
-# Note: "pnl_char" is the exact (typo'd) id used in the existing chart code
 
 @callback(
     Output("winners_chart", "figure"),
     Output("losers_chart", "figure"),
     Output("value_chart", "figure"),
-    Output("pnl_char", "figure"),
+    Output("pnl_chart", "figure"),
     Output("losers_pnl_chart", "figure"),
     Output("winners_pnl_chart", "figure"),
     Output("position_weight_donut_chart", "figure"),

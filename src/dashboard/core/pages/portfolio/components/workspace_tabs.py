@@ -80,7 +80,7 @@ def portfolio_tab_content(view_model=None, theme="light"):
                 _chart_section(
                     "Profit & Loss",
                     dcc.Graph(
-                        id="pnl_char",
+                        id="pnl_chart",
                         figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
                         config=_GRAPH_CONFIG,
                     )

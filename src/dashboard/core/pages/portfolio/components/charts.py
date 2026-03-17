@@ -705,37 +705,3 @@ class PortfolioPNLPlotlyLineChart:
         _apply_spike_config(fig)
         return fig
 
-
-# Duplicate logic. Needed
-# Might want to move graphs - Open/Close Principle
-def performance_chart(data=None, theme="light"):
-    if data is None:
-        return html.P("NO DATA")
-    return dbc.Row([
-        dbc.Col([
-            html.H6("Winners", className="text-muted mb-2"),
-            dcc.Graph(id="winners_chart", figure=WinnersPlotlyBarChart().render(data, theme=theme), config=_GRAPH_CONFIG),
-        ], md=6),
-        dbc.Col([
-            html.H6("Losers", className="text-muted mb-2"),
-            dcc.Graph(id="losers_chart", figure=LosersPlotlyBarChart().render(data, theme=theme), config=_GRAPH_CONFIG),
-        ], md=6),
-    ], id="portfolio_page_charts")
-
-def value_chart(data=None, theme="light"):
-    if data is None:
-        return html.P("NO DATA")
-    return dcc.Graph(
-        id="value_chart",
-        figure=PortfolioPerformancePlotlyLineChart().render(data, theme=theme),
-        config=_GRAPH_CONFIG,
-    )
-
-def pnl_chart(data=None, theme="light"):
-    if data is None:
-        return html.P("NO DATA")
-    return dcc.Graph(
-        id="pnl_char",
-        figure=PortfolioPNLPlotlyLineChart().render(data, theme=theme),
-        config=_GRAPH_CONFIG,
-    )

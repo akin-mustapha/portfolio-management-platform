@@ -67,7 +67,7 @@ def _top_navbar():
         className="top-navbar",
     )
 
-porfoltio_serivce = build_portfolio_service()
+portfolio_service = build_portfolio_service()
 
 @callback(Output("page-content", "children"), Output("active-page", "data"), [Input("url", "pathname")])
 def render_page_content(pathname):
@@ -97,7 +97,7 @@ def create_new_tag(n_clicks, value):
     if not value:
         return "Tag name cannot be empty"
 
-    porfoltio_serivce.create_tag(value)
+    portfolio_service.create_tag(value)
     return f"Tag '{value}' created"
 
 # Layout
