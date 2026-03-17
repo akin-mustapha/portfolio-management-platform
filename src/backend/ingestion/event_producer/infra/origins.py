@@ -2,12 +2,12 @@ import os
 import asyncio
 from dotenv import load_dotenv
 
-from src.backend.ingestion.app.interfaces.interfaces import Source
+from backend.ingestion.app.interfaces.interfaces import Source
 
 from ..app.policies import Origin
 
 # TODO: should depend on interface
-from src.backend.ingestion.infra.api.api_client_trading212 import Trading212APIClient
+from backend.ingestion.infra.api.api_client_trading212 import Trading212APIClient
 
 load_dotenv()
 

@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from random import randint
 from datetime import UTC, datetime
 
-from src.shared.utils.custom_logger import customer_logger
-from src.backend.services.portfolio.service import PortfolioService
+from shared.utils.custom_logger import customer_logger
+from backend.services.portfolio.service import PortfolioService
 
 logging = customer_logger("Portfolio Service")
 load_dotenv()

@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from src.shared.database.client import SQLModelClient
+from shared.database.client import SQLModelClient
 import os
 
 load_dotenv()

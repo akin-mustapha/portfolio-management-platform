@@ -1,7 +1,4 @@
-try:
-    from src.shared.repositories.base_table_repository import BaseTableRepository
-except ImportError:
-    from shared.repositories.base_table_repository import BaseTableRepository
+from shared.repositories.base_table_repository import BaseTableRepository
 
 
 class PostgresRepository(BaseTableRepository):

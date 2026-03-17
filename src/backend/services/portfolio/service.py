@@ -6,7 +6,7 @@ from .infra.repositories.repository_factory import RepositoryFactory
 from .app.models import Asset, AssetTag, Tag, Category
 from .app.models import Industry, Sector
 
-from src.shared.utils.custom_logger import customer_logger
+from shared.utils.custom_logger import customer_logger
 
 from datetime import datetime, UTC
 

@@ -10,9 +10,6 @@ source venv/bin/activate
 echo -e "${GREEN}Installing dependencies...${NC}"
 pip install -r requirements.txt
 
-echo -e "${GREEN}Changing directory to src...${NC}"
-cd src
-
 mkdir -p logs
 
 echo -e "${GREEN}Starting Prefect Orion server...${NC}"

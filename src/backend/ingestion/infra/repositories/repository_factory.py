@@ -1,9 +1,6 @@
 import os
 from typing import Dict
-try:
-    from src.shared.repositories.interface import RepositoryInterface
-except ImportError:
-    from shared.repositories.interface import RepositoryInterface
+from shared.repositories.interface import RepositoryInterface
 from .repository_postgres import PostgresRepository
 from .repository_sqlite import SQLiteRespository
 

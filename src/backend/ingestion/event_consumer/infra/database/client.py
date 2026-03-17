@@ -3,7 +3,7 @@ import logging
 from dotenv import load_dotenv
 from typing import Iterable, Dict
 
-from src.shared.database.client import SQLModelClient
+from shared.database.client import SQLModelClient
 
 logging.basicConfig(
     level=logging.INFO,
