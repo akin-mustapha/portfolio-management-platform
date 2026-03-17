@@ -61,6 +61,12 @@ clientside_callback(
     Output("losers_chart", "figure"),
     Output("value_chart", "figure"),
     Output("pnl_char", "figure"),
+    Output("losers_pnl_chart", "figure"),
+    Output("winners_pnl_chart", "figure"),
+    Output("position_weight_donut_chart", "figure"),
+    Output("profitability_donut_chart", "figure"),
+    Output("portfolio_performance_map", "figure"),
+    Output("portfolio_drawdown_chart", "figure"),
     Input("theme-store", "data"),
     prevent_initial_call=True,
 )
@@ -87,7 +93,20 @@ def update_chart_theme(theme):
         p["layout"]["xaxis"]["rangeselector"]["activecolor"] = rs_ac
         return p
 
-    return bar_patch(), bar_patch(), line_patch(), line_patch()
+    def donut_patch():
+        p = Patch()
+        p["layout"]["paper_bgcolor"] = bg
+        p["layout"]["plot_bgcolor"]  = bg
+        p["layout"]["font"]["color"] = fc
+        return p
+
+    return (
+        bar_patch(), bar_patch(), line_patch(), line_patch(),
+        bar_patch(), bar_patch(),
+        donut_patch(), donut_patch(),
+        bar_patch(),
+        bar_patch(),  # portfolio_drawdown_chart
+    )
 
 
 # ── Patch workspace (asset) chart backgrounds on theme change ────────────────

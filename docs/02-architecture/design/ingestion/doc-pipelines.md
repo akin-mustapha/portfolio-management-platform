@@ -118,5 +118,5 @@ Specify any required database tables using DDL migrations. See the database migr
 
 ## Reference
 
-**Database Migration**: See `docs/04-design/doc-migration.md`
-**Ingestion Pipeline Architecture:** See `docs/03-architecture/ingestion_pipeline_architecture_vx.x.x_latest.png`
+**Database Migration**: See `docs/02-architecture/design/doc-migration.md`
+**Ingestion Pipeline Architecture:** See `docs/02-architecture/assets/ingestion_pipeline_architecture_vx.x.x_latest.png`
