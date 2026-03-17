@@ -71,22 +71,34 @@ class PostgresAssetQueryRepository:
 
   def get_most_recent_asset_data(self):
     sql = """
-      ;WITH most_recent_asset AS
+      WITH most_recent_asset AS
       (
-      SELECT
-          ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) as rn
-          , id
-      FROM staging.asset
+          SELECT
+              ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) AS rn,
+              id
+          FROM staging.asset
+      ),
+      portfolio_value AS
+      (
+          SELECT total_value
+          FROM staging.account
+          ORDER BY created_timestamp DESC
+          LIMIT 1
       )
+
       SELECT
           a.ticker,
           a.name,
+          CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
           a.description AS asset_description,
           -- STRING_AGG(t.name, ',') AS tag_list,
           a.value,
           a.profit,
           a.price,
           a.cost,
+
+          a.value / pv.total_value * 100 AS weight_pct,
+
           ac.recent_profit_high_30d,
           ac.recent_profit_low_30d,
           ac.pct_drawdown,
@@ -95,14 +107,18 @@ class PostgresAssetQueryRepository:
           ac.ma_30d,
           ac.ma_50d,
           ac.dca_bias,
-          CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
-          a.created_timestamp as data_date
+          ac.cumulative_return,
+          a.created_timestamp AS data_date
+
       FROM staging.asset a
       INNER JOIN most_recent_asset lm
           ON a.id = lm.id
-          AND lm.rn = 1               -- only take latest metric per asset
+          AND lm.rn = 1
+
       LEFT JOIN staging.asset_computed ac
           ON a.id = ac.asset_id
+
+      CROSS JOIN portfolio_value pv
     """
     with self.client as client:
       res = client.execute(
@@ -110,6 +126,46 @@ class PostgresAssetQueryRepository:
       )
       res = res.fetchall()
     return res
+
+  def get_portfolio_price_history(self, tickers: list):
+    if not tickers:
+      return []
+    ticker_list = "', '".join(tickers)
+    sql = f"""
+      SELECT ticker, price, created_timestamp as data_date
+      FROM staging.asset
+      WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
+        AND ticker IN ('{ticker_list}')
+      ORDER BY ticker, created_timestamp ASC
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
+  
+  def get_asset_history(self):
+    try:
+    
+      sql = f"""
+          ;WITH cte AS (
+          SELECT  *
+                , CAST(created_timestamp AS date) AS created_date
+                , ROW_NUMBER()OVER(PARTITION BY ticker, CAST(created_timestamp AS date) ORDER BY created_timestamp DESC) AS rn
+            FROM staging.asset
+            WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
+            ORDER BY ticker, created_timestamp ASC
+        )
+        SELECT
+          *
+         , CASE WHEN profit > 0 THEN 1 ELSE 0 END AS is_profitable
+          
+        FROM cte
+        WHERE rn = 1
+      """
+      with self.client as client:
+        res = client.execute(sql)
+      return res.fetchall()
+    except Exception as e:
+      raise e
 
 class PostgresSnapshotQueryRepository:
   def __init__(self):
@@ -194,6 +250,21 @@ class PostgresSnapshotQueryRepository:
 
 # ===== SQLite Repos =====
 class SQLiteAssetQueryRepository(PostgresAssetQueryRepository):
+  def get_portfolio_price_history(self, tickers: list):
+    if not tickers:
+      return []
+    ticker_list = "', '".join(tickers)
+    sql = f"""
+      SELECT ticker, price, created_timestamp as data_date
+      FROM asset
+      WHERE created_timestamp >= datetime('now', '-30 days')
+        AND ticker IN ('{ticker_list}')
+      ORDER BY ticker, created_timestamp ASC
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
+
   def select_all_asset(self):
     sql = """
     SELECT a.id as asset_id, a.name as asset_name

@@ -6,6 +6,7 @@ from ..pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
 from ..pipelines.pipeline_account_bronze import PipelineAccountBronze
 from ..pipelines.pipeline_account_silver import PipelineAccountSilver
 from ..pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
+from ..pipelines.portfolio_enrichment_synchronizer import enrichment_sychronization
 
 class PipelineFactory:
   _registry = {
@@ -15,7 +16,9 @@ class PipelineFactory:
     "asset_portfolio": PipelineAssetPortfolio,
     "account_bronze": PipelineAccountBronze,
     "account_silver": PipelineAccountSilver,
+    "enrichment_sychronization": enrichment_sychronization,
   }
   @classmethod
   def get(self, name: str) -> Pipeline:
-      return self._registry.get(name.lower())()
+    print(self._registry.get(name))
+    return self._registry.get(name.lower())()

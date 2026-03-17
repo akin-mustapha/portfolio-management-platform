@@ -1,6 +1,6 @@
 from dash import Dash
 import dash_bootstrap_components as dbc
-from .src.layouts.layout import layout
+from .core.layouts.layout import layout
 
 
 plotly_config = {
@@ -15,10 +15,46 @@ plotly_config = {
 app = Dash(
     __name__,
     suppress_callback_exceptions=True,
-    external_stylesheets=[dbc.themes.COSMO, dbc.icons.FONT_AWESOME]
+    external_stylesheets=[
+        dbc.themes.COSMO,
+        dbc.icons.FONT_AWESOME,
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+    ]
     )
 
 app.layout = layout
+
+# Anti-FOUC: read stored theme from localStorage and apply before first paint
+app.index_string = '''<!DOCTYPE html>
+<html>
+<head>
+    {%metas%}
+    <title>{%title%}</title>
+    {%favicon%}
+    {%css%}
+    <script>
+        (function() {
+            try {
+                var raw = localStorage.getItem('theme-store');
+                if (raw) {
+                    var theme = JSON.parse(raw);
+                    if (typeof theme === 'string' && (theme === 'dark' || theme === 'light')) {
+                        document.documentElement.setAttribute('data-theme', theme);
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+</head>
+<body>
+    {%app_entry%}
+    <footer>
+        {%config%}
+        {%scripts%}
+        {%renderer%}
+    </footer>
+</body>
+</html>'''
 
 
 if __name__ == "__main__":
