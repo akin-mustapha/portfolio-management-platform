@@ -21,20 +21,20 @@ Four layers. Each has a single responsibility.
 Dash application. Reads from the analytics (gold) layer via backend services.
 Does no data transformation — only displays what services provide.
 
-## Orchestration (`src/orc/`)
+## Orchestration (`src/orchestration/`)
 
 Prefect. Defines when and in what order pipelines run.
 Sits above the backend — coordinates it, doesn't contain business logic.
 
-## Backend
+## Backend (`src/backend/`)
 
-**Ingestion** (`src/ingestion/`) — Pulls data from Trading212 via events and pipelines. Loads into raw, transforms through to staging.
+**Ingestion** (`src/backend/ingestion/`) — Pulls data from Trading212 via events and pipelines. Loads into raw, transforms through to staging.
 - `event_producer/` — produces Kafka events from Trading212 API
 - `event_consumer/` — consumes events and triggers pipelines
 - `pipelines/` — ETL logic (bronze → silver)
 - `full_loader/` — bulk/historical loads
 
-**Services** (`src/services/`) — Business logic layer between storage and frontend.
+**Services** (`src/backend/services/`) — Business logic layer between storage and frontend.
 Currently: `portfolio/` service.
 
 ## Storage (`raw` → `staging` → `analytics`)

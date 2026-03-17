@@ -15,10 +15,10 @@ A personal stock portfolio monitoring system. It pulls data from Trading212, pro
 Four layers. Keep changes within one layer per task.
 
 ```
-Frontend        src/dashboard/       Dash UI — reads from services
-Orchestration   src/orc/             Prefect — schedules pipelines
-Backend         src/ingestion/       ETL pipelines and Kafka events
-                src/services/        Portfolio domain logic
+Frontend        src/dashboard/            Dash UI — reads from services
+Orchestration   src/orchestration/        Prefect — schedules pipelines
+Backend         src/backend/ingestion/    ETL pipelines and Kafka events
+                src/backend/services/     Portfolio domain logic
 Storage         raw → staging → analytics (Postgres, 3 schemas)
 ```
 

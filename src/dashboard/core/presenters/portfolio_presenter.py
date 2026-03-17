@@ -43,10 +43,13 @@ class PortfolioPresenter:
             if yesterday:
                 daily_change_pct = (today - yesterday) / yesterday * 100
 
+        def _safe(v):
+            return 0 if v is None or (isinstance(v, float) and math.isnan(v)) else v
+
         portfolio_vol = None
         if assets:
             portfolio_vol = sum(
-                (a.get("volatility_30d") or 0) * (a.get("weight_pct") or 0) / 100
+                _safe(a.get("volatility_30d")) * _safe(a.get("weight_pct")) / 100
                 for a in assets
             )
 

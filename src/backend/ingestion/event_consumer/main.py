@@ -2,7 +2,7 @@
 import os
 import logging
 
-from src.services.event_consumer.infra.kafka_adapter import KafkaAdapter
+from src.backend.services.event_consumer.infra.kafka_adapter import KafkaAdapter
 from .trading212_asset_consumer import Trading212AssetConsumer
 
 # ───────────────────────── Logging ─────────────────────────
