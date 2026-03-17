@@ -3,12 +3,12 @@ import os
 import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
-from typing import List, Any, Dict
+from typing import List, Dict
 from dataclasses import dataclass, asdict
 
 import pandas as pd
 
-from ..app.policies import Pipeline
+from ..app.policies import BaseSilverPipeline
 from ..app.protocols import Source
 from ..app.protocols import Destination
 from ..app.protocols import Transformation
@@ -120,56 +120,30 @@ class Trading212AccountDestination(Destination):
       self._repository.upsert(records=data, unique_key=['business_key'])
       
 
-class PipelineAccountSilver(Pipeline):
+class PipelineAccountSilver(BaseSilverPipeline):
   def __init__(self):
     self._source = Trading212AccountSourceSilver()
     self._transformation = Trading212AccountTransformationSilver()
     self._destination = Trading212AccountDestination()
 
-  def run(self):
-    try:
-      # Fetch raw data from source
-      # Copy to prevent mutating object
-      data = self._source.extract()
-
-      if len(data) == 0:
-        logging.warning("NO RECORD")
-        return
-      
-      # Apply Transformation Logic
-      transformed_data: List[Any] = self._transformation.transform(data)
-      
-      # Mapping
-      data = [
-        asdict(
-          Account(
-          data_timestamp = row.get("data_timestamp"),
-          external_id = row.get("external_id"), 
-          cash_in_pies = row.get("cash_in_pies"), 
-          cash_available_to_trade = row.get("cash_available_to_trade"),
-          cash_reserved_for_orders = row.get("cash_reserved_for_orders"), 
-          broker = row.get("broker"), 
-          currency = row.get("currency"), 
-          total_value = row.get("total_value"), 
-          investments_total_cost = row.get("investments_total_cost"),
-          investments_realized_pnl = row.get("investments_realized_pnl"),
-          investments_unrealized_pnl = row.get("investments_unrealized_pnl"),
-          business_key = row.get("business_key"),
-          )
-        )
-        
-        for row in transformed_data
-      ]
-
-      # Save to Destination Table
-      self._destination.load(data)
-      return None
-    except Exception as e:
-      # TODO REPLACE WITH ERROR MANAGEMENT 
-      # Persist raw data
-      # self._sink.save(data)
-
-      raise e
+  def _to_records(self, transformed_data: list) -> list[dict]:
+    return [
+      asdict(Account(
+        data_timestamp=row.get("data_timestamp"),
+        external_id=row.get("external_id"),
+        cash_in_pies=row.get("cash_in_pies"),
+        cash_available_to_trade=row.get("cash_available_to_trade"),
+        cash_reserved_for_orders=row.get("cash_reserved_for_orders"),
+        broker=row.get("broker"),
+        currency=row.get("currency"),
+        total_value=row.get("total_value"),
+        investments_total_cost=row.get("investments_total_cost"),
+        investments_realized_pnl=row.get("investments_realized_pnl"),
+        investments_unrealized_pnl=row.get("investments_unrealized_pnl"),
+        business_key=row.get("business_key"),
+      ))
+      for row in transformed_data
+    ]
     
     
 if __name__ == "__main__":

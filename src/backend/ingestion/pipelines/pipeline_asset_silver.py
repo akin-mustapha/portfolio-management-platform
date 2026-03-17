@@ -2,12 +2,12 @@ import os
 import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
-from typing import List, Any, Dict
+from typing import List, Dict
 from dataclasses import dataclass, asdict
 
 import pandas as pd
 
-from..app.policies import Pipeline
+from..app.policies import BaseSilverPipeline
 from..app.protocols import Source
 from..app.protocols import Destination
 from..app.protocols import Transformation
@@ -138,61 +138,34 @@ class Trading212AssetDestination(Destination):
       self._repository.upsert(records=data, unique_key=['business_key'])
       
 
-class PipelineAssetSilver(Pipeline):
+class PipelineAssetSilver(BaseSilverPipeline):
   def __init__(self):
     self._source = Trading212AssetSourceSilver()
     self._transformation = Trading212AssetTransformationSilver()
     self._destination = Trading212AssetDestination()
 
-  def run(self):
-    try:
-      
-      # Fetch raw data from source
-      # Copy to prevent mutating object
-      data = self._source.extract()
-
-      if len(data) == 0:
-        logging.warning("NO RECORD")
-        return
-      
-      # Apply Transformation Logic
-      transformed_data: List[Any] = self._transformation.transform(data)
-      
-      # Mapping
-      data = [
-        asdict(Asset(
-          data_timestamp = row.get("data_timestamp"),
-          external_id = row.get("external_id"), 
-          ticker = row.get("ticker"), 
-          name = row.get("name"),
-          description = row.get("description"), 
-          broker = row.get("broker"), 
-          currency = row.get("currency"), 
-          local_currency = row.get("local_currency"), 
-          share = row.get("share"),
-          price = row.get("price"),
-          avg_price = row.get("avg_price"),
-          value = row.get("value"),
-          cost = row.get("cost"),
-          profit = row.get("profit"),
-          fx_impact = row.get("fx_impact"),
-          business_key = row.get("business_key"),
-          )
-        )
-        
-        for row in transformed_data
-      ]
-      
-      # print(data)
-      # Save to Destination Table
-      self._destination.load(data)
-      return None
-    except Exception as e:
-      # TODO REPLACE WITH ERROR MANAGEMENT 
-      # Persist raw data
-      # self._sink.save(data)
-
-      raise e
+  def _to_records(self, transformed_data: list) -> list[dict]:
+    return [
+      asdict(Asset(
+        data_timestamp=row.get("data_timestamp"),
+        external_id=row.get("external_id"),
+        ticker=row.get("ticker"),
+        name=row.get("name"),
+        description=row.get("description"),
+        broker=row.get("broker"),
+        currency=row.get("currency"),
+        local_currency=row.get("local_currency"),
+        share=row.get("share"),
+        price=row.get("price"),
+        avg_price=row.get("avg_price"),
+        value=row.get("value"),
+        cost=row.get("cost"),
+        profit=row.get("profit"),
+        fx_impact=row.get("fx_impact"),
+        business_key=row.get("business_key"),
+      ))
+      for row in transformed_data
+    ]
     
     
     

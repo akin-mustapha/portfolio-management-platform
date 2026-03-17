@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 from ..app.protocols import Source
 from ..app.policies import Pipeline
 from ..app.protocols import Destination
-from ..app.protocols import Transformation
 
 from ..full_loader.asset_full_loader import PostgresAssetFullLoader
 from ..infra.api.api_client_trading212 import Trading212APIClient
@@ -46,28 +45,9 @@ class Trading212AssetDestination(Destination):
     PostgresAssetFullLoader("raw.asset").load(data)
 
 
-class Trading212AssetTransformation(Transformation):
-  """
-    Trading212AssetTransformation:
-  """
-  _FIELD_MAP = {
-    "external_id": "ticker",
-    "name": "ticker",
-    "description": "name",
-  }
-  _SOURCE_NAME = "trading212"
-
-  def transform(self, data: list[Dict]) -> list[Dict]:
-    """
-      transform: 
-    """
-    pass
-  
-  
 class PipelineAssetBronze(Pipeline):
   def __init__(self):
     self._source = Trading212AssetSource()
-    self._transformation = Trading212AssetTransformation()
     self._destination = Trading212AssetDestination()
 
   def run(self):

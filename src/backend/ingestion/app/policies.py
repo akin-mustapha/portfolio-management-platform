@@ -1,4 +1,6 @@
+import logging
 from abc import ABC, abstractmethod
+from dataclasses import asdict
 from datetime import date, timedelta, datetime
 
 from ..app.protocols import Source
@@ -9,9 +11,37 @@ class Pipeline(ABC):
   _source: Source
   _transformation: Transformation
   _destination: Destination
-    
+
   @abstractmethod
   def run(self):
+    raise NotImplementedError
+
+
+class BaseSilverPipeline(Pipeline):
+  """
+  Shared run() logic for silver pipelines.
+  Subclasses implement _to_records() to apply their schema contract mapping.
+  """
+
+  def run(self):
+    try:
+      data = self._source.extract()
+
+      if len(data) == 0:
+        logging.warning("NO RECORD")
+        return
+
+      transformed_data = self._transformation.transform(data)
+      data = self._to_records(transformed_data)
+      self._destination.load(data)
+      return None
+
+    except Exception as e:
+      raise e
+
+  @abstractmethod
+  def _to_records(self, transformed_data: list) -> list[dict]:
+    """Map transformed dicts to destination record dicts via dataclass."""
     raise NotImplementedError
 
 class FullLoader(ABC):

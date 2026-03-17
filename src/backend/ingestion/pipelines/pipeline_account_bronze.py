@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 from ..app.protocols import Source
 from ..app.policies import Pipeline
 from ..app.protocols import Destination
-from ..app.protocols import Transformation
 
 from ..full_loader.account_full_loader import PostgresAccountFullLoader
 from ..infra.api.api_client_trading212 import Trading212APIClient
@@ -47,28 +46,9 @@ class Trading212AccountDestination(Destination):
     PostgresAccountFullLoader("raw.account").load(data)
 
 
-class Trading212AccountTransformation(Transformation):
-  """
-    Trading212AccountTransformation:
-  """
-  _FIELD_MAP = {
-    "external_id": "ticker",
-    "name": "ticker",
-    "description": "name",
-  }
-  _SOURCE_NAME = "trading212"
-
-  def transform(self, data: list[Dict]) -> list[Dict]:
-    """
-      transform: 
-    """
-    pass
-  
-  
 class PipelineAccountBronze(Pipeline):
   def __init__(self):
     self._source = Trading212AccountSource()
-    self._transformation = Trading212AccountTransformation()
     self._destination = Trading212AccountDestination()
 
   def run(self):
