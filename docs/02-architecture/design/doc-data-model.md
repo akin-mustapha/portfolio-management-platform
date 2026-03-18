@@ -7,9 +7,11 @@ Data model for tagging system
 ## Entities
 
 - Asset
-- Tag/Category
-- Tag_type
-- Asset_tag
+- Tag
+- Category
+- AssetTag
+- Industry
+- Sector
 
 ## Rules
 
@@ -33,13 +35,12 @@ Data model for tagging system
 Attribute
 
 - id
-- asset_external_id
+- external_id
 - name
 - description
 - source_name
 - is_active
-- created_datetime
-- updated_datetime
+- created_timestamp
 
 Behaviour
 
@@ -50,7 +51,7 @@ Behaviour
 
 Constraint
 
-- Unique(asset_external_id)
+- Unique(external_id)
 - PK(id)
 <!-- - Unique asset_name -->
 
@@ -73,8 +74,7 @@ Attribute
 - description
 - tag_type_id
 - is_active
-- created_datetime
-- updated_datetime
+- created_timestamp
 
 Behaviour
 
@@ -86,9 +86,9 @@ Constraint
 
 - Unique(name)
 - PK(id)
-- FK(tag_type_id) REF (tag_type.id)
+- FK(tag_type_id) REF (category.id)
 
-### tag_type
+### category
 
 ---
 Attribute
@@ -96,8 +96,7 @@ Attribute
 - id
 - name
 - is_active
-- created_datetime
-- updated_datetime
+- created_timestamp
 
 Behaviour
 
@@ -117,8 +116,7 @@ Attribute
 - asset_id
 - tag_id
 - is_active
-- created_datetime
-- updated_datetime
+- created_timestamp
 
 Behaviour
 
@@ -133,10 +131,46 @@ Constraint
 
 ---
 
+### industry
+
+---
+Attribute
+
+- id
+- name
+- description
+- created_timestamp
+
+Constraint
+
+- PK(id)
+- Unique(name)
+
+Domain rule: name is required and must be unique
+
+### sector
+
+---
+Attribute
+
+- id
+- industry_id
+- name
+- description
+- created_timestamp
+
+Constraint
+
+- PK(id)
+- Unique(name)
+- FK(industry_id) REF (industry.id)
+
+Domain rule: industry_id is required; a sector must belong to an industry
+
+---
+
 ## New Data
 
-- industry
-- sector
 - market cap
 - beta
 - ETF (asset list)

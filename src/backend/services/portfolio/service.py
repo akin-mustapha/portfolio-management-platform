@@ -3,7 +3,7 @@
 """
 from .infrastructure.repositories.repository_factory import RepositoryFactory
 from .domain.entities import Asset, AssetTag, Tag, Category, Industry, Sector
-from .app.interfaces import AssetQueryRepository
+from .application.interfaces import AssetQueryRepository
 
 from shared.utils.custom_logger import customer_logger
 
