@@ -1,9 +1,8 @@
 
 
 import pytest
-from traitlets import Any
-from backend.ingestion.event_producer.app.policies import Destination
-from backend.ingestion.event_producer.app.domain import Event
+from backend.ingestion.application.policies import EventDestination as Destination
+from backend.ingestion.domain.models import Event
 
 class TestDestination:
   @pytest.fixture
