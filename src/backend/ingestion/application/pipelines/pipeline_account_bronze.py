@@ -7,6 +7,7 @@ import logging
 import asyncio
 from typing import Dict, Any
 from dotenv import load_dotenv
+from pydantic import ValidationError
 
 from ...application.protocols import Source
 from ...application.policies import Pipeline
@@ -14,6 +15,7 @@ from ...application.protocols import Destination
 
 from .loaders.account_full_loader import PostgresAccountFullLoader
 from ...infrastructure.api.api_client_trading212 import Trading212APIClient
+from ...domain.schemas.bronze.account_api import AccountAPIResponse
 
 logging.basicConfig(
     level=logging.INFO,
@@ -52,23 +54,20 @@ class PipelineAccountBronze(Pipeline):
     self._destination = Trading212AccountDestination()
 
   def run(self):
-
     try:
-      # Extract raw data from source
-      data: list[Dict] = self._source.extract()
-
-      # Load to Destination Table
+      data: Dict = self._source.extract()
+      self._validate_structure(data)
       self._destination.load(data)
       return None
 
     except Exception as e:
-      # Update raw data
-
-      # TODO REPLACE WITH ERROR MANAGEMENT
-      # Persist raw data
-      # self._sink.save(data)
-
       raise e
+
+  def _validate_structure(self, data: dict) -> None:
+    try:
+      AccountAPIResponse(**data)
+    except ValidationError as e:
+      raise ValueError(f"[AccountBronze] API response failed structural validation: {e}")
 
 
 if __name__ == "__main__":
