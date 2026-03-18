@@ -7,13 +7,13 @@ name: Event
 ## Event Consumer
 
 ```sh
-  python3 -m src.ingestion.event_consumer.main
+  python3 -m backend.ingestion.infrastructure.kafka.consumer_main
 ```
 
 ## Event Producer
 
 ```python
-from src.ingestion.ingestion.pipeline_factory import PipelineFactory
+from backend.ingestion.factories.event_producer_factory import EventProducerFactory
 
 if __name__ == "__main__":
 
@@ -28,16 +28,19 @@ if __name__ == "__main__":
 ## Ingestion
 
 ```python
-from src.ingestion.pipeline_factory import PipelineFactory
+from backend.ingestion.factories.pipeline_factory import PipelineFactory
 
 if __name__ == "__main__":
 
   """
-  trading212AssetPipeline
-  trading212AssetSnapshotPipeline
-  trading212PortfolioSnapshotPipeline
+  asset_bronze
+  asset_silver
+  asset_computed_silver
+  asset_portfolio
+  account_bronze
+  account_silver
   """
-  pipeline = PipePipelineFactory.get("trading212AssetPipeline")
+  pipeline = PipelineFactory.get("asset_bronze")
   pipeline.run()
 
 

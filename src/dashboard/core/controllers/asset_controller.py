@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from ..presenters.asset_presenter import AssetPresenter
 
 from ...infra.repositories.repository_factory import RepositoryFactory
-from backend.services.portfolio.infra.repositories.repository_factory import RepositoryFactory as PortfolioRepositoryFactory
+from backend.services.portfolio.infrastructure.repositories.repository_factory import RepositoryFactory as PortfolioRepositoryFactory
 
 load_dotenv()
 

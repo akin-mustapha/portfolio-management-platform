@@ -1,12 +1,12 @@
-from ..app.policies import Pipeline
+from ..application.policies import Pipeline
 
-from ..pipelines.pipeline_asset_bronze import PipelineAssetBronze
-from ..pipelines.pipeline_asset_silver import PipelineAssetSilver
-from ..pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
-from ..pipelines.pipeline_account_bronze import PipelineAccountBronze
-from ..pipelines.pipeline_account_silver import PipelineAccountSilver
-from ..pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
-from ..pipelines.portfolio_enrichment_synchronizer import enrichment_sychronization
+from ..application.pipelines.pipeline_asset_bronze import PipelineAssetBronze
+from ..application.pipelines.pipeline_asset_silver import PipelineAssetSilver
+from ..application.pipelines.pipeline_asset_portfolio import PipelineAssetPortfolio
+from ..application.pipelines.pipeline_account_bronze import PipelineAccountBronze
+from ..application.pipelines.pipeline_account_silver import PipelineAccountSilver
+from ..application.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
+from ..application.pipelines.portfolio_enrichment_synchronizer import enrichment_sychronization
 
 class PipelineFactory:
   _registry = {
