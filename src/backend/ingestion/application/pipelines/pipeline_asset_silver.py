@@ -3,7 +3,7 @@ import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Dict
-from dataclasses import dataclass, asdict
+from pydantic import ValidationError
 
 import pandas as pd
 
@@ -15,6 +15,7 @@ from...application.protocols import Transformation
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from...infrastructure.repositories.repository_factory import RepositoryFactory
+from...domain.schemas.silver.asset import AssetRecord
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,25 +28,6 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-
-@dataclass
-class Asset:
-  data_timestamp: datetime
-  external_id: str
-  ticker: str
-  name: str
-  description: str
-  broker: str
-  currency: str
-  local_currency: str
-  share: float
-  price: float
-  avg_price: float
-  value: float
-  cost: float
-  profit: float
-  fx_impact: float
-  business_key: str
 
 
 class Trading212AssetSourceSilver(Source):
@@ -145,27 +127,15 @@ class PipelineAssetSilver(BaseSilverPipeline):
     self._destination = Trading212AssetDestination()
 
   def _to_records(self, transformed_data: list) -> list[dict]:
-    return [
-      asdict(Asset(
-        data_timestamp=row.get("data_timestamp"),
-        external_id=row.get("external_id"),
-        ticker=row.get("ticker"),
-        name=row.get("name"),
-        description=row.get("description"),
-        broker=row.get("broker"),
-        currency=row.get("currency"),
-        local_currency=row.get("local_currency"),
-        share=row.get("share"),
-        price=row.get("price"),
-        avg_price=row.get("avg_price"),
-        value=row.get("value"),
-        cost=row.get("cost"),
-        profit=row.get("profit"),
-        fx_impact=row.get("fx_impact"),
-        business_key=row.get("business_key"),
-      ))
-      for row in transformed_data
-    ]
+    valid, invalid = [], []
+    for row in transformed_data:
+      try:
+        valid.append(AssetRecord(**row).model_dump())
+      except ValidationError as e:
+        invalid.append((row.get("business_key"), e))
+    if invalid:
+      logging.warning(f"[AssetSilver] {len(invalid)} records failed validation: {invalid}")
+    return valid
 
 
 

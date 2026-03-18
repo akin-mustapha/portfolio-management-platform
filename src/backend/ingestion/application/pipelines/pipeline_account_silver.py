@@ -4,7 +4,7 @@ import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Dict
-from dataclasses import dataclass, asdict
+from pydantic import ValidationError
 
 import pandas as pd
 
@@ -16,6 +16,7 @@ from ...application.protocols import Transformation
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from ...infrastructure.repositories.repository_factory import RepositoryFactory
+from ...domain.schemas.silver.account import AccountRecord
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,20 +30,6 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
-@dataclass
-class Account:
-  data_timestamp: datetime
-  external_id: str
-  cash_in_pies: float
-  cash_available_to_trade: float
-  cash_reserved_for_orders: float
-  broker: str
-  currency: str
-  total_value: float
-  investments_total_cost: float
-  investments_realized_pnl: float
-  investments_unrealized_pnl: float
-  business_key: str
 
 class Trading212AccountSourceSilver(Source):
   def __init__(self):
@@ -127,23 +114,15 @@ class PipelineAccountSilver(BaseSilverPipeline):
     self._destination = Trading212AccountDestination()
 
   def _to_records(self, transformed_data: list) -> list[dict]:
-    return [
-      asdict(Account(
-        data_timestamp=row.get("data_timestamp"),
-        external_id=row.get("external_id"),
-        cash_in_pies=row.get("cash_in_pies"),
-        cash_available_to_trade=row.get("cash_available_to_trade"),
-        cash_reserved_for_orders=row.get("cash_reserved_for_orders"),
-        broker=row.get("broker"),
-        currency=row.get("currency"),
-        total_value=row.get("total_value"),
-        investments_total_cost=row.get("investments_total_cost"),
-        investments_realized_pnl=row.get("investments_realized_pnl"),
-        investments_unrealized_pnl=row.get("investments_unrealized_pnl"),
-        business_key=row.get("business_key"),
-      ))
-      for row in transformed_data
-    ]
+    valid, invalid = [], []
+    for row in transformed_data:
+      try:
+        valid.append(AccountRecord(**row).model_dump())
+      except ValidationError as e:
+        invalid.append((row.get("business_key"), e))
+    if invalid:
+      logging.warning(f"[AccountSilver] {len(invalid)} records failed validation: {invalid}")
+    return valid
 
 
 if __name__ == "__main__":

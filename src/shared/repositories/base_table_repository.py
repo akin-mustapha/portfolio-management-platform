@@ -68,8 +68,8 @@ class BaseTableRepository(RepositoryInterface):
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self._client as client:
                 res = client.execute(sql, record)
-            logging.info(f"Inserted record into {self._table}")
-        return res
+                logging.info(f"Inserted record into {self._table}")
+            return res
 
     def upsert(self, records: Iterable[Dict], unique_key: list[str]):
         for record in records:
@@ -86,8 +86,8 @@ class BaseTableRepository(RepositoryInterface):
             logging.debug(f"Executing query: {sql} with params: {record}")
             with self._client as client:
                 res = client.execute(sql, record)
-            logging.info(f"Upserted record into {self._table}")
-        return res
+                logging.info(f"Upserted record into {self._table}")
+            return res
 
     def select(self, params: Dict):
         db_params = self._to_db_fields(params)
