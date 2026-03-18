@@ -16,7 +16,7 @@ class AssetWalletImpact(BaseModel):
     totalCost: float
     currentValue: float
     unrealizedProfitLoss: float
-    fxImpact: float
+    fxImpact: Optional[float] = None
 
 
 class AssetAPIRecord(BaseModel):

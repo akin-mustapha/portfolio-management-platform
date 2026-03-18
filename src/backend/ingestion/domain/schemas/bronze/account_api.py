@@ -22,7 +22,7 @@ class AccountAPIResponse(BaseModel):
     avoid breaking on new API additions. Used in the bronze pipeline only.
     """
     model_config = ConfigDict(extra='allow')
-    id: str
+    id: int
     cash: AccountCash
     currency: str
     totalValue: float
