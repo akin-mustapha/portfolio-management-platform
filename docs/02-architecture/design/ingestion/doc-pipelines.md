@@ -63,7 +63,21 @@ class XYZData:
     # add fields relevant to this pipeline
 ```
 
+## Convenience Base Classes
+
+Rather than directly subclassing `Pipeline`, most concrete pipelines extend one of these:
+
+**`BaseSilverPipeline`** — implements `run()` for the standard extract → transform → load flow. Override `_to_records()` to map transformed dicts to a dataclass schema. Use for silver-tier pipelines.
+
+**`FullLoader`** — implements `run()` for bronze-tier bulk loads with date partitioning. Override `_create_partition()`, `_loader()`, and `_exposition_abstraction()`. Use for raw/bronze ingestion.
+
+Both are defined in `src/backend/ingestion/application/policies.py`.
+
 ## How to Create a New Pipeline
+
+All pipelines live under `src/backend/ingestion/application/pipelines/`. Sub-folders by type:
+- `pipelines/loaders/` — bronze-tier full loaders
+- `pipelines/events/` — event producers and consumers
 
 Follow these steps to implement a new pipeline:
 
