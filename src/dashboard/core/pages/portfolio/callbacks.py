@@ -12,6 +12,7 @@ from .components.workspace_tabs import (
 from .components.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart
 from ...controllers.portfolio_controller import PortfolioController
 from ...controllers.asset_controller import AssetController
+from ...controllers.asset_profile_controller import AssetProfileController
 from ...presenters.portfolio_presenter import PortfolioPresenter
 
 
@@ -198,3 +199,56 @@ def toggle_advanced_filter(n, is_open):
     if n:
         return not is_open
     return is_open
+
+
+# ── 6. Asset Profile tab — populate on row selection ─────────────
+
+@callback(
+    Output("profile-ticker", "children"),
+    Output("profile-name", "children"),
+    Output("profile-description", "children"),
+    Output("profile-created", "children"),
+    Output("profile-last-ingestion", "children"),
+    Output("profile-tag-select", "options"),
+    Output("profile-industry-select", "options"),
+    Output("profile-sector-select", "options"),
+    Output("profile-category-select", "options"),
+    Input("portfolio-asset-table", "selectedRows"),
+    prevent_initial_call=True,
+)
+def on_asset_profile_selected(selected_rows):
+    if not selected_rows:
+        raise PreventUpdate
+
+    asset_row = selected_rows[0]
+    vm = AssetProfileController().get_profile(asset_row)
+
+    return (
+        vm["ticker"],
+        vm["name"],
+        vm["description"],
+        vm["created"],
+        vm["last_ingestion"],
+        vm["tag_options"],
+        vm["industry_options"],
+        vm["sector_options"],
+        vm["category_options"],
+    )
+
+
+# ── 7. Asset Profile tab — assign tag ────────────────────────────
+
+@callback(
+    Output("profile-tag-status", "children"),
+    Input("profile-tag-assign-btn", "n_clicks"),
+    State("profile-tag-select", "value"),
+    State("portfolio-asset-table", "selectedRows"),
+    prevent_initial_call=True,
+)
+def on_assign_tag(n_clicks, tag_id, selected_rows):
+    if not selected_rows or not tag_id:
+        raise PreventUpdate
+
+    asset_name = selected_rows[0].get("name", "")
+    status = AssetProfileController().assign_tag(asset_name, tag_id)
+    return status
