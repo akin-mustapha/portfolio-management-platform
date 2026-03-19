@@ -48,27 +48,52 @@ docker exec -it kafka kafka-topics \
 
 ### Migration
 
-```sh
-  alembic init <migration name>
-```
+Migrations are split into 4 independent tracks, one per layer. Each has its own ini file in `migrations/postgres/`.
 
-#### Create new migration
+#### Apply all migrations (fresh database)
 
 ```sh
-  alembic revision -m "<descritpion>"
+  alembic -c migrations/postgres/portfolio.ini upgrade head
+  alembic -c migrations/postgres/raw.ini upgrade head
+  alembic -c migrations/postgres/staging.ini upgrade head
+  alembic -c migrations/postgres/analytics.ini upgrade head
 ```
 
-#### Apply migration
+#### Check status of all tracks
 
 ```sh
-  alembic upgrade head
+  alembic -c migrations/postgres/raw.ini current
+  alembic -c migrations/postgres/staging.ini current
+  alembic -c migrations/postgres/analytics.ini current
+  alembic -c migrations/postgres/portfolio.ini current
 ```
 
-#### Downgrade migration
+#### Create a new migration in a specific track
 
 ```sh
-  alembic downgrade -2
+  alembic -c migrations/postgres/staging.ini revision -m "<description>"
 ```
+
+Replace `staging.ini` with the ini file for the layer you are modifying (`raw.ini`, `analytics.ini`, `portfolio.ini`).
+
+#### Downgrade a track
+
+```sh
+  alembic -c migrations/postgres/staging.ini downgrade -1
+```
+
+#### Stamp an existing database at head (no SQL executed)
+
+Use this when the database is already migrated and you need to register the new tracks:
+
+```sh
+  alembic -c migrations/postgres/raw.ini stamp <head-revision-id>
+  alembic -c migrations/postgres/staging.ini stamp <head-revision-id>
+  alembic -c migrations/postgres/analytics.ini stamp <head-revision-id>
+  alembic -c migrations/postgres/portfolio.ini stamp <head-revision-id>
+```
+
+Get the head revision ID for a track with: `alembic -c migrations/postgres/<layer>.ini heads`
 
 ### Prefect Deployment
 

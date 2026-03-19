@@ -29,13 +29,18 @@ Sits above the backend — coordinates it, doesn't contain business logic.
 ## Backend (`src/backend/`)
 
 **Ingestion** (`src/backend/ingestion/`) — Pulls data from Trading212 via events and pipelines. Loads into raw, transforms through to staging.
-- `event_producer/` — produces Kafka events from Trading212 API
-- `event_consumer/` — consumes events and triggers pipelines
-- `pipelines/` — ETL logic (bronze → silver)
-- `full_loader/` — bulk/historical loads
+
+- `domain/` — core models: Data and Event
+- `application/` — protocols, policies, all pipeline logic (bronze, silver, loaders, events)
+- `infrastructure/` — external integrations: Trading212 API client, Kafka producer/consumer, database repositories
+- `factories/` — PipelineFactory and EventProducerFactory registries
 
 **Services** (`src/backend/services/`) — Business logic layer between storage and frontend.
 Currently: `portfolio/` service.
+
+- `domain/` — entities: Asset, Tag, Category, AssetTag, Industry, Sector
+- `application/` — use case interfaces and repository contracts (protocols)
+- `infrastructure/` — repository implementations (Postgres and SQLite) per entity
 
 ## Storage (`raw` → `staging` → `analytics`)
 

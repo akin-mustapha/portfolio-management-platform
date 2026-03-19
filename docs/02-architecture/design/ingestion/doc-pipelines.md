@@ -53,21 +53,48 @@ class Pipeline(ABC):
 
 ## Data Model
 
-Each `Pipeline` module declares a dataclass representing the data passed between ETL steps. This object typically has a simpler shape than the physical data store — for example, it may flatten nested structures or omit fields not relevant to the pipeline. These dataclasses are independent of the database schema.
+Each pipeline declares a Pydantic schema in `src/backend/ingestion/domain/schemas/` representing the data contract for that pipeline. Schemas are independent of the database schema — they enforce types, coerce values, and reject invalid records before anything is written.
 
 ```python
-@dataclass
-class XYZData:
+from pydantic import BaseModel, ConfigDict, field_validator
+
+class XYZRecord(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     id: str
     value: float
-    # add fields relevant to this pipeline
+
+    @field_validator("id")
+    @classmethod
+    def must_not_be_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("must not be empty")
+        return v
 ```
+
+Place schemas under:
+- `domain/schemas/bronze/` — for API response shape checks (bronze pipelines)
+- `domain/schemas/silver/` — for staging table contracts (silver pipelines)
+
+## Convenience Base Classes
+
+Rather than directly subclassing `Pipeline`, most concrete pipelines extend one of these:
+
+**`BaseSilverPipeline`** — implements `run()` for the standard extract → transform → load flow. Override `_to_records()` to validate and map transformed dicts through a Pydantic schema. Invalid records are logged and skipped; the batch continues with valid records only. Use for silver-tier pipelines.
+
+**`FullLoader`** — implements `run()` for bronze-tier bulk loads with date partitioning. Override `_create_partition()`, `_loader()`, and `_exposition_abstraction()`. Use for raw/bronze ingestion.
+
+Both are defined in `src/backend/ingestion/application/policies.py`.
 
 ## How to Create a New Pipeline
 
+All pipelines live under `src/backend/ingestion/application/pipelines/`. Sub-folders by type:
+- `pipelines/loaders/` — bronze-tier full loaders
+- `pipelines/events/` — event producers and consumers
+
 Follow these steps to implement a new pipeline:
 
-1. **Define your data model** — create a dataclass in your pipeline module representing the data shape
+1. **Define your data contract** — create a Pydantic schema in `domain/schemas/bronze/` or `domain/schemas/silver/` depending on the layer (see Validation section below)
 2. **Implement `Source`** — create a class implementing the `extract` method
 3. **Implement `Transformation`** — create a class implementing the `transform` method (skip if not needed)
 4. **Implement `Destination`** — create a class implementing the `load` method
@@ -100,6 +127,32 @@ class XYZPipeline(Pipeline):
 - If `extract` fails, the pipeline should raise and not proceed to transformation or loading
 - If `transform` fails, the pipeline should raise and not proceed to loading
 - *(Document any retry logic or failure recovery strategy here)*
+
+## Validation
+
+Pipelines use a two-layer validation approach. Each layer has a distinct schema location and a different failure behaviour.
+
+| Layer | Schema location | On validation failure |
+|---|---|---|
+| Bronze | `domain/schemas/bronze/` | Raises — aborts the entire run |
+| Silver | `domain/schemas/silver/` | Logs a warning, skips the bad record, batch continues |
+
+**Bronze schemas** are structural API contracts. They check that required fields are present and have the expected types. `extra='allow'` is set so new fields added by the upstream API do not break the pipeline. A bronze validation failure means the API response is malformed — the run should not proceed.
+
+**Silver schemas** are business contracts for staging tables. They enforce types, coerce values (e.g. `Decimal` to `float`), strip whitespace, and reject records with empty identity fields. A silver validation failure means one record is bad — the rest of the batch should still be written.
+
+```python
+# Bronze — fail fast
+records = [AssetAPIRecord.model_validate(r) for r in raw_data]  # raises on failure
+
+# Silver — fault-isolated, inside _to_records()
+validated = []
+for record in transformed:
+    try:
+        validated.append(AssetRecord.model_validate(record).model_dump())
+    except ValidationError as e:
+        logger.warning("Skipping invalid record: %s", e)
+```
 
 ## Testing
 
