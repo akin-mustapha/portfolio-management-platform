@@ -29,11 +29,48 @@ Add the following variables to env file
 - SECRET_TOKEN
 - DATABASE_URL
 
-## Set Prefect server port
+## Start infrastructure
 
-- deploy/prefect_deploy.sh
-- Start Kafka
-- Start Consumer
+Start Postgres and Kafka via Docker:
+
+```sh
+docker compose up -d
+```
+
+## Prefect setup
+
+Prefect 3 uses a persistent server, a work pool, and a worker process. Schedules are defined in `prefect.yaml` — not in the flow files.
+
+### 1. Point Prefect at the local server
+
+```sh
+prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
+```
+
+Only needed once per environment. Verify with `prefect config view`.
+
+### 2. Start everything
+
+```sh
+bash scripts/deploy/prefect_deploy.sh
+```
+
+This script does four things:
+
+1. Starts the Prefect server (UI at `http://127.0.0.1:4200`)
+2. Creates the `asset-monitoring-pool` work pool (skips if it already exists)
+3. Registers all deployments from `prefect.yaml` (`prefect deploy --all`)
+4. Starts a process worker on the pool
+
+### 3. Updating schedules or adding a new deployment
+
+Edit `prefect.yaml`, then re-run:
+
+```sh
+prefect deploy --all
+```
+
+No restart required.
 
 ### Set Alembic ini
 

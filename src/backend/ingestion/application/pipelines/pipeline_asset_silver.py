@@ -56,13 +56,7 @@ class Trading212AssetSourceSilver(Source):
         ingested_timestamp,
         business_key
       FROM raw.v_bronze_asset t1
-      WHERE NOT EXISTS (
-            SELECT 1
-            FROM staging.asset x1
-            WHERE t1.business_key = x1.business_key
-          )
-          AND ticker IS NOT NULL
-      LIMIT 1000;
+      WHERE ticker IS NOT NULL;
     """
 
     with self._client as db:
