@@ -1,5 +1,4 @@
 import logging
-from datetime import timedelta
 
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
@@ -22,7 +21,3 @@ def flow_t212_enrichment_sychronization():
     task_enrichment_sychronization()
     logging.info("End process")
 
-    
-if __name__ == "__main__": 
-    flow_t212_enrichment_sychronization.serve(
-        name="t212_enrichment_sychronization", interval=timedelta(seconds=600))  # Runs every 5mins
