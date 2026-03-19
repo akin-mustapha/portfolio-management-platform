@@ -167,3 +167,7 @@ class PortfolioService:
   def get_all_categories(self):
     category_repo = self._repo_factory.get("category")
     return category_repo.select_all()
+
+  def get_asset_by_name(self, name: str):
+    asset_repo = self._repo_factory.get("asset")
+    return asset_repo.select({"name": name})

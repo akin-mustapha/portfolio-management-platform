@@ -1,3 +1,4 @@
+import dash_ag_grid as dag
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
@@ -313,6 +314,130 @@ def opportunities_tab_content():
 
 
 # ─────────────────────────────────────────────
+# Asset Profile tab content
+# ─────────────────────────────────────────────
+
+def tags_tab_content():
+    return html.Div([
+
+        # ─────────────────────────────────────────────
+        # Row 1 — Asset info KPI cards
+        # ─────────────────────────────────────────────
+        dbc.Row([
+            dbc.Col(
+                html.Div([
+                    html.Div("Ticker", className="kpi-label"),
+                    html.Span("—", id="profile-ticker", className="kpi-value"),
+                ], className="kpi-card"),
+                md=True,
+            ),
+            dbc.Col(
+                html.Div([
+                    html.Div("Name", className="kpi-label"),
+                    html.Span("—", id="profile-name", className="kpi-value"),
+                ], className="kpi-card"),
+                md=True,
+            ),
+            dbc.Col(
+                html.Div([
+                    html.Div("Description", className="kpi-label"),
+                    html.Span("—", id="profile-description", className="kpi-value"),
+                ], className="kpi-card"),
+                md=True,
+            ),
+            dbc.Col(
+                html.Div([
+                    html.Div("First Seen", className="kpi-label"),
+                    html.Span("—", id="profile-created", className="kpi-value"),
+                ], className="kpi-card"),
+                md=True,
+            ),
+            dbc.Col(
+                html.Div([
+                    html.Div("Last Ingestion", className="kpi-label"),
+                    html.Span("—", id="profile-last-ingestion", className="kpi-value"),
+                ], className="kpi-card"),
+                md=True,
+            ),
+        ], className="g-3 mb-4"),
+
+        html.Hr(className="tv-divider"),
+
+        # ─────────────────────────────────────────────
+        # Row 2 — Classification assignment
+        # ─────────────────────────────────────────────
+        dbc.Row([
+
+            dbc.Col(
+                dbc.Stack([
+                    html.Div([
+                        html.Small("Tag", className="text-muted d-block mb-1"),
+                        dbc.InputGroup([
+                            dcc.Dropdown(
+                                id="profile-tag-select",
+                                placeholder="Select or search tag\u2026",
+                                options=[],
+                                style={"flex": "1", "minWidth": "0"},
+                            ),
+                            dbc.Button("Assign", id="profile-tag-assign-btn", color="primary", size="sm"),
+                        ], className="flex-nowrap"),
+                        html.Small(id="profile-tag-status", className="text-muted"),
+                    ]),
+                    html.Div([
+                        html.Small("Industry", className="text-muted d-block mb-1"),
+                        dbc.InputGroup([
+                            dcc.Dropdown(
+                                id="profile-industry-select",
+                                placeholder="Select or search industry\u2026",
+                                options=[],
+                                style={"flex": "1", "minWidth": "0"},
+                            ),
+                            dbc.Button("Assign", id="profile-industry-assign-btn", color="primary", size="sm"),
+                        ], className="flex-nowrap"),
+                        html.Small(id="profile-industry-status", className="text-muted"),
+                    ]),
+                ], gap=3),
+                width=6,
+            ),
+
+            dbc.Col(
+                dbc.Stack([
+                    html.Div([
+                        html.Small("Sector", className="text-muted d-block mb-1"),
+                        dbc.InputGroup([
+                            dcc.Dropdown(
+                                id="profile-sector-select",
+                                placeholder="Select or search sector\u2026",
+                                options=[],
+                                style={"flex": "1", "minWidth": "0"},
+                            ),
+                            dbc.Button("Assign", id="profile-sector-assign-btn", color="primary", size="sm"),
+                        ], className="flex-nowrap"),
+                        html.Small(id="profile-sector-status", className="text-muted"),
+                    ]),
+                    html.Div([
+                        html.Small("Category", className="text-muted d-block mb-1"),
+                        dbc.InputGroup([
+                            dcc.Dropdown(
+                                id="profile-category-select",
+                                placeholder="Select or search category\u2026",
+                                options=[],
+                                style={"flex": "1", "minWidth": "0"},
+                            ),
+                            dbc.Button("Assign", id="profile-category-assign-btn", color="primary", size="sm"),
+                        ], className="flex-nowrap"),
+                        html.Small(id="profile-category-status", className="text-muted"),
+                    ]),
+                ], gap=3),
+                width=6,
+            ),
+
+        ], className="g-4"),
+
+    ], id="tab-tags-content")
+
+
+# ─────────────────────────────────────────────
 # Full tab widget
 # ─────────────────────────────────────────────
 
@@ -361,6 +486,13 @@ def workspace_tabs(view_model=None, theme="light"):
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
                 children=opportunities_tab_content(),
+            ),
+            dbc.Tab(
+                label="Asset Profile",
+                tab_id="tab-tags",
+                tab_class_name="workspace-tab",
+                active_tab_class_name="workspace-tab--active",
+                children=tags_tab_content(),
             ),
         ],
     )
