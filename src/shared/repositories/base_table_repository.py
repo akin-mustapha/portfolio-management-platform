@@ -111,6 +111,17 @@ class BaseTableRepository(RepositoryInterface):
         logging.info(f"Count of records fetched: {result.rowcount}")
         return [self._from_db_fields(dict(r._mapping)) for r in results]
 
+    def select_all_by(self, params: Dict):
+        db_params = self._to_db_fields(params)
+        filters = [f"{key} = :{key}" for key in db_params.keys()]
+        sql = f"SELECT * FROM {self._table} WHERE {' AND '.join(filters)}"
+        logging.info(f"Selecting records from {self._table}")
+        with self._client as client:
+            result = client.execute(sql, db_params)
+        results = result.fetchall()
+        logging.info(f"Count of records fetched: {result.rowcount}")
+        return [self._from_db_fields(dict(r._mapping)) for r in results]
+
     def update(self, params: Dict, data: Dict):
         db_params = self._to_db_fields(params)
         db_data = self._to_db_fields(data)
