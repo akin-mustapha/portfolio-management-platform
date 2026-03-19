@@ -1,19 +1,18 @@
-"""011_create_scd
+"""004_portfolio_industry_sector
 
-Revision ID: c9cb652df5fe
-Revises: 1a61c607b4c0
-Create Date: 2026-02-09 21:55:30.926415
+Revision ID: 4400000000d4
+Revises: 4400000000d3
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c9cb652df5fe'
-down_revision: Union[str, Sequence[str], None] = '1a61c607b4c0'
+revision: str = '4400000000d4'
+down_revision: Union[str, Sequence[str], None] = '4400000000d3'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -35,7 +34,7 @@ def upgrade() -> None:
         -- Industry history
         CREATE TABLE IF NOT EXISTS portfolio.industry_history
         (LIKE portfolio.industry INCLUDING DEFAULTS INCLUDING GENERATED);
-        
+
         ALTER TABLE portfolio.industry_history
         ADD COLUMN history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY;
 
@@ -65,8 +64,7 @@ def upgrade() -> None:
         -- Sector history
         CREATE TABLE IF NOT EXISTS portfolio.sector_history
         (LIKE portfolio.sector INCLUDING DEFAULTS INCLUDING GENERATED);
-        
-        
+
         ALTER TABLE portfolio.sector_history
         ADD COLUMN history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY;
 

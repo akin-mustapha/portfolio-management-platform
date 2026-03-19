@@ -1,19 +1,18 @@
-"""013_v2_oltp_portfolio_asset_table
+"""005_portfolio_asset_v2
 
-Revision ID: 5df2e1b367ab
-Revises: eee5d1e4f1c4
-Create Date: 2026-02-13 20:40:16.077756
+Revision ID: 4400000000d5
+Revises: 4400000000d4
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '5df2e1b367ab'
-down_revision: Union[str, Sequence[str], None] = 'eee5d1e4f1c4'
+revision: str = '4400000000d5'
+down_revision: Union[str, Sequence[str], None] = '4400000000d4'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -35,6 +34,7 @@ def upgrade() -> None:
                 UNIQUE (ticker, broker, currency)
         );
     """)
+
 
 def downgrade() -> None:
     """Downgrade schema."""

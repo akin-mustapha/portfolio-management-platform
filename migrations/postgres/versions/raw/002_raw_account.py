@@ -1,19 +1,18 @@
-"""014_account_raw_bronze_table
+"""002_raw_account
 
-Revision ID: 4ce1cda63acb
-Revises: 5df2e1b367ab
-Create Date: 2026-02-16 00:14:00.448103
+Revision ID: 1100000000a2
+Revises: 1100000000a1
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '4ce1cda63acb'
-down_revision: Union[str, Sequence[str], None] = '5df2e1b367ab'
+revision: str = '1100000000a2'
+down_revision: Union[str, Sequence[str], None] = '1100000000a1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -29,16 +28,16 @@ def upgrade() -> None:
         ingested_timestamp TIMESTAMPTZ DEFAULT now()
         )
         PARTITION BY RANGE (ingested_date);
-        
-        
+
+
         CREATE INDEX IF NOT EXISTS idx_raw_account_ingested_date
         ON raw.account (ingested_date);
 
         CREATE INDEX IF NOT EXISTS idx_raw_account_id
         ON raw.account (id);
-    """
-    )
-    
+    """)
+
+
 def downgrade() -> None:
     """Downgrade schema."""
     op.execute("DROP TABLE IF EXISTS raw.account CASCADE")

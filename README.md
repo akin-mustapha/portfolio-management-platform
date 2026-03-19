@@ -47,6 +47,7 @@ The storage layer uses a medallion architecture inside Postgres:
 | Dashboard      | Dash, Plotly, Dash Bootstrap  |
 | Orchestration  | Prefect                       |
 | Messaging      | Kafka (Confluent)             |
+| Validation     | Pydantic                      |
 | Database       | PostgreSQL, SQLModel, Alembic |
 | HTTP Client    | HTTPX                         |
 | Data           | Pandas                        |

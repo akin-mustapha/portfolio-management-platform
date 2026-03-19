@@ -1,26 +1,24 @@
-"""015_portfolio_raw_silver_table
+"""003_staging_account
 
-Revision ID: c0a57dbfeb28
-Revises: 4ce1cda63acb
-Create Date: 2026-02-16 00:40:12.346867
+Revision ID: 2200000000b3
+Revises: 2200000000b2
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c0a57dbfeb28'
-down_revision: Union[str, Sequence[str], None] = '4ce1cda63acb'
+revision: str = '2200000000b3'
+down_revision: Union[str, Sequence[str], None] = '2200000000b2'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    
     op.execute("""
         CREATE TABLE staging.account
         (
@@ -39,7 +37,7 @@ def upgrade() -> None:
             business_key TEXT NOT NULL UNIQUE,
             created_timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
             updated_timestamp TIMESTAMPTZ
-        )           
+        )
     """)
 
 

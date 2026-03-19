@@ -1,26 +1,24 @@
-"""016_update_silver_asset_computed-table-#53
+"""004_staging_update_asset
 
-Revision ID: 192a2efb33f5
-Revises: c0a57dbfeb28
-Create Date: 2026-02-21 15:45:07.439192
+Revision ID: 2200000000b4
+Revises: 2200000000b3
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '192a2efb33f5'
-down_revision: Union[str, Sequence[str], None] = 'c0a57dbfeb28'
+revision: str = '2200000000b4'
+down_revision: Union[str, Sequence[str], None] = '2200000000b3'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    
     op.execute("""
         DROP TABLE IF EXISTS staging.asset;
         CREATE TABLE staging.asset
@@ -44,13 +42,9 @@ def upgrade() -> None:
             business_key TEXT NOT NULL UNIQUE,
             created_timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
             updated_timestamp TIMESTAMPTZ
-            
-            
-        )           
+        )
     """)
-    
-    
-    
+
     op.execute("""
         DROP TABLE IF EXISTS staging.asset_computed;
         CREATE TABLE staging.asset_computed
@@ -78,16 +72,14 @@ def upgrade() -> None:
             CONSTRAINT fk_asset_computed_asset_id
                 FOREIGN KEY (asset_id)
                 REFERENCES staging.asset(id)
-            
-            
-        )           
+        )
     """)
-    
+
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('asset_computed', schema="staging")
-    op.drop_table('asset', schema="staging")
+    op.execute("DROP TABLE IF EXISTS staging.asset_computed")
+    op.execute("DROP TABLE IF EXISTS staging.asset")
     op.execute("""
         CREATE TABLE staging.asset_v2
         (
@@ -110,11 +102,8 @@ def downgrade() -> None:
             business_key TEXT NOT NULL UNIQUE,
             created_timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
             updated_timestamp TIMESTAMPTZ
-            
-            
-        )           
+        )
     """)
-    
     op.execute("""
         CREATE TABLE staging.asset_computed
         (
@@ -139,7 +128,5 @@ def downgrade() -> None:
             CONSTRAINT fk_asset_computed_asset_id
                 FOREIGN KEY (asset_id)
                 REFERENCES staging.asset_v2(id)
-            
-            
-        )           
+        )
     """)
