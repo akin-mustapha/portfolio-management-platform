@@ -48,6 +48,10 @@ class AssetComputed:
   volatility_20d: float
   volatility_30d: float
   volatility_50d: float
+  pnl_pct: float
+  var_95_1d: float
+  profit_range_30d: float
+  ma_crossover_signal: float
 
 
 class Trading212AssetComputedSourceSilver(Source):
@@ -141,7 +145,9 @@ class Trading212AssetComputedSourceSilver(Source):
             ma_50d,
             volatility_20d,
             volatility_30d,
-            volatility_50d
+            volatility_50d,
+            value,
+            profit
         FROM stats s
     """
     with self._client as db:
@@ -162,26 +168,38 @@ class Trading212AssetComputedTransformation(Transformation):
     for record in data:
       record = dict(record._mapping)
       rget = record.get
+      cashflow=0 if (value := rget("cashflow")) is None else value
+      profit=0 if (value := rget("profit")) is None else value
+      asset_value=0 if (value := rget("value")) is None else value
+      volatility_30d=0 if (value := rget("volatility_30d")) is None else value
+      recent_profit_high_30d=0 if (value := rget("recent_profit_high_30d")) is None else value
+      recent_profit_low_30d=0 if (value := rget("recent_profit_low_30d")) is None else value
+      ma_20d=0 if (value := rget("ma_20d")) is None else value
+      ma_50d=0 if (value := rget("ma_50d")) is None else value
       transformed_data.append(
         AssetComputed(
           asset_id=rget("asset_id"),
-          cashflow=0 if (value := rget("cashflow")) is None else value,
+          cashflow=cashflow,
           daily_return=0 if (value := rget("daily_return")) is None else value,
           cumulative_return=0 if (value := rget("cumulative_return")) is None else value,
           dca_bias=0 if (value := rget("dca_bias")) is None else value,
           pct_drawdown=0 if (value := rget("pct_drawdown")) is None else value,
           recent_value_high_30d=0 if (value := rget("recent_value_high_30d")) is None else value,
           recent_value_low_30d=0 if (value := rget("recent_value_low_30d")) is None else value,
-          recent_profit_high_30d=0 if (value := rget("recent_profit_high_30d")) is None else value,
-          recent_profit_low_30d=0 if (value := rget("recent_profit_low_30d")) is None else value,
+          recent_profit_high_30d=recent_profit_high_30d,
+          recent_profit_low_30d=recent_profit_low_30d,
           value_high=0 if (value := rget("value_high")) is None else value,
           value_low=0 if (value := rget("value_low")) is None else value,
-          ma_20d=0 if (value := rget("ma_20d")) is None else value,
+          ma_20d=ma_20d,
           ma_30d=0 if (value := rget("ma_30d")) is None else value,
-          ma_50d=0 if (value := rget("ma_50d")) is None else value,
+          ma_50d=ma_50d,
           volatility_20d=0 if (value := rget("volatility_20d")) is None else value,
-          volatility_30d=0 if (value := rget("volatility_30d")) is None else value,
+          volatility_30d=volatility_30d,
           volatility_50d=0 if (value := rget("volatility_50d")) is None else value,
+          pnl_pct=0 if cashflow == 0 else profit / cashflow * 100,
+          var_95_1d=volatility_30d * asset_value * 1.65,
+          profit_range_30d=recent_profit_high_30d - recent_profit_low_30d,
+          ma_crossover_signal=ma_20d - ma_50d,
         )
       )
     return transformed_data
