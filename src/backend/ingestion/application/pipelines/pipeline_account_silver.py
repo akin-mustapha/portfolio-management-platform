@@ -57,7 +57,6 @@ class Trading212AccountSourceSilver(Source):
             WHERE t1.business_key = x1.business_key
           )
           AND external_id IS NOT NULL
-      LIMIT 1000;
     """
 
     with self._client as db:
