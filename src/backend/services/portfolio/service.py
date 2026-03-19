@@ -163,3 +163,7 @@ class PortfolioService:
   def get_all_sectors(self):
     sector_repo = self._repo_factory.get("sector")
     return sector_repo.select_all()
+
+  def get_all_categories(self):
+    category_repo = self._repo_factory.get("category")
+    return category_repo.select_all()
