@@ -1,19 +1,18 @@
-"""017_portfolio_service_pmp_59
+"""006_portfolio_restructure
 
-Revision ID: 3f8f7fe34497
-Revises: 192a2efb33f5
-Create Date: 2026-02-21 23:43:29.469328
+Revision ID: 4400000000d6
+Revises: 4400000000d5
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '3f8f7fe34497'
-down_revision: Union[str, Sequence[str], None] = '192a2efb33f5'
+revision: str = '4400000000d6'
+down_revision: Union[str, Sequence[str], None] = '4400000000d5'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -21,20 +20,19 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.execute("""
-                
         ALTER TABLE portfolio.industry
         ADD COLUMN is_active Boolean DEFAULT (true);
-                
+
         ALTER TABLE portfolio.industry_history
         ADD COLUMN is_active Boolean DEFAULT (true);
-        
-        
+
+
         ALTER TABLE portfolio.sector
         ADD COLUMN is_active Boolean DEFAULT(true);
-        
+
         ALTER TABLE portfolio.sector_history
         ADD COLUMN is_active Boolean DEFAULT(true);
-        
+
         DROP TABLE IF EXISTS portfolio.asset_tag;
         DROP TABLE IF EXISTS portfolio.asset;
         DROP TABLE IF EXISTS portfolio.asset_v2;
@@ -52,8 +50,8 @@ def upgrade() -> None:
             CONSTRAINT unique_portfolio_asset_1
                 UNIQUE (ticker, broker, currency)
         );
-        
-        
+
+
         CREATE TABLE portfolio.asset_tag(
             asset_id uuid NOT NULL,
             tag_id uuid NOT NULL,
@@ -64,8 +62,8 @@ def upgrade() -> None:
             CONSTRAINT asset_tag_asset_id_fkey FOREIGN key(asset_id) REFERENCES portfolio.asset(id),
             CONSTRAINT asset_tag_tag_id_fkey FOREIGN key(tag_id) REFERENCES portfolio.tag(id)
         );
-        
-        
+
+
         CREATE OR REPLACE FUNCTION portfolio.industry_history()
         RETURNS trigger
         LANGUAGE plpgsql
@@ -108,13 +106,13 @@ def upgrade() -> None:
 
         ALTER TABLE portfolio.category
         ADD COLUMN description varchar NULL;
-        
+
         ALTER TABLE portfolio.category
         ADD COLUMN is_active boolean Default true;
-        
+
         ALTER TABLE portfolio.category_history
         ADD COLUMN description varchar;
-        
+
         ALTER TABLE portfolio.sector
         ADD CONSTRAINT unq_sector_name UNIQUE(name);
 
@@ -126,13 +124,12 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     op.execute("""
-               
     ALTER TABLE portfolio.industry
     DROP COLUMN is_active;
 
     ALTER TABLE portfolio.industry_history
     DROP COLUMN is_active;
-    
+
     ALTER TABLE portfolio.sector
     DROP COLUMN is_active;
 
@@ -140,19 +137,18 @@ def downgrade() -> None:
     DROP COLUMN is_active;
 
     CREATE OR REPLACE TRIGGER industry_versioning BEFORE DELETE OR UPDATE ON portfolio.industry FOR EACH ROW EXECUTE FUNCTION portfolio.record_history();
-    
+
     DROP FUNCTION portfolio.industry_history;
-    
+
     ALTER TABLE portfolio.category
     DROP COLUMN description;
-    
+
     ALTER TABLE portfolio.category
     DROP COLUMN is_active;
-    
+
     ALTER TABLE portfolio.category_history
     DROP COLUMN description;
-        
+
     ALTER TABLE portfolio.sector
     DROP CONSTRAINT unq_sector_name;
-
     """)

@@ -1,26 +1,24 @@
-"""012_create_silver_asset_computed_table
+"""002_staging_asset_tables
 
-Revision ID: eee5d1e4f1c4
-Revises: c9cb652df5fe
-Create Date: 2026-02-10 19:23:29.760805
+Revision ID: 2200000000b2
+Revises: 2200000000b1
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'eee5d1e4f1c4'
-down_revision: Union[str, Sequence[str], None] = 'c9cb652df5fe'
+revision: str = '2200000000b2'
+down_revision: Union[str, Sequence[str], None] = '2200000000b1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    
     op.execute("""
         CREATE TABLE staging.asset_v2
         (
@@ -43,11 +41,9 @@ def upgrade() -> None:
             business_key TEXT NOT NULL UNIQUE,
             created_timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
             updated_timestamp TIMESTAMPTZ
-            
-            
-        )           
+        )
     """)
-    
+
     op.execute("""
         CREATE TABLE staging.asset_computed
         (
@@ -72,12 +68,11 @@ def upgrade() -> None:
             CONSTRAINT fk_asset_computed_asset_id
                 FOREIGN KEY (asset_id)
                 REFERENCES staging.asset_v2(id)
-            
-            
-        )           
+        )
     """)
+
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('asset_computed', schema="staging")
-    op.drop_table('asset_v2', schema="staging")
+    op.execute("DROP TABLE IF EXISTS staging.asset_computed")
+    op.execute("DROP TABLE IF EXISTS staging.asset_v2")

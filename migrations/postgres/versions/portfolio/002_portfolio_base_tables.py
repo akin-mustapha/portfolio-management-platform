@@ -1,19 +1,20 @@
-"""002_setup_base_OLTP_tables
+"""002_portfolio_base_tables
 
-Revision ID: 1ce744d0b220
-Revises: 941ca72a5bf5
-Create Date: 2026-02-04 18:14:23.679537
+Revision ID: 4400000000d2
+Revises: 4400000000d1
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1ce744d0b220'
-down_revision: Union[str, Sequence[str], None] = '941ca72a5bf5'
+revision: str = '4400000000d2'
+down_revision: Union[str, Sequence[str], None] = '4400000000d1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -82,8 +83,8 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.drop_table('portfolio_snapshot', schema='portfolio')
     op.drop_table('asset_tag', schema='portfolio')
     op.drop_table('tag', schema='portfolio')
     op.drop_table('category', schema='portfolio')
     op.drop_table('asset', schema='portfolio')
-    op.drop_table('portfolio_snapshot', schema='portfolio')

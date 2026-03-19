@@ -1,21 +1,18 @@
-"""007_populate_date_dimensions
+"""005_analytics_populate_dates
 
-Revision ID: ec8b1de1afc0
-Revises: c0f773873a1d
-Create Date: 2026-02-06 15:57:50.797413
+Revision ID: 3300000000c5
+Revises: 3300000000c4
+Create Date: 2026-03-18
 
 """
-from calendar import month
-from datetime import date
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ec8b1de1afc0'
-down_revision: Union[str, Sequence[str], None] = 'c0f773873a1d'
+revision: str = '3300000000c5'
+down_revision: Union[str, Sequence[str], None] = '3300000000c4'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -49,10 +46,10 @@ def upgrade() -> None:
         TO_CHAR(d, 'Day')                               AS day_name,
         EXTRACT(DOW FROM d) IN (0, 6)                   AS is_weekend,
         d = date_trunc('month', d)::date                AS is_month_start,
-        d = (date_trunc('month', d) 
+        d = (date_trunc('month', d)
             + interval '1 month - 1 day')::date        AS is_month_end,
         d = date_trunc('year', d)::date                 AS is_year_start,
-        d = (date_trunc('year', d) 
+        d = (date_trunc('year', d)
             + interval '1 year - 1 day')::date         AS is_year_end
     FROM generate_series(
         '2000-01-01'::date,
@@ -60,7 +57,7 @@ def upgrade() -> None:
         interval '1 day'
     ) AS d;
     """)
-    
+
     op.execute("""
         INSERT INTO analytics.dim_time (time, hour, minute, second)
             SELECT

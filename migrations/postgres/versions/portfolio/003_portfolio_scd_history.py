@@ -1,29 +1,26 @@
-"""010_create_scd_history_table
+"""003_portfolio_scd_history
 
-Revision ID: 1a61c607b4c0
-Revises: c0002396119d
-Create Date: 2026-02-09 21:18:04.637658
+Revision ID: 4400000000d3
+Revises: 4400000000d2
+Create Date: 2026-03-18
 
 """
 from typing import Sequence, Union
 
 from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1a61c607b4c0'
-down_revision: Union[str, Sequence[str], None] = 'c0002396119d'
+revision: str = '4400000000d3'
+down_revision: Union[str, Sequence[str], None] = '4400000000d2'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    
     op.execute(
-        """            
+        """
             CREATE OR REPLACE FUNCTION portfolio.record_history()
             RETURNS trigger AS $$
             DECLARE
@@ -45,10 +42,10 @@ def upgrade() -> None:
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
-            
+
             -- Create Audit Table
             CREATE TABLE portfolio.asset_history (LIKE portfolio.asset INCLUDING DEFAULTS INCLUDING GENERATED);
-            
+
             ALTER TABLE portfolio.asset_history
             ADD COLUMN history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY;
 
@@ -59,15 +56,15 @@ def upgrade() -> None:
             EXECUTE FUNCTION portfolio.record_history();
         """
     )
-    
+
     op.execute(
         """
             -- Create Audit Table
             CREATE TABLE portfolio.asset_tag_history (LIKE portfolio.asset_tag INCLUDING DEFAULTS INCLUDING GENERATED);
-            
+
             ALTER TABLE portfolio.asset_tag_history
             ADD COLUMN history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY;
-            
+
             CREATE TRIGGER asset_tag_versioning
             BEFORE UPDATE OR DELETE
             ON portfolio.asset_tag
@@ -75,15 +72,15 @@ def upgrade() -> None:
             EXECUTE FUNCTION portfolio.record_history();
         """
     )
-    
+
     op.execute(
         """
             -- Create Audit Table
             CREATE TABLE portfolio.tag_history (LIKE portfolio.tag INCLUDING DEFAULTS INCLUDING GENERATED);
-            
+
             ALTER TABLE portfolio.tag_history
             ADD COLUMN history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY;
-            
+
             CREATE TRIGGER tag_versioning
             BEFORE UPDATE OR DELETE
             ON portfolio.tag
@@ -91,15 +88,15 @@ def upgrade() -> None:
             EXECUTE FUNCTION portfolio.record_history();
         """
     )
-    
+
     op.execute(
         """
             -- Create Audit Table
             CREATE TABLE portfolio.category_history (LIKE portfolio.category INCLUDING DEFAULTS INCLUDING GENERATED);
-            
+
             ALTER TABLE portfolio.category_history
             ADD COLUMN history_id UUID DEFAULT gen_random_uuid() PRIMARY KEY;
-            
+
             CREATE TRIGGER category_versioning
             BEFORE UPDATE OR DELETE
             ON portfolio.category
@@ -107,6 +104,7 @@ def upgrade() -> None:
             EXECUTE FUNCTION portfolio.record_history();
         """
     )
+
 
 def downgrade() -> None:
     op.execute(
@@ -133,7 +131,6 @@ def downgrade() -> None:
         DROP TABLE IF EXISTS portfolio.category_history;
         """
     )
-    
     op.execute(
         """
         DROP FUNCTION IF EXISTS portfolio.record_history();

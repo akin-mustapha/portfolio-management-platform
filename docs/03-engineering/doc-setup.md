@@ -37,4 +37,24 @@ Add the following variables to env file
 
 ### Set Alembic ini
 
-Section on alembic setup
+Migrations use four separate ini files, one per medallion layer. They all read `DATABASE_URL` from the `.env` file — no manual URL configuration needed.
+
+To verify Alembic can connect and see the current state of all tracks:
+
+```sh
+alembic -c migrations/postgres/raw.ini current
+alembic -c migrations/postgres/staging.ini current
+alembic -c migrations/postgres/analytics.ini current
+alembic -c migrations/postgres/portfolio.ini current
+```
+
+To apply all migrations on a fresh database:
+
+```sh
+alembic -c migrations/postgres/portfolio.ini upgrade head
+alembic -c migrations/postgres/raw.ini upgrade head
+alembic -c migrations/postgres/staging.ini upgrade head
+alembic -c migrations/postgres/analytics.ini upgrade head
+```
+
+Full migration reference: `docs/02-architecture/design/doc-migration.md`
