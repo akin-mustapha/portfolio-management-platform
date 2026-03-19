@@ -14,17 +14,17 @@ def task_account_silver_pipeline():
     pipeline.run()
 
 
-# @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
-# def task_asset_computed_silver():
-#     pipeline = PipelineFactory.get("asset_computed_silver")
-#     pipeline.run()
+@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
+def task_account_computed_silver():
+    pipeline = PipelineFactory.get("account_computed_silver")
+    pipeline.run()
 
 @flow
 def flow_t212_account_silver():
     logging.info("Starting the flow to fetch account cash")
     logging.info("Starting data ingestion process")
     task_account_silver_pipeline()
-    # task_asset_computed_silver()
+    task_account_computed_silver()
     logging.info("End data ingestion process")
 
     

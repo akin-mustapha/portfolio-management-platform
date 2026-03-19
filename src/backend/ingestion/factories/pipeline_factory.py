@@ -6,6 +6,7 @@ from ..application.pipelines.pipeline_asset_portfolio import PipelineAssetPortfo
 from ..application.pipelines.pipeline_account_bronze import PipelineAccountBronze
 from ..application.pipelines.pipeline_account_silver import PipelineAccountSilver
 from ..application.pipelines.pipeline_asset_computed_silver import PipelineAssetComputedSilver
+from ..application.pipelines.pipeline_account_computed_silver import PipelineAccountComputedSilver
 from ..application.pipelines.portfolio_enrichment_synchronizer import enrichment_sychronization
 
 class PipelineFactory:
@@ -16,6 +17,7 @@ class PipelineFactory:
     "asset_portfolio": PipelineAssetPortfolio,
     "account_bronze": PipelineAccountBronze,
     "account_silver": PipelineAccountSilver,
+    "account_computed_silver": PipelineAccountComputedSilver,
     "enrichment_sychronization": enrichment_sychronization,
   }
   @classmethod
