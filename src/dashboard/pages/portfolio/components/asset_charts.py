@@ -39,26 +39,6 @@ def _donut_chart(labels, values, colors, theme):
 # Figures
 # ─────────────────────────────────────────────
 
-class AssetCategoryPlotlyPieChart:
-    # Placeholder — replace with real asset-type breakdown when data is wired in
-    _LABELS = ["Stocks", "ETFs"]
-    _VALUES = [60, 40]
-    _COLORS = ["#5b8db8", "#1a9e6e"]
-
-    def render(self, data, theme="light"):
-        return _donut_chart(self._LABELS, self._VALUES, self._COLORS, theme)
-
-
-class AssetTagsPlotlyPieChart:
-    # Placeholder — replace with real tag breakdown when data is wired in
-    _LABELS = ["Growth", "Income", "Speculative"]
-    _VALUES = [50, 30, 20]
-    _COLORS = ["#1a9e6e", "#5b8db8", "#e8a838"]
-
-    def render(self, data, theme="light"):
-        return _donut_chart(self._LABELS, self._VALUES, self._COLORS, theme)
-
-
 class PriceStructurePlotlyLineChart:
     def render(self, data, theme="light"):
         asset_data: dict = data.get("asset_price")

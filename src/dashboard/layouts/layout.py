@@ -1,9 +1,6 @@
 import dash_bootstrap_components as dbc
-from dash import Input, Output, dcc, html, callback, State
+from dash import Input, Output, dcc, html, callback
 from ..pages.portfolio.portfolio_page import portfolio_layout
-from ..pages.asset.asset_page import asset_layout
-from ..pages.tag.tag_page import tag_layout
-from backend.services.portfolio.portfolio_service_builder import build_portfolio_service
 from ..pages.portfolio import theme_callbacks  # noqa: F401
 from ..components.buttons import privacy_toggle_btn
 
@@ -35,8 +32,6 @@ def _top_navbar():
             dbc.Nav(
                 [
                     dbc.NavLink("Portfolio", href="/portfolio", active="exact", className="top-nav-link"),
-                    dbc.NavLink("Assets", href="/assets", active="exact", className="top-nav-link"),
-                    dbc.NavLink("Tags", href="/tag", active="exact", className="top-nav-link"),
                 ],
                 className="d-flex flex-row gap-1 ms-4",
             ),
@@ -67,17 +62,11 @@ def _top_navbar():
         className="top-navbar",
     )
 
-portfolio_service = build_portfolio_service()
-
 @callback(Output("page-content", "children"), Output("active-page", "data"), [Input("url", "pathname")])
 def render_page_content(pathname):
   if pathname == "/portfolio":
     return portfolio_layout(), pathname
-  elif pathname == "/assets":
-    return asset_layout(), pathname
-  elif pathname == "/tag":
-    return tag_layout(), pathname
-  # If the user tries to reach a different page, return a 404 message
+# If the user tries to reach a different page, return a 404 message
   return html.Div(
     [
       html.H1("404: Not found", className="text-danger"),
@@ -86,19 +75,6 @@ def render_page_content(pathname):
     ],
     className="p-3 bg-light rounded-3",
   ), pathname
-
-@callback(
-    Output("tag-create-status", "value"),
-    Input("btn-create-tag-name", "n_clicks"),
-    State("input-tag-name", "value"),
-    prevent_initial_call=True
-)
-def create_new_tag(n_clicks, value):
-    if not value:
-        return "Tag name cannot be empty"
-
-    portfolio_service.create_tag(value)
-    return f"Tag '{value}' created"
 
 # Layout
 layout = dbc.Container(

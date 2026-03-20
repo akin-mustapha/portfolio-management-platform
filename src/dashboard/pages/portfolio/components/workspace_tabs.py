@@ -15,13 +15,11 @@ from .charts import (
     PortfolioDrawdownPlotlyLineChart,
     PositionProfitabilityPlotlyDonutChart,
 )
-from ...asset.components.charts import (
+from .asset_charts import (
     PriceStructurePlotlyLineChart,
     AssetValuePlotlyLineChart,
     RiskContextPlotlyLineChart,
     DCABiasPlotlyLineChart,
-    AssetCategoryPlotlyPieChart,
-    AssetTagsPlotlyPieChart,
 )
 
 _GRAPH_CONFIG = {"displayModeBar": False}
@@ -189,39 +187,26 @@ def portfolio_tab_content(view_model=None, theme="light"):
         html.Hr(className="tv-divider"),
         dbc.Row([
 
-            dbc.Col
-            (
-                _chart_section
-                (
+            dbc.Col(
+                _chart_section(
                     "Top Losers",
-                    dcc.Graph
-                    (
+                    dcc.Graph(
                         id="losers_chart",
                         figure=LosersPlotlyBarChart().render(losers, theme=theme),
                         config=_GRAPH_CONFIG,
                     )
                 ),
-                # lg=6,
-                # md=12,
-                # width=6,
-                
             ),
-            
-            dbc.Col
-            (
-                _chart_section
-                (
+
+            dbc.Col(
+                _chart_section(
                     "Top Winners",
-                    dcc.Graph
-                    (
+                    dcc.Graph(
                         id="winners_chart",
                         figure=WinnersPlotlyBarChart().render(winners, theme=theme),
                         config=_GRAPH_CONFIG,
                     )
                 ),
-                # width=6
-                # , lg=6
-                # , md=12
             ),
 
         ], className="mb-6 workspace-chart-grid"),

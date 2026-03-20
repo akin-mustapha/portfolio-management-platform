@@ -228,18 +228,16 @@ class PortfolioPresenter:
         try:
             import pandas as pd
             df = pd.DataFrame(assets)
-            dict = df[df["is_profitable"] == 1].groupby('created_date')["profit"].sum().to_dict()
-            
-            return dict
+            df["created_date"] = pd.to_datetime(df["created_date"]).dt.date
+            return df[df["is_profitable"] == 1].groupby('created_date')["profit"].sum().to_dict()
         except Exception as e:
             raise e
-    
+
     def _losers_pnl_vm(self, assets: list[dict]) -> dict:
         try:
             import pandas as pd
             df = pd.DataFrame(assets)
-            dict = df[df["is_profitable"] == 0].groupby('created_date')["profit"].sum().to_dict()
-            
-            return dict
+            df["created_date"] = pd.to_datetime(df["created_date"]).dt.date
+            return df[df["is_profitable"] == 0].groupby('created_date')["profit"].sum().to_dict()
         except Exception as e:
             raise e
