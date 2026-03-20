@@ -99,7 +99,10 @@ class PortfolioPerformanceScatterPlot:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data)
-        
+        for col in ["roi_pct", "weight_pct", "value", "profit"]:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
         fig = px.scatter(
             df,
             x="roi_pct",
@@ -248,12 +251,15 @@ class PortfolioPerformanceScatterPlot:
         _apply_spike_config(fig)
         return fig
 
-class WinnersPlotlyBarChart:
+class _BaseRankedBarChart:
+    sort_ascending: bool = True
+    y_axis_side: str = "left"
+
     def render(self, data, theme="light", x_col="profit"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-
         df = pd.DataFrame(data)
-        df = df.sort_values(x_col, ascending=True)
+        df[x_col] = pd.to_numeric(df[x_col], errors="coerce")
+        df = df.sort_values(x_col, ascending=self.sort_ascending)
         max_val = df[x_col].abs().max() or 1
 
         fig = px.bar(
@@ -281,7 +287,7 @@ class WinnersPlotlyBarChart:
             height=CHART_HEIGHT,
             xaxis_title=None,
             yaxis_title=None,
-            yaxis=dict(side="left", showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(side=self.y_axis_side, showgrid=False, zeroline=False, showticklabels=False),
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             font=dict(size=11, color=ct["font_color"]),
             bargap=0.2,
@@ -294,49 +300,15 @@ class WinnersPlotlyBarChart:
 
         return fig
 
-class LosersPlotlyBarChart:
-    def render(self, data, theme="light", x_col="profit"):
-        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-        df = pd.DataFrame(data)
-        df = df.sort_values(x_col, ascending=False)
-        max_val = df[x_col].abs().max() or 1
 
-        fig = px.bar(
-            df,
-            x=x_col,
-            y="ticker",
-            orientation="h",
-            text="label",
-            color=x_col,
-            labels=[x_col, "name"],
-            color_continuous_scale=px.colors.diverging.RdYlGn,
-            range_color=[-max_val, max_val],
-        )
+class WinnersPlotlyBarChart(_BaseRankedBarChart):
+    sort_ascending = True
+    y_axis_side = "left"
 
-        fig.update_traces(
-            marker=dict(line=dict(width=0)),
-            texttemplate="%{text}",
-            textposition="inside",
-            textfont=dict(color=ct["font_color"], size=13),
-        )
 
-        fig.update_layout(
-            template="plotly_white",
-            height=CHART_HEIGHT,
-            margin=dict(l=2, r=2, t=2, b=2),
-            xaxis_title=None,
-            yaxis_title=None,
-            yaxis=dict(side="right", showgrid=False, zeroline=False, showticklabels=False),
-            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            font=dict(size=11, color=ct["font_color"]),
-            bargap=0.2,
-            paper_bgcolor=ct["paper_bgcolor"],
-            plot_bgcolor=ct["plot_bgcolor"],
-            coloraxis_showscale=False,
-            title=None,
-        )
-
-        return fig
+class LosersPlotlyBarChart(_BaseRankedBarChart):
+    sort_ascending = False
+    y_axis_side = "right"
 
 class PositionWeightPlotlyDonutChart:
     def render (self, data, theme="light"):

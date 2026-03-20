@@ -8,6 +8,8 @@ from .components.tables import asset_table
 from .components.workspace_tabs import (
     portfolio_tab_content,
     valuation_tab_content,
+    risk_tab_content,
+    opportunities_tab_content,
 )
 from .components.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart
 from ...controllers.portfolio_controller import PortfolioController
@@ -55,6 +57,8 @@ def _filter_vm_by_timeframe(view_model: dict, start: str, end: str) -> dict:
     Output("portfolio_page_asset_table_container", "children"),
     Output("tab-portfolio-content", "children"),
     Output("workspace-table-footer", "children"),
+    Output("tab-risk-content", "children"),
+    Output("tab-opportunities-content", "children"),
     Input("portfolio_page_location", "pathname"),
     State("portfolio_page_asset_store", "data"),
     State("theme-store", "data"),
@@ -81,6 +85,8 @@ def load_portfolio_page(pathname, cached_data, theme):
         asset_table(rows),
         portfolio_tab_content(view_model, current_theme),
         asset_count,
+        risk_tab_content(view_model, current_theme),
+        opportunities_tab_content(view_model, current_theme),
     )
 
 
@@ -124,6 +130,8 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
     Output("tab-valuation-content", "children", allow_duplicate=True),
     Output("tab-portfolio-content", "children", allow_duplicate=True),
     Output("workspace-timeframe", "data"),
+    Output("tab-risk-content", "children", allow_duplicate=True),
+    Output("tab-opportunities-content", "children", allow_duplicate=True),
     Input("workspace-timeframe-selector", "value"),
     State("portfolio_page_asset_store", "data"),
     State("workspace-selected-asset", "data"),
@@ -138,15 +146,19 @@ def on_timeframe_change(timeframe, cached_data, selected_asset, theme):
     start_date, end_date = _date_window(timeframe)
     kpi_children = no_update
     portfolio_tab = no_update
+    risk_tab = no_update
+    opportunities_tab = no_update
 
     if cached_data:
         view_model = cached_data.get("view_model", {})
         kpi_children = kpi_row(view_model.get("kpi", {}))
         filtered_vm = _filter_vm_by_timeframe(view_model, start_date, end_date)
         portfolio_tab = portfolio_tab_content(filtered_vm, current_theme)
+        risk_tab = risk_tab_content(filtered_vm, current_theme)
+        opportunities_tab = opportunities_tab_content(filtered_vm, current_theme)
 
     if not selected_asset:
-        return kpi_children, no_update, portfolio_tab, timeframe
+        return kpi_children, no_update, portfolio_tab, timeframe, risk_tab, opportunities_tab
 
     asset_history = AssetController().get_asset_snapshot(selected_asset.lower(), start_date, end_date)
 
@@ -155,6 +167,8 @@ def on_timeframe_change(timeframe, cached_data, selected_asset, theme):
         valuation_tab_content(asset_history, current_theme),
         portfolio_tab,
         timeframe,
+        risk_tab,
+        opportunities_tab,
     )
 
 

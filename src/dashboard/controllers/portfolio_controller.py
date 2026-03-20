@@ -30,11 +30,10 @@ class PortfolioController:
         assets = df_asset_data.to_dict(orient="records")
         for row in assets:
             row["price_series"] = price_map.get(row["ticker"], [])
-
         data = {
             "assets": assets,
             "assets_history": df_asset_data_history,
             "portfolio_history": df_portfolio_history.to_dict(orient="records"),
-            "portfolio_current_snapshot": portfolio_snapshot[0],
+            "portfolio_current_snapshot": portfolio_snapshot[0] if portfolio_snapshot else {},
         }
         return self._presenter.present(data)

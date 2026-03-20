@@ -131,6 +131,8 @@ Current deployments:
 | Portfolio sync | `prefect deployment run 'flow_t212_asset_portfolio_sync/t212_asset_portfolio_sync'` |
 | Enrichment sync | `prefect deployment run 'flow_t212_enrichment_sychronization/t212_enrichment_synchronization'` |
 
+> Gold pipelines (`PipelineAssetGold`, `PipelineAccountGold`) are not yet registered as Prefect deployments. Run them manually — see **Services** section below.
+
 Create the work pool manually (already done by the deploy script):
 
 ```sh
@@ -139,22 +141,19 @@ prefect work-pool create asset-monitoring-pool --type process
 
 ## Services
 
-### Ingestion Pipeline
+### Gold Pipelines
+
+Run manually from the project root (not yet in Prefect):
 
 ```sh
-  python3 -m ingestion.pipelines.pipeline_account_bronze
-```
-
-### Tagging Service
-
-```sh
-  python3 -m scripts.run_tagging_service
+  python -m src.backend.ingestion.application.pipelines.pipeline_asset_gold
+  python -m src.backend.ingestion.application.pipelines.pipeline_account_gold
 ```
 
 ### Dash UI
 
 ```sh
-  python -m src.dashboard.app_2
+  python -m src.dashboard.app
 ```
 
 ## Util

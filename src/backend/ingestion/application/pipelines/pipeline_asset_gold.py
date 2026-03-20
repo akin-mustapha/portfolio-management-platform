@@ -40,19 +40,28 @@ class AssetGoldSource(Source):
 
     def extract(self):
         sql = """
+            WITH cte_asset AS (
+                SELECT
+                    ROW_NUMBER() OVER (
+                        PARTITION BY ticker, data_timestamp::DATE
+                        ORDER BY data_timestamp DESC
+                    ) AS rn,
+                    *
+                FROM staging.asset
+            )
             SELECT
-                TO_CHAR(CURRENT_DATE, 'YYYYMMDD')::INTEGER  AS date_id,
-                dp.id                                        AS portfolio_id,
+                TO_CHAR(a.data_timestamp, 'YYYYMMDD')::INTEGER  AS date_id,
+                dp.id                                             AS portfolio_id,
                 da.asset_id,
 
                 a.price,
                 a.avg_price,
 
                 a.value,
-                a.cost                                       AS cost_basis,
-                a.profit                                     AS unrealized_pnl,
-                a.profit / NULLIF(a.cost, 0) * 100          AS unrealized_pnl_pct,
-                NULL::FLOAT                                  AS realized_pnl,
+                a.cost                                            AS cost_basis,
+                a.profit                                          AS unrealized_pnl,
+                a.profit / NULLIF(a.cost, 0) * 100               AS unrealized_pnl_pct,
+                NULL::FLOAT                                       AS realized_pnl,
                 c.position_weight_pct,
                 a.fx_impact,
 
@@ -70,26 +79,27 @@ class AssetGoldSource(Source):
                 c.volatility_50d,
                 c.var_95_1d,
                 c.profit_range_30d,
+                c.recent_profit_high_30d,
+                c.recent_profit_low_30d,
+                c.recent_value_high_30d,
+                c.recent_value_low_30d,
 
                 c.dca_bias,
                 c.ma_crossover_signal,
-                (a.price > c.ma_20d)                        AS price_above_ma_20d,
-                (a.price > c.ma_50d)                        AS price_above_ma_50d
+                (a.price > c.ma_20d)                             AS price_above_ma_20d,
+                (a.price > c.ma_50d)                             AS price_above_ma_50d
 
-            FROM (
-                SELECT DISTINCT ON (ticker) *
-                FROM staging.asset
-                ORDER BY ticker, data_timestamp DESC
-            ) a
+            FROM cte_asset a
             JOIN staging.asset_computed c
                 ON c.asset_id = a.id
             JOIN analytics.dim_asset da
-                ON da.asset_id = a.id
+                ON da.ticker = a.ticker
             CROSS JOIN (
                 SELECT id
                 FROM analytics.dim_portfolio
                 WHERE portfolio_id = 'trading212'
             ) dp
+            WHERE a.rn = 1
         """
         with self._client as db:
             result = db.execute(sql)
@@ -158,6 +168,8 @@ class FactTechnicalDestination(Destination):
         'ma_20d', 'ma_30d', 'ma_50d',
         'volatility_20d', 'volatility_30d', 'volatility_50d',
         'var_95_1d', 'profit_range_30d',
+        'recent_profit_high_30d', 'recent_profit_low_30d',
+        'recent_value_high_30d', 'recent_value_low_30d',
     }
 
     def __init__(self):
@@ -220,14 +232,15 @@ class PipelineAssetGold(BaseGoldPipeline):
             """)
             db.execute("""
                 INSERT INTO analytics.dim_asset (asset_id, ticker, name, asset_type, currency)
-                SELECT DISTINCT
+                SELECT DISTINCT ON (ticker)
                     id          AS asset_id,
                     ticker,
                     name,
                     'STOCK'     AS asset_type,
                     currency
                 FROM staging.asset
-                ON CONFLICT (asset_id) DO NOTHING
+                ORDER BY ticker, data_timestamp DESC
+                ON CONFLICT (ticker) DO NOTHING
             """)
 
 

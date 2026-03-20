@@ -48,6 +48,10 @@ class AssetGoldRecord(BaseModel):
     volatility_50d: Optional[float] = None
     var_95_1d: Optional[float] = None
     profit_range_30d: Optional[float] = None
+    recent_profit_high_30d: Optional[float] = None
+    recent_profit_low_30d: Optional[float] = None
+    recent_value_high_30d: Optional[float] = None
+    recent_value_low_30d: Optional[float] = None
 
     # Signals / Opportunities (fact_signal)
     dca_bias: Optional[float] = None

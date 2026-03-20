@@ -219,6 +219,10 @@ fact_technical:
     - volatility_50d::numeric
     - var_95_1d::numeric             # volatility_30d × value × 1.65 (parametric VaR, 95% confidence)
     - profit_range_30d::numeric      # recent_profit_high_30d - recent_profit_low_30d
+    - recent_profit_high_30d::numeric  # highest unrealized_pnl over the past 30 days
+    - recent_profit_low_30d::numeric   # lowest unrealized_pnl over the past 30 days
+    - recent_value_high_30d::numeric   # highest position value over the past 30 days
+    - recent_value_low_30d::numeric    # lowest position value over the past 30 days
     - created_timestamp::timestamptz
     - updated_timestamp::timestamptz
 ```

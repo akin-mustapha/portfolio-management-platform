@@ -163,6 +163,7 @@ class Trading212AssetComputedSourceSilver(Source):
             -- position weight: this asset's value as % of total portfolio
             s.value / NULLIF((SELECT total_value FROM account_snapshot), 0) * 100 AS position_weight_pct
         FROM stats s
+        WHERE s.asset_id NOT IN (SELECT asset_id FROM staging.asset_computed)
     """
     with self._client as db:
       result = db.execute(sql)

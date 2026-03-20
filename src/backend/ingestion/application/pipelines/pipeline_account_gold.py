@@ -40,12 +40,24 @@ class AccountGoldSource(Source):
 
     def extract(self):
         sql = """
+            ;WITH cte_fx AS (
+            SELECT data_timestamp::DATE, SUM(fx_impact) AS fx_impact_total
+            FROM staging.asset sa
+            GROUP BY data_timestamp::DATE
+            )
+            , cte_account AS (
             SELECT
-                TO_CHAR(CURRENT_DATE, 'YYYYMMDD')::INTEGER          AS date_id,
-                dp.id                                                 AS portfolio_id,
+                ROW_NUMBER()OVER(PARTITION BY data_timestamp::DATE ORDER BY data_timestamp DESC) AS rn
+                , *
+            FROM staging.account
+            ORDER BY data_timestamp DESC
+            )
+            SELECT
+                TO_CHAR(a.data_timestamp, 'YYYYMMDD')::INTEGER          AS date_id,
+                dp.id                                               AS portfolio_id,
 
                 a.total_value,
-                a.investments_total_cost                              AS total_cost,
+                a.investments_total_cost                             AS total_cost,
                 a.investments_unrealized_pnl                         AS unrealized_pnl,
                 a.investments_unrealized_pnl
                     / NULLIF(a.investments_total_cost, 0) * 100      AS unrealized_pnl_pct,
@@ -62,9 +74,7 @@ class AccountGoldSource(Source):
                 fx.fx_impact_total,
                 c.portfolio_volatility_weighted
 
-            FROM (
-                SELECT * FROM staging.account ORDER BY data_timestamp DESC LIMIT 1
-            ) a
+            FROM cte_account a
             JOIN staging.account_computed c
                 ON c.account_id = a.id
             CROSS JOIN (
@@ -72,9 +82,9 @@ class AccountGoldSource(Source):
                 FROM analytics.dim_portfolio
                 WHERE portfolio_id = 'trading212'
             ) dp
-            LEFT JOIN (
-                SELECT SUM(fx_impact) AS fx_impact_total FROM staging.asset
-            ) fx ON true
+            LEFT JOIN cte_fx fx
+            ON fx.data_timestamp = a.data_timestamp::DATE
+            WHERE a.rn = 1
         """
         with self._client as db:
             result = db.execute(sql)

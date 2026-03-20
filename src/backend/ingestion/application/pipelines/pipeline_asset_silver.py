@@ -56,7 +56,11 @@ class Trading212AssetSourceSilver(Source):
         ingested_timestamp,
         business_key
       FROM raw.v_bronze_asset t1
-      WHERE ticker IS NOT NULL;
+      WHERE ticker IS NOT NULL
+        AND ingested_date > (
+            SELECT COALESCE(MAX(data_timestamp::DATE), '1900-01-01')
+            FROM staging.asset
+        );
     """
 
     with self._client as db:

@@ -13,48 +13,41 @@ class PostgresAssetQueryRepository:
 
   def get_most_recent_asset_data(self):
     sql = """
-      WITH most_recent_asset AS
-      (
-          SELECT
-              ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) AS rn,
-              id
-          FROM staging.asset
+      WITH latest AS (
+          SELECT asset_id, MAX(date_id) AS max_date_id
+          FROM analytics.fact_valuation
+          GROUP BY asset_id
       )
-
       SELECT
-          a.ticker,
-          a.name,
-          CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
-          a.description AS asset_description,
-          a.value,
-          a.profit,
-          a.price,
-          a.cost,
-          COALESCE(ac.position_weight_pct, 0) AS weight_pct,
-          COALESCE(ac.pnl_pct, 0) AS pnl_pct,
-          ac.recent_profit_high_30d,
-          ac.recent_profit_low_30d,
-          ac.pct_drawdown,
-          ac.volatility_30d,
-          ac.volatility_50d,
-          ac.ma_30d,
-          ac.ma_50d,
-          ac.dca_bias,
-          ac.cumulative_return,
-          a.data_timestamp AS data_date
-
-      FROM staging.asset a
-      INNER JOIN most_recent_asset lm
-          ON a.id = lm.id
-          AND lm.rn = 1
-
-      LEFT JOIN staging.asset_computed ac
-          ON a.id = ac.asset_id
+          da.ticker,
+          da.name,
+          da.name                                       AS asset_description,
+          fv.value,
+          fv.unrealized_pnl                             AS profit,
+          fp.price,
+          fv.cost_basis                                 AS cost,
+          COALESCE(fv.position_weight_pct, 0)           AS weight_pct,
+          COALESCE(fv.unrealized_pnl_pct, 0)            AS pnl_pct,
+          ft.recent_profit_high_30d,
+          ft.recent_profit_low_30d,
+          ft.pct_drawdown,
+          ft.volatility_30d,
+          ft.volatility_50d,
+          ft.ma_30d,
+          ft.ma_50d,
+          fs.dca_bias,
+          fr.cumulative_return,
+          TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
+      FROM analytics.fact_valuation fv
+      JOIN latest ON fv.asset_id = latest.asset_id AND fv.date_id = latest.max_date_id
+      JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id
+      JOIN analytics.fact_price fp ON fp.asset_id = fv.asset_id AND fp.date_id = fv.date_id
+      LEFT JOIN analytics.fact_technical ft ON ft.asset_id = fv.asset_id AND ft.date_id = fv.date_id
+      LEFT JOIN analytics.fact_signal fs ON fs.asset_id = fv.asset_id AND fs.date_id = fv.date_id
+      LEFT JOIN analytics.fact_return fr ON fr.asset_id = fv.asset_id AND fr.date_id = fv.date_id
     """
     with self.client as client:
-      res = client.execute(
-          sql
-      )
+      res = client.execute(sql)
       res = res.fetchall()
     return res
 
@@ -64,40 +57,39 @@ class PostgresAssetQueryRepository:
     placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
     params = {f"t{i}": t for i, t in enumerate(tickers)}
     sql = f"""
-      SELECT ticker, price, created_timestamp as data_date
-      FROM staging.asset
-      WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
-        AND ticker IN ({placeholders})
-      ORDER BY ticker, created_timestamp ASC
+      SELECT
+          da.ticker,
+          fp.price,
+          TO_DATE(fp.date_id::TEXT, 'YYYYMMDD')         AS data_date
+      FROM analytics.fact_price fp
+      JOIN analytics.dim_asset da ON da.asset_id = fp.asset_id
+      WHERE fp.date_id >= TO_CHAR(CURRENT_DATE - INTERVAL '30 days', 'YYYYMMDD')::INTEGER
+        AND da.ticker IN ({placeholders})
+      ORDER BY da.ticker, fp.date_id ASC
     """
     with self.client as client:
       res = client.execute(sql, params)
     return res.fetchall()
-  
+
   def get_asset_history(self):
-    try:
-    
-      sql = f"""
-          ;WITH cte AS (
-          SELECT  *
-                , CAST(data_timestamp AS date) AS data_date
-                , ROW_NUMBER()OVER(PARTITION BY ticker, CAST(data_timestamp AS date) ORDER BY data_timestamp DESC) AS rn
-            FROM staging.asset
-            WHERE data_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
-            ORDER BY ticker, data_timestamp ASC
-        )
-        SELECT
-          *
-         , CASE WHEN profit > 0 THEN 1 ELSE 0 END AS is_profitable
-          
-        FROM cte
-        WHERE rn = 1
-      """
-      with self.client as client:
-        res = client.execute(sql)
-      return res.fetchall()
-    except Exception as e:
-      raise e
+    sql = """
+      SELECT
+          da.ticker,
+          fv.unrealized_pnl                             AS profit,
+          fv.value,
+          fp.price,
+          fv.cost_basis                                 AS cost,
+          TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date,
+          CASE WHEN fv.unrealized_pnl > 0 THEN 1 ELSE 0 END AS is_profitable
+      FROM analytics.fact_valuation fv
+      JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id
+      JOIN analytics.fact_price fp ON fp.asset_id = fv.asset_id AND fp.date_id = fv.date_id
+      WHERE fv.date_id >= TO_CHAR(CURRENT_DATE - INTERVAL '30 days', 'YYYYMMDD')::INTEGER
+      ORDER BY da.ticker, fv.date_id ASC
+    """
+    with self.client as client:
+      res = client.execute(sql)
+    return res.fetchall()
 
 class PostgresSnapshotQueryRepository:
   def __init__(self):
@@ -132,48 +124,50 @@ class PostgresSnapshotQueryRepository:
   def get_unrealized_profit(self):
     sql = """
     SELECT
-        a.data_timestamp as data_date,
-        a.total_value,
-        a.investments_total_cost,
-        a.investments_realized_pnl,
-        a.investments_unrealized_pnl,
-        a.currency,
-        a.cash_available_to_trade,
-        COALESCE(ac.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
-        COALESCE(ac.daily_change_pct, 0) AS daily_change_pct,
-        COALESCE(ac.daily_change_abs, 0) AS daily_change_abs
-    FROM staging.account a
-    LEFT JOIN staging.account_computed ac ON ac.account_id = a.id
-    WHERE a.external_id IS NOT NULL
-    ORDER BY data_date
+        TO_DATE(fpd.date_id::TEXT, 'YYYYMMDD')        AS data_date,
+        fpd.total_value,
+        fpd.total_cost                                AS investments_total_cost,
+        fpd.realized_pnl                              AS investments_realized_pnl,
+        fpd.unrealized_pnl                            AS investments_unrealized_pnl,
+        dp.base_currency                              AS currency,
+        fpd.cash_available                            AS cash_available_to_trade,
+        COALESCE(fpd.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
+        COALESCE(fpd.daily_change_pct, 0)             AS daily_change_pct,
+        COALESCE(fpd.daily_change_abs, 0)             AS daily_change_abs
+    FROM analytics.fact_portfolio_daily fpd
+    JOIN analytics.dim_portfolio dp ON dp.id = fpd.portfolio_id
+    WHERE dp.portfolio_id = 'trading212'
+    ORDER BY data_date ASC
     """
     with self.client as client:
       res = client.execute(sql)
     return res.fetchall()
-  
+
   def get_asset_snapshot(self, ticker, start_date, end_date):
     sql = """
         SELECT
-            a.ticker,
-            a.name as asset_description,
-            ac.recent_value_high_30d,
-            ac.recent_value_low_30d,
-            ac.ma_30d,
-            ac.ma_50d,
-            ac.dca_bias,
-            a.value,
-            a.avg_price,
-            a.price,
-            a.profit,
-            ac.volatility_30d,
-            ac.pct_drawdown,
-            a.created_timestamp as data_date
-        FROM staging.asset a
-        INNER JOIN staging.asset_computed as ac
-            on a.id = ac.asset_id
-        WHERE date(a.created_timestamp) BETWEEN :start_date AND :end_date
-          AND lower(a.ticker) = :ticker
-        AND ac.asset_id IS NOT NULL
+            da.ticker,
+            da.name                                       AS asset_description,
+            ft.recent_value_high_30d,
+            ft.recent_value_low_30d,
+            ft.ma_30d,
+            ft.ma_50d,
+            fs.dca_bias,
+            fv.value,
+            fp.avg_price,
+            fp.price,
+            fv.unrealized_pnl                             AS profit,
+            ft.volatility_30d,
+            ft.pct_drawdown,
+            TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
+        FROM analytics.fact_valuation fv
+        JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id
+        JOIN analytics.fact_price fp ON fp.asset_id = fv.asset_id AND fp.date_id = fv.date_id
+        LEFT JOIN analytics.fact_technical ft ON ft.asset_id = fv.asset_id AND ft.date_id = fv.date_id
+        LEFT JOIN analytics.fact_signal fs ON fs.asset_id = fv.asset_id AND fs.date_id = fv.date_id
+        WHERE TO_DATE(fv.date_id::TEXT, 'YYYYMMDD') BETWEEN :start_date AND :end_date
+          AND LOWER(da.ticker) = :ticker
+        ORDER BY fv.date_id ASC
       """
     with self.client as client:
       res = client.execute(sql, {"ticker": ticker.lower(), "start_date": start_date, "end_date": end_date})
