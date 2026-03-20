@@ -27,10 +27,18 @@ def task_asset_computed_silver():
     pipeline.run()
 
 
+@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
+def task_asset_gold():
+    pipeline = PipelineFactory.get("asset_gold")
+    logger.info("Running asset gold pipeline")
+    pipeline.run()
+
+
 @flow
 def flow_t212_asset():
-    logger.info("Starting asset flow: bronze → silver → computed silver")
+    logger.info("Starting asset flow: bronze → silver → computed silver → gold")
     task_asset_bronze()
     task_asset_silver()
     task_asset_computed_silver()
+    task_asset_gold()
     logger.info("Asset flow complete")

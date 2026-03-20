@@ -12,8 +12,9 @@ class SchemaValidator:
     pipeline_name is set to None here — the pipeline sets it before writing to dead letter.
     """
 
-    def __init__(self, model: Type[BaseModel]):
+    def __init__(self, model: Type[BaseModel], layer: str = "silver"):
         self._model = model
+        self._layer = layer
 
     def validate(self, data: list[dict]) -> ValidationResult:
         valid, invalid = [], []
@@ -23,7 +24,7 @@ class SchemaValidator:
             except ValidationError as e:
                 invalid.append(RejectedRecord(
                     pipeline_name=None,
-                    layer="silver",
+                    layer=self._layer,
                     business_key=row.get("business_key"),
                     raw_payload=row,
                     error_type="schema_validation",

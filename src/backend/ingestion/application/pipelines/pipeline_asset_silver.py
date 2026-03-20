@@ -97,6 +97,7 @@ class Trading212AssetTransformationSilver(Transformation):
     asset_df["cost"] = df["total_cost"]
     asset_df["profit"] = df["unrealized_pnl"]
     asset_df["fx_impact"] = df["fx_impact"]
+    asset_df["quantity_in_pies"] = df["quantity_in_pies"]
     asset_df["business_key"] = df["business_key"]
     asset_df["updated_timestamp"] = datetime.now(UTC)
 

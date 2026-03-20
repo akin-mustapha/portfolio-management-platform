@@ -26,9 +26,10 @@ class AssetRecord(BaseModel):
     cost: float
     profit: float
     fx_impact: float = 0.0
+    quantity_in_pies: float = 0.0
     business_key: str
 
-    @field_validator("fx_impact", mode="before")
+    @field_validator("fx_impact", "quantity_in_pies", mode="before")
     @classmethod
     def coerce_fx_impact(cls, v):
         return v if v is not None else 0.0

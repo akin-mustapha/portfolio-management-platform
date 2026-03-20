@@ -30,6 +30,7 @@ asset:
     - cost                 # FLOAT
     - profit               # FLOAT
     - fx_impact            # FLOAT
+    - quantity_in_pies     # FLOAT  (added migration 009)
     - business_key         # TEXT, unique
     - created_timestamp    # TIMESTAMPTZ
     - updated_timestamp    # TIMESTAMPTZ
@@ -43,7 +44,7 @@ asset:
 asset_computed:
   columns:
     - asset_id             # UUID, FK → staging.asset(id), unique
-    - cashflow             # FLOAT
+    - cost_basis           # FLOAT  (renamed from cashflow — migration 011)
     - daily_return         # FLOAT
     - cumulative_return    # FLOAT
     - dca_bias             # FLOAT
@@ -64,6 +65,7 @@ asset_computed:
     - var_95_1d            # FLOAT  (added migration 006)
     - profit_range_30d     # FLOAT  (added migration 006)
     - ma_crossover_signal  # FLOAT  (added migration 006)
+    - position_weight_pct  # FLOAT  (added migration 010)
     - created_timestamp    # TIMESTAMPTZ
 ```
 
@@ -103,6 +105,7 @@ account_computed:
     - total_return_pct       # FLOAT
     - cash_deployment_ratio  # FLOAT
     - daily_change_abs       # FLOAT
-    - daily_change_pct       # FLOAT
-    - created_timestamp      # TIMESTAMPTZ NOT NULL DEFAULT now()
+    - daily_change_pct                 # FLOAT
+    - portfolio_volatility_weighted    # FLOAT  (added migration 010)
+    - created_timestamp                # TIMESTAMPTZ NOT NULL DEFAULT now()
 ```
