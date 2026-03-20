@@ -270,6 +270,95 @@ html[data-theme="dark"] .tv-collapse-body {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   Asset Profile — summary card (AWS Console style)
+   ══════════════════════════════════════════════════════════════ */
+
+.profile-summary-card {
+    border: 1px solid var(--border-main);
+    border-radius: 4px;
+    padding: 20px;
+    background: var(--bg-panel);
+}
+
+.profile-summary-card .summary-card-header {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+}
+
+.profile-summary-prop {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.profile-summary-prop .prop-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.profile-summary-prop .prop-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Asset Profile — outline accordion
+   ══════════════════════════════════════════════════════════════ */
+
+#profile-accordion .accordion-item {
+    background: transparent;
+    border: 1px solid var(--border-main);
+    border-radius: 6px !important;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+#profile-accordion .accordion-item:last-child {
+    margin-bottom: 0;
+}
+
+#profile-accordion .accordion-button {
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 12px 16px;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+}
+
+#profile-accordion .accordion-button:not(.collapsed) {
+    background: transparent;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-main);
+    border-radius: 6px 6px 0 0 !important;
+}
+
+#profile-accordion .accordion-button::after {
+    filter: var(--accordion-chevron-filter, none);
+}
+
+html[data-theme="dark"] #profile-accordion .accordion-button::after {
+    filter: invert(1) brightness(0.7);
+}
+
+#profile-accordion .accordion-body {
+    background: transparent;
+    padding: 12px 16px;
+}
+
+/* ══════════════════════════════════════════════════════════════
    Workspace Split Panel
    ══════════════════════════════════════════════════════════════ */
 
@@ -355,6 +444,33 @@ html[data-theme="dark"] .tv-collapse-body {
     padding: 4px 12px;
     flex-shrink: 0;
     min-height: 0;
+}
+
+/* ── Profile tag chips ─────────────────────────────────────────── */
+.profile-tag-chip {
+    display: inline-block;
+    background: rgba(38, 166, 154, 0.08);
+    color: #26a69a;
+    border: 1px solid rgba(38, 166, 154, 0.25);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    margin: 2px 4px 2px 0;
+    letter-spacing: 0.04em;
+}
+
+html[data-theme="dark"] .profile-tag-chip {
+    background: rgba(38, 166, 154, 0.12);
+    color: #4db6ac;
+    border-color: rgba(38, 166, 154, 0.3);
+}
+
+.profile-tags-list {
+    min-height: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
 }
 
 /* ── Asset ticker tag ──────────────────────────────────────────── */

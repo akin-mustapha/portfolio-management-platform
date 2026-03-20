@@ -1,88 +1,108 @@
 ---
-name:
-description:
+name: schema-staging
+description: Silver layer schema reference for staging.asset, staging.asset_computed, staging.account, staging.account_computed
 ---
 
-# Schema
+# Schema — Staging (Silver Layer)
 
-Silver layer schema
+Silver layer schema. Source of truth is the migration files in `migrations/postgres/versions/staging/`.
 
-**asset:**
+---
+
+**staging.asset**
 
 ```yaml
-asset
+asset:
   columns:
-    - id
-    - data_timestamp
-    - external_id
-    - ticker
-    - name
-    - description
-    - broker
-    - currency
-    - local_currency
-    - share
-    - price
-    - avg_price
-    - value
-    - cost
-    - profit
-    - fx_impact
-    - business_key
-    - created_timestamp
-    - updated_timestamp
+    - id                   # UUID, PK
+    - data_timestamp       # TIMESTAMPTZ
+    - external_id          # TEXT
+    - ticker               # TEXT
+    - name                 # TEXT
+    - description          # TEXT
+    - broker               # TEXT
+    - currency             # TEXT
+    - local_currency       # TEXT
+    - share                # FLOAT
+    - price                # FLOAT
+    - avg_price            # FLOAT
+    - value                # FLOAT
+    - cost                 # FLOAT
+    - profit               # FLOAT
+    - fx_impact            # FLOAT
+    - business_key         # TEXT, unique
+    - created_timestamp    # TIMESTAMPTZ
+    - updated_timestamp    # TIMESTAMPTZ
 ```
 
-**asset_computed:**
+---
+
+**staging.asset_computed**
 
 ```yaml
-asset_computed
+asset_computed:
   columns:
-    - asset_id
-    - cashflow
-    - daily_return
-    - cumulative_return
-    - dca_bias
-    - pct_drawdown
-    - recent_value_high_30d
-    - recent_value_low_30d
-    - recent_profit_high_30d
-    - recent_profit_low_30d
-    - value_high
-    - value_low
-    - ma_20d
-    - ma_30d
-    - ma_50d
-    - volatility_20d
-    - volatility_30d
-    - volatility_50d
-    - created_timestamp
+    - asset_id             # UUID, FK → staging.asset(id), unique
+    - cashflow             # FLOAT
+    - daily_return         # FLOAT
+    - cumulative_return    # FLOAT
+    - dca_bias             # FLOAT
+    - pct_drawdown         # FLOAT
+    - recent_value_high_30d   # FLOAT
+    - recent_value_low_30d    # FLOAT
+    - recent_profit_high_30d  # FLOAT
+    - recent_profit_low_30d   # FLOAT
+    - value_high           # FLOAT
+    - value_low            # FLOAT
+    - ma_20d               # FLOAT
+    - ma_30d               # FLOAT
+    - ma_50d               # FLOAT
+    - volatility_20d       # FLOAT
+    - volatility_30d       # FLOAT
+    - volatility_50d       # FLOAT
+    - pnl_pct              # FLOAT  (added migration 006)
+    - var_95_1d            # FLOAT  (added migration 006)
+    - profit_range_30d     # FLOAT  (added migration 006)
+    - ma_crossover_signal  # FLOAT  (added migration 006)
+    - created_timestamp    # TIMESTAMPTZ
 ```
 
-**account:**
+---
+
+**staging.account**
 
 ```yaml
-account
+account:
   columns:
-    - id
-    - data_timestamp
-    - external_id
-    - cash_in_pies
-    - cash_available_to_trade
-    - cash_reserved_for_orders
-    - broker
-    - currency
-    - total_value
-    - investments_total_cost
-    - investments_realized_pnl
-    - investments_unrealized_pnl
-    - business_key
-    - created_timestamp
-    - updated_timestamp
+    - id                          # UUID, PK
+    - data_timestamp              # TIMESTAMPTZ
+    - external_id                 # TEXT
+    - cash_in_pies                # FLOAT
+    - cash_available_to_trade     # FLOAT
+    - cash_reserved_for_orders    # FLOAT
+    - broker                      # TEXT
+    - currency                    # TEXT
+    - total_value                 # FLOAT
+    - investments_total_cost      # FLOAT
+    - investments_realized_pnl    # FLOAT
+    - investments_unrealized_pnl  # FLOAT
+    - business_key                # TEXT, unique
+    - created_timestamp           # TIMESTAMPTZ
+    - updated_timestamp           # TIMESTAMPTZ
 ```
 
-**account_computed:**
+---
+
+**staging.account_computed**
 
 ```yaml
-
+account_computed:
+  columns:
+    - account_id             # UUID, FK → staging.account(id), unique
+    - total_return_abs       # FLOAT
+    - total_return_pct       # FLOAT
+    - cash_deployment_ratio  # FLOAT
+    - daily_change_abs       # FLOAT
+    - daily_change_pct       # FLOAT
+    - created_timestamp      # TIMESTAMPTZ NOT NULL DEFAULT now()
 ```

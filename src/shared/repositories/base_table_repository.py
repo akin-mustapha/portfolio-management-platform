@@ -47,7 +47,7 @@ class BaseTableRepository(RepositoryInterface):
         """Map domain-friendly fields to DB column names. Passthrough when no field_map."""
         if not self._field_map:
             return data
-        return {v: data.get(k) for k, v in self._field_map.items()}
+        return {self._field_map.get(k, k): v for k, v in data.items()}
 
     def _from_db_fields(self, data: Dict) -> Dict:
         """Map DB column names back to domain-friendly fields. Passthrough when no field_map."""
@@ -60,6 +60,7 @@ class BaseTableRepository(RepositoryInterface):
         if not isinstance(records, list):
             records = [records]
 
+        res = None
         for record in records:
             record = self._to_db_fields(record)
             columns = ", ".join(record.keys())
@@ -69,9 +70,10 @@ class BaseTableRepository(RepositoryInterface):
             with self._client as client:
                 res = client.execute(sql, record)
                 logging.info(f"Inserted record into {self._table}")
-            return res
+        return res
 
     def upsert(self, records: Iterable[Dict], unique_key: list[str]):
+        res = None
         for record in records:
             record = self._to_db_fields(record)
             db_unique_key = [self._field_map.get(k, k) for k in unique_key]
@@ -87,7 +89,7 @@ class BaseTableRepository(RepositoryInterface):
             with self._client as client:
                 res = client.execute(sql, record)
                 logging.info(f"Upserted record into {self._table}")
-            return res
+        return res
 
     def select(self, params: Dict):
         db_params = self._to_db_fields(params)

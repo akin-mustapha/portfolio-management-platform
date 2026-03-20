@@ -317,122 +317,93 @@ def opportunities_tab_content():
 # Asset Profile tab content
 # ─────────────────────────────────────────────
 
+def _summary_prop(label, value_id):
+    return html.Div([
+        html.Div(label, className="prop-label"),
+        html.Div("—", id=value_id, className="prop-value"),
+    ], className="profile-summary-prop")
+
+
 def tags_tab_content():
     return html.Div([
 
         # ─────────────────────────────────────────────
-        # Row 1 — Asset info KPI cards
+        # Top — AWS-style summary card
         # ─────────────────────────────────────────────
-        dbc.Row([
-            dbc.Col(
-                html.Div([
-                    html.Div("Ticker", className="kpi-label"),
-                    html.Span("—", id="profile-ticker", className="kpi-value"),
-                ], className="kpi-card"),
-                md=True,
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Div("Name", className="kpi-label"),
-                    html.Span("—", id="profile-name", className="kpi-value"),
-                ], className="kpi-card"),
-                md=True,
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Div("Description", className="kpi-label"),
-                    html.Span("—", id="profile-description", className="kpi-value"),
-                ], className="kpi-card"),
-                md=True,
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Div("First Seen", className="kpi-label"),
-                    html.Span("—", id="profile-created", className="kpi-value"),
-                ], className="kpi-card"),
-                md=True,
-            ),
-            dbc.Col(
-                html.Div([
-                    html.Div("Last Ingestion", className="kpi-label"),
-                    html.Span("—", id="profile-last-ingestion", className="kpi-value"),
-                ], className="kpi-card"),
-                md=True,
-            ),
-        ], className="g-3 mb-4"),
+        html.Div([
+            html.Div("Asset Details", className="summary-card-header"),
 
-        html.Hr(className="tv-divider"),
+            # Row 1: identity
+            dbc.Row([
+                dbc.Col(_summary_prop("Ticker", "profile-ticker"), width=2),
+                dbc.Col(_summary_prop("Name", "profile-name"), width=3),
+                dbc.Col(_summary_prop("Description", "profile-description"), width=4),
+                dbc.Col(_summary_prop("First Seen", "profile-created"), width=2),
+                dbc.Col(_summary_prop("Last Ingestion", "profile-last-ingestion"), width=1),
+            ], className="g-3 mb-3"),
+
+            html.Hr(className="tv-divider"),
+
+            # Row 2: current classification values
+            dbc.Row([
+                dbc.Col(_summary_prop("Tags", "profile-summary-tags"), width=3),
+                dbc.Col(_summary_prop("Category", "profile-summary-category"), width=3),
+                dbc.Col(_summary_prop("Industry", "profile-summary-industry"), width=3),
+                dbc.Col(_summary_prop("Sector", "profile-summary-sector"), width=3),
+            ], className="g-3"),
+
+        ], className="profile-summary-card mb-4"),
 
         # ─────────────────────────────────────────────
-        # Row 2 — Classification assignment
+        # Bottom — accordion forms + single save
         # ─────────────────────────────────────────────
-        dbc.Row([
-
-            dbc.Col(
-                dbc.Stack([
-                    html.Div([
-                        html.Small("Tag", className="text-muted d-block mb-1"),
-                        dbc.InputGroup([
-                            dcc.Dropdown(
-                                id="profile-tag-select",
-                                placeholder="Select or search tag\u2026",
-                                options=[],
-                                style={"flex": "1", "minWidth": "0"},
-                            ),
-                            dbc.Button("Assign", id="profile-tag-assign-btn", color="primary", size="sm"),
-                        ], className="flex-nowrap"),
-                        html.Small(id="profile-tag-status", className="text-muted"),
-                    ]),
-                    html.Div([
-                        html.Small("Industry", className="text-muted d-block mb-1"),
-                        dbc.InputGroup([
-                            dcc.Dropdown(
-                                id="profile-industry-select",
-                                placeholder="Select or search industry\u2026",
-                                options=[],
-                                style={"flex": "1", "minWidth": "0"},
-                            ),
-                            dbc.Button("Assign", id="profile-industry-assign-btn", color="primary", size="sm"),
-                        ], className="flex-nowrap"),
-                        html.Small(id="profile-industry-status", className="text-muted"),
-                    ]),
-                ], gap=3),
-                width=6,
+        dbc.Accordion([
+            dbc.AccordionItem(
+                dcc.Dropdown(
+                    id="profile-tag-select",
+                    placeholder="Select or search tag\u2026",
+                    options=[],
+                ),
+                title="Tag",
+                item_id="acc-tag",
             ),
-
-            dbc.Col(
-                dbc.Stack([
-                    html.Div([
-                        html.Small("Sector", className="text-muted d-block mb-1"),
-                        dbc.InputGroup([
-                            dcc.Dropdown(
-                                id="profile-sector-select",
-                                placeholder="Select or search sector\u2026",
-                                options=[],
-                                style={"flex": "1", "minWidth": "0"},
-                            ),
-                            dbc.Button("Assign", id="profile-sector-assign-btn", color="primary", size="sm"),
-                        ], className="flex-nowrap"),
-                        html.Small(id="profile-sector-status", className="text-muted"),
-                    ]),
-                    html.Div([
-                        html.Small("Category", className="text-muted d-block mb-1"),
-                        dbc.InputGroup([
-                            dcc.Dropdown(
-                                id="profile-category-select",
-                                placeholder="Select or search category\u2026",
-                                options=[],
-                                style={"flex": "1", "minWidth": "0"},
-                            ),
-                            dbc.Button("Assign", id="profile-category-assign-btn", color="primary", size="sm"),
-                        ], className="flex-nowrap"),
-                        html.Small(id="profile-category-status", className="text-muted"),
-                    ]),
-                ], gap=3),
-                width=6,
+            dbc.AccordionItem(
+                dcc.Dropdown(
+                    id="profile-category-select",
+                    placeholder="Select or search category\u2026",
+                    options=[],
+                ),
+                title="Categorizing Tag",
+                item_id="acc-category",
             ),
+            dbc.AccordionItem(
+                dcc.Dropdown(
+                    id="profile-industry-select",
+                    placeholder="Select or search industry\u2026",
+                    options=[],
+                ),
+                title="Industry",
+                item_id="acc-industry",
+            ),
+            dbc.AccordionItem(
+                dcc.Dropdown(
+                    id="profile-sector-select",
+                    placeholder="Select or search sector\u2026",
+                    options=[],
+                ),
+                title="Sector",
+                item_id="acc-sector",
+            ),
+        ], id="profile-accordion", always_open=True),
 
-        ], className="g-4"),
+        html.Div([
+            dbc.Button("Save", id="profile-save-btn", color="primary", size="sm", className="me-2"),
+            html.Small("", id="profile-save-status", className="text-muted"),
+        ], className="d-flex align-items-center mt-3"),
+
+        # Hidden legacy IDs required by callbacks
+        html.Div(id="profile-current-tags", style={"display": "none"}),
+        html.Div(id="profile-tag-status", style={"display": "none"}),
 
     ], id="tab-tags-content")
 

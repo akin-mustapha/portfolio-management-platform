@@ -86,6 +86,21 @@ Rather than directly subclassing `Pipeline`, most concrete pipelines extend one 
 
 Both are defined in `src/backend/ingestion/application/policies.py`.
 
+## Computed Silver Pattern
+
+Computed silver pipelines (`PipelineAssetComputedSilver`, `PipelineAccountComputedSilver`) follow a different pattern from standard silver pipelines:
+
+| Aspect | Silver (`BaseSilverPipeline`) | Computed Silver (bare `Pipeline`) |
+|--------|-------------------------------|-----------------------------------|
+| Base class | `BaseSilverPipeline` | `Pipeline` |
+| Output type | Pydantic model | Dataclass |
+| Validation | `_to_records()` — logs and skips bad records | None — errors raise and halt |
+| Source | Reads from bronze view (incremental) | Reads from silver table (full recompute) |
+| Computation | Python transform | Heavy SQL window functions; Python handles derived metrics |
+| Unique key | `business_key` | Entity ID (`asset_id` / `account_id`) |
+
+Use this pattern when metrics require window functions over the full history of a table (rolling averages, cumulative returns, LAG-based daily change). The source query does the heavy lifting in SQL; Python handles null-coercion and any derived values that combine SQL outputs.
+
 ## How to Create a New Pipeline
 
 All pipelines live under `src/backend/ingestion/application/pipelines/`. Sub-folders by type:

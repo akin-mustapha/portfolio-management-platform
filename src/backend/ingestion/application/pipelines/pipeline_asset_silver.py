@@ -3,18 +3,18 @@ import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Dict
-from pydantic import ValidationError
-
 import pandas as pd
 
 from...application.policies import BaseSilverPipeline
 from...application.protocols import Source
 from...application.protocols import Destination
 from...application.protocols import Transformation
+from...application.validators.schema_validator import SchemaValidator
 
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from...infrastructure.repositories.repository_factory import RepositoryFactory
+from...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
 from...domain.schemas.silver.asset import AssetRecord
 
 logging.basicConfig(
@@ -115,21 +115,14 @@ class Trading212AssetDestination(Destination):
 
 
 class PipelineAssetSilver(BaseSilverPipeline):
+  _pipeline_name = "asset_silver"
+
   def __init__(self):
     self._source = Trading212AssetSourceSilver()
     self._transformation = Trading212AssetTransformationSilver()
+    self._validator = SchemaValidator(AssetRecord)
     self._destination = Trading212AssetDestination()
-
-  def _to_records(self, transformed_data: list) -> list[dict]:
-    valid, invalid = [], []
-    for row in transformed_data:
-      try:
-        valid.append(AssetRecord(**row).model_dump())
-      except ValidationError as e:
-        invalid.append((row.get("business_key"), e))
-    if invalid:
-      logging.warning(f"[AssetSilver] {len(invalid)} records failed validation: {invalid}")
-    return valid
+    self._dead_letter = DeadLetterDestination()
 
 
 

@@ -142,7 +142,7 @@ class PostgresSnapshotQueryRepository:
 
   def get_unrealized_profit(self):
     sql = """
-    SELECT created_timestamp as data_date,
+    SELECT data_timestamp as data_date,
            total_value,
            investments_total_cost,
            investments_realized_pnl,

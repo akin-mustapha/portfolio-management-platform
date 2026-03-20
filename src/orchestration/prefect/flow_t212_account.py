@@ -20,9 +20,17 @@ def task_account_silver():
     pipeline.run()
 
 
+@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
+def task_account_computed_silver():
+    pipeline = PipelineFactory.get("account_computed_silver")
+    logger.info("Running account computed silver pipeline")
+    pipeline.run()
+
+
 @flow
 def flow_t212_account():
-    logger.info("Starting account flow: bronze → silver")
+    logger.info("Starting account flow: bronze → silver → computed silver")
     task_account_bronze()
     task_account_silver()
+    task_account_computed_silver()
     logger.info("Account flow complete")

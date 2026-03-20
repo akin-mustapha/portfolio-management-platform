@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from ...infra.repositories.repository_factory import RepositoryFactory
+from ...infrastructure.repositories.repository_factory import RepositoryFactory
 from ..presenters.portfolio_presenter import PortfolioPresenter
 
 class PortfolioController:

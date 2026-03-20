@@ -21,8 +21,9 @@ class Pipeline(ABC):
 class BaseSilverPipeline(Pipeline):
   """
   Shared run() logic for silver pipelines.
-  Subclasses implement _to_records() to apply their schema contract mapping.
+  Subclasses declare _pipeline_name and wire _validator and _dead_letter in __init__.
   """
+  _pipeline_name: str
 
   def run(self):
     try:
@@ -33,17 +34,24 @@ class BaseSilverPipeline(Pipeline):
         return
 
       transformed_data = self._transformation.transform(data)
-      data = self._to_records(transformed_data)
-      self._destination.load(data)
+      result = self._validator.validate(transformed_data)
+
+      if result.invalid:
+        for r in result.invalid:
+          r.pipeline_name = self._pipeline_name
+        self._dead_letter.load(result.invalid)
+        logging.warning(f"[{self._pipeline_name}] {len(result.invalid)} records rejected — written to dead letter")
+
+      records = self._to_records(result.valid)
+      self._destination.load(records)
       return None
 
     except Exception as e:
       raise e
 
-  @abstractmethod
-  def _to_records(self, transformed_data: list) -> list[dict]:
-    """Map transformed dicts to destination record dicts via dataclass."""
-    raise NotImplementedError
+  def _to_records(self, validated_data: list) -> list[dict]:
+    """Convert validated Pydantic model instances to dicts for the destination."""
+    return [record.model_dump() for record in validated_data]
 
 class FullLoader(ABC):
   def __init__(self, table_name):

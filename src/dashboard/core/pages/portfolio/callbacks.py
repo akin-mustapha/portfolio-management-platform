@@ -213,6 +213,8 @@ def toggle_advanced_filter(n, is_open):
     Output("profile-industry-select", "options"),
     Output("profile-sector-select", "options"),
     Output("profile-category-select", "options"),
+    Output("profile-summary-tags", "children"),
+    Output("profile-current-tags", "children"),
     Input("portfolio-asset-table", "selectedRows"),
     prevent_initial_call=True,
 )
@@ -222,6 +224,9 @@ def on_asset_profile_selected(selected_rows):
 
     asset_row = selected_rows[0]
     vm = AssetProfileController().get_profile(asset_row)
+
+    current_tags = vm.get("current_tags", [])
+    tag_display = ", ".join(current_tags) if current_tags else "—"
 
     return (
         vm["ticker"],
@@ -233,22 +238,43 @@ def on_asset_profile_selected(selected_rows):
         vm["industry_options"],
         vm["sector_options"],
         vm["category_options"],
+        tag_display,
+        "",  # profile-current-tags hidden
     )
 
 
-# ── 7. Asset Profile tab — assign tag ────────────────────────────
+# ── 7. Asset Profile tab — save classifications ───────────────────
 
 @callback(
-    Output("profile-tag-status", "children"),
-    Input("profile-tag-assign-btn", "n_clicks"),
+    Output("profile-save-status", "children"),
+    Output("profile-summary-tags", "children", allow_duplicate=True),
+    Input("profile-save-btn", "n_clicks"),
     State("profile-tag-select", "value"),
+    State("profile-category-select", "value"),
+    State("profile-category-select", "options"),
+    State("profile-industry-select", "value"),
+    State("profile-industry-select", "options"),
+    State("profile-sector-select", "value"),
+    State("profile-sector-select", "options"),
     State("portfolio-asset-table", "selectedRows"),
     prevent_initial_call=True,
 )
-def on_assign_tag(n_clicks, tag_id, selected_rows):
-    if not selected_rows or not tag_id:
+def on_save_profile(n_clicks, tag_id, category_id, category_opts, industry_id, industry_opts, sector_id, sector_opts, selected_rows):
+    if not selected_rows:
         raise PreventUpdate
 
-    asset_name = selected_rows[0].get("name", "")
-    status = AssetProfileController().assign_tag(asset_name, tag_id)
-    return status
+    asset_row = selected_rows[0]
+    asset_name = asset_row.get("name", "")
+    messages = []
+
+    if tag_id:
+        msg = AssetProfileController().assign_tag(asset_name, tag_id)
+        messages.append(msg)
+
+    # Refresh tag display from service after save
+    vm = AssetProfileController().get_profile(asset_row)
+    current_tags = vm.get("current_tags", [])
+    tag_display = ", ".join(current_tags) if current_tags else "—"
+
+    status = " | ".join(messages) if messages else "Nothing to save."
+    return status, tag_display
