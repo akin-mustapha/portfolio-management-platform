@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import Input, Output, dcc, html, callback
 from ..pages.portfolio.portfolio_page import portfolio_layout
 from ..pages.portfolio import theme_callbacks  # noqa: F401
-from ..components.buttons import privacy_toggle_btn
+from ..ui.buttons import privacy_toggle_btn
 
 
 def _top_navbar():

@@ -1,4 +1,3 @@
-import math
 class PortfolioPresenter:
     """
     Presenter for the Portfolio Dashboard screen.
@@ -16,7 +15,7 @@ class PortfolioPresenter:
         assets = data.get("assets", [])
         assets_history = data.get("assets_history", [])
         return {
-            "kpi": self._kpi(snapshot, assets, data.get("portfolio_history", [])),
+            "kpi": self._kpi(snapshot),
             "asset_table": self._asset_table_vm(assets),
             "portfolio_value_series": self._portfolio_value_series_vm(
                 data.get("portfolio_history", [])
@@ -35,24 +34,7 @@ class PortfolioPresenter:
             "profitability": self._profitablity_vm(assets),
         }
         
-    def _kpi(self, snapshot: dict, assets: list, portfolio_history: list) -> dict:
-        daily_change_pct = None
-        if len(portfolio_history) >= 2:
-            today = portfolio_history[-1]["total_value"]
-            yesterday = portfolio_history[-2]["total_value"]
-            if yesterday:
-                daily_change_pct = (today - yesterday) / yesterday * 100
-
-        def _safe(v):
-            return 0 if v is None or (isinstance(v, float) and math.isnan(v)) else v
-
-        portfolio_vol = None
-        if assets:
-            portfolio_vol = sum(
-                _safe(a.get("volatility_30d")) * _safe(a.get("weight_pct")) / 100
-                for a in assets
-            )
-
+    def _kpi(self, snapshot: dict) -> dict:
         return {
             "value": snapshot.get('total_value', 0),
             "currency": snapshot.get('currency', "#"),
@@ -60,8 +42,8 @@ class PortfolioPresenter:
             "unrealized_pnl": snapshot.get('investments_unrealized_pnl', 0),
             "total_cost": snapshot.get('investments_total_cost', 0),
             "cash": snapshot.get('cash_available_to_trade', 0),
-            "daily_change_pct": daily_change_pct,
-            "portfolio_vol": portfolio_vol,
+            "daily_change_pct": snapshot.get('daily_change_pct'),
+            "portfolio_vol": snapshot.get('portfolio_volatility_weighted'),
         }
 
     # ---------- Table ----------
@@ -134,15 +116,10 @@ class PortfolioPresenter:
     # ---------- Position Distribution ----------
 
     def _position_weight_distribution_vm(self, assets: list[dict]) -> list[dict]:
-        def _roi_pct(a):
-            cost = a.get("cost") or 0
-            profit = a.get("profit") or 0
-            return round((profit / cost) * 100, 2) if cost else 0
-
         items = sorted(
             [{"ticker": a["ticker"]
               , "weight_pct": a["weight_pct"]
-              , "roi_pct": _roi_pct(a)
+              , "roi_pct": round(a.get("pnl_pct") or 0, 2)
               , "profit": a["profit"]
               , "value": a["value"]
               , "name": a["name"]
@@ -165,13 +142,8 @@ class PortfolioPresenter:
     def _top_winner_bar_vm(self, assets: list[dict], sort_by: str = "profit") -> dict:
 
         try:
-            def _roi_pct(a):
-                cost = a.get("cost") or 0
-                profit = a.get("profit") or 0
-                return round((profit / cost) * 100, 2) if cost else 0
-
             def _label(a):
-                roi = _roi_pct(a)
+                roi = round(a.get("pnl_pct") or 0, 2)
                 roi_str = ("+" if roi >= 0 else "") + str(roi) + "%"
                 return f"{a['ticker']}  €{round(a['profit'], 2)}  {roi_str}"
 
@@ -197,13 +169,8 @@ class PortfolioPresenter:
     def _top_losers_bar_vm(self, assets: list[dict], sort_by: str = "profit") -> dict:
 
         try:
-            def _roi_pct(a):
-                cost = a.get("cost") or 0
-                profit = a.get("profit") or 0
-                return round((profit / cost) * 100, 2) if cost else 0
-
             def _label(a):
-                roi = _roi_pct(a)
+                roi = round(a.get("pnl_pct") or 0, 2)
                 roi_str = ("+" if roi >= 0 else "") + str(roi) + "%"
                 return f"{a['ticker']}  €{round(a['profit'], 2)}  {roi_str}"
 
@@ -228,8 +195,7 @@ class PortfolioPresenter:
         try:
             import pandas as pd
             df = pd.DataFrame(assets)
-            df["created_date"] = pd.to_datetime(df["created_date"]).dt.date
-            return df[df["is_profitable"] == 1].groupby('created_date')["profit"].sum().to_dict()
+            return df[df["is_profitable"] == 1].groupby('data_date')["profit"].sum().to_dict()
         except Exception as e:
             raise e
 
@@ -237,7 +203,6 @@ class PortfolioPresenter:
         try:
             import pandas as pd
             df = pd.DataFrame(assets)
-            df["created_date"] = pd.to_datetime(df["created_date"]).dt.date
-            return df[df["is_profitable"] == 0].groupby('created_date')["profit"].sum().to_dict()
+            return df[df["is_profitable"] == 0].groupby('data_date')["profit"].sum().to_dict()
         except Exception as e:
             raise e

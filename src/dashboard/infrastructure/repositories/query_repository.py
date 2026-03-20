@@ -19,13 +19,6 @@ class PostgresAssetQueryRepository:
               ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY data_timestamp DESC) AS rn,
               id
           FROM staging.asset
-      ),
-      portfolio_value AS
-      (
-          SELECT total_value
-          FROM staging.account
-          ORDER BY created_timestamp DESC
-          LIMIT 1
       )
 
       SELECT
@@ -33,14 +26,12 @@ class PostgresAssetQueryRepository:
           a.name,
           CASE WHEN ac.ma_30d > ac.ma_50d THEN 'Bullish' ELSE 'Bearish' END AS trend,
           a.description AS asset_description,
-          -- STRING_AGG(t.name, ',') AS tag_list,
           a.value,
           a.profit,
           a.price,
           a.cost,
-
-          a.value / pv.total_value * 100 AS weight_pct,
-
+          COALESCE(ac.position_weight_pct, 0) AS weight_pct,
+          COALESCE(ac.pnl_pct, 0) AS pnl_pct,
           ac.recent_profit_high_30d,
           ac.recent_profit_low_30d,
           ac.pct_drawdown,
@@ -50,7 +41,7 @@ class PostgresAssetQueryRepository:
           ac.ma_50d,
           ac.dca_bias,
           ac.cumulative_return,
-          a.created_timestamp AS data_date
+          a.data_timestamp AS data_date
 
       FROM staging.asset a
       INNER JOIN most_recent_asset lm
@@ -59,8 +50,6 @@ class PostgresAssetQueryRepository:
 
       LEFT JOIN staging.asset_computed ac
           ON a.id = ac.asset_id
-
-      CROSS JOIN portfolio_value pv
     """
     with self.client as client:
       res = client.execute(
@@ -91,11 +80,11 @@ class PostgresAssetQueryRepository:
       sql = f"""
           ;WITH cte AS (
           SELECT  *
-                , CAST(created_timestamp AS date) AS created_date
-                , ROW_NUMBER()OVER(PARTITION BY ticker, CAST(created_timestamp AS date) ORDER BY created_timestamp DESC) AS rn
+                , CAST(data_timestamp AS date) AS data_date
+                , ROW_NUMBER()OVER(PARTITION BY ticker, CAST(data_timestamp AS date) ORDER BY data_timestamp DESC) AS rn
             FROM staging.asset
-            WHERE created_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
-            ORDER BY ticker, created_timestamp ASC
+            WHERE data_timestamp >= CURRENT_TIMESTAMP - INTERVAL '30 days'
+            ORDER BY ticker, data_timestamp ASC
         )
         SELECT
           *
@@ -142,14 +131,20 @@ class PostgresSnapshotQueryRepository:
 
   def get_unrealized_profit(self):
     sql = """
-    SELECT data_timestamp as data_date,
-           total_value,
-           investments_total_cost,
-           investments_realized_pnl,
-           investments_unrealized_pnl,
-           currency
-    FROM staging.account
-    WHERE external_id IS NOT NULL
+    SELECT
+        a.data_timestamp as data_date,
+        a.total_value,
+        a.investments_total_cost,
+        a.investments_realized_pnl,
+        a.investments_unrealized_pnl,
+        a.currency,
+        a.cash_available_to_trade,
+        COALESCE(ac.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
+        COALESCE(ac.daily_change_pct, 0) AS daily_change_pct,
+        COALESCE(ac.daily_change_abs, 0) AS daily_change_abs
+    FROM staging.account a
+    LEFT JOIN staging.account_computed ac ON ac.account_id = a.id
+    WHERE a.external_id IS NOT NULL
     ORDER BY data_date
     """
     with self.client as client:
