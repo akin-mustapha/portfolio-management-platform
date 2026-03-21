@@ -16,7 +16,7 @@ def portfolio_layout():
     return html.Div([
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
-        dcc.Store(id="workspace-selected-asset"),
+        dcc.Store(id="workspace-selected-asset", data=[]),
         dcc.Store(id="workspace-timeframe", data="1Y"),
 
         # ── Row 1: KPI Summary (always portfolio-scoped) ──────────

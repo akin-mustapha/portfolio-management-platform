@@ -11,6 +11,12 @@ body, * {
     border: 1px solid var(--border-tv);
     border-radius: 8px;
     margin-bottom: 12px;
+    padding: 0 8px 8px;
+}
+
+/* Divider between section header and content when expanded */
+.tv-section-header + .collapse.show {
+    border-top: 1px solid var(--border-tv);
 }
 
 /* ── TradingView section header ───────────────────────────────── */
@@ -719,6 +725,8 @@ html[data-theme="dark"] .asset-ticker-tag {
     cursor: pointer;
     border-radius: 4px;
     transition: color 0.12s;
+    border: none;
+    background: transparent;
 }
 
 .top-util-btn:hover {
@@ -864,4 +872,228 @@ html[data-theme="dark"] .workspace-tab .nav-link.active,
 html[data-theme="dark"] .workspace-tab--active .nav-link {
     color: #639aff !important;
     border-bottom-color: #639aff !important;
+}
+
+/* ── Settings Modal ───────────────────────────────────────────── */
+.settings-modal .modal-dialog {
+    max-width: 500px;
+    width: 500px;
+}
+
+.settings-modal .modal-content {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.settings-modal .modal-header {
+    border-bottom: 1px solid var(--border-tv);
+    padding: 12px 16px;
+    flex-shrink: 0;
+}
+
+.settings-modal .modal-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.settings-modal .btn-close {
+    filter: var(--close-btn-filter, none);
+}
+
+.settings-modal-body {
+    padding: 0 !important;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.settings-sidebar {
+    background: var(--bg-sidebar, #f8f9fa);
+    border-right: 1px solid var(--border-tv);
+    padding: 12px 0;
+    height: 100%;
+}
+
+.settings-nav-item {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.1s, color 0.1s;
+}
+
+.settings-nav-item--active {
+    color: var(--text-primary);
+    background: var(--bg-strip-hover, rgba(13, 110, 253, 0.06));
+    border-left: 2px solid #0d6efd;
+    padding-left: 14px;
+}
+
+/* Content pane */
+.settings-content {
+    padding: 20px 20px 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+}
+
+.settings-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.settings-field-group {
+    margin-bottom: 14px;
+}
+
+.settings-field-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.settings-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.settings-api-input {
+    flex: 1;
+    font-size: 13px;
+    background: var(--bg-app) !important;
+    border: 1px solid var(--border-main) !important;
+    color: var(--text-primary) !important;
+    border-radius: 4px;
+    height: 32px;
+}
+
+.settings-api-input:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
+}
+
+.settings-eye-btn {
+    background: transparent;
+    border: 1px solid var(--border-main);
+    border-radius: 4px;
+    color: var(--text-muted);
+    padding: 5px 9px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    height: 32px;
+}
+
+.settings-eye-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-strip-hover, rgba(0,0,0,0.04));
+}
+
+.settings-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    margin-bottom: 20px;
+}
+
+.settings-connect-btn {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border-main);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.settings-connect-btn:hover {
+    border-color: #0d6efd;
+    color: #0d6efd;
+    background: rgba(13, 110, 253, 0.06);
+}
+
+.settings-save-status {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+/* Status indicator */
+.settings-status-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.settings-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.settings-status-dot--connected {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.settings-status-dot--disconnected {
+    background: var(--text-muted, #adb5bd);
+}
+
+.settings-status-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Last ingestion */
+.settings-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-meta-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 500;
+}
+
+.settings-meta-value {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .settings-modal .btn-close {
+    filter: invert(1) grayscale(1);
+}
+
+html[data-theme="dark"] .settings-sidebar {
+    background: var(--bg-sidebar);
 }

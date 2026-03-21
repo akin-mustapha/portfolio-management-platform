@@ -148,36 +148,9 @@ def portfolio_tab_content(view_model=None, theme="light"):
         ], className="tv-section-container"),
 
         # ─────────────────────────────────────────────
-        # Asset detail section — collapsible, opens on row selection
+        # Asset detail — populated dynamically on row selection
         # ─────────────────────────────────────────────
-        html.Div([
-            html.Div(id="valuation-asset-badge", style={"display": "none"}),
-            html.Div(
-                ["Asset Detail", html.Span("›", className="tv-chevron")],
-                id="asset-detail-header",
-                className="tv-section-header tv-section-header--section",
-                n_clicks=0,
-                style={"cursor": "pointer"},
-            ),
-
-            dbc.Collapse(
-                id="asset-detail-collapse",
-                is_open=False,
-                children=html.Div([
-                    html.Div([
-                        _chart_section("Price",
-                            dcc.Graph(id="workspace-price-graph", figure={}, config=_GRAPH_CONFIG),
-                        ),
-                        _chart_section("Asset Value",
-                            dcc.Graph(id="workspace-value-graph", figure={}, config=_GRAPH_CONFIG),
-                        ),
-                        _chart_section("Profit Range (30D)",
-                            dcc.Graph(id="workspace-profit-range-graph", figure={}, config=_GRAPH_CONFIG),
-                        ),
-                    ], className="workspace-chart-grid"),
-                ]),
-            ),
-        ], className="tv-section-container"),
+        html.Div(id="asset-detail-sections"),
 
     ], id="tab-portfolio-content", className='workspace-wrapper')
 
@@ -267,27 +240,9 @@ def risk_tab_content(view_model=None, theme="light"):
         ),
 
         # ─────────────────────────────────────────────
-        # Asset detail — collapsible, opens on row selection
+        # Asset detail — populated dynamically on row selection
         # ─────────────────────────────────────────────
-        html.Hr(className="tv-divider"),
-        html.Div(
-            id="risk-asset-detail-header",
-            className="tv-section-header",
-            n_clicks=0,
-            style={"cursor": "pointer"},
-        ),
-
-        dbc.Collapse(
-            id="risk-asset-detail-collapse",
-            is_open=False,
-            children=html.Div([
-                html.Div([
-                    _chart_section("Risk Context - Drawdown",
-                        dcc.Graph(id="workspace-risk-graph", figure={}, config=_GRAPH_CONFIG),
-                    ),
-                ], className="workspace-chart-grid"),
-            ]),
-        ),
+        html.Div(id="risk-asset-detail-sections"),
 
     ], id="tab-risk-content", className='workspace-wrapper')
 
@@ -351,27 +306,9 @@ def opportunities_tab_content(view_model=None, theme="light"):
         ),
 
         # ─────────────────────────────────────────────
-        # Asset detail — collapsible, opens on row selection
+        # Asset detail — populated dynamically on row selection
         # ─────────────────────────────────────────────
-        html.Hr(className="tv-divider"),
-        html.Div(
-            id="opportunities-asset-detail-header",
-            className="tv-section-header",
-            n_clicks=0,
-            style={"cursor": "pointer"},
-        ),
-
-        dbc.Collapse(
-            id="opportunities-asset-detail-collapse",
-            is_open=False,
-            children=html.Div([
-                html.Div([
-                    _chart_section("Opportunity - DCA Bias",
-                        dcc.Graph(id="workspace-dca-graph", figure={}, config=_GRAPH_CONFIG),
-                    ),
-                ], className="workspace-chart-grid"),
-            ]),
-        ),
+        html.Div(id="opportunities-asset-detail-sections"),
 
     ], id="tab-opportunities-content", className='workspace-wrapper')
 

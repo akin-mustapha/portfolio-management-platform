@@ -210,7 +210,7 @@ def asset_table(data=None):
         },
         columnSize="autoSize",
         dashGridOptions={
-            "rowSelection": {"mode": "singleRow"},
+            "rowSelection": {"mode": "multiRow", "maxSelectedRows": 3, "enableSelectionWithoutKeys": True},
             "selectionColumnDef": {"width": 36, "minWidth": 36, "maxWidth": 36},
             "tooltipInteraction": True,
             "enableBrowserTooltips": False,

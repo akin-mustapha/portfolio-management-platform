@@ -1,4 +1,13 @@
-from dash import Output, Input, State, callback, clientside_callback, Patch
+from dash import Output, Input, State, callback, clientside_callback, no_update, Patch
+
+from .callbacks import (
+    _build_compare_rows,
+    _date_window,
+    _fetch_snapshots,
+    _VALUATION_METRICS,
+    _RISK_METRICS,
+    _OPPS_METRICS,
+)
 
 
 # ── Privacy toggle ───────────────────────────────────────────────────────────
@@ -94,30 +103,32 @@ def update_chart_theme(theme):
     )
 
 
-# ── Patch workspace (asset) chart backgrounds on theme change ────────────────
+# ── Rebuild workspace (asset) charts on theme change ─────────────────────────
 
 @callback(
-    Output("workspace-price-graph", "figure", allow_duplicate=True),
-    Output("workspace-value-graph", "figure", allow_duplicate=True),
-    Output("workspace-profit-range-graph", "figure", allow_duplicate=True),
-    Output("workspace-risk-graph", "figure", allow_duplicate=True),
-    Output("workspace-dca-graph", "figure", allow_duplicate=True),
+    Output("asset-detail-sections", "children", allow_duplicate=True),
+    Output("risk-asset-detail-sections", "children", allow_duplicate=True),
+    Output("opportunities-asset-detail-sections", "children", allow_duplicate=True),
     Input("theme-store", "data"),
+    State("workspace-selected-asset", "data"),
+    State("workspace-timeframe", "data"),
     prevent_initial_call=True,
 )
-def update_workspace_chart_theme(theme):
-    is_dark = theme == "dark"
-    bg = "#1e222d" if is_dark else "white"
-    fc = "#9598a1" if is_dark else "#555555"
+def update_workspace_chart_theme(theme, selected_assets, timeframe):
+    tickers = selected_assets if isinstance(selected_assets, list) else []
+    if not tickers:
+        return no_update, no_update, no_update
 
-    def line_patch():
-        p = Patch()
-        p["layout"]["paper_bgcolor"] = bg
-        p["layout"]["plot_bgcolor"]  = bg
-        p["layout"]["font"]["color"] = fc
-        return p
+    current_theme = theme or "light"
+    start_date, end_date = _date_window(timeframe or "1Y")
 
-    return line_patch(), line_patch(), line_patch(), line_patch(), line_patch()
+    snapshots = _fetch_snapshots(tickers, start_date, end_date)
+
+    return (
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val"),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk"),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps"),
+    )
 
 
 # ── Clientside: drag-to-resize split panel ───────────────────────────────────

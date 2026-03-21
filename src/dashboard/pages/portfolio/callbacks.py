@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
-from dash import Output, Input, State, callback, html, no_update
+import dash_bootstrap_components as dbc
+from dash import MATCH, Output, Input, State, callback, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 
 from .components.kpis import kpi_row
@@ -55,6 +56,72 @@ def _filter_vm_by_timeframe(view_model: dict, start: str, end: str) -> dict:
     return vm
 
 
+# ── Compare layout helpers ────────────────────────────────────────
+
+_GRAPH_CONFIG = {"displayModeBar": False}
+
+_VALUATION_METRICS = [
+    ("Price", PriceStructurePlotlyLineChart),
+    ("Asset Value", AssetValuePlotlyLineChart),
+    ("Profit Range (30D)", ProfitRangePlotlyLineChart),
+]
+_RISK_METRICS = [
+    ("Risk Context", RiskContextPlotlyLineChart),
+]
+_OPPS_METRICS = [
+    ("DCA Bias", DCABiasPlotlyLineChart),
+]
+
+
+def _fetch_snapshots(tickers, start_date, end_date):
+    ctrl = AssetController()
+    return [(t, ctrl.get_asset_snapshot(t.lower(), start_date, end_date)) for t in tickers]
+
+
+def _build_compare_rows(snapshots, metrics, theme, ns=""):
+    """
+    Build one tv-section-container per asset, placed side by side.
+    Each container has a collapsible header (ticker) and charts stacked
+    vertically inside. Pattern-matched IDs handle the collapse toggle.
+
+    snapshots : list of (ticker, history) tuples
+    metrics   : list of (title, ChartClass) tuples
+    ns        : namespace prefix to make IDs unique across tabs
+    Returns   : html.Div containing a dbc.Row of section containers.
+    """
+    n = len(snapshots)
+    col_width = 12 // n
+    cols = []
+    for ticker, history in snapshots:
+        idx = f"{ns}-{ticker}" if ns else ticker
+        charts = []
+        for i, (title, ChartClass) in enumerate(metrics):
+            if i > 0:
+                charts.append(html.Hr(className="tv-divider"))
+            charts.append(html.Div([
+                html.Div(title, className="tv-section-header"),
+                dcc.Graph(figure=ChartClass().render(history, theme), config=_GRAPH_CONFIG),
+            ]))
+        cols.append(dbc.Col(
+            html.Div([
+                html.Div(
+                    [ticker.upper(), html.Span("›", className="tv-chevron")],
+                    id={"type": "asset-section-toggle", "index": idx},
+                    className="tv-section-header tv-section-header--section",
+                    n_clicks=0,
+                    style={"cursor": "pointer"},
+                ),
+                dbc.Collapse(
+                    id={"type": "asset-section-collapse", "index": idx},
+                    is_open=True,
+                    children=html.Div(charts),
+                ),
+            ], className="tv-section-container"),
+            width=col_width,
+        ))
+    return html.Div(dbc.Row(cols, className="g-2"))
+
+
 # ── 1. Initial page load ──────────────────────────────────────────
 
 @callback(
@@ -96,22 +163,13 @@ def load_portfolio_page(pathname, cached_data, theme):
     )
 
 
-# ── 2. Asset row selection → update Valuation tab ────────────────
+# ── 2. Asset row selection → populate asset detail sections ───────
 
 @callback(
     Output("workspace-selected-asset", "data"),
-    Output("valuation-asset-badge", "children"),
-    Output("asset-detail-collapse", "is_open"),
-    Output("asset-detail-header", "children"),
-    Output("workspace-price-graph", "figure"),
-    Output("workspace-value-graph", "figure"),
-    Output("workspace-profit-range-graph", "figure"),
-    Output("risk-asset-detail-collapse", "is_open"),
-    Output("risk-asset-detail-header", "children"),
-    Output("workspace-risk-graph", "figure"),
-    Output("opportunities-asset-detail-collapse", "is_open"),
-    Output("opportunities-asset-detail-header", "children"),
-    Output("workspace-dca-graph", "figure"),
+    Output("asset-detail-sections", "children"),
+    Output("risk-asset-detail-sections", "children"),
+    Output("opportunities-asset-detail-sections", "children"),
     Input("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
     State("theme-store", "data"),
@@ -119,70 +177,54 @@ def load_portfolio_page(pathname, cached_data, theme):
 )
 def on_asset_row_selected(selected_rows, timeframe, theme):
     if not selected_rows:
-        return (
-            no_update, no_update, False, no_update,
-            no_update, no_update, no_update,
-            False, "", no_update,
-            False, "", no_update,
-        )
+        return [], None, None, None
 
-    ticker = selected_rows[0].get("ticker", "")
-    if not ticker:
+    tickers = [r.get("ticker") for r in selected_rows if r.get("ticker")][:3]
+    if not tickers:
         raise PreventUpdate
 
     current_theme = theme or "light"
     start_date, end_date = _date_window(timeframe or "1Y")
-
-    asset_history = AssetController().get_asset_snapshot(ticker.lower(), start_date, end_date)
-
-    badge = html.Span(ticker.upper(), className="asset-ticker-tag")
-    valuation_header = [
-        "Asset Detail",
-        html.Span("›", className="tv-chevron"),
-        badge,
-    ]
-    detail_header = html.Span([
-        html.Span(ticker.upper(), className="asset-ticker-tag"),
-        " — Asset Detail",
-    ])
+    snapshots = _fetch_snapshots(tickers, start_date, end_date)
 
     return (
-        ticker,
-        no_update,
-        True,
-        valuation_header,
-        PriceStructurePlotlyLineChart().render(asset_history, current_theme),
-        AssetValuePlotlyLineChart().render(asset_history, current_theme),
-        ProfitRangePlotlyLineChart().render(asset_history, current_theme),
-        True,
-        detail_header,
-        RiskContextPlotlyLineChart().render(asset_history, current_theme),
-        True,
-        detail_header,
-        DCABiasPlotlyLineChart().render(asset_history, current_theme),
+        tickers,
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val"),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk"),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps"),
     )
+
+
+# ── 2b. Pattern-matched collapse toggle for asset sections ─────────
+
+@callback(
+    Output({"type": "asset-section-collapse", "index": MATCH}, "is_open"),
+    Input({"type": "asset-section-toggle", "index": MATCH}, "n_clicks"),
+    State({"type": "asset-section-collapse", "index": MATCH}, "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_asset_section(n, is_open):
+    return not is_open if n else is_open
 
 
 # ── 3. Timeframe change → update KPIs + charts ───────────────────
 
 @callback(
     Output("portfolio_kpi_container", "children", allow_duplicate=True),
-    Output("workspace-price-graph", "figure", allow_duplicate=True),
-    Output("workspace-value-graph", "figure", allow_duplicate=True),
-    Output("workspace-profit-range-graph", "figure", allow_duplicate=True),
-    Output("workspace-risk-graph", "figure", allow_duplicate=True),
-    Output("workspace-dca-graph", "figure", allow_duplicate=True),
     Output("tab-portfolio-content", "children", allow_duplicate=True),
     Output("workspace-timeframe", "data"),
     Output("tab-risk-content", "children", allow_duplicate=True),
     Output("tab-opportunities-content", "children", allow_duplicate=True),
+    Output("asset-detail-sections", "children", allow_duplicate=True),
+    Output("risk-asset-detail-sections", "children", allow_duplicate=True),
+    Output("opportunities-asset-detail-sections", "children", allow_duplicate=True),
     Input("workspace-timeframe-selector", "value"),
     State("portfolio_page_asset_store", "data"),
     State("workspace-selected-asset", "data"),
     State("theme-store", "data"),
     prevent_initial_call=True,
 )
-def on_timeframe_change(timeframe, cached_data, selected_asset, theme):
+def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
     if not timeframe:
         raise PreventUpdate
 
@@ -201,26 +243,22 @@ def on_timeframe_change(timeframe, cached_data, selected_asset, theme):
         risk_tab = risk_tab_content(filtered_vm, current_theme)
         opportunities_tab = opportunities_tab_content(filtered_vm, current_theme)
 
-    if not selected_asset:
+    tickers = selected_assets if isinstance(selected_assets, list) else []
+    if not tickers:
         return (
             kpi_children,
-            no_update, no_update, no_update, no_update, no_update,
             portfolio_tab, timeframe, risk_tab, opportunities_tab,
+            no_update, no_update, no_update,
         )
 
-    asset_history = AssetController().get_asset_snapshot(selected_asset.lower(), start_date, end_date)
+    snapshots = _fetch_snapshots(tickers, start_date, end_date)
 
     return (
         kpi_children,
-        PriceStructurePlotlyLineChart().render(asset_history, current_theme),
-        AssetValuePlotlyLineChart().render(asset_history, current_theme),
-        ProfitRangePlotlyLineChart().render(asset_history, current_theme),
-        RiskContextPlotlyLineChart().render(asset_history, current_theme),
-        DCABiasPlotlyLineChart().render(asset_history, current_theme),
-        portfolio_tab,
-        timeframe,
-        risk_tab,
-        opportunities_tab,
+        portfolio_tab, timeframe, risk_tab, opportunities_tab,
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val"),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk"),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps"),
     )
 
 
@@ -281,20 +319,6 @@ def toggle_portfolio_section(n, is_open):
     return is_open
 
 
-# ── 5b. Asset detail section toggle ──────────────────────────────
-
-@callback(
-    Output("asset-detail-collapse", "is_open", allow_duplicate=True),
-    Input("asset-detail-header", "n_clicks"),
-    State("asset-detail-collapse", "is_open"),
-    prevent_initial_call=True,
-)
-def toggle_asset_detail_section(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-
 # ── 5c. Risk tab — portfolio section toggle ───────────────────────
 
 @callback(
@@ -309,20 +333,6 @@ def toggle_risk_portfolio_section(n, is_open):
     return is_open
 
 
-# ── 5d. Risk tab — asset detail toggle ───────────────────────────
-
-@callback(
-    Output("risk-asset-detail-collapse", "is_open", allow_duplicate=True),
-    Input("risk-asset-detail-header", "n_clicks"),
-    State("risk-asset-detail-collapse", "is_open"),
-    prevent_initial_call=True,
-)
-def toggle_risk_asset_detail_section(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-
 # ── 5e. Opportunities tab — portfolio section toggle ──────────────
 
 @callback(
@@ -332,20 +342,6 @@ def toggle_risk_asset_detail_section(n, is_open):
     prevent_initial_call=True,
 )
 def toggle_opportunities_portfolio_section(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-
-# ── 5f. Opportunities tab — asset detail toggle ───────────────────
-
-@callback(
-    Output("opportunities-asset-detail-collapse", "is_open", allow_duplicate=True),
-    Input("opportunities-asset-detail-header", "n_clicks"),
-    State("opportunities-asset-detail-collapse", "is_open"),
-    prevent_initial_call=True,
-)
-def toggle_opportunities_asset_detail_section(n, is_open):
     if n:
         return not is_open
     return is_open
