@@ -14,7 +14,7 @@ A personal stock portfolio monitoring system. It pulls data from Trading212, pro
 
 Four layers. Keep changes within one layer per task.
 
-```
+```text
 Frontend        src/dashboard/            Dash UI — reads from services
 Orchestration   src/orchestration/        Prefect — schedules pipelines
 Backend         src/backend/ingestion/    ETL pipelines and Kafka events
@@ -48,7 +48,7 @@ Reference: `docs/02-architecture/design/ingestion/doc-pipelines.md`
 ## Storage — Medallion Architecture
 
 | Schema | Layer | What It Holds |
-|--------|-------|---------------|
+| --- | --- | --- |
 | `raw` | Bronze | Append-only, partitioned by date, data as received |
 | `staging` | Silver | Typed, deduplicated, computed metrics |
 | `analytics` | Gold | Built to answer dashboard questions (not yet built) |
@@ -112,8 +112,9 @@ Full workflow: `docs/03-engineering/doc-project-workflow.md`
 
 ## Skills Available
 
-- `/database` — schema reference, query help, migration guidance
+- `/database` — schema reference for all three layers, query rules, migration commands
+- `/pipeline` — pipeline pattern, failure modes, pipeline inventory, migration safety
+- `/dashboard` — layout rules, component IDs, callback safety checks, theme wiring
+- `/docs` — doc map, trustworthiness ratings, update checklist by change type
 - `/financial-analyst` — metrics catalogue, dashboard KPI suggestions
 - `/project-navigation` — navigating the codebase (incomplete)
-- `/dashboard` — layout rules, component IDs, callback safety checks, theme wiring
-- `/pipeline` — pipeline pattern, failure modes, pipeline inventory, migration safety
