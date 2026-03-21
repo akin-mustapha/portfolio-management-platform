@@ -2,8 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from .charts import (
-    WinnersPlotlyBarChart,
-    LosersPlotlyBarChart,
+    _ranked_panel,
     PortfolioPerformancePlotlyLineChart,
     PortfolioPNLPlotlyLineChart,
     PositionWeightPlotlyDonutChart,
@@ -13,7 +12,7 @@ from .charts import (
     PortfolioDrawdownPlotlyLineChart,
     PositionProfitabilityPlotlyDonutChart,
     VaRBarChart,
-    DailyMoversBarChart,
+    daily_movers_table,
 )
 
 _GRAPH_CONFIG = {"displayModeBar": False}
@@ -96,25 +95,25 @@ def portfolio_tab_content(view_model=None, theme="light"):
                     dbc.Row([
 
                         dbc.Col(
-                            _chart_section(
-                                "Top Losers",
-                                dcc.Graph(
-                                    id="losers_chart",
-                                    figure=LosersPlotlyBarChart().render(losers, theme=theme),
-                                    config=_GRAPH_CONFIG,
-                                )
-                            ),
+                            html.Div([
+                                html.Div("Top Losers", className="tv-section-header"),
+                                html.Div(
+                                    id="losers-table",
+                                    children=_ranked_panel(losers, "profit", False),
+                                    className="movers-table-scroll",
+                                ),
+                            ]),
                         ),
 
                         dbc.Col(
-                            _chart_section(
-                                "Top Winners",
-                                dcc.Graph(
-                                    id="winners_chart",
-                                    figure=WinnersPlotlyBarChart().render(winners, theme=theme),
-                                    config=_GRAPH_CONFIG,
-                                )
-                            ),
+                            html.Div([
+                                html.Div("Top Winners", className="tv-section-header"),
+                                html.Div(
+                                    id="winners-table",
+                                    children=_ranked_panel(winners, "profit", True),
+                                    className="movers-table-scroll",
+                                ),
+                            ]),
                         ),
 
                         dbc.Col(
@@ -131,18 +130,22 @@ def portfolio_tab_content(view_model=None, theme="light"):
                     ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "1fr 1fr 25%"}),
 
                     html.Hr(className="tv-divider"),
-                    dbc.Row([
-                        dbc.Col(
-                            _chart_section(
-                                "Today's Movers",
-                                dcc.Graph(
-                                    id="daily_movers_chart",
-                                    figure=DailyMoversBarChart().render(daily_movers, theme=theme, x_col="daily_return"),
-                                    config=_GRAPH_CONFIG,
-                                )
+                    html.Div([
+                        html.Div([
+                            html.Div("Today's Movers", className="tv-section-header", style={"padding": "12px 0 8px"}),
+                            dbc.Select(
+                                id="daily-movers-n-dropdown",
+                                options=[{"label": f"Top {n}", "value": n} for n in range(5, 31, 5)],
+                                value=5,
+                                className="movers-n-dropdown",
                             ),
+                        ], className="movers-header-row"),
+                        html.Div(
+                            id="daily-movers-table",
+                            children=daily_movers_table(daily_movers, n=5),
+                            className="movers-table-scroll",
                         ),
-                    ], className="mb-6 workspace-chart-grid"),
+                    ], className="mb-6"),
                 ],
             ),
         ], className="tv-section-container"),

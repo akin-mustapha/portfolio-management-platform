@@ -18,7 +18,7 @@ from .components.asset_charts import (
     RiskContextPlotlyLineChart,
     DCABiasPlotlyLineChart,
 )
-from .components.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart
+from .components.charts import _ranked_panel, daily_movers_table
 from ...controllers.portfolio_controller import PortfolioController
 from ...controllers.asset_controller import AssetController
 from ...controllers.asset_profile_controller import AssetProfileController
@@ -265,14 +265,13 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
 # ── 4. Winners/Losers sort toggle ────────────────────────────────
 
 @callback(
-    Output("winners_chart", "figure", allow_duplicate=True),
-    Output("losers_chart", "figure", allow_duplicate=True),
+    Output("winners-table", "children", allow_duplicate=True),
+    Output("losers-table", "children", allow_duplicate=True),
     Input("winners-losers-sort-toggle", "value"),
     State("portfolio_page_asset_store", "data"),
-    State("theme-store", "data"),
     prevent_initial_call=True,
 )
-def on_winners_losers_sort_change(sort_by, cached_data, theme):
+def on_winners_losers_sort_change(sort_by, cached_data):
     if not cached_data:
         raise PreventUpdate
 
@@ -280,14 +279,13 @@ def on_winners_losers_sort_change(sort_by, cached_data, theme):
     if not assets:
         raise PreventUpdate
 
-    current_theme = theme or "light"
     presenter = PortfolioPresenter()
     winners = presenter._top_winner_bar_vm(assets, sort_by=sort_by)
     losers = presenter._top_losers_bar_vm(assets, sort_by=sort_by)
 
     return (
-        WinnersPlotlyBarChart().render(winners, theme=current_theme, x_col=sort_by),
-        LosersPlotlyBarChart().render(losers, theme=current_theme, x_col=sort_by),
+        _ranked_panel(winners, sort_by, True),
+        _ranked_panel(losers, sort_by, False),
     )
 
 
@@ -424,3 +422,18 @@ def on_save_profile(n_clicks, tag_id, category_id, category_opts, industry_id, i
 
     status = " | ".join(messages) if messages else "Nothing to save."
     return status, tag_display
+
+
+# ── 8. Daily movers pagination ────────────────────────────────────
+
+@callback(
+    Output("daily-movers-table", "children"),
+    Input("daily-movers-n-dropdown", "value"),
+    State("portfolio_page_asset_store", "data"),
+    prevent_initial_call=True,
+)
+def on_daily_movers_n_change(n, cached_data):
+    if not cached_data or not n:
+        raise PreventUpdate
+    movers = cached_data.get("view_model", {}).get("daily_movers", [])
+    return daily_movers_table(movers, n=int(n))

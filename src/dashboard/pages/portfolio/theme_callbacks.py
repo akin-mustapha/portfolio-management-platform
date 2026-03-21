@@ -65,8 +65,6 @@ clientside_callback(
 # ── Patch portfolio chart backgrounds on theme change ────────────────────────
 
 @callback(
-    Output("winners_chart", "figure"),
-    Output("losers_chart", "figure"),
     Output("value_chart", "figure"),
     Output("pnl_chart", "figure"),
     Output("losers_pnl_chart", "figure"),
@@ -75,7 +73,6 @@ clientside_callback(
     Output("profitability_donut_chart", "figure"),
     Output("portfolio_performance_map", "figure"),
     Output("portfolio_drawdown_chart", "figure"),
-    Output("daily_movers_chart", "figure"),
     Output("var_by_position_chart", "figure"),
     Input("theme-store", "data"),
     prevent_initial_call=True,
@@ -93,13 +90,12 @@ def update_chart_theme(theme):
         return p
 
     return (
-        patch(), patch(), patch(), patch(),
-        patch(), patch(),
-        patch(), patch(),
-        patch(),
-        patch(),  # portfolio_drawdown_chart
-        patch(),  # daily_movers_chart
-        patch(),  # var_by_position_chart
+        patch(), patch(),  # value_chart, pnl_chart
+        patch(), patch(),  # losers_pnl_chart, winners_pnl_chart
+        patch(), patch(),  # position_weight_donut_chart, profitability_donut_chart
+        patch(),           # portfolio_performance_map
+        patch(),           # portfolio_drawdown_chart
+        patch(),           # var_by_position_chart
     )
 
 

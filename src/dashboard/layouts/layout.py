@@ -149,6 +149,31 @@ layout = dbc.Container(
                                         ],
                                         className="settings-field-group",
                                     ),
+                                    # Secret token row
+                                    html.Div(
+                                        [
+                                            html.Label("Secret Token", className="settings-field-label"),
+                                            html.Div(
+                                                [
+                                                    dbc.Input(
+                                                        id="settings-secret-token-input",
+                                                        type="password",
+                                                        placeholder="Enter secret token",
+                                                        className="settings-api-input",
+                                                    ),
+                                                    html.Button(
+                                                        html.I(id="settings-secret-eye-icon", className="fa-solid fa-eye"),
+                                                        id="settings-secret-eye-btn",
+                                                        n_clicks=0,
+                                                        className="settings-eye-btn",
+                                                        title="Show/hide token",
+                                                    ),
+                                                ],
+                                                className="settings-input-row",
+                                            ),
+                                        ],
+                                        className="settings-field-group",
+                                    ),
                                     # Action buttons
                                     html.Div(
                                         [

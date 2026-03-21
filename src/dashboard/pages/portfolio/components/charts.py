@@ -2,11 +2,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from dash import dcc, html
-from plotly.subplots import make_subplots
+from dash import html
 
-
-_GRAPH_CONFIG = {"displayModeBar": False}
 
 CHART_HEIGHT_1 = 200
 CHART_HEIGHT = 230
@@ -315,58 +312,83 @@ class LosersPlotlyBarChart(_BaseRankedBarChart):
     y_axis_side = "right"
 
 
-class DailyMoversBarChart:
-    def render(self, data, theme="light", x_col="daily_return"):
-        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-        if not data:
-            return go.Figure()
+_PCT_COLS = {"daily_return", "cumulative_return", "weight_pct", "pnl_pct"}
 
-        df = pd.DataFrame(data)
-        df[x_col] = pd.to_numeric(df[x_col], errors="coerce").fillna(0)
 
-        gainers = df[df[x_col] > 0].sort_values(x_col, ascending=False).head(8).copy()
-        losers  = df[df[x_col] < 0].sort_values(x_col, ascending=True).head(8).copy()
+def _ranked_panel(data, sort_by="profit", is_gain=True):
+    """Single Winners or Losers inline-bar panel. Data is pre-sorted."""
+    if not data:
+        return html.Div("—", className="movers-empty")
 
-        gainers["display"] = gainers["ticker"] + "  +" + gainers[x_col].map(lambda v: f"{v:.2f}%")
-        losers["display"]  = losers["ticker"]  + "  "  + losers[x_col].map(lambda v: f"{v:.2f}%")
+    df = pd.DataFrame(data)
+    values = pd.to_numeric(df[sort_by], errors="coerce").fillna(0)
+    max_val = values.abs().max() or 1
 
-        fig = make_subplots(rows=1, cols=2, horizontal_spacing=0.06)
-        axis_style = dict(showgrid=False, zeroline=False, showticklabels=False)
+    fmt = (lambda v: f"+{v:.2f}%" if v >= 0 else f"{v:.2f}%") if sort_by in _PCT_COLS \
+        else (lambda v: f"+{v:,.2f}" if v >= 0 else f"{v:,.2f}")
 
-        # Gainers panel — sorted ascending so the largest bar sits at the top
-        g = gainers.sort_values(x_col, ascending=True)
-        fig.add_trace(go.Bar(
-            x=g[x_col], y=g["ticker"], orientation="h",
-            text=g["display"], textposition="auto",
-            marker=dict(color=px.colors.diverging.RdYlGn[-3], line=dict(width=0)),
-            textfont=dict(size=11),
-            showlegend=False,
-            hovertemplate="%{text}<extra></extra>",
-        ), row=1, col=1)
+    bg      = "rgba(38,166,113,0.18)" if is_gain else "rgba(239,83,80,0.18)"
+    val_cls = "movers-value--gain"     if is_gain else "movers-value--loss"
+    lbl_cls = "movers-panel-label--gain" if is_gain else "movers-panel-label--loss"
 
-        # Losers panel — largest absolute move at the top
-        l = losers.sort_values(x_col, ascending=False)
-        fig.add_trace(go.Bar(
-            x=l[x_col].abs(), y=l["ticker"], orientation="h",
-            text=l["display"], textposition="auto",
-            marker=dict(color=px.colors.diverging.RdYlGn[1], line=dict(width=0)),
-            textfont=dict(size=11),
-            showlegend=False,
-            hovertemplate="%{text}<extra></extra>",
-        ), row=1, col=2)
+    rows = []
+    for v, (_, r) in zip(values, df.iterrows()):
+        fill = abs(v) / max_val * 100
+        rows.append(html.Div([
+            html.Span(r["ticker"], className="movers-ticker"),
+            html.Span(fmt(v), className=val_cls),
+        ], className="movers-row", style={
+            "background": f"linear-gradient(to right, {bg} {fill:.0f}%, transparent {fill:.0f}%)",
+        }))
 
-        fig.update_xaxes(**axis_style)
-        fig.update_yaxes(**axis_style)
-        fig.update_layout(
-            template="plotly_white",
-            height=CHART_HEIGHT_1,
-            margin=dict(l=4, r=4, t=4, b=4),
-            paper_bgcolor=ct["paper_bgcolor"],
-            plot_bgcolor=ct["plot_bgcolor"],
-            font=dict(size=11, color=ct["font_color"]),
-            bargap=0.25,
+    label = "Winners" if is_gain else "Losers"
+    return html.Div([
+        html.Div(label, className=f"movers-panel-label {lbl_cls}"),
+        html.Div(rows),
+    ])
+
+
+def daily_movers_table(data, n=5):
+    """Inline-bar movers table: two panels (Gainers / Losers), each with n rows.
+    Bar fill is a CSS gradient proportional to the move within each panel."""
+    if not data:
+        return html.Div()
+
+    df = pd.DataFrame(data)
+    df["daily_return"] = pd.to_numeric(df["daily_return"], errors="coerce").fillna(0)
+
+    gainers = df[df["daily_return"] > 0].sort_values("daily_return", ascending=False).head(n)
+    losers  = df[df["daily_return"] < 0].sort_values("daily_return", ascending=True).head(n)
+
+    gain_max = gainers["daily_return"].max() if not gainers.empty else 1
+    loss_max = losers["daily_return"].abs().max() if not losers.empty else 1
+
+    def _row(ticker, value, is_gain):
+        fill = abs(value) / (gain_max if is_gain else loss_max) * 100
+        bg = "rgba(38,166,113,0.18)" if is_gain else "rgba(239,83,80,0.18)"
+        label = f"+{value:.2f}%" if is_gain else f"{value:.2f}%"
+        return html.Div([
+            html.Span(ticker, className="movers-ticker"),
+            html.Span(label, className="movers-value--gain" if is_gain else "movers-value--loss"),
+        ], className="movers-row", style={
+            "background": f"linear-gradient(to right, {bg} {fill:.0f}%, transparent {fill:.0f}%)",
+        })
+
+    def _panel(label, rows_df, is_gain):
+        rows = (
+            [_row(r["ticker"], r["daily_return"], is_gain) for _, r in rows_df.iterrows()]
+            if not rows_df.empty else [html.Div("—", className="movers-empty")]
         )
-        return fig
+        cls = "movers-panel-label--gain" if is_gain else "movers-panel-label--loss"
+        return html.Div([
+            html.Div(label, className=f"movers-panel-label {cls}"),
+            html.Div(rows),
+        ])
+
+    return dbc.Row([
+        dbc.Col(_panel("Gainers", gainers, True)),
+        dbc.Col(_panel("Losers",  losers,  False)),
+    ], className="g-3")
 
 
 class VaRBarChart(_BaseRankedBarChart):
