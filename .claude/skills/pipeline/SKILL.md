@@ -1,6 +1,6 @@
 ---
 name: pipeline
-description: Use this skill when building, debugging, or modifying data pipelines in the ingestion layer.
+description: Use this skill when building, debugging, or modifying data pipelines — including Prefect flows, Pydantic validation schemas, and bronze/silver/gold layer ETL.
 ---
 
 # Why

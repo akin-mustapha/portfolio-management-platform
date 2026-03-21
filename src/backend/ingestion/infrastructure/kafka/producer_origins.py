@@ -9,9 +9,24 @@ from backend.ingestion.infrastructure.api.api_client_trading212 import Trading21
 
 load_dotenv()
 
-URL = os.getenv("API_URL")
-API_TOKEN = os.getenv("API_TOKEN")
-SECRET_TOKEN = os.getenv("SECRET_TOKEN")
+# Try to load credentials from DB (set via Settings modal).
+# Fall back to .env so existing pipeline runs keep working if no DB row exists yet.
+def _load_credentials():
+    try:
+        from backend.services.credentials.repository import CredentialsRepository
+        row = CredentialsRepository().load("trading212")
+        if row and row.get("api_key"):
+            return (
+                row.get("api_url") or os.getenv("API_URL"),
+                row["api_key"],
+                row.get("secret_token") or os.getenv("SECRET_TOKEN"),
+            )
+    except Exception:
+        pass
+    return os.getenv("API_URL"), os.getenv("API_TOKEN"), os.getenv("SECRET_TOKEN")
+
+
+URL, API_TOKEN, SECRET_TOKEN = _load_credentials()
 
 class Trading212AssetAPIOrigin(Origin):
   def __init__(self, origin_name: str):

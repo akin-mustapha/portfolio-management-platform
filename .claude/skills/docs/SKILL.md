@@ -17,11 +17,11 @@ Docs in this project drift from the code after refactors. This skill tells you w
 |---|---|---|
 | `schema-reference.md` (skill reference) | ✅ High | Kept in sync manually — most accurate schema source |
 | `docs/02-architecture/design/schema/schema-staging.md` | ✅ High | Most accurate schema doc in the docs folder |
+| `docs/02-architecture/design/schema/schema-analytics.md` | ✅ High | Most accurate schema doc in the docs folder |
 | `docs/02-architecture/architecture.md` | ⚠️ Medium | Accurate structure, some detail may lag code |
 | `docs/02-architecture/design/ingestion/doc-pipelines.md` | ⚠️ Medium | Pattern is correct, specific implementations may drift |
 | `docs/02-architecture/design/doc-data-model.md` | ⚠️ Medium | Field names have drifted — `tag_type` in doc is `Category` in code |
-| `docs/02-architecture/design/ui-design.md` | 🔵 Design intent | Gold layer tables referenced don't exist yet |
-| `docs/02-architecture/design/schema/schema-analytics.md` | 🔵 Design intent | Planned gold schema — not implemented |
+| `docs/02-architecture/design/ui-design.md` | 🔵 Design intent | Gold layer tables referenced don't exist yet (now implemented) |
 | `docs/03-engineering/doc-commands.md` | ✅ High | Commands are stable and accurate |
 | `docs/03-engineering/doc-project-workflow.md` | ✅ High | Git/PR workflow — rarely changes |
 | `docs/04-bugs/bug_prefect.md` | 🔵 Historical | Bug log, not a living doc |

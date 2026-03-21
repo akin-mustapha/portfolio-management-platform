@@ -1,6 +1,6 @@
 ---
 name: database
-description: Use this skill when answering schema questions, writing queries, or working on migrations. Covers all three medallion layers.
+description: Use this skill when answering schema questions, writing queries, or working on migrations, database, storage. Covers all three medallion layers.
 ---
 
 # Why

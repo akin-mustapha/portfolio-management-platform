@@ -2,10 +2,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from dash import dcc, html
+from dash import html
 
-
-_GRAPH_CONFIG = {"displayModeBar": False}
 
 CHART_HEIGHT_1 = 200
 CHART_HEIGHT = 230
@@ -48,6 +46,8 @@ class _PnLPlotlyLineChart:
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         keys = list(data.keys())
         values = list(data.values())
+        if not values:
+            return go.Figure()
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=keys, y=values,
@@ -59,7 +59,7 @@ class _PnLPlotlyLineChart:
         fig.add_trace(go.Scatter(
             x=keys, y=values,
             mode="lines",
-            line=dict(width=1),
+            line=dict(width=1.5),
             fill=self.fill,
             hovertemplate="%{y:,.2f}<extra></extra>",
             showlegend=False,
@@ -73,7 +73,7 @@ class _PnLPlotlyLineChart:
         fig.update_layout(
             template="plotly_white",
             colorway=self.colorway,
-            height=CHART_HEIGHT_1,
+            height=getattr(self, "chart_height", CHART_HEIGHT_1),
             hovermode="x unified",
             margin=dict(l=2, r=2, t=2, b=2),
             xaxis_title=None,
@@ -91,6 +91,7 @@ class _PnLPlotlyLineChart:
 class WinnersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     colorway = px.colors.sequential.Bluyl_r
     fill = "toself"
+    chart_height = 280
 
 class LosersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     colorway = px.colors.sequential.Brwnyl_r
@@ -98,6 +99,8 @@ class LosersPnLPlotlyLineChart(_PnLPlotlyLineChart):
 class PortfolioPerformanceScatterPlot:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        if not data:
+            return go.Figure()
         df = pd.DataFrame(data)
         for col in ["roi_pct", "weight_pct", "value", "profit"]:
             if col in df.columns:
@@ -232,7 +235,7 @@ class PortfolioPerformanceScatterPlot:
             template="plotly_white",
             margin=dict(l=5, r=5, t=5, b=5),
             colorway=px.colors.sequential.Agsunset,
-            height=350,
+            height=280,
             xaxis_title="ROI %",
             yaxis_title="% Weight",
             # xaxis_title=None,
@@ -280,19 +283,16 @@ class _BaseRankedBarChart:
             textfont=dict(color=ct["font_color"], size=13),
         )
 
-        n = len(df)
-        chart_h = max(200, n * 28 + 20)
-
         fig.update_layout(
             template="plotly_white",
-            margin=dict(l=2, r=80, t=2, b=2),
-            height=chart_h,
+            margin=dict(l=4, r=4, t=4, b=4),
+            height=CHART_HEIGHT_1,
             xaxis_title=None,
             yaxis_title=None,
             yaxis=dict(side=self.y_axis_side, showgrid=False, zeroline=False, showticklabels=False),
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             font=dict(size=11, color=ct["font_color"]),
-            bargap=0.2,
+            bargap=0.15,
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
             title=None,
@@ -313,9 +313,83 @@ class LosersPlotlyBarChart(_BaseRankedBarChart):
     y_axis_side = "right"
 
 
-class DailyMoversBarChart(_BaseRankedBarChart):
-    sort_ascending = True
-    y_axis_side = "left"
+_PCT_COLS = {"daily_return", "cumulative_return", "weight_pct", "pnl_pct"}
+
+
+def _ranked_panel(data, sort_by="profit", is_gain=True):
+    """Single Winners or Losers inline-bar panel. Data is pre-sorted."""
+    if not data:
+        return html.Div("—", className="movers-empty")
+
+    df = pd.DataFrame(data)
+    values = pd.to_numeric(df[sort_by], errors="coerce").fillna(0)
+    max_val = values.abs().max() or 1
+
+    fmt = (lambda v: f"+{v:.2f}%" if v >= 0 else f"{v:.2f}%") if sort_by in _PCT_COLS \
+        else (lambda v: f"+{v:,.2f}" if v >= 0 else f"{v:,.2f}")
+
+    bg      = "rgba(38,166,113,0.18)" if is_gain else "rgba(239,83,80,0.18)"
+    val_cls = "movers-value--gain"     if is_gain else "movers-value--loss"
+    lbl_cls = "movers-panel-label--gain" if is_gain else "movers-panel-label--loss"
+
+    rows = []
+    for v, (_, r) in zip(values, df.iterrows()):
+        fill = abs(v) / max_val * 100
+        rows.append(html.Div([
+            html.Span(r["ticker"], className="movers-ticker"),
+            html.Span(fmt(v), className=val_cls),
+        ], className="movers-row", style={
+            "background": f"linear-gradient(to right, {bg} {fill:.0f}%, transparent {fill:.0f}%)",
+        }))
+
+    label = "Winners" if is_gain else "Losers"
+    return html.Div([
+        html.Div(label, className=f"movers-panel-label {lbl_cls}"),
+        html.Div(rows),
+    ])
+
+
+def daily_movers_table(data, n=5):
+    """Inline-bar movers table: two panels (Gainers / Losers), each with n rows.
+    Bar fill is a CSS gradient proportional to the move within each panel."""
+    if not data:
+        return html.Div()
+
+    df = pd.DataFrame(data)
+    df["daily_return"] = pd.to_numeric(df["daily_return"], errors="coerce").fillna(0)
+
+    gainers = df[df["daily_return"] > 0].sort_values("daily_return", ascending=False).head(n)
+    losers  = df[df["daily_return"] < 0].sort_values("daily_return", ascending=True).head(n)
+
+    gain_max = gainers["daily_return"].max() if not gainers.empty else 1
+    loss_max = losers["daily_return"].abs().max() if not losers.empty else 1
+
+    def _row(ticker, value, is_gain):
+        fill = abs(value) / (gain_max if is_gain else loss_max) * 100
+        bg = "rgba(38,166,113,0.18)" if is_gain else "rgba(239,83,80,0.18)"
+        label = f"+{value:.2f}%" if is_gain else f"{value:.2f}%"
+        return html.Div([
+            html.Span(ticker, className="movers-ticker"),
+            html.Span(label, className="movers-value--gain" if is_gain else "movers-value--loss"),
+        ], className="movers-row", style={
+            "background": f"linear-gradient(to right, {bg} {fill:.0f}%, transparent {fill:.0f}%)",
+        })
+
+    def _panel(label, rows_df, is_gain):
+        rows = (
+            [_row(r["ticker"], r["daily_return"], is_gain) for _, r in rows_df.iterrows()]
+            if not rows_df.empty else [html.Div("—", className="movers-empty")]
+        )
+        cls = "movers-panel-label--gain" if is_gain else "movers-panel-label--loss"
+        return html.Div([
+            html.Div(label, className=f"movers-panel-label {cls}"),
+            html.Div(rows),
+        ])
+
+    return dbc.Row([
+        dbc.Col(_panel("Gainers", gainers, True)),
+        dbc.Col(_panel("Losers",  losers,  False)),
+    ], className="g-3")
 
 
 class VaRBarChart(_BaseRankedBarChart):
@@ -408,64 +482,11 @@ class PositionProfitabilityPlotlyDonutChart:
         )
         return fig
 
-class PositionWeightPlotlyBarChart:
-    def render(self, data, theme="light"):
-        if not data:
-            return go.Figure()
-        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-        df = pd.DataFrame(data)
-
-        fig = px.bar(
-            df,
-            x="weight_pct",
-            y="ticker",
-            # orientation="h",
-            text="weight_pct",
-            color_continuous_scale=px.colors.sequential.Bluyl_r,
-            color_discrete_sequence=px.colors.sequential.Bluyl_r,
-        )
-
-        fig.update_traces(
-            marker=dict(
-                color="#3d89a7",
-                line=dict(width=0),
-            ),
-            texttemplate="%{text:.1f}%",
-            textposition="outside",
-            textfont=dict(color=ct["font_color"], size=11),
-        )
-
-        fig.add_vline(
-            x=5,
-            line_dash="dot",
-            line_color="rgba(200,80,80,0.5)",
-            line_width=2,
-            annotation_text="5%",
-            annotation_font_size=10,
-            annotation_font_color="rgba(200,80,80,0.7)",
-        )
-
-        fig.update_layout(
-            template="plotly_white",
-            colorway=px.colors.sequential.Bluyl_r,
-            margin=dict(l=80, r=60, t=10, b=20),
-            height=CHART_HEIGHT,
-            xaxis_title=None,
-            yaxis_title=None,
-            yaxis=dict(showgrid=False, zeroline=False),
-            xaxis=dict(showgrid=False, zeroline=False),
-            font=dict(size=11, color=ct["font_color"]),
-            bargap=0.3,
-            paper_bgcolor=ct["paper_bgcolor"],
-            plot_bgcolor=ct["plot_bgcolor"],
-            title=None,
-        )
-
-        return fig
-
 class PortfolioDrawdownPlotlyLineChart:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        if not data or not data.get("dates"):
+            return go.Figure()
         df = pd.DataFrame(data).sort_values("dates")
         max_dd = df["drawdown_pct"].min()
 
@@ -478,7 +499,7 @@ class PortfolioDrawdownPlotlyLineChart:
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["drawdown_pct"],
             mode="lines",
-            line=dict(width=1, color="rgba(200,60,60,0.8)"),
+            line=dict(width=1.5, color="rgba(200,60,60,0.8)"),
             fill="toself",
             fillcolor="rgba(200,60,60,0.15)",
             hovertemplate="%{y:.2f}%<extra></extra>",
@@ -529,7 +550,7 @@ class PortfolioPerformancePlotlyLineChart:
             y=df["values"],
             name="Portfolio Value",
             mode="lines",
-            line=dict(width=1),
+            line=dict(width=1.5),
             fill="tonexty",
             hovertemplate="Portfolio Value: %{y:,.2f}<extra></extra>",
             showlegend=True,
@@ -622,7 +643,7 @@ class PortfolioPNLPlotlyLineChart:
             y=df["values"],
             name="Unrealized",
             mode="lines",
-            line=dict(width=1),
+            line=dict(width=1.5),
             fill="tonexty",
             hovertemplate="Unrealized: %{y:,.2f}<extra></extra>",
             showlegend=True,
@@ -706,3 +727,50 @@ class PortfolioPNLPlotlyLineChart:
         _apply_spike_config(fig)
         return fig
 
+
+
+def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light") -> go.Figure:
+    ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+    dates = series.get("dates", [])
+    values = series.get("values", [])
+
+    if change_sign > 0:
+        line_color = "#26a69a"
+        fill_color = "rgba(38,166,154,0.15)"
+    elif change_sign < 0:
+        line_color = "#ef5350"
+        fill_color = "rgba(239,83,80,0.15)"
+    else:
+        line_color = "rgba(150,150,150,0.6)"
+        fill_color = "rgba(150,150,150,0.10)"
+
+    zeros = [0] * len(dates)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=dates, y=zeros,
+        mode="lines",
+        line=dict(color="rgba(0,0,0,0)", width=0),
+        showlegend=False,
+        hoverinfo="skip",
+    ))
+    fig.add_trace(go.Scatter(
+        x=dates, y=values,
+        mode="lines",
+        line=dict(color=line_color, width=1.5),
+        fill="tonexty",
+        fillcolor=fill_color,
+        showlegend=False,
+        hoverinfo="skip",
+    ))
+    fig.update_layout(
+        height=22,
+        width=56,
+        margin=dict(l=0, r=0, t=0, b=0),
+        paper_bgcolor=ct["paper_bgcolor"],
+        plot_bgcolor=ct["plot_bgcolor"],
+        xaxis=dict(visible=False, showgrid=False, zeroline=False, fixedrange=True),
+        yaxis=dict(visible=False, showgrid=False, zeroline=False, fixedrange=True),
+        dragmode=False,
+    )
+    return fig
