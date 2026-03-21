@@ -7,9 +7,15 @@ from .components.kpis import kpi_row
 from .components.tables import asset_table
 from .components.workspace_tabs import (
     portfolio_tab_content,
-    valuation_tab_content,
     risk_tab_content,
     opportunities_tab_content,
+)
+from .components.asset_charts import (
+    PriceStructurePlotlyLineChart,
+    AssetValuePlotlyLineChart,
+    ProfitRangePlotlyLineChart,
+    RiskContextPlotlyLineChart,
+    DCABiasPlotlyLineChart,
 )
 from .components.charts import WinnersPlotlyBarChart, LosersPlotlyBarChart
 from ...controllers.portfolio_controller import PortfolioController
@@ -94,8 +100,18 @@ def load_portfolio_page(pathname, cached_data, theme):
 
 @callback(
     Output("workspace-selected-asset", "data"),
-    Output("workspace-chart-header", "children"),
-    Output("tab-valuation-content", "children"),
+    Output("valuation-asset-badge", "children"),
+    Output("asset-detail-collapse", "is_open"),
+    Output("asset-detail-header", "children"),
+    Output("workspace-price-graph", "figure"),
+    Output("workspace-value-graph", "figure"),
+    Output("workspace-profit-range-graph", "figure"),
+    Output("risk-asset-detail-collapse", "is_open"),
+    Output("risk-asset-detail-header", "children"),
+    Output("workspace-risk-graph", "figure"),
+    Output("opportunities-asset-detail-collapse", "is_open"),
+    Output("opportunities-asset-detail-header", "children"),
+    Output("workspace-dca-graph", "figure"),
     Input("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
     State("theme-store", "data"),
@@ -103,7 +119,12 @@ def load_portfolio_page(pathname, cached_data, theme):
 )
 def on_asset_row_selected(selected_rows, timeframe, theme):
     if not selected_rows:
-        return no_update, "", valuation_tab_content()
+        return (
+            no_update, no_update, False, no_update,
+            no_update, no_update, no_update,
+            False, "", no_update,
+            False, "", no_update,
+        )
 
     ticker = selected_rows[0].get("ticker", "")
     if not ticker:
@@ -114,12 +135,31 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
 
     asset_history = AssetController().get_asset_snapshot(ticker.lower(), start_date, end_date)
 
-    header = html.Span(ticker.upper(), className="asset-ticker-tag")
+    badge = html.Span(ticker.upper(), className="asset-ticker-tag")
+    valuation_header = [
+        "Asset Detail",
+        html.Span("›", className="tv-chevron"),
+        badge,
+    ]
+    detail_header = html.Span([
+        html.Span(ticker.upper(), className="asset-ticker-tag"),
+        " — Asset Detail",
+    ])
 
     return (
         ticker,
-        header,
-        valuation_tab_content(asset_history, current_theme),
+        no_update,
+        True,
+        valuation_header,
+        PriceStructurePlotlyLineChart().render(asset_history, current_theme),
+        AssetValuePlotlyLineChart().render(asset_history, current_theme),
+        ProfitRangePlotlyLineChart().render(asset_history, current_theme),
+        True,
+        detail_header,
+        RiskContextPlotlyLineChart().render(asset_history, current_theme),
+        True,
+        detail_header,
+        DCABiasPlotlyLineChart().render(asset_history, current_theme),
     )
 
 
@@ -127,7 +167,11 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
 
 @callback(
     Output("portfolio_kpi_container", "children", allow_duplicate=True),
-    Output("tab-valuation-content", "children", allow_duplicate=True),
+    Output("workspace-price-graph", "figure", allow_duplicate=True),
+    Output("workspace-value-graph", "figure", allow_duplicate=True),
+    Output("workspace-profit-range-graph", "figure", allow_duplicate=True),
+    Output("workspace-risk-graph", "figure", allow_duplicate=True),
+    Output("workspace-dca-graph", "figure", allow_duplicate=True),
     Output("tab-portfolio-content", "children", allow_duplicate=True),
     Output("workspace-timeframe", "data"),
     Output("tab-risk-content", "children", allow_duplicate=True),
@@ -158,13 +202,21 @@ def on_timeframe_change(timeframe, cached_data, selected_asset, theme):
         opportunities_tab = opportunities_tab_content(filtered_vm, current_theme)
 
     if not selected_asset:
-        return kpi_children, no_update, portfolio_tab, timeframe, risk_tab, opportunities_tab
+        return (
+            kpi_children,
+            no_update, no_update, no_update, no_update, no_update,
+            portfolio_tab, timeframe, risk_tab, opportunities_tab,
+        )
 
     asset_history = AssetController().get_asset_snapshot(selected_asset.lower(), start_date, end_date)
 
     return (
         kpi_children,
-        valuation_tab_content(asset_history, current_theme),
+        PriceStructurePlotlyLineChart().render(asset_history, current_theme),
+        AssetValuePlotlyLineChart().render(asset_history, current_theme),
+        ProfitRangePlotlyLineChart().render(asset_history, current_theme),
+        RiskContextPlotlyLineChart().render(asset_history, current_theme),
+        DCABiasPlotlyLineChart().render(asset_history, current_theme),
         portfolio_tab,
         timeframe,
         risk_tab,
@@ -210,6 +262,90 @@ def on_winners_losers_sort_change(sort_by, cached_data, theme):
     prevent_initial_call=True,
 )
 def toggle_advanced_filter(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+# ── 5a. Portfolio section toggle ──────────────────────────────────
+
+@callback(
+    Output("portfolio-charts-collapse", "is_open"),
+    Input("portfolio-section-header", "n_clicks"),
+    State("portfolio-charts-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_portfolio_section(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+# ── 5b. Asset detail section toggle ──────────────────────────────
+
+@callback(
+    Output("asset-detail-collapse", "is_open", allow_duplicate=True),
+    Input("asset-detail-header", "n_clicks"),
+    State("asset-detail-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_asset_detail_section(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+# ── 5c. Risk tab — portfolio section toggle ───────────────────────
+
+@callback(
+    Output("risk-portfolio-charts-collapse", "is_open"),
+    Input("risk-portfolio-section-header", "n_clicks"),
+    State("risk-portfolio-charts-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_risk_portfolio_section(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+# ── 5d. Risk tab — asset detail toggle ───────────────────────────
+
+@callback(
+    Output("risk-asset-detail-collapse", "is_open", allow_duplicate=True),
+    Input("risk-asset-detail-header", "n_clicks"),
+    State("risk-asset-detail-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_risk_asset_detail_section(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+# ── 5e. Opportunities tab — portfolio section toggle ──────────────
+
+@callback(
+    Output("opportunities-portfolio-charts-collapse", "is_open"),
+    Input("opportunities-portfolio-section-header", "n_clicks"),
+    State("opportunities-portfolio-charts-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_opportunities_portfolio_section(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+
+# ── 5f. Opportunities tab — asset detail toggle ───────────────────
+
+@callback(
+    Output("opportunities-asset-detail-collapse", "is_open", allow_duplicate=True),
+    Input("opportunities-asset-detail-header", "n_clicks"),
+    State("opportunities-asset-detail-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_opportunities_asset_detail_section(n, is_open):
     if n:
         return not is_open
     return is_open

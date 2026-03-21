@@ -74,8 +74,17 @@ class PortfolioPresenter:
         return sorted(items, key=lambda x: x["var_95_1d"], reverse=True)[:10]
 
     def _daily_movers_vm(self, assets):
-        items = [{"ticker": a["ticker"], "daily_return": a.get("daily_return"), "label": a["ticker"]}
-                 for a in assets if a.get("daily_return") is not None]
+        items = []
+        for a in assets:
+            series = a.get("price_series") or []
+            if len(series) >= 2 and series[-2] not in (None, 0):
+                daily_return = (series[-1] - series[-2]) / series[-2] * 100
+            elif a.get("daily_return") is not None:
+                daily_return = a["daily_return"] * 100  # stored as decimal fraction
+            else:
+                continue
+            items.append({"ticker": a["ticker"], "daily_return": daily_return, "label": a["ticker"]})
+            
         return sorted(items, key=lambda x: abs(x["daily_return"]), reverse=True)[:15]
     # ---------- Line Chart ----------
 

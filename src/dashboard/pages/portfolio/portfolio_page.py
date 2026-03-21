@@ -67,11 +67,6 @@ def portfolio_layout():
                     className="workspace-panel-right",
                     **{"data-observer": ""},
                     children=[
-                        html.Div(
-                            id="workspace-chart-header",
-                            className="workspace-chart-header",
-                        ),
-                        
                         workspace_tabs(),
                         
                     ],

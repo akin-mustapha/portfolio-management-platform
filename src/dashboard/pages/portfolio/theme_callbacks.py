@@ -66,33 +66,17 @@ clientside_callback(
     Output("profitability_donut_chart", "figure"),
     Output("portfolio_performance_map", "figure"),
     Output("portfolio_drawdown_chart", "figure"),
+    Output("daily_movers_chart", "figure"),
+    Output("var_by_position_chart", "figure"),
     Input("theme-store", "data"),
     prevent_initial_call=True,
 )
 def update_chart_theme(theme):
     is_dark = theme == "dark"
-    bg     = "#1e222d" if is_dark else "white"
-    fc     = "#9598a1" if is_dark else "#555555"
-    rs_bg  = "#252d3d" if is_dark else "white"
-    rs_ac  = "#1c2a4a" if is_dark else "#f0f0f0"
+    bg = "#1e222d" if is_dark else "white"
+    fc = "#9598a1" if is_dark else "#555555"
 
-    def bar_patch():
-        p = Patch()
-        p["layout"]["paper_bgcolor"] = bg
-        p["layout"]["plot_bgcolor"]  = bg
-        p["layout"]["font"]["color"] = fc
-        return p
-
-    def line_patch():
-        p = Patch()
-        p["layout"]["paper_bgcolor"] = bg
-        p["layout"]["plot_bgcolor"]  = bg
-        p["layout"]["font"]["color"] = fc
-        p["layout"]["xaxis"]["rangeselector"]["bgcolor"]     = rs_bg
-        p["layout"]["xaxis"]["rangeselector"]["activecolor"] = rs_ac
-        return p
-
-    def donut_patch():
+    def patch():
         p = Patch()
         p["layout"]["paper_bgcolor"] = bg
         p["layout"]["plot_bgcolor"]  = bg
@@ -100,41 +84,40 @@ def update_chart_theme(theme):
         return p
 
     return (
-        bar_patch(), bar_patch(), line_patch(), line_patch(),
-        bar_patch(), bar_patch(),
-        donut_patch(), donut_patch(),
-        bar_patch(),
-        bar_patch(),  # portfolio_drawdown_chart
+        patch(), patch(), patch(), patch(),
+        patch(), patch(),
+        patch(), patch(),
+        patch(),
+        patch(),  # portfolio_drawdown_chart
+        patch(),  # daily_movers_chart
+        patch(),  # var_by_position_chart
     )
 
 
 # ── Patch workspace (asset) chart backgrounds on theme change ────────────────
 
 @callback(
-    Output("workspace-price-graph", "figure"),
-    Output("workspace-value-graph", "figure"),
-    Output("workspace-risk-graph", "figure"),
-    Output("workspace-dca-graph", "figure"),
+    Output("workspace-price-graph", "figure", allow_duplicate=True),
+    Output("workspace-value-graph", "figure", allow_duplicate=True),
+    Output("workspace-profit-range-graph", "figure", allow_duplicate=True),
+    Output("workspace-risk-graph", "figure", allow_duplicate=True),
+    Output("workspace-dca-graph", "figure", allow_duplicate=True),
     Input("theme-store", "data"),
     prevent_initial_call=True,
 )
 def update_workspace_chart_theme(theme):
     is_dark = theme == "dark"
-    bg    = "#1e222d" if is_dark else "white"
-    fc    = "#9598a1" if is_dark else "#555555"
-    rs_bg = "#252d3d" if is_dark else "white"
-    rs_ac = "#1c2a4a" if is_dark else "#f0f0f0"
+    bg = "#1e222d" if is_dark else "white"
+    fc = "#9598a1" if is_dark else "#555555"
 
     def line_patch():
         p = Patch()
         p["layout"]["paper_bgcolor"] = bg
         p["layout"]["plot_bgcolor"]  = bg
         p["layout"]["font"]["color"] = fc
-        p["layout"]["xaxis"]["rangeselector"]["bgcolor"]     = rs_bg
-        p["layout"]["xaxis"]["rangeselector"]["activecolor"] = rs_ac
         return p
 
-    return line_patch(), line_patch(), line_patch(), line_patch()
+    return line_patch(), line_patch(), line_patch(), line_patch(), line_patch()
 
 
 # ── Clientside: drag-to-resize split panel ───────────────────────────────────

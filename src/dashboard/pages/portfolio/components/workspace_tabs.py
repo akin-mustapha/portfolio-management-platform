@@ -15,23 +15,13 @@ from .charts import (
     VaRBarChart,
     DailyMoversBarChart,
 )
-from .asset_charts import (
-    PriceStructurePlotlyLineChart,
-    AssetValuePlotlyLineChart,
-    RiskContextPlotlyLineChart,
-    DCABiasPlotlyLineChart,
-    ProfitRangePlotlyLineChart,
-)
 
 _GRAPH_CONFIG = {"displayModeBar": False}
-_CENTERED_LOADER_STYLE = {
-    "position": "absolute", "top": "50%", "left": "50%", "transform": "translate(-50%, -50%)"
-}
 
 
 def _chart_section(title, chart):
     return html.Div([
-        html.Div([title, html.Span("›", className="tv-chevron")], className="tv-section-header"),
+        html.Div(title, className="tv-section-header"),
         chart,
     ])
 
@@ -59,155 +49,137 @@ def portfolio_tab_content(view_model=None, theme="light"):
     daily_movers = view_model.get("daily_movers", [])
 
     return html.Div([
-        # ─────────────────────────────────────────────
-        # Row: Performance (Value, PNL)
-        # ─────────────────────────────────────────────
-        dbc.Row([
-
-            dbc.Col(
-                _chart_section(
-                    "Portfolio Value",
-                    dcc.Graph(
-                        id="value_chart",
-                        figure=PortfolioPerformancePlotlyLineChart().render(value_series, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-
-            dbc.Col(
-                _chart_section(
-                    "Portfolio P&L",
-                    dcc.Graph(
-                        id="pnl_chart",
-                        figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-
-        ], className="mb-6 workspace-chart-grid"),
 
         # ─────────────────────────────────────────────
-        # Row: Winners | Losers + Position Weight
+        # Portfolio section — collapsible
         # ─────────────────────────────────────────────
-        html.Hr(className="tv-divider"),
-        dbc.Row([
-
-            dbc.Col(
-                _chart_section(
-                    "Top Losers",
-                    dcc.Graph(
-                        id="losers_chart",
-                        figure=LosersPlotlyBarChart().render(losers, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
+        html.Div([
+            html.Div(
+                ["Portfolio Overview", html.Span("›", className="tv-chevron")],
+                id="portfolio-section-header",
+                className="tv-section-header tv-section-header--section",
+                n_clicks=0,
+                style={"cursor": "pointer"},
             ),
 
-            dbc.Col(
-                _chart_section(
-                    "Top Winners",
-                    dcc.Graph(
-                        id="winners_chart",
-                        figure=WinnersPlotlyBarChart().render(winners, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
+            dbc.Collapse(
+                id="portfolio-charts-collapse",
+                is_open=False,
+                children=[
+                    dbc.Row([
+
+                        dbc.Col(
+                            _chart_section(
+                                "Portfolio Value",
+                                dcc.Graph(
+                                    id="value_chart",
+                                    figure=PortfolioPerformancePlotlyLineChart().render(value_series, theme=theme),
+                                    config=_GRAPH_CONFIG,
+                                )
+                            ),
+                        ),
+
+                        dbc.Col(
+                            _chart_section(
+                                "Portfolio P&L",
+                                dcc.Graph(
+                                    id="pnl_chart",
+                                    figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
+                                    config=_GRAPH_CONFIG,
+                                )
+                            ),
+                        ),
+
+                    ], className="mb-6 workspace-chart-grid"),
+
+                    html.Hr(className="tv-divider"),
+                    dbc.Row([
+
+                        dbc.Col(
+                            _chart_section(
+                                "Top Losers",
+                                dcc.Graph(
+                                    id="losers_chart",
+                                    figure=LosersPlotlyBarChart().render(losers, theme=theme),
+                                    config=_GRAPH_CONFIG,
+                                )
+                            ),
+                        ),
+
+                        dbc.Col(
+                            _chart_section(
+                                "Top Winners",
+                                dcc.Graph(
+                                    id="winners_chart",
+                                    figure=WinnersPlotlyBarChart().render(winners, theme=theme),
+                                    config=_GRAPH_CONFIG,
+                                )
+                            ),
+                        ),
+
+                        dbc.Col(
+                            _chart_section(
+                                "Position Weight",
+                                dcc.Graph(
+                                    id="position_weight_donut_chart",
+                                    figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
+                                    config=_GRAPH_CONFIG,
+                                ),
+                            ),
+                        ),
+
+                    ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "1fr 1fr 25%"}),
+
+                    html.Hr(className="tv-divider"),
+                    dbc.Row([
+                        dbc.Col(
+                            _chart_section(
+                                "Today's Movers",
+                                dcc.Graph(
+                                    id="daily_movers_chart",
+                                    figure=DailyMoversBarChart().render(daily_movers, theme=theme, x_col="daily_return"),
+                                    config=_GRAPH_CONFIG,
+                                )
+                            ),
+                        ),
+                    ], className="mb-6 workspace-chart-grid"),
+                ],
+            ),
+        ], className="tv-section-container"),
+
+        # ─────────────────────────────────────────────
+        # Asset detail section — collapsible, opens on row selection
+        # ─────────────────────────────────────────────
+        html.Div([
+            html.Div(id="valuation-asset-badge", style={"display": "none"}),
+            html.Div(
+                ["Asset Detail", html.Span("›", className="tv-chevron")],
+                id="asset-detail-header",
+                className="tv-section-header tv-section-header--section",
+                n_clicks=0,
+                style={"cursor": "pointer"},
             ),
 
-            dbc.Col(
-                _chart_section(
-                    "Position Weight",
-                    dcc.Graph(
-                        id="position_weight_donut_chart",
-                        figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    ),
-                ),
+            dbc.Collapse(
+                id="asset-detail-collapse",
+                is_open=False,
+                children=html.Div([
+                    html.Div([
+                        _chart_section("Price",
+                            dcc.Graph(id="workspace-price-graph", figure={}, config=_GRAPH_CONFIG),
+                        ),
+                        _chart_section("Asset Value",
+                            dcc.Graph(id="workspace-value-graph", figure={}, config=_GRAPH_CONFIG),
+                        ),
+                        _chart_section("Profit Range (30D)",
+                            dcc.Graph(id="workspace-profit-range-graph", figure={}, config=_GRAPH_CONFIG),
+                        ),
+                    ], className="workspace-chart-grid"),
+                ]),
             ),
-
-        ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "1fr 1fr 25%"}),
-
-        html.Hr(className="tv-divider"),
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Today's Movers",
-                    dcc.Graph(
-                        id="daily_movers_chart",
-                        figure=DailyMoversBarChart().render(daily_movers, theme=theme, x_col="daily_return"),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-        ], className="mb-6 workspace-chart-grid"),
+        ], className="tv-section-container"),
 
     ], id="tab-portfolio-content", className='workspace-wrapper')
-
-
-# ─────────────────────────────────────────────
-# Valuation tab content
-# ─────────────────────────────────────────────
-
-def valuation_tab_content(asset_history=None, theme="light"):
-    if asset_history is None:
-        return html.Div(
-            html.P(
-                "Select an asset from the table to view valuation charts.",
-                className="text-muted text-center py-5",
-            ),
-            id="tab-valuation-content",
-        )
-
-    return html.Div([
-        html.Div([
-            _chart_section("Price",
-                dcc.Graph(
-                    id="workspace-price-graph",
-                    figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
-                    config=_GRAPH_CONFIG,
-                ),
-            ),
-
-            _chart_section("Asset Value",
-                dcc.Graph(
-                    id="workspace-value-graph",
-                    figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
-                    config=_GRAPH_CONFIG,
-                )
-            ),
-
-            _chart_section("Profit Range (30D)",
-                dcc.Graph(
-                    id="workspace-profit-range-graph",
-                    figure=ProfitRangePlotlyLineChart().render(asset_history, theme=theme),
-                    config=_GRAPH_CONFIG,
-                )
-            ),
-
-        ], className="workspace-chart-grid"),
-        
-        
-        html.Div([
-            
-            _chart_section("Risk Context - Drawdown", 
-                dcc.Graph(
-                    id="workspace-risk-graph",
-                    figure=RiskContextPlotlyLineChart().render(asset_history, theme=theme),
-                    config=_GRAPH_CONFIG,
-                )
-            ),
-            _chart_section("Opportunity - DCA Bias", 
-                dcc.Graph(
-                    id="workspace-dca-graph",
-                    figure=DCABiasPlotlyLineChart().render(asset_history, theme=theme),
-                    config=_GRAPH_CONFIG,
-                )
-            )
-            
-        ], className="workspace-chart-grid"),
-    ], id="tab-valuation-content")
 
 
 # ─────────────────────────────────────────────
@@ -224,63 +196,98 @@ def risk_tab_content(view_model=None, theme="light"):
     var_data = view_model.get("var_by_position", [])
 
     return html.Div([
-        # ─────────────────────────────────────────────
-        # Row: Drawdown + Profitability Donut
-        # ─────────────────────────────────────────────
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Portfolio Drawdown",
-                    dcc.Graph(
-                        id="portfolio_drawdown_chart",
-                        figure=PortfolioDrawdownPlotlyLineChart().render(drawdown_series, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-            dbc.Col(
-                _chart_section(
-                    "Profit & Loss",
-                    dcc.Graph(
-                        id="profitability_donut_chart",
-                        figure=PositionProfitabilityPlotlyDonutChart().render(profitability_data_vm, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-                width=4,
-            ),
-        ], className="mb-6 workspace-chart-grid"),
 
         # ─────────────────────────────────────────────
-        # Row: Unprofitable Positions P&L
+        # Portfolio overview — collapsible
+        # ─────────────────────────────────────────────
+        html.Div(
+            ["Portfolio Overview", html.Span("›", className="tv-chevron")],
+            id="risk-portfolio-section-header",
+            className="tv-section-header",
+            n_clicks=0,
+            style={"cursor": "pointer"},
+        ),
+
+        dbc.Collapse(
+            id="risk-portfolio-charts-collapse",
+            is_open=True,
+            children=[
+                dbc.Row([
+                    dbc.Col(
+                        _chart_section(
+                            "Portfolio Drawdown",
+                            dcc.Graph(
+                                id="portfolio_drawdown_chart",
+                                figure=PortfolioDrawdownPlotlyLineChart().render(drawdown_series, theme=theme),
+                                config=_GRAPH_CONFIG,
+                            )
+                        ),
+                    ),
+                    dbc.Col(
+                        _chart_section(
+                            "Profit & Loss",
+                            dcc.Graph(
+                                id="profitability_donut_chart",
+                                figure=PositionProfitabilityPlotlyDonutChart().render(profitability_data_vm, theme=theme),
+                                config=_GRAPH_CONFIG,
+                            )
+                        ),
+                        width=4,
+                    ),
+                ], className="mb-6 workspace-chart-grid"),
+
+                html.Hr(className="tv-divider"),
+                dbc.Row([
+                    dbc.Col(
+                        _chart_section(
+                            "Unprofitable Positions P&L",
+                            dcc.Graph(
+                                id="losers_pnl_chart",
+                                figure=LosersPnLPlotlyLineChart().render(losers_pnl, theme=theme),
+                                config=_GRAPH_CONFIG,
+                            )
+                        ),
+                    ),
+                ], className="mb-6 workspace-chart-grid"),
+
+                html.Hr(className="tv-divider"),
+                dbc.Row([
+                    dbc.Col(
+                        _chart_section(
+                            "Value at Risk by Position",
+                            dcc.Graph(
+                                id="var_by_position_chart",
+                                figure=VaRBarChart().render(var_data, theme=theme),
+                                config=_GRAPH_CONFIG,
+                            )
+                        ),
+                    ),
+                ], className="mb-6 workspace-chart-grid"),
+            ],
+        ),
+
+        # ─────────────────────────────────────────────
+        # Asset detail — collapsible, opens on row selection
         # ─────────────────────────────────────────────
         html.Hr(className="tv-divider"),
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Unprofitable Positions P&L",
-                    dcc.Graph(
-                        id="losers_pnl_chart",
-                        figure=LosersPnLPlotlyLineChart().render(losers_pnl, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-        ], className="mb-6 workspace-chart-grid"),
+        html.Div(
+            id="risk-asset-detail-header",
+            className="tv-section-header",
+            n_clicks=0,
+            style={"cursor": "pointer"},
+        ),
 
-        html.Hr(className="tv-divider"),
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Value at Risk by Position",
-                    dcc.Graph(
-                        id="var_by_position_chart",
-                        figure=VaRBarChart().render(var_data, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-        ], className="mb-6 workspace-chart-grid"),
+        dbc.Collapse(
+            id="risk-asset-detail-collapse",
+            is_open=False,
+            children=html.Div([
+                html.Div([
+                    _chart_section("Risk Context - Drawdown",
+                        dcc.Graph(id="workspace-risk-graph", figure={}, config=_GRAPH_CONFIG),
+                    ),
+                ], className="workspace-chart-grid"),
+            ]),
+        ),
 
     ], id="tab-risk-content", className='workspace-wrapper')
 
@@ -297,39 +304,74 @@ def opportunities_tab_content(view_model=None, theme="light"):
     winners_pnl = view_model.get("winners_pnl", [])
 
     return html.Div([
-        # ─────────────────────────────────────────────
-        # Row: Position Performance Map
-        # ─────────────────────────────────────────────
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Position Performance Map",
-                    dcc.Graph(
-                        id="portfolio_performance_map",
-                        figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-                className='workpspace-chart-performance-map',
-            ),
-        ], className="mb-6 workspace-chart-grid"),
 
         # ─────────────────────────────────────────────
-        # Row: Profitable Positions P&L
+        # Portfolio overview — collapsible
+        # ─────────────────────────────────────────────
+        html.Div(
+            ["Portfolio Overview", html.Span("›", className="tv-chevron")],
+            id="opportunities-portfolio-section-header",
+            className="tv-section-header",
+            n_clicks=0,
+            style={"cursor": "pointer"},
+        ),
+
+        dbc.Collapse(
+            id="opportunities-portfolio-charts-collapse",
+            is_open=True,
+            children=[
+                dbc.Row([
+                    dbc.Col(
+                        _chart_section(
+                            "Position Performance Map",
+                            dcc.Graph(
+                                id="portfolio_performance_map",
+                                figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme),
+                                config=_GRAPH_CONFIG,
+                            )
+                        ),
+                        className='workpspace-chart-performance-map',
+                    ),
+                ], className="mb-6 workspace-chart-grid"),
+
+                html.Hr(className="tv-divider"),
+                dbc.Row([
+                    dbc.Col(
+                        _chart_section(
+                            "Profitable Positions P&L",
+                            dcc.Graph(
+                                id="winners_pnl_chart",
+                                figure=WinnersPnLPlotlyLineChart().render(winners_pnl, theme=theme),
+                                config=_GRAPH_CONFIG,
+                            )
+                        ),
+                    ),
+                ], className="mb-6 workspace-chart-grid"),
+            ],
+        ),
+
+        # ─────────────────────────────────────────────
+        # Asset detail — collapsible, opens on row selection
         # ─────────────────────────────────────────────
         html.Hr(className="tv-divider"),
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Profitable Positions P&L",
-                    dcc.Graph(
-                        id="winners_pnl_chart",
-                        figure=WinnersPnLPlotlyLineChart().render(winners_pnl, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    )
-                ),
-            ),
-        ], className="mb-6 workspace-chart-grid"),
+        html.Div(
+            id="opportunities-asset-detail-header",
+            className="tv-section-header",
+            n_clicks=0,
+            style={"cursor": "pointer"},
+        ),
+
+        dbc.Collapse(
+            id="opportunities-asset-detail-collapse",
+            is_open=False,
+            children=html.Div([
+                html.Div([
+                    _chart_section("Opportunity - DCA Bias",
+                        dcc.Graph(id="workspace-dca-graph", figure={}, config=_GRAPH_CONFIG),
+                    ),
+                ], className="workspace-chart-grid"),
+            ]),
+        ),
 
     ], id="tab-opportunities-content", className='workspace-wrapper')
 
@@ -441,29 +483,11 @@ def workspace_tabs(view_model=None, theme="light"):
         className="workspace-tab-bar mb-0",
         children=[
             dbc.Tab(
-                label="Portfolio",
+                label="Valuation",
                 tab_id="tab-portfolio",
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
-                children=dcc.Loading(
-                    id="loading-portfolio-tab",
-                    type="circle",
-                    style=_CENTERED_LOADER_STYLE,
-                    children=portfolio_tab_content(view_model, theme),
-                ),
-                
-            ),
-            dbc.Tab(
-                label="Valuation",
-                tab_id="tab-valuation",
-                tab_class_name="workspace-tab",
-                active_tab_class_name="workspace-tab--active",
-                children=dcc.Loading(
-                    id="loading-valuation-tab",
-                    type="circle",
-                    style=_CENTERED_LOADER_STYLE,
-                    children=valuation_tab_content(theme=theme),
-                ),
+                children=portfolio_tab_content(view_model, theme),
             ),
             dbc.Tab(
                 label="Risk",
