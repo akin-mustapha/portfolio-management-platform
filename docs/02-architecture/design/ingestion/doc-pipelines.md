@@ -86,6 +86,66 @@ Rather than directly subclassing `Pipeline`, most concrete pipelines extend one 
 
 Both are defined in `src/backend/ingestion/application/policies.py`.
 
+## Computed Silver Pattern
+
+Computed silver pipelines (`PipelineAssetComputedSilver`, `PipelineAccountComputedSilver`) follow a different pattern from standard silver pipelines:
+
+| Aspect | Silver (`BaseSilverPipeline`) | Computed Silver (bare `Pipeline`) |
+|--------|-------------------------------|-----------------------------------|
+| Base class | `BaseSilverPipeline` | `Pipeline` |
+| Output type | Pydantic model | Dataclass |
+| Validation | `_to_records()` — logs and skips bad records | None — errors raise and halt |
+| Source | Reads from silver table (full recompute) | Reads from silver table (full recompute) |
+| Computation | Python transform | SQL window functions; Python handles null-coercion only |
+| Unique key | `business_key` | Entity ID (`asset_id` / `account_id`) |
+
+Use this pattern when metrics require window functions over the full history of a table (rolling averages, cumulative returns, LAG-based daily change). All computation lives in the SQL source query; Python only coerces nulls to 0 and maps rows to dataclasses.
+
+## Gold Pattern
+
+Gold pipelines (`PipelineAssetGold`, `PipelineAccountGold`) use `BaseGoldPipeline` and write to multiple fact tables in a single run.
+
+**`BaseGoldPipeline`** — implements `run()` for the gold layer. Subclasses must declare:
+- `_pipeline_name: str` — used in log messages and dead letter records
+- `_fact_destinations: list[Destination]` — one destination per fact table
+
+And wire `_source`, `_transformation`, `_validator`, `_dead_letter` in `__init__`.
+
+The `run()` flow is:
+1. `_ensure_dimensions()` — upsert dimension rows the source query FK-joins against
+2. `extract()` — single source query joining staging and dim tables
+3. `transform()` — convert SQLAlchemy rows to plain dicts (no computation)
+4. `validate()` — `SchemaValidator` separates valid records from rejected ones
+5. Invalid records → `DeadLetterDestination` (written to `monitoring` schema)
+6. Valid records → fan-out to all `_fact_destinations` (each projects only its columns)
+
+```python
+class PipelineAssetGold(BaseGoldPipeline):
+    _pipeline_name = "pipeline_asset_gold"
+
+    def __init__(self):
+        self._source = AssetGoldSource()
+        self._transformation = AssetGoldTransformation()
+        self._validator = SchemaValidator(AssetGoldRecord, layer="gold")
+        self._dead_letter = DeadLetterDestination()
+        self._fact_destinations = [
+            FactPriceDestination(),
+            FactValuationDestination(),
+            # ... one per fact table
+        ]
+
+    def _ensure_dimensions(self):
+        # upsert dim_portfolio and dim_asset before source query runs
+        ...
+```
+
+**`SchemaValidator`** — generic validator used by gold (and can be used by silver) pipelines. Takes a Pydantic model and a `layer` string. Returns a `ValidationResult` with `valid` (model instances) and `invalid` (`RejectedRecord` objects). The pipeline sets `pipeline_name` on rejected records before passing them to `DeadLetterDestination`.
+
+**`DeadLetterDestination`** — writes `RejectedRecord` objects to the `monitoring` schema. Used to capture records that fail schema validation without halting the pipeline. Defined in `src/backend/ingestion/infrastructure/repositories/dead_letter_destination.py`.
+
+Place gold schemas under:
+- `domain/schemas/gold/` — for analytics fact table contracts
+
 ## How to Create a New Pipeline
 
 All pipelines live under `src/backend/ingestion/application/pipelines/`. Sub-folders by type:

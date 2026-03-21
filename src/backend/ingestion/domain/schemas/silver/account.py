@@ -24,6 +24,13 @@ class AccountRecord(BaseModel):
     investments_unrealized_pnl: float
     business_key: str
 
+    @field_validator("external_id", mode="before")
+    @classmethod
+    def coerce_external_id_to_str(cls, v) -> str:
+        if v is None:
+            raise ValueError("external_id must not be None")
+        return str(v)
+
     @field_validator("business_key", "external_id", "currency")
     @classmethod
     def must_not_be_empty(cls, v: str) -> str:

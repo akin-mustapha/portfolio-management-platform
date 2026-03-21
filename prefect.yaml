@@ -1,0 +1,51 @@
+name: asset-monitoring-system
+prefect-version: 3.6.15
+
+build: null
+push: null
+
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /Users/kunmi/Projects/workspace/data_engineering/asset_monitoring_system
+
+deployments:
+
+  # Asset pipeline: bronze → silver → computed silver
+  - name: t212_asset
+    entrypoint: src/orchestration/prefect/flow_t212_asset.py:flow_t212_asset
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly, starts on the hour
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  # Account pipeline: bronze → silver (offset 5 min so it doesn't overlap with asset)
+  - name: t212_account
+    entrypoint: src/orchestration/prefect/flow_t212_account.py:flow_t212_account
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly, starts at :05 past the hour
+        anchor_date: "2024-01-01T00:05:00Z"
+
+  - name: t212_asset_portfolio_sync
+    entrypoint: src/orchestration/prefect/asset_flow_portfolio.py:flow_t212_asset_portfolio_sync
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+
+  - name: t212_enrichment_synchronization
+    entrypoint: src/orchestration/prefect/enrichment_synchronization.py:flow_t212_enrichment_sychronization
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+
+  # - name: trading_212_asset_event_producer
+  #   entrypoint: src/orchestration/prefect/asset_flow_event_producer.py:trading_212_asset_event_producer
+  #   work_pool:
+  #     name: asset-monitoring-pool
+  #   schedules:
+  #     - interval: 3600
+  #   is_schedule_active: false  # disabled — enable when ready

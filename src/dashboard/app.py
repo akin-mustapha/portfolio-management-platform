@@ -1,6 +1,6 @@
 from dash import Dash
 import dash_bootstrap_components as dbc
-from .core.layouts.layout import layout
+from .layouts.layout import layout
 
 
 plotly_config = {
@@ -62,5 +62,5 @@ if __name__ == "__main__":
         host='0.0.0.0',
         port=8050,
         debug=True,
-        dev_tools_ui=False
+        # dev_tools_ui=False
     )

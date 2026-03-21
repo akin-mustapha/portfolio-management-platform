@@ -4,18 +4,18 @@ import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Dict
-from pydantic import ValidationError
-
 import pandas as pd
 
 from ...application.policies import BaseSilverPipeline
 from ...application.protocols import Source
 from ...application.protocols import Destination
 from ...application.protocols import Transformation
+from ...application.validators.schema_validator import SchemaValidator
 
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from ...infrastructure.repositories.repository_factory import RepositoryFactory
+from ...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
 from ...domain.schemas.silver.account import AccountRecord
 
 logging.basicConfig(
@@ -57,7 +57,6 @@ class Trading212AccountSourceSilver(Source):
             WHERE t1.business_key = x1.business_key
           )
           AND external_id IS NOT NULL
-      LIMIT 1000;
     """
 
     with self._client as db:
@@ -108,21 +107,14 @@ class Trading212AccountDestination(Destination):
 
 
 class PipelineAccountSilver(BaseSilverPipeline):
+  _pipeline_name = "account_silver"
+
   def __init__(self):
     self._source = Trading212AccountSourceSilver()
     self._transformation = Trading212AccountTransformationSilver()
+    self._validator = SchemaValidator(AccountRecord)
     self._destination = Trading212AccountDestination()
-
-  def _to_records(self, transformed_data: list) -> list[dict]:
-    valid, invalid = [], []
-    for row in transformed_data:
-      try:
-        valid.append(AccountRecord(**row).model_dump())
-      except ValidationError as e:
-        invalid.append((row.get("business_key"), e))
-    if invalid:
-      logging.warning(f"[AccountSilver] {len(invalid)} records failed validation: {invalid}")
-    return valid
+    self._dead_letter = DeadLetterDestination()
 
 
 if __name__ == "__main__":

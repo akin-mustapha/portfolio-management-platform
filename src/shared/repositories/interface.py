@@ -33,6 +33,10 @@ class RepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def select_all_by(self, params: Dict):
+        raise NotImplementedError
+
+    @abstractmethod
     def update(self, params: Dict, data: Dict):
         raise NotImplementedError
 

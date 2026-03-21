@@ -21,8 +21,9 @@ class Pipeline(ABC):
 class BaseSilverPipeline(Pipeline):
   """
   Shared run() logic for silver pipelines.
-  Subclasses implement _to_records() to apply their schema contract mapping.
+  Subclasses declare _pipeline_name and wire _validator and _dead_letter in __init__.
   """
+  _pipeline_name: str
 
   def run(self):
     try:
@@ -33,17 +34,76 @@ class BaseSilverPipeline(Pipeline):
         return
 
       transformed_data = self._transformation.transform(data)
-      data = self._to_records(transformed_data)
-      self._destination.load(data)
+      result = self._validator.validate(transformed_data)
+
+      if result.invalid:
+        for r in result.invalid:
+          r.pipeline_name = self._pipeline_name
+        self._dead_letter.load(result.invalid)
+        logging.warning(f"[{self._pipeline_name}] {len(result.invalid)} records rejected — written to dead letter")
+
+      records = self._to_records(result.valid)
+      self._destination.load(records)
       return None
 
     except Exception as e:
       raise e
 
-  @abstractmethod
-  def _to_records(self, transformed_data: list) -> list[dict]:
-    """Map transformed dicts to destination record dicts via dataclass."""
-    raise NotImplementedError
+  def _to_records(self, validated_data: list) -> list[dict]:
+    """Convert validated Pydantic model instances to dicts for the destination."""
+    return [record.model_dump() for record in validated_data]
+
+class BaseGoldPipeline(Pipeline):
+  """
+  Shared run() logic for gold layer pipelines.
+
+  Subclasses must declare:
+    _pipeline_name: str
+    _fact_destinations: list[Destination]
+
+  And wire _source, _transformation, _validator, _dead_letter in __init__.
+
+  Override _ensure_dimensions() to upsert any dimension rows that fact FK
+  constraints depend on. This runs before extract so the source query can
+  safely join dim tables.
+  """
+  _pipeline_name: str
+  _fact_destinations: list
+
+  def run(self):
+    self._ensure_dimensions()
+
+    data = self._source.extract()
+
+    if not data:
+      logging.warning(f"[{self._pipeline_name}] NO RECORD — skipping")
+      return
+
+    transformed_data = self._transformation.transform(data)
+    result = self._validator.validate(transformed_data)
+
+    if result.invalid:
+      for r in result.invalid:
+        r.pipeline_name = self._pipeline_name
+      self._dead_letter.load(result.invalid)
+      logging.warning(f"[{self._pipeline_name}] {len(result.invalid)} records rejected — written to dead letter")
+
+    if not result.valid:
+      logging.warning(f"[{self._pipeline_name}] no valid records after validation — nothing to load")
+      return
+
+    records = self._to_records(result.valid)
+
+    for destination in self._fact_destinations:
+      destination.load(records)
+
+  def _ensure_dimensions(self):
+    """Seed dimension tables before the source query runs. Override in subclass."""
+    pass
+
+  def _to_records(self, validated_data: list) -> list[dict]:
+    return [record.model_dump() for record in validated_data]
+
 
 class FullLoader(ABC):
   def __init__(self, table_name):
@@ -63,7 +123,7 @@ class FullLoader(ABC):
     pass
 
   @abstractmethod
-  def _loader(self):
+  def _loader(self, data):
     pass
 
   def _exposition_abstraction(self):

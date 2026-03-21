@@ -89,10 +89,10 @@ class PortfolioService:
     tag_repo = self._repo_factory.get("tag")
     asset_tag_repo = self._repo_factory.get("asset_tag")
 
-    if not asset_repo.select(asset_tag.get("asset_id")):
+    if not asset_repo.select({"id": asset_tag.get("asset_id")}):
       raise ValueError(f"Asset with ID {asset_tag.get('asset_id')} does not exist.")
 
-    if not tag_repo.select(asset_tag.get("tag_id")):
+    if not tag_repo.select({"id": asset_tag.get("tag_id")}):
       raise ValueError(f"Tag with ID {asset_tag.get('tag_id')} does not exist.")
 
     try:
@@ -103,15 +103,71 @@ class PortfolioService:
       raise
 
   def remove_tag_from_asset(self, item_tag: AssetTag):
-    raise NotImplementedError("remove_tag_from_asset: not yet implemented")
+    asset_tag_repo = self._repo_factory.get("asset_tag")
+
+    try:
+      asset_tag_repo.delete({"asset_id": item_tag.asset_id, "tag_id": item_tag.tag_id})
+    except Exception as e:
+      logging.error(f"Error removing tag from asset: {e}")
+      raise
+
+  def assign_industry_to_sector(self, sector_id: int, industry_id: int):
+    sector_repo = self._repo_factory.get("sector")
+    industry_repo = self._repo_factory.get("industry")
+
+    if not industry_repo.select({"id": industry_id}):
+      raise ValueError(f"Industry with ID {industry_id} does not exist.")
+
+    if not sector_repo.select({"id": sector_id}):
+      raise ValueError(f"Sector with ID {sector_id} does not exist.")
+
+    try:
+      sector_repo.update(params={"id": sector_id}, data={"industry_id": industry_id})
+    except Exception as e:
+      logging.error(f"Error assigning industry to sector: {e}")
+      raise
 
   def search_asset_by_tag(self, tag: Tag):
-    raise NotImplementedError("search_asset_by_tag: not yet implemented")
+    asset_tag_repo = self._repo_factory.get("asset_tag")
+
+    if not tag.id:
+      raise ValueError("Tag must have an id to search by.")
+
+    try:
+      return asset_tag_repo.select_all_by({"tag_id": tag.id})
+    except Exception as e:
+      logging.error(f"Error searching assets by tag: {e}")
+      raise
 
   def search_tag_by_asset(self, asset: Asset):
-    raise NotImplementedError("search_tag_by_asset: not yet implemented")
+    asset_tag_repo = self._repo_factory.get("asset_tag")
+
+    if not asset.id:
+      raise ValueError("Asset must have an id to search by.")
+
+    try:
+      return asset_tag_repo.select_all_by({"asset_id": asset.id})
+    except Exception as e:
+      logging.error(f"Error searching tags by asset: {e}")
+      raise
 
   def get_all_tags(self):
     tag_repo = self._repo_factory.get("tag")
     result = tag_repo.select_all()
     return result
+
+  def get_all_industries(self):
+    industry_repo = self._repo_factory.get("industry")
+    return industry_repo.select_all()
+
+  def get_all_sectors(self):
+    sector_repo = self._repo_factory.get("sector")
+    return sector_repo.select_all()
+
+  def get_all_categories(self):
+    category_repo = self._repo_factory.get("category")
+    return category_repo.select_all()
+
+  def get_asset_by_name(self, name: str):
+    asset_repo = self._repo_factory.get("asset")
+    return asset_repo.select({"name": name})

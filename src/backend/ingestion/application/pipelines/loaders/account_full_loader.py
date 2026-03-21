@@ -67,15 +67,16 @@ class PostgresAccountFullLoader(FullLoader):
     return None
 
   def _exposition_abstraction(self):
-    sql = f"""
-      CREATE OR REPLACE VIEW raw.v_bronze_account AS
+    drop_sql = "DROP VIEW IF EXISTS raw.v_bronze_account"
+    create_sql = f"""
+      CREATE VIEW raw.v_bronze_account AS
       WITH cte AS (
           SELECT
-              payload->'id' AS external_id,
+              payload->>'id' AS external_id,
               payload->'cash'->>'inPies' AS cash_in_pies,
               payload->'cash'->>'availableToTrade' AS cash_available_to_trade,
               payload->'cash'->>'reservedForOrders' AS cash_reserved_for_orders,
-              payload->'currency'::TEXT AS currency,
+              payload->>'currency' AS currency,
               payload->'totalValue' AS total_value,
               payload->'investments'->>'totalCost' AS investments_total_cost,
               payload->'investments'->>'realizedProfitLoss' AS investments_realized_pnl,
@@ -86,8 +87,11 @@ class PostgresAccountFullLoader(FullLoader):
       )
       SELECT
           *,
-          external_id::TEXT || '_' || currency || '_' || ingested_timestamp AS business_key
-      FROM cte;
+          external_id || '_' || currency || '_' || ingested_timestamp AS business_key
+      FROM cte
     """
-    with self._client as client:
-      client.execute(sql)
+    from sqlalchemy import text
+    with self._client.engine.connect() as conn:
+      conn.execute(text(drop_sql))
+      conn.execute(text(create_sql))
+      conn.commit()

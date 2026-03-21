@@ -14,7 +14,7 @@ A personal stock portfolio monitoring system. It pulls data from Trading212, pro
 
 Four layers. Keep changes within one layer per task.
 
-```
+```text
 Frontend        src/dashboard/            Dash UI — reads from services
 Orchestration   src/orchestration/        Prefect — schedules pipelines
 Backend         src/backend/ingestion/    ETL pipelines and Kafka events
@@ -48,7 +48,7 @@ Reference: `docs/02-architecture/design/ingestion/doc-pipelines.md`
 ## Storage — Medallion Architecture
 
 | Schema | Layer | What It Holds |
-|--------|-------|---------------|
+| --- | --- | --- |
 | `raw` | Bronze | Append-only, partitioned by date, data as received |
 | `staging` | Silver | Typed, deduplicated, computed metrics |
 | `analytics` | Gold | Built to answer dashboard questions (not yet built) |
@@ -90,6 +90,12 @@ Do not implement gold layer tables speculatively. Only build what a dashboard qu
 
 **Migrations** — Any new or changed table requires an Alembic migration. See `docs/03-engineering/doc-commands.md`.
 
+**Dashboard callbacks** — Before adding any callback output, search for existing `Output('component-id', 'property')` patterns to avoid duplicates. For layout direction (horizontal vs vertical), confirm with the user before implementing — default to side-by-side for chart pairs.
+
+**Schema changes** — Never reference columns from unapplied migrations in application code. Confirm migrations are applied before writing code that reads those columns.
+
+**Refactoring** — Do not remove variables that appear unused without first searching templates, callbacks, and conditional logic (especially theme variables like `ct`). After any multi-file refactor, run the test suite and verify all imports resolve — Prefect workers and the dashboard app may resolve imports differently.
+
 ---
 
 ## Git & Branching
@@ -106,6 +112,9 @@ Full workflow: `docs/03-engineering/doc-project-workflow.md`
 
 ## Skills Available
 
-- `/database` — schema reference, query help, migration guidance
+- `/database` — schema reference for all three layers, query rules, migration commands
+- `/pipeline` — pipeline pattern, failure modes, pipeline inventory, migration safety
+- `/dashboard` — layout rules, component IDs, callback safety checks, theme wiring
+- `/docs` — doc map, trustworthiness ratings, update checklist by change type
 - `/financial-analyst` — metrics catalogue, dashboard KPI suggestions
 - `/project-navigation` — navigating the codebase (incomplete)

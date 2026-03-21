@@ -1,7 +1,31 @@
+from dataclasses import dataclass
 from datetime import datetime, UTC
 from typing import Protocol, Any
 
+from pydantic import BaseModel
+
 from ..domain import Data
+
+"""
+  VALIDATION
+"""
+@dataclass
+class RejectedRecord:
+    pipeline_name: str | None
+    layer: str
+    business_key: str | None
+    raw_payload: dict
+    error_type: str
+    error_message: str
+
+@dataclass
+class ValidationResult:
+    valid: list[BaseModel]
+    invalid: list[RejectedRecord]
+
+class Validator(Protocol):
+    def validate(self, data: list[dict]) -> ValidationResult: ...
+
 
 """
   PROTOCOLS

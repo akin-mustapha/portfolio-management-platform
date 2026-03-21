@@ -259,7 +259,7 @@ These files outside `ingestion/` require import updates:
 | `src/orchestration/prefect/enrichment_synchronization.py` | `from backend.ingestion.pipelines.portfolio_enrichment_synchronizer` → `from backend.ingestion.application.pipelines.portfolio_enrichment_synchronizer` |
 | `src/orchestration/prefect/asset_flow_event_producer.py` | `from backend.ingestion.event_producer.event_producer_factory` → `from backend.ingestion.factories.event_producer_factory` |
 
-All other orchestration flows (`asset_flow_bronze`, `asset_flow_silver`, `account_flow_bronze`, `account_flow_silver`, `asset_flow_portfolio`) import only from `factories/pipeline_factory.py` which does not move — no changes needed.
+All other orchestration flows (`flow_t212_asset`, `flow_t212_account`, `asset_flow_portfolio`) import only from `factories/pipeline_factory.py` which does not move — no changes needed.
 
 ---
 

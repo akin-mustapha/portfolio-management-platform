@@ -1,4 +1,4 @@
-from .base_table_repository import BaseTableRepository
+from shared.repositories.base_table_repository import BaseTableRepository
 
 class PostgresAssetTagRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):

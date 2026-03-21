@@ -43,7 +43,8 @@ docker exec -it kafka kafka-topics \
   prefect server stop
   lsof -i :4200
   lsof -nP -iTCP:4200 -sTCP:LISTEN
-  rm -rf ~/.prefect   # nuclear option — resets all prefect config
+  kill -9 <PID>         # free port 4200 if server hangs
+  rm -rf ~/.prefect     # nuclear option — resets all prefect config
 ```
 
 ### Migration
@@ -97,28 +98,62 @@ Get the head revision ID for a track with: `alembic -c migrations/postgres/<laye
 
 ### Prefect Deployment
 
+Start the server, register all deployments, and start the worker:
+
 ```sh
-  ./deploy/prefect_deploy.sh
+bash scripts/deploy/prefect_deploy.sh
+```
+
+Re-register deployments after editing `prefect.yaml` (no restart needed):
+
+```sh
+prefect deploy --all
+```
+
+Inspect registered deployments:
+
+```sh
+prefect deployment ls
+```
+
+Manually trigger a flow run:
+
+```sh
+prefect deployment run '<flow-function-name>/<deployment-name>'
+```
+
+Current deployments:
+
+| Deployment name | Command |
+|---|---|
+| Asset pipeline (bronze → silver → computed) | `prefect deployment run 'flow_t212_asset/t212_asset'` |
+| Account pipeline (bronze → silver) | `prefect deployment run 'flow_t212_account/t212_account'` |
+| Portfolio sync | `prefect deployment run 'flow_t212_asset_portfolio_sync/t212_asset_portfolio_sync'` |
+| Enrichment sync | `prefect deployment run 'flow_t212_enrichment_sychronization/t212_enrichment_synchronization'` |
+
+> Gold pipelines (`PipelineAssetGold`, `PipelineAccountGold`) are not yet registered as Prefect deployments. Run them manually — see **Services** section below.
+
+Create the work pool manually (already done by the deploy script):
+
+```sh
+prefect work-pool create asset-monitoring-pool --type process
 ```
 
 ## Services
 
-### Ingestion Pipeline
+### Gold Pipelines
+
+Run manually from the project root (not yet in Prefect):
 
 ```sh
-  python3 -m ingestion.pipelines.pipeline_account_bronze
-```
-
-### Tagging Service
-
-```sh
-  python3 -m scripts.run_tagging_service
+  python -m src.backend.ingestion.application.pipelines.pipeline_asset_gold
+  python -m src.backend.ingestion.application.pipelines.pipeline_account_gold
 ```
 
 ### Dash UI
 
 ```sh
-  python -m src.dashboard.app_2
+  python -m src.dashboard.app
 ```
 
 ## Util

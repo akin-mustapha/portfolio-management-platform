@@ -3,18 +3,18 @@ import logging
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Dict
-from pydantic import ValidationError
-
 import pandas as pd
 
 from...application.policies import BaseSilverPipeline
 from...application.protocols import Source
 from...application.protocols import Destination
 from...application.protocols import Transformation
+from...application.validators.schema_validator import SchemaValidator
 
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from...infrastructure.repositories.repository_factory import RepositoryFactory
+from...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
 from...domain.schemas.silver.asset import AssetRecord
 
 logging.basicConfig(
@@ -56,13 +56,11 @@ class Trading212AssetSourceSilver(Source):
         ingested_timestamp,
         business_key
       FROM raw.v_bronze_asset t1
-      WHERE NOT EXISTS (
-            SELECT 1
-            FROM staging.asset x1
-            WHERE t1.business_key = x1.business_key
-          )
-          AND ticker IS NOT NULL
-      LIMIT 1000;
+      WHERE ticker IS NOT NULL
+        AND ingested_date > (
+            SELECT COALESCE(MAX(data_timestamp::DATE), '1900-01-01')
+            FROM staging.asset
+        );
     """
 
     with self._client as db:
@@ -81,9 +79,6 @@ class Trading212AssetTransformationSilver(Transformation):
       transform
     """
     bronze_asset_df = pd.DataFrame(data)
-    bronze_asset_df.rename({
-      "ticker": "external_id"
-    })
 
     # REMOVE NULL
     df = bronze_asset_df[bronze_asset_df["ticker"].notna()]
@@ -103,6 +98,7 @@ class Trading212AssetTransformationSilver(Transformation):
     asset_df["cost"] = df["total_cost"]
     asset_df["profit"] = df["unrealized_pnl"]
     asset_df["fx_impact"] = df["fx_impact"]
+    asset_df["quantity_in_pies"] = df["quantity_in_pies"]
     asset_df["business_key"] = df["business_key"]
     asset_df["updated_timestamp"] = datetime.now(UTC)
 
@@ -121,21 +117,14 @@ class Trading212AssetDestination(Destination):
 
 
 class PipelineAssetSilver(BaseSilverPipeline):
+  _pipeline_name = "asset_silver"
+
   def __init__(self):
     self._source = Trading212AssetSourceSilver()
     self._transformation = Trading212AssetTransformationSilver()
+    self._validator = SchemaValidator(AssetRecord)
     self._destination = Trading212AssetDestination()
-
-  def _to_records(self, transformed_data: list) -> list[dict]:
-    valid, invalid = [], []
-    for row in transformed_data:
-      try:
-        valid.append(AssetRecord(**row).model_dump())
-      except ValidationError as e:
-        invalid.append((row.get("business_key"), e))
-    if invalid:
-      logging.warning(f"[AssetSilver] {len(invalid)} records failed validation: {invalid}")
-    return valid
+    self._dead_letter = DeadLetterDestination()
 
 
 

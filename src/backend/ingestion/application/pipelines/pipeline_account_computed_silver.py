@@ -36,6 +36,7 @@ class AccountComputed:
   cash_deployment_ratio: float
   daily_change_abs: float
   daily_change_pct: float
+  portfolio_volatility_weighted: float
 
 
 class Trading212AccountComputedSourceSilver(Source):
@@ -52,7 +53,15 @@ class Trading212AccountComputedSourceSilver(Source):
                 investments_total_cost,
                 total_value,
                 cash_available_to_trade,
-                LAG(total_value) OVER (ORDER BY data_timestamp) AS prev_total_value
+                LAG(total_value) OVER (ORDER BY data_timestamp) AS prev_total_value,
+                (
+                    SELECT SUM((a.value / NULLIF(acc.total_value, 0)) * c.volatility_30d)
+                    FROM staging.asset a
+                    JOIN staging.asset_computed c ON c.asset_id = a.id
+                    CROSS JOIN (
+                        SELECT total_value FROM staging.account ORDER BY data_timestamp DESC LIMIT 1
+                    ) acc
+                ) AS portfolio_volatility_weighted
             FROM {table_name}
     """
     with self._client as db:
@@ -77,6 +86,7 @@ class Trading212AccountComputedTransformation(Transformation):
       cash_deployment_ratio = 0 if total_value == 0 else (total_value - cash_available_to_trade) / total_value * 100
       daily_change_abs = 0 if prev_total_value == 0 else total_value - prev_total_value
       daily_change_pct = 0 if prev_total_value == 0 else daily_change_abs / prev_total_value * 100
+      portfolio_volatility_weighted=0 if (value := rget("portfolio_volatility_weighted")) is None else value
       transformed_data.append(
         AccountComputed(
           account_id=rget("account_id"),
@@ -85,6 +95,7 @@ class Trading212AccountComputedTransformation(Transformation):
           cash_deployment_ratio=cash_deployment_ratio,
           daily_change_abs=daily_change_abs,
           daily_change_pct=daily_change_pct,
+          portfolio_volatility_weighted=portfolio_volatility_weighted,
         )
       )
     return transformed_data
