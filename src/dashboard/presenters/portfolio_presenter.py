@@ -14,8 +14,9 @@ class PortfolioPresenter:
         snapshot = data.get("portfolio_current_snapshot", {})
         assets = data.get("assets", [])
         assets_history = data.get("assets_history", [])
+        portfolio_history = data.get("portfolio_history", [])
         return {
-            "kpi": self._kpi(snapshot),
+            "kpi": self._kpi(snapshot, portfolio_history),
             "asset_table": self._asset_table_vm(assets),
             "portfolio_value_series": self._portfolio_value_series_vm(
                 data.get("portfolio_history", [])
@@ -36,7 +37,15 @@ class PortfolioPresenter:
             "daily_movers":    self._daily_movers_vm(assets),
         }
         
-    def _kpi(self, snapshot: dict) -> dict:
+    def _daily_change_series(self, history: list[dict]) -> dict:
+        rows = [r for r in history if r.get("daily_change_pct") is not None]
+        rows = rows[-30:]
+        return {
+            "dates": [r["data_date"] for r in rows],
+            "values": [r["daily_change_pct"] for r in rows],
+        }
+
+    def _kpi(self, snapshot: dict, history: list[dict] | None = None) -> dict:
         return {
             "value": snapshot.get('total_value', 0),
             "currency": snapshot.get('currency', "#"),
@@ -48,6 +57,7 @@ class PortfolioPresenter:
             "cash_in_pies":  snapshot.get("cash_in_pies", 0),
             "daily_change_pct": snapshot.get('daily_change_pct'),
             "portfolio_vol": snapshot.get('portfolio_volatility_weighted'),
+            "daily_change_series": self._daily_change_series(history or []),
         }
 
     # ---------- Table ----------

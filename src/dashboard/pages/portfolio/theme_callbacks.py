@@ -1,4 +1,13 @@
-from dash import Output, Input, State, callback, clientside_callback, Patch
+from dash import Output, Input, State, callback, clientside_callback, no_update, Patch
+
+from .callbacks import (
+    _build_compare_rows,
+    _date_window,
+    _fetch_snapshots,
+    _VALUATION_METRICS,
+    _RISK_METRICS,
+    _OPPS_METRICS,
+)
 
 
 # ── Privacy toggle ───────────────────────────────────────────────────────────
@@ -56,8 +65,6 @@ clientside_callback(
 # ── Patch portfolio chart backgrounds on theme change ────────────────────────
 
 @callback(
-    Output("winners_chart", "figure"),
-    Output("losers_chart", "figure"),
     Output("value_chart", "figure"),
     Output("pnl_chart", "figure"),
     Output("losers_pnl_chart", "figure"),
@@ -66,7 +73,6 @@ clientside_callback(
     Output("profitability_donut_chart", "figure"),
     Output("portfolio_performance_map", "figure"),
     Output("portfolio_drawdown_chart", "figure"),
-    Output("daily_movers_chart", "figure"),
     Output("var_by_position_chart", "figure"),
     Input("theme-store", "data"),
     prevent_initial_call=True,
@@ -84,40 +90,44 @@ def update_chart_theme(theme):
         return p
 
     return (
-        patch(), patch(), patch(), patch(),
-        patch(), patch(),
-        patch(), patch(),
-        patch(),
-        patch(),  # portfolio_drawdown_chart
-        patch(),  # daily_movers_chart
-        patch(),  # var_by_position_chart
+        patch(), patch(),  # value_chart, pnl_chart
+        patch(), patch(),  # losers_pnl_chart, winners_pnl_chart
+        patch(), patch(),  # position_weight_donut_chart, profitability_donut_chart
+        patch(),           # portfolio_performance_map
+        patch(),           # portfolio_drawdown_chart
+        patch(),           # var_by_position_chart
     )
 
 
-# ── Patch workspace (asset) chart backgrounds on theme change ────────────────
+# ── Rebuild workspace (asset) charts on theme change ─────────────────────────
 
 @callback(
-    Output("workspace-price-graph", "figure", allow_duplicate=True),
-    Output("workspace-value-graph", "figure", allow_duplicate=True),
-    Output("workspace-profit-range-graph", "figure", allow_duplicate=True),
-    Output("workspace-risk-graph", "figure", allow_duplicate=True),
-    Output("workspace-dca-graph", "figure", allow_duplicate=True),
+    Output("asset-detail-sections", "children", allow_duplicate=True),
+    Output("risk-asset-detail-sections", "children", allow_duplicate=True),
+    Output("opportunities-asset-detail-sections", "children", allow_duplicate=True),
     Input("theme-store", "data"),
+    State("workspace-selected-asset", "data"),
+    State("workspace-timeframe", "data"),
+    State("portfolio_page_asset_store", "data"),
     prevent_initial_call=True,
 )
-def update_workspace_chart_theme(theme):
-    is_dark = theme == "dark"
-    bg = "#1e222d" if is_dark else "white"
-    fc = "#9598a1" if is_dark else "#555555"
+def update_workspace_chart_theme(theme, selected_assets, timeframe, asset_store):
+    tickers = selected_assets if isinstance(selected_assets, list) else []
+    if not tickers:
+        return no_update, no_update, no_update
 
-    def line_patch():
-        p = Patch()
-        p["layout"]["paper_bgcolor"] = bg
-        p["layout"]["plot_bgcolor"]  = bg
-        p["layout"]["font"]["color"] = fc
-        return p
+    current_theme = theme or "light"
+    start_date, end_date = _date_window(timeframe or "1Y")
 
-    return line_patch(), line_patch(), line_patch(), line_patch(), line_patch()
+    snapshots = _fetch_snapshots(tickers, start_date, end_date)
+    asset_rows = (asset_store or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    names_map = {r["ticker"]: r.get("name", "") for r in asset_rows if r.get("ticker")}
+
+    return (
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
+    )
 
 
 # ── Clientside: drag-to-resize split panel ───────────────────────────────────

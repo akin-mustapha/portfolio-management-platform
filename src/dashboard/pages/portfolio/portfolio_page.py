@@ -16,8 +16,9 @@ def portfolio_layout():
     return html.Div([
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
-        dcc.Store(id="workspace-selected-asset"),
+        dcc.Store(id="workspace-selected-asset", data=[]),
         dcc.Store(id="workspace-timeframe", data="1Y"),
+        dcc.Store(id="assign-tag-modal-ticker"),
 
         # ── Row 1: KPI Summary (always portfolio-scoped) ──────────
         dbc.Row([
@@ -68,7 +69,33 @@ def portfolio_layout():
                     **{"data-observer": ""},
                     children=[
                         workspace_tabs(),
-                        
+
+                        # ── Edit Tags overlay — localized to workspace right panel ──
+                        html.Div(
+                            id="assign-tag-modal-overlay",
+                            className="ws-modal-overlay",
+                            style={"display": "none"},
+                            children=html.Div([
+                                html.Div([
+                                    html.Span(id="assign-tag-modal-title", className="ws-modal-title"),
+                                    html.Button("×", id="assign-tag-modal-close-btn", className="ws-modal-close"),
+                                ], className="ws-modal-header"),
+                                html.Div([
+                                    html.Div([
+                                        html.Label("Tag", className="ws-modal-label"),
+                                        dcc.Dropdown(id="assign-tag-modal-tag-select", placeholder="Select tag…", className="ws-modal-dropdown"),
+                                    ], className="mb-3"),
+                                    html.Div([
+                                        html.Label("Category", className="ws-modal-label"),
+                                        dcc.Dropdown(id="assign-tag-modal-category-select", placeholder="Select category…", className="ws-modal-dropdown"),
+                                    ], className="mb-3"),
+                                ], className="ws-modal-body"),
+                                html.Div([
+                                    dbc.Button("Save", id="assign-tag-modal-save-btn", color="primary", size="sm"),
+                                    html.Small("", id="assign-tag-modal-status", className="text-muted ms-3"),
+                                ], className="ws-modal-footer"),
+                            ], className="ws-modal-card"),
+                        ),
                     ],
                 ),
             ],

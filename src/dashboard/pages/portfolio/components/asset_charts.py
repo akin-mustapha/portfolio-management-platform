@@ -10,6 +10,12 @@ CHART_THEMES = {
 CHART_HEIGHT = 200
 
 
+def _hex_to_rgba(hex_color, alpha=1.0):
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
+
 def _apply_spike_config(fig):
     fig.update_xaxes(
         showspikes=True, spikemode="across", spikesnap="cursor",
@@ -43,7 +49,7 @@ def _base_layout(t):
 # ─────────────────────────────────────────────
 
 class PriceStructurePlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_price")
         df = pd.DataFrame({
             "dates": asset_data.get("dates", []),
@@ -59,13 +65,16 @@ class PriceStructurePlotlyLineChart:
             mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False, hoverinfo="skip",
         ))
+        line_kw = dict(width=1.5, color=accent_color) if accent_color else dict(width=1.5)
+        fill_kw = dict(fillcolor=_hex_to_rgba(accent_color, 0.12)) if accent_color else {}
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["values"],
             mode="lines",
-            line=dict(width=1.5),
+            line=line_kw,
             fill="tonexty",
             hovertemplate="%{y:,.2f}<extra></extra>",
             showlegend=False,
+            **fill_kw,
         ))
         fig.add_hline(y=ref_value, line_dash="dot", line_color="rgba(0,0,0,0.25)", line_width=1)
         fig.update_layout(**_base_layout(t))
@@ -74,7 +83,7 @@ class PriceStructurePlotlyLineChart:
 
 
 class AssetValuePlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_value")
         df = pd.DataFrame({
             "dates": asset_data.get("dates", []),
@@ -90,13 +99,16 @@ class AssetValuePlotlyLineChart:
             mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False, hoverinfo="skip",
         ))
+        line_kw = dict(width=1.5, color=accent_color) if accent_color else dict(width=1.5)
+        fill_kw = dict(fillcolor=_hex_to_rgba(accent_color, 0.12)) if accent_color else {}
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["values"],
             mode="lines",
-            line=dict(width=1.5),
+            line=line_kw,
             fill="tonexty",
             hovertemplate="%{y:,.2f}<extra></extra>",
             showlegend=False,
+            **fill_kw,
         ))
         fig.add_hline(y=ref_value, line_dash="dot", line_color="rgba(0,0,0,0.25)", line_width=1)
         fig.update_layout(**_base_layout(t))
@@ -105,7 +117,7 @@ class AssetValuePlotlyLineChart:
 
 
 class RiskContextPlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_risk")
         df = pd.DataFrame({
             "dates": asset_data.get("dates", []),
@@ -120,13 +132,16 @@ class RiskContextPlotlyLineChart:
             mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False, hoverinfo="skip",
         ))
+        line_kw = dict(width=1.5, color=accent_color) if accent_color else dict(width=1.5)
+        fill_kw = dict(fillcolor=_hex_to_rgba(accent_color, 0.12)) if accent_color else {}
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["values"],
             mode="lines",
-            line=dict(width=1.5),
+            line=line_kw,
             fill="tonexty",
             hovertemplate="%{y:,.2f}<extra></extra>",
             showlegend=False,
+            **fill_kw,
         ))
         fig.add_hline(y=0, line_dash="dot", line_color="rgba(0,0,0,0.25)", line_width=1)
         fig.update_layout(**_base_layout(t))
@@ -135,7 +150,7 @@ class RiskContextPlotlyLineChart:
 
 
 class DCABiasPlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_dca_bias")
         df = pd.DataFrame({
             "dates": asset_data.get("dates", []),
@@ -150,13 +165,16 @@ class DCABiasPlotlyLineChart:
             mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False, hoverinfo="skip",
         ))
+        line_kw = dict(width=1.5, color=accent_color) if accent_color else dict(width=1.5)
+        fill_kw = dict(fillcolor=_hex_to_rgba(accent_color, 0.12)) if accent_color else {}
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["values"],
             mode="lines",
-            line=dict(width=1.5),
+            line=line_kw,
             fill="tonexty",
             hovertemplate="%{y:,.2f}<extra></extra>",
             showlegend=False,
+            **fill_kw,
         ))
         fig.add_hline(y=0, line_dash="dot", line_color="rgba(0,0,0,0.25)", line_width=1)
         fig.update_layout(**_base_layout(t))
@@ -165,13 +183,15 @@ class DCABiasPlotlyLineChart:
 
 
 class ProfitRangePlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_profit_range")
         if not asset_data or not asset_data.get("dates"):
             return go.Figure()
 
         df = pd.DataFrame(asset_data).sort_values("dates")
         t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
+        band_color = _hex_to_rgba(accent_color, 0.08) if accent_color else "rgba(150,150,150,0.1)"
+        band_edge  = _hex_to_rgba(accent_color, 0.25) if accent_color else "rgba(150,150,150,0.3)"
 
         fig = go.Figure()
         # Band lower boundary (invisible fill reference)
@@ -180,18 +200,19 @@ class ProfitRangePlotlyLineChart:
             mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
             showlegend=False, hoverinfo="skip",
         ))
-        # Band upper boundary (neutral fill)
+        # Band upper boundary
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["high_30d"],
-            mode="lines", line=dict(color="rgba(150,150,150,0.3)", width=0),
-            fill="tonexty", fillcolor="rgba(150,150,150,0.1)",
+            mode="lines", line=dict(color=band_edge, width=0),
+            fill="tonexty", fillcolor=band_color,
             showlegend=False, hoverinfo="skip",
         ))
         # Profit line
+        line_kw = dict(width=1.5, color=accent_color) if accent_color else dict(width=1.5)
         fig.add_trace(go.Scatter(
             x=df["dates"], y=df["values"],
             mode="lines",
-            line=dict(width=1.5),
+            line=line_kw,
             hovertemplate="%{y:,.2f}<extra></extra>",
             showlegend=False,
         ))

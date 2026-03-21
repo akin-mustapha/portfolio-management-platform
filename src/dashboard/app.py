@@ -1,6 +1,7 @@
 from dash import Dash
 import dash_bootstrap_components as dbc
 from .layouts.layout import layout
+from .api.credentials_routes import credentials_bp
 
 
 plotly_config = {
@@ -23,6 +24,7 @@ app = Dash(
     )
 
 app.layout = layout
+app.server.register_blueprint(credentials_bp)
 
 # Anti-FOUC: read stored theme from localStorage and apply before first paint
 app.index_string = '''<!DOCTYPE html>

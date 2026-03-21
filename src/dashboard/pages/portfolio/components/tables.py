@@ -15,11 +15,12 @@ def asset_table(data=None):
     df["weight_pct"] = df["weight_pct"].round(decimals)
     df["pct_drawdown"] = df["pct_drawdown"].round(decimals)
     df["volatility_30d"] = df["volatility_30d"].round(decimals)
-    df["volatility_50d"] = df["volatility_50d"].round(decimals)
-    df["recent_profit_low_30d"] = df["recent_profit_low_30d"].round(decimals)
     df["recent_profit_high_30d"] = df["recent_profit_high_30d"].round(decimals)
-    # df["price_vs_ma_50"] = df["price_vs_ma_50"].round(decimals)
     df["dca_bias"] = df["dca_bias"].round(decimals)
+    df["pnl_pct"] = df["pnl_pct"].round(decimals)
+    df["avg_price"] = df["avg_price"].round(decimals)
+    if "var_95_1d" in df.columns:
+        df["var_95_1d"] = df["var_95_1d"].round(decimals)
     if "cumulative_return" in df.columns:
         df["cumulative_return"] = df["cumulative_return"].round(decimals)
     if "daily_return" in df.columns:
@@ -85,6 +86,15 @@ def asset_table(data=None):
                 "cellStyle": pnl_style(),
             },
             {
+                "field": "pnl_pct",
+                "headerName": "P&L %",
+                "minWidth": 80, "width": 80,
+                "type": "numericColumn",
+                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "headerTooltip": "Unrealised P&L as a percentage of cost basis. Comparable across positions.",
+                "cellStyle": pnl_style(),
+            },
+            {
                 "field": "cumulative_return",
                 "headerName": "Cumul. Return",
                 "minWidth": 108, "width": 108,
@@ -118,6 +128,13 @@ def asset_table(data=None):
                 "headerTooltip": "Latest market price of the asset."
             },
             {
+                "field": "avg_price",
+                "headerName": "Avg Cost",
+                "minWidth": 84, "width": 84,
+                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "headerTooltip": "Average price paid (DCA average). Compare against current price to understand DCA Bias.",
+            },
+            {
                 "field": "weight_pct",
                 "headerName": "Weight %",
                 "minWidth": 84, "width": 84,
@@ -134,17 +151,6 @@ def asset_table(data=None):
                 "headerTooltip": (
                     "Highest price reached in the last 30 days. "
                     "Use to judge how far price has pulled back."
-                ),
-            },
-            {
-                "field": "recent_profit_low_30d",
-                "headerName": "30D Low",
-                "minWidth": 88, "width": 88,
-                "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
-                "headerTooltip": (
-                    "Lowest price in the last 30 days. "
-                    "Helps frame downside risk and recent range."
                 ),
             },
             {
@@ -172,15 +178,12 @@ def asset_table(data=None):
                 "cellStyle": pnl_style(),
             },
             {
-                "field": "volatility_50d",
-                "headerName": "Vol 50D",
-                "minWidth": 80, "width": 80,
+                "field": "var_95_1d",
+                "headerName": "VaR 95%",
+                "minWidth": 84, "width": 84,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘,.4f’)(params.value)"},
-                "headerTooltip": (
-                    "Volatility 50D: 50-day volatility measure. "
-                    "Higher values indicate larger price swings."
-                ),
+                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "headerTooltip": "Value at Risk (95% confidence, 1-day). Maximum expected daily loss under normal conditions.",
                 "cellStyle": pnl_style(),
             },
             {
@@ -210,7 +213,7 @@ def asset_table(data=None):
         },
         columnSize="autoSize",
         dashGridOptions={
-            "rowSelection": {"mode": "singleRow"},
+            "rowSelection": {"mode": "multiRow", "maxSelectedRows": 3, "enableSelectionWithoutKeys": True},
             "selectionColumnDef": {"width": 36, "minWidth": 36, "maxWidth": 36},
             "tooltipInteraction": True,
             "enableBrowserTooltips": False,

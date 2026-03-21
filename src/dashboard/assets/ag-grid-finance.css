@@ -221,3 +221,72 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
 .kpi-card-zero {
     opacity: 0.38;
 }
+
+/* Secondary KPI badge row — sits inside portfolio section collapse */
+.kpi-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.kpi-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    border-radius: 20px;
+    padding: 3px 10px;
+    width: 200px;
+    overflow: hidden;
+}
+
+.kpi-badge__label {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.kpi-badge__value {
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+.kpi-badge__unit {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* Daily Change badge variant — wider to contain the inline sparkline */
+.kpi-badge--with-spark {
+    width: 200px;
+}
+
+/* Edit Tags action button — ghost pill style */
+.kpi-badge--action {
+    background: none !important;
+    border: 1px solid var(--border-main) !important;
+    border-radius: 20px !important;
+    padding: 3px 10px !important;
+    font-size: 0.72rem !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer;
+    box-shadow: none !important;
+    height: auto !important;
+    line-height: inherit !important;
+    width: auto !important;
+    text-decoration: none !important;
+}
+
+.kpi-badge--action:hover {
+    background: var(--bg-strip-hover) !important;
+    color: var(--text-primary) !important;
+}
