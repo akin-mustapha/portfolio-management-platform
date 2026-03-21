@@ -73,7 +73,7 @@ class _PnLPlotlyLineChart:
         fig.update_layout(
             template="plotly_white",
             colorway=self.colorway,
-            height=CHART_HEIGHT_1,
+            height=getattr(self, "chart_height", CHART_HEIGHT_1),
             hovermode="x unified",
             margin=dict(l=2, r=2, t=2, b=2),
             xaxis_title=None,
@@ -91,6 +91,7 @@ class _PnLPlotlyLineChart:
 class WinnersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     colorway = px.colors.sequential.Bluyl_r
     fill = "toself"
+    chart_height = 280
 
 class LosersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     colorway = px.colors.sequential.Brwnyl_r
@@ -234,7 +235,7 @@ class PortfolioPerformanceScatterPlot:
             template="plotly_white",
             margin=dict(l=5, r=5, t=5, b=5),
             colorway=px.colors.sequential.Agsunset,
-            height=350,
+            height=280,
             xaxis_title="ROI %",
             yaxis_title="% Weight",
             # xaxis_title=None,

@@ -1224,3 +1224,178 @@ html[data-theme="dark"] .settings-modal .btn-close {
 html[data-theme="dark"] .settings-sidebar {
     background: var(--bg-sidebar);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace-localized Edit Tags overlay
+   ══════════════════════════════════════════════════════════════ */
+
+.ws-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+}
+
+.ws-modal-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+    border-radius: 12px;
+    width: 380px;
+    max-width: 90%;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-tv);
+    flex-shrink: 0;
+}
+
+.ws-modal-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.ws-modal-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.ws-modal-close:hover {
+    color: var(--text-primary);
+}
+
+.ws-modal-body {
+    padding: 16px;
+    flex: 1;
+    overflow: visible;
+}
+
+.ws-modal-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.ws-modal-footer {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-tv);
+}
+
+/* ── ws-modal dcc.Dropdown — Dash 4 class names, match settings-api-input ── */
+
+/* Control box (the visible trigger area) */
+.ws-modal-dropdown .dash-dropdown-wrapper {
+    background: var(--bg-app) !important;
+    border: 1px solid var(--border-main) !important;
+    border-radius: 4px !important;
+    min-height: 32px !important;
+    font-size: 13px !important;
+    color: var(--text-primary) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Open / focused state — blue ring matching settings */
+.ws-modal-dropdown[data-state='open'] .dash-dropdown-wrapper,
+.ws-modal-dropdown .dash-dropdown-wrapper:focus-within {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
+}
+
+/* Suppress browser native focus ring on the trigger */
+.ws-modal-dropdown .dash-dropdown-wrapper:focus {
+    outline: none !important;
+}
+
+/* Placeholder */
+.ws-modal-dropdown .dash-dropdown-placeholder {
+    color: var(--text-muted) !important;
+    font-size: 13px !important;
+}
+
+/* Selected value text */
+.ws-modal-dropdown .dash-dropdown-value {
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+}
+
+/* Arrow icon */
+.ws-modal-dropdown .dash-dropdown-trigger-icon {
+    color: var(--text-muted) !important;
+    fill: var(--text-muted) !important;
+}
+
+/* Dropdown menu panel */
+.ws-modal-dropdown .dash-dropdown-content {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--border-main) !important;
+    border-radius: 4px !important;
+    font-size: 13px !important;
+    z-index: 9999 !important;
+    margin-top: 2px !important;
+}
+
+/* Options */
+.ws-modal-dropdown .dash-dropdown-option {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+    padding: 6px 10px !important;
+}
+
+.ws-modal-dropdown .dash-dropdown-option:hover,
+.ws-modal-dropdown .dash-dropdown-option:focus {
+    background: var(--bg-strip-hover) !important;
+    outline: none !important;
+}
+
+/* Selected option */
+.ws-modal-dropdown .dash-dropdown-option[aria-selected='true'] {
+    background: rgba(13, 110, 253, 0.10) !important;
+    color: #0d6efd !important;
+}
+
+/* Search input inside the open menu */
+.ws-modal-dropdown .dash-dropdown-search {
+    background: var(--bg-app) !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    font-size: 13px !important;
+    outline: none !important;
+}
+
+/* Asset secondary KPI two-row layout */
+.asset-secondary-kpi .kpi-badge-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.asset-tag-btn-row {
+    margin-top: 6px;
+}
+
+html[data-theme="dark"] .ws-modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}

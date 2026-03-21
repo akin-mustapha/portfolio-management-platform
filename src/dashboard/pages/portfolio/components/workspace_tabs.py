@@ -166,7 +166,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
 # Risk tab content (placeholder)
 # ─────────────────────────────────────────────
 
-def risk_tab_content(view_model=None, theme="light"):
+def risk_tab_content(view_model=None, theme="light", kpi_data=None):
     if view_model is None:
         return _loading_placeholder("tab-risk-content", "Loading risk charts…")
 
@@ -180,18 +180,22 @@ def risk_tab_content(view_model=None, theme="light"):
         # ─────────────────────────────────────────────
         # Portfolio overview — collapsible
         # ─────────────────────────────────────────────
-        html.Div(
-            ["Portfolio Overview", html.Span("›", className="tv-chevron")],
-            id="risk-portfolio-section-header",
-            className="tv-section-header",
-            n_clicks=0,
-            style={"cursor": "pointer"},
-        ),
+        html.Div([
+            html.Div(
+                ["Portfolio Overview", html.Span("›", className="tv-chevron")],
+                id="risk-portfolio-section-header",
+                className="tv-section-header tv-section-header--section",
+                n_clicks=0,
+                style={"cursor": "pointer"},
+            ),
 
-        dbc.Collapse(
-            id="risk-portfolio-charts-collapse",
-            is_open=True,
-            children=[
+            secondary_kpi_row(kpi_data, theme=theme),
+
+            dbc.Collapse(
+                id="risk-portfolio-charts-collapse",
+                is_open=True,
+                children=[
+                html.Hr(className="tv-divider"),
                 dbc.Row([
                     dbc.Col(
                         _chart_section(
@@ -212,9 +216,8 @@ def risk_tab_content(view_model=None, theme="light"):
                                 config=_GRAPH_CONFIG,
                             )
                         ),
-                        width=4,
                     ),
-                ], className="mb-6 workspace-chart-grid"),
+                ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "1fr 30%"}),
 
                 html.Hr(className="tv-divider"),
                 dbc.Row([
@@ -228,10 +231,6 @@ def risk_tab_content(view_model=None, theme="light"):
                             )
                         ),
                     ),
-                ], className="mb-6 workspace-chart-grid"),
-
-                html.Hr(className="tv-divider"),
-                dbc.Row([
                     dbc.Col(
                         _chart_section(
                             "Value at Risk by Position",
@@ -242,9 +241,10 @@ def risk_tab_content(view_model=None, theme="light"):
                             )
                         ),
                     ),
-                ], className="mb-6 workspace-chart-grid"),
+                ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "1fr 40%"}),
             ],
         ),
+        ], className="tv-section-container"),
 
         # ─────────────────────────────────────────────
         # Asset detail — populated dynamically on row selection
@@ -258,7 +258,7 @@ def risk_tab_content(view_model=None, theme="light"):
 # Opportunities tab content
 # ─────────────────────────────────────────────
 
-def opportunities_tab_content(view_model=None, theme="light"):
+def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
     if view_model is None:
         return _loading_placeholder("tab-opportunities-content", "Loading opportunities charts…")
 
@@ -270,18 +270,22 @@ def opportunities_tab_content(view_model=None, theme="light"):
         # ─────────────────────────────────────────────
         # Portfolio overview — collapsible
         # ─────────────────────────────────────────────
-        html.Div(
-            ["Portfolio Overview", html.Span("›", className="tv-chevron")],
-            id="opportunities-portfolio-section-header",
-            className="tv-section-header",
-            n_clicks=0,
-            style={"cursor": "pointer"},
-        ),
+        html.Div([
+            html.Div(
+                ["Portfolio Overview", html.Span("›", className="tv-chevron")],
+                id="opportunities-portfolio-section-header",
+                className="tv-section-header tv-section-header--section",
+                n_clicks=0,
+                style={"cursor": "pointer"},
+            ),
 
-        dbc.Collapse(
-            id="opportunities-portfolio-charts-collapse",
-            is_open=True,
-            children=[
+            secondary_kpi_row(kpi_data, theme=theme),
+
+            dbc.Collapse(
+                id="opportunities-portfolio-charts-collapse",
+                is_open=True,
+                children=[
+                html.Hr(className="tv-divider"),
                 dbc.Row([
                     dbc.Col(
                         _chart_section(
@@ -292,12 +296,7 @@ def opportunities_tab_content(view_model=None, theme="light"):
                                 config=_GRAPH_CONFIG,
                             )
                         ),
-                        className='workpspace-chart-performance-map',
                     ),
-                ], className="mb-6 workspace-chart-grid"),
-
-                html.Hr(className="tv-divider"),
-                dbc.Row([
                     dbc.Col(
                         _chart_section(
                             "Profitable Positions P&L",
@@ -308,9 +307,10 @@ def opportunities_tab_content(view_model=None, theme="light"):
                             )
                         ),
                     ),
-                ], className="mb-6 workspace-chart-grid"),
+                ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "3fr 2fr"}),
             ],
         ),
+        ], className="tv-section-container"),
 
         # ─────────────────────────────────────────────
         # Asset detail — populated dynamically on row selection
@@ -335,7 +335,7 @@ def tags_tab_content():
     return html.Div([
 
         # ─────────────────────────────────────────────
-        # Top — AWS-style summary card
+        # Read-only summary card
         # ─────────────────────────────────────────────
         html.Div([
             html.Div("Asset Details", className="summary-card-header"),
@@ -360,57 +360,6 @@ def tags_tab_content():
             ], className="g-3"),
 
         ], className="profile-summary-card mb-4"),
-
-        # ─────────────────────────────────────────────
-        # Bottom — accordion forms + single save
-        # ─────────────────────────────────────────────
-        dbc.Accordion([
-            dbc.AccordionItem(
-                dcc.Dropdown(
-                    id="profile-tag-select",
-                    placeholder="Select or search tag\u2026",
-                    options=[],
-                ),
-                title="Tag",
-                item_id="acc-tag",
-            ),
-            dbc.AccordionItem(
-                dcc.Dropdown(
-                    id="profile-category-select",
-                    placeholder="Select or search category\u2026",
-                    options=[],
-                ),
-                title="Categorizing Tag",
-                item_id="acc-category",
-            ),
-            dbc.AccordionItem(
-                dcc.Dropdown(
-                    id="profile-industry-select",
-                    placeholder="Select or search industry\u2026",
-                    options=[],
-                ),
-                title="Industry",
-                item_id="acc-industry",
-            ),
-            dbc.AccordionItem(
-                dcc.Dropdown(
-                    id="profile-sector-select",
-                    placeholder="Select or search sector\u2026",
-                    options=[],
-                ),
-                title="Sector",
-                item_id="acc-sector",
-            ),
-        ], id="profile-accordion", always_open=True),
-
-        html.Div([
-            dbc.Button("Save", id="profile-save-btn", color="primary", size="sm", className="me-2"),
-            html.Small("", id="profile-save-status", className="text-muted"),
-        ], className="d-flex align-items-center mt-3"),
-
-        # Hidden legacy IDs required by callbacks
-        html.Div(id="profile-current-tags", style={"display": "none"}),
-        html.Div(id="profile-tag-status", style={"display": "none"}),
 
     ], id="tab-tags-content")
 

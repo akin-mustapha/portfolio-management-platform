@@ -25,6 +25,7 @@ class PostgresAssetQueryRepository:
           fv.value,
           fv.unrealized_pnl                             AS profit,
           fp.price,
+          fp.avg_price,
           fv.cost_basis                                 AS cost,
           COALESCE(fv.position_weight_pct, 0)           AS weight_pct,
           COALESCE(fv.unrealized_pnl_pct, 0)            AS pnl_pct,

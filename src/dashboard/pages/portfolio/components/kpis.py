@@ -169,6 +169,31 @@ def kpi_row(data=None):
     ], className="mb-4")
 
 
+def secondary_asset_kpi_row(ticker: str, metadata: dict):
+    tags = metadata.get("tags", [])
+    industry = metadata.get("industry") or "—"
+    sector = metadata.get("sector") or "—"
+    tag_str = ", ".join(tags) if tags else "—"
+
+    return html.Div([
+        html.Div([
+            _kpi_badge("Industry", industry),
+            _kpi_badge("Sector", sector),
+            _kpi_badge("Tags", tag_str),
+        ], className="kpi-badge-row"),
+        html.Div([
+            dbc.Button(
+                "Edit Tags ▸",
+                id={"type": "assign-tag-btn", "index": ticker},
+                size="sm",
+                color="link",
+                className="kpi-badge kpi-badge--action",
+                n_clicks=0,
+            ),
+        ], className="asset-tag-btn-row"),
+    ], className="asset-secondary-kpi", style={"paddingTop": "var(--ws-section-pad-v)", "marginBottom": "var(--ws-divider-v)"})
+
+
 def secondary_kpi_row(data=None, theme="light"):
     data = data or {}
     daily_change_pct = data.get("daily_change_pct")

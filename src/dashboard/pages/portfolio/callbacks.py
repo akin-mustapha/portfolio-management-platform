@@ -1,10 +1,10 @@
 from datetime import date, timedelta
 
 import dash_bootstrap_components as dbc
-from dash import MATCH, Output, Input, State, callback, dcc, html, no_update
+from dash import ALL, MATCH, Output, Input, State, callback, ctx, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 
-from .components.kpis import kpi_row
+from .components.kpis import kpi_row, secondary_asset_kpi_row
 from .components.tables import asset_table
 from .components.workspace_tabs import (
     portfolio_tab_content,
@@ -82,7 +82,23 @@ def _fetch_snapshots(tickers, start_date, end_date):
     return [(t, ctrl.get_asset_snapshot(t.lower(), start_date, end_date)) for t in tickers]
 
 
-def _build_compare_rows(snapshots, metrics, theme, ns="", names_map=None):
+def _fetch_asset_metadata(selected_rows: list) -> dict:
+    """Return {ticker: {tags, industry, sector}} for each selected row."""
+    result = {}
+    ctrl = AssetProfileController()
+    for row in (selected_rows or []):
+        ticker = row.get("ticker", "")
+        if ticker:
+            vm = ctrl.get_profile(row)
+            result[ticker] = {
+                "tags": vm.get("current_tags", []),
+                "industry": "—",
+                "sector": "—",
+            }
+    return result
+
+
+def _build_compare_rows(snapshots, metrics, theme, ns="", names_map=None, metadata_map=None):
     """
     Build one tv-section-container per asset, placed side by side.
     Each container has a collapsible header (ticker) and charts stacked
@@ -117,6 +133,7 @@ def _build_compare_rows(snapshots, metrics, theme, ns="", names_map=None):
         header_children = [ticker.upper(), html.Span("›", className="tv-chevron")]
         if name:
             header_children.append(html.Span(name, className="asset-header-name"))
+        metadata = (metadata_map or {}).get(ticker, {})
         cols.append(dbc.Col(
             html.Div([
                 html.Div(
@@ -126,6 +143,7 @@ def _build_compare_rows(snapshots, metrics, theme, ns="", names_map=None):
                     n_clicks=0,
                     style={"cursor": "pointer"},
                 ),
+                secondary_asset_kpi_row(ticker, metadata),
                 dbc.Collapse(
                     id={"type": "asset-section-collapse", "index": idx},
                     is_open=True,
@@ -173,8 +191,8 @@ def load_portfolio_page(pathname, cached_data, theme):
         asset_table(rows),
         portfolio_tab_content(view_model, current_theme, kpi_data=view_model.get("kpi", {})),
         asset_count,
-        risk_tab_content(view_model, current_theme),
-        opportunities_tab_content(view_model, current_theme),
+        risk_tab_content(view_model, current_theme, kpi_data=view_model.get("kpi", {})),
+        opportunities_tab_content(view_model, current_theme, kpi_data=view_model.get("kpi", {})),
     )
 
 
@@ -202,12 +220,13 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
     start_date, end_date = _date_window(timeframe or "1Y")
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
     names_map = {r["ticker"]: r.get("name", "") for r in selected_rows if r.get("ticker")}
+    metadata_map = _fetch_asset_metadata(selected_rows)
 
     return (
         tickers,
-        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
-        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
-        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map, metadata_map=metadata_map),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map, metadata_map=metadata_map),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map, metadata_map=metadata_map),
     )
 
 
@@ -256,8 +275,8 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
         kpi_children = kpi_row(view_model.get("kpi", {}))
         filtered_vm = _filter_vm_by_timeframe(view_model, start_date, end_date)
         portfolio_tab = portfolio_tab_content(filtered_vm, current_theme, kpi_data=view_model.get("kpi", {}))
-        risk_tab = risk_tab_content(filtered_vm, current_theme)
-        opportunities_tab = opportunities_tab_content(filtered_vm, current_theme)
+        risk_tab = risk_tab_content(filtered_vm, current_theme, kpi_data=view_model.get("kpi", {}))
+        opportunities_tab = opportunities_tab_content(filtered_vm, current_theme, kpi_data=view_model.get("kpi", {}))
 
     tickers = selected_assets if isinstance(selected_assets, list) else []
     if not tickers:
@@ -270,13 +289,15 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
     asset_rows = (cached_data or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
     names_map = {r["ticker"]: r.get("name", "") for r in asset_rows if r.get("ticker")}
+    selected_row_objs = [r for r in asset_rows if r.get("ticker") in tickers]
+    metadata_map = _fetch_asset_metadata(selected_row_objs)
 
     return (
         kpi_children,
         portfolio_tab, timeframe, risk_tab, opportunities_tab,
-        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
-        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
-        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map, metadata_map=metadata_map),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map, metadata_map=metadata_map),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map, metadata_map=metadata_map),
     )
 
 
@@ -363,7 +384,7 @@ def toggle_opportunities_portfolio_section(n, is_open):
     return is_open
 
 
-# ── 6. Asset Profile tab — populate on row selection ─────────────
+# ── 6. Asset Profile tab — populate on row selection (read-only) ──
 
 @callback(
     Output("profile-ticker", "children"),
@@ -371,12 +392,10 @@ def toggle_opportunities_portfolio_section(n, is_open):
     Output("profile-description", "children"),
     Output("profile-created", "children"),
     Output("profile-last-ingestion", "children"),
-    Output("profile-tag-select", "options"),
-    Output("profile-industry-select", "options"),
-    Output("profile-sector-select", "options"),
-    Output("profile-category-select", "options"),
     Output("profile-summary-tags", "children"),
-    Output("profile-current-tags", "children"),
+    Output("profile-summary-category", "children"),
+    Output("profile-summary-industry", "children"),
+    Output("profile-summary-sector", "children"),
     Input("portfolio-asset-table", "selectedRows"),
     prevent_initial_call=True,
 )
@@ -396,53 +415,75 @@ def on_asset_profile_selected(selected_rows):
         vm["description"],
         vm["created"],
         vm["last_ingestion"],
-        vm["tag_options"],
-        vm["industry_options"],
-        vm["sector_options"],
-        vm["category_options"],
         tag_display,
-        "",  # profile-current-tags hidden
+        "—",  # category — assignment not yet implemented
+        "—",  # industry — assignment not yet implemented
+        "—",  # sector — assignment not yet implemented
     )
 
 
-# ── 7. Asset Profile tab — save classifications ───────────────────
+# ── 7. Edit Tags modal — open ─────────────────────────────────────
+
+_MODAL_SHOW = {"display": "flex"}
+_MODAL_HIDE = {"display": "none"}
 
 @callback(
-    Output("profile-save-status", "children"),
-    Output("profile-summary-tags", "children", allow_duplicate=True),
-    Input("profile-save-btn", "n_clicks"),
-    State("profile-tag-select", "value"),
-    State("profile-category-select", "value"),
-    State("profile-category-select", "options"),
-    State("profile-industry-select", "value"),
-    State("profile-industry-select", "options"),
-    State("profile-sector-select", "value"),
-    State("profile-sector-select", "options"),
-    State("portfolio-asset-table", "selectedRows"),
+    Output("assign-tag-modal-overlay", "style"),
+    Output("assign-tag-modal-title", "children"),
+    Output("assign-tag-modal-tag-select", "options"),
+    Output("assign-tag-modal-category-select", "options"),
+    Output("assign-tag-modal-ticker", "data"),
+    Output("assign-tag-modal-status", "children"),
+    Input({"type": "assign-tag-btn", "index": ALL}, "n_clicks"),
+    State("portfolio_page_asset_store", "data"),
     prevent_initial_call=True,
 )
-def on_save_profile(n_clicks, tag_id, category_id, category_opts, industry_id, industry_opts, sector_id, sector_opts, selected_rows):
-    if not selected_rows:
+def open_assign_tag_modal(n_clicks_list, cached_data):
+    if not any(n for n in n_clicks_list if n):
         raise PreventUpdate
-
-    asset_row = selected_rows[0]
-    asset_name = asset_row.get("name", "")
-    messages = []
-
-    if tag_id:
-        msg = AssetProfileController().assign_tag(asset_name, tag_id)
-        messages.append(msg)
-
-    # Refresh tag display from service after save
+    triggered = ctx.triggered_id
+    ticker = triggered["index"]
+    asset_rows = (cached_data or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    asset_row = next((r for r in asset_rows if r.get("ticker") == ticker), {})
     vm = AssetProfileController().get_profile(asset_row)
-    current_tags = vm.get("current_tags", [])
-    tag_display = ", ".join(current_tags) if current_tags else "—"
-
-    status = " | ".join(messages) if messages else "Nothing to save."
-    return status, tag_display
+    return _MODAL_SHOW, f"Assign Tags — {ticker.upper()}", vm["tag_options"], vm["category_options"], ticker, ""
 
 
-# ── 8. Daily movers pagination ────────────────────────────────────
+# ── 8. Edit Tags modal — save ─────────────────────────────────────
+
+@callback(
+    Output("assign-tag-modal-status", "children", allow_duplicate=True),
+    Output("assign-tag-modal-overlay", "style", allow_duplicate=True),
+    Input("assign-tag-modal-save-btn", "n_clicks"),
+    State("assign-tag-modal-tag-select", "value"),
+    State("assign-tag-modal-ticker", "data"),
+    State("portfolio_page_asset_store", "data"),
+    prevent_initial_call=True,
+)
+def save_modal_tag(n_clicks, tag_id, ticker, cached_data):
+    if not n_clicks or not ticker:
+        raise PreventUpdate
+    asset_rows = (cached_data or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    asset_row = next((r for r in asset_rows if r.get("ticker") == ticker), {})
+    asset_name = asset_row.get("name", "")
+    if tag_id and asset_name:
+        AssetProfileController().assign_tag(asset_name, tag_id)
+        return "Saved ✓", _MODAL_HIDE
+    return "Nothing to save.", no_update
+
+
+# ── 9. Edit Tags modal — close ────────────────────────────────────
+
+@callback(
+    Output("assign-tag-modal-overlay", "style", allow_duplicate=True),
+    Input("assign-tag-modal-close-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def close_assign_tag_modal(n):
+    return _MODAL_HIDE
+
+
+# ── 10. Daily movers pagination ───────────────────────────────────
 
 @callback(
     Output("daily-movers-table", "children"),

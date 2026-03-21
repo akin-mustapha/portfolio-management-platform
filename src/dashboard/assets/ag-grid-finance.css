@@ -269,3 +269,24 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
 .kpi-badge--with-spark {
     width: 200px;
 }
+
+/* Edit Tags action button — ghost pill style */
+.kpi-badge--action {
+    background: none !important;
+    border: 1px solid var(--border-main) !important;
+    border-radius: 20px !important;
+    padding: 3px 10px !important;
+    font-size: 0.72rem !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer;
+    box-shadow: none !important;
+    height: auto !important;
+    line-height: inherit !important;
+    width: auto !important;
+    text-decoration: none !important;
+}
+
+.kpi-badge--action:hover {
+    background: var(--bg-strip-hover) !important;
+    color: var(--text-primary) !important;
+}
