@@ -14,6 +14,7 @@ from .charts import (
     VaRBarChart,
     daily_movers_table,
 )
+from .kpis import secondary_kpi_row
 
 _GRAPH_CONFIG = {"displayModeBar": False}
 
@@ -36,7 +37,7 @@ def _loading_placeholder(tab_id, message="Loading…"):
 # Portfolio tab content
 # ─────────────────────────────────────────────
 
-def portfolio_tab_content(view_model=None, theme="light"):
+def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
     if view_model is None:
         return _loading_placeholder("tab-portfolio-content", "Loading portfolio charts…")
 
@@ -61,10 +62,13 @@ def portfolio_tab_content(view_model=None, theme="light"):
                 style={"cursor": "pointer"},
             ),
 
+            secondary_kpi_row(kpi_data, theme=theme),
+
             dbc.Collapse(
                 id="portfolio-charts-collapse",
                 is_open=False,
                 children=[
+
                     dbc.Row([
 
                         dbc.Col(

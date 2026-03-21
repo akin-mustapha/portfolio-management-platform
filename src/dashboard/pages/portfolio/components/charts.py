@@ -726,3 +726,50 @@ class PortfolioPNLPlotlyLineChart:
         _apply_spike_config(fig)
         return fig
 
+
+
+def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light") -> go.Figure:
+    ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+    dates = series.get("dates", [])
+    values = series.get("values", [])
+
+    if change_sign > 0:
+        line_color = "#26a69a"
+        fill_color = "rgba(38,166,154,0.15)"
+    elif change_sign < 0:
+        line_color = "#ef5350"
+        fill_color = "rgba(239,83,80,0.15)"
+    else:
+        line_color = "rgba(150,150,150,0.6)"
+        fill_color = "rgba(150,150,150,0.10)"
+
+    zeros = [0] * len(dates)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=dates, y=zeros,
+        mode="lines",
+        line=dict(color="rgba(0,0,0,0)", width=0),
+        showlegend=False,
+        hoverinfo="skip",
+    ))
+    fig.add_trace(go.Scatter(
+        x=dates, y=values,
+        mode="lines",
+        line=dict(color=line_color, width=1.5),
+        fill="tonexty",
+        fillcolor=fill_color,
+        showlegend=False,
+        hoverinfo="skip",
+    ))
+    fig.update_layout(
+        height=22,
+        width=56,
+        margin=dict(l=0, r=0, t=0, b=0),
+        paper_bgcolor=ct["paper_bgcolor"],
+        plot_bgcolor=ct["plot_bgcolor"],
+        xaxis=dict(visible=False, showgrid=False, zeroline=False, fixedrange=True),
+        yaxis=dict(visible=False, showgrid=False, zeroline=False, fixedrange=True),
+        dragmode=False,
+    )
+    return fig

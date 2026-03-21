@@ -60,6 +60,10 @@ def _filter_vm_by_timeframe(view_model: dict, start: str, end: str) -> dict:
 
 _GRAPH_CONFIG = {"displayModeBar": False}
 
+_ASSET_MODIFIERS    = ["asset-1", "asset-2", "asset-3"]
+_ASSET_COLORS_LIGHT = {"asset-1": "#0d6efd", "asset-2": "#26a671", "asset-3": "#ef5350"}
+_ASSET_COLORS_DARK  = {"asset-1": "#639aff", "asset-2": "#4cbb9f", "asset-3": "#f47c7c"}
+
 _VALUATION_METRICS = [
     ("Price", PriceStructurePlotlyLineChart),
     ("Asset Value", AssetValuePlotlyLineChart),
@@ -78,7 +82,7 @@ def _fetch_snapshots(tickers, start_date, end_date):
     return [(t, ctrl.get_asset_snapshot(t.lower(), start_date, end_date)) for t in tickers]
 
 
-def _build_compare_rows(snapshots, metrics, theme, ns=""):
+def _build_compare_rows(snapshots, metrics, theme, ns="", names_map=None):
     """
     Build one tv-section-container per asset, placed side by side.
     Each container has a collapsible header (ticker) and charts stacked
@@ -87,27 +91,38 @@ def _build_compare_rows(snapshots, metrics, theme, ns=""):
     snapshots : list of (ticker, history) tuples
     metrics   : list of (title, ChartClass) tuples
     ns        : namespace prefix to make IDs unique across tabs
+    names_map : optional dict mapping ticker -> display name
     Returns   : html.Div containing a dbc.Row of section containers.
     """
     n = len(snapshots)
     col_width = 12 // n
+    color_map = _ASSET_COLORS_DARK if theme == "dark" else _ASSET_COLORS_LIGHT
     cols = []
-    for ticker, history in snapshots:
+    for asset_idx, (ticker, history) in enumerate(snapshots):
+        modifier = _ASSET_MODIFIERS[asset_idx] if asset_idx < len(_ASSET_MODIFIERS) else "asset-1"
+        accent   = color_map[modifier]
         idx = f"{ns}-{ticker}" if ns else ticker
+        name = (names_map or {}).get(ticker, "")
         charts = []
         for i, (title, ChartClass) in enumerate(metrics):
             if i > 0:
                 charts.append(html.Hr(className="tv-divider"))
             charts.append(html.Div([
                 html.Div(title, className="tv-section-header"),
-                dcc.Graph(figure=ChartClass().render(history, theme), config=_GRAPH_CONFIG),
+                dcc.Graph(
+                    figure=ChartClass().render(history, theme, accent_color=accent),
+                    config=_GRAPH_CONFIG,
+                ),
             ]))
+        header_children = [ticker.upper(), html.Span("›", className="tv-chevron")]
+        if name:
+            header_children.append(html.Span(name, className="asset-header-name"))
         cols.append(dbc.Col(
             html.Div([
                 html.Div(
-                    [ticker.upper(), html.Span("›", className="tv-chevron")],
+                    header_children,
                     id={"type": "asset-section-toggle", "index": idx},
-                    className="tv-section-header tv-section-header--section",
+                    className=f"tv-section-header tv-section-header--{modifier}",
                     n_clicks=0,
                     style={"cursor": "pointer"},
                 ),
@@ -116,7 +131,7 @@ def _build_compare_rows(snapshots, metrics, theme, ns=""):
                     is_open=True,
                     children=html.Div(charts),
                 ),
-            ], className="tv-section-container"),
+            ], className=f"tv-section-container tv-section-container--{modifier}"),
             width=col_width,
         ))
     return html.Div(dbc.Row(cols, className="g-2"))
@@ -156,7 +171,7 @@ def load_portfolio_page(pathname, cached_data, theme):
         cached_data,
         kpi_row(view_model.get("kpi", {})),
         asset_table(rows),
-        portfolio_tab_content(view_model, current_theme),
+        portfolio_tab_content(view_model, current_theme, kpi_data=view_model.get("kpi", {})),
         asset_count,
         risk_tab_content(view_model, current_theme),
         opportunities_tab_content(view_model, current_theme),
@@ -186,12 +201,13 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
     current_theme = theme or "light"
     start_date, end_date = _date_window(timeframe or "1Y")
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
+    names_map = {r["ticker"]: r.get("name", "") for r in selected_rows if r.get("ticker")}
 
     return (
         tickers,
-        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val"),
-        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk"),
-        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps"),
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
     )
 
 
@@ -239,7 +255,7 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
         view_model = cached_data.get("view_model", {})
         kpi_children = kpi_row(view_model.get("kpi", {}))
         filtered_vm = _filter_vm_by_timeframe(view_model, start_date, end_date)
-        portfolio_tab = portfolio_tab_content(filtered_vm, current_theme)
+        portfolio_tab = portfolio_tab_content(filtered_vm, current_theme, kpi_data=view_model.get("kpi", {}))
         risk_tab = risk_tab_content(filtered_vm, current_theme)
         opportunities_tab = opportunities_tab_content(filtered_vm, current_theme)
 
@@ -252,13 +268,15 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
         )
 
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
+    asset_rows = (cached_data or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    names_map = {r["ticker"]: r.get("name", "") for r in asset_rows if r.get("ticker")}
 
     return (
         kpi_children,
         portfolio_tab, timeframe, risk_tab, opportunities_tab,
-        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val"),
-        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk"),
-        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps"),
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
     )
 
 

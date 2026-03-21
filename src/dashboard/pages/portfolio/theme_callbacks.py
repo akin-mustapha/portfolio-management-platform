@@ -108,9 +108,10 @@ def update_chart_theme(theme):
     Input("theme-store", "data"),
     State("workspace-selected-asset", "data"),
     State("workspace-timeframe", "data"),
+    State("portfolio_page_asset_store", "data"),
     prevent_initial_call=True,
 )
-def update_workspace_chart_theme(theme, selected_assets, timeframe):
+def update_workspace_chart_theme(theme, selected_assets, timeframe, asset_store):
     tickers = selected_assets if isinstance(selected_assets, list) else []
     if not tickers:
         return no_update, no_update, no_update
@@ -119,11 +120,13 @@ def update_workspace_chart_theme(theme, selected_assets, timeframe):
     start_date, end_date = _date_window(timeframe or "1Y")
 
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
+    asset_rows = (asset_store or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    names_map = {r["ticker"]: r.get("name", "") for r in asset_rows if r.get("ticker")}
 
     return (
-        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val"),
-        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk"),
-        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps"),
+        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
+        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
+        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
     )
 
 

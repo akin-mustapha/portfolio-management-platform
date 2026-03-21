@@ -23,6 +23,11 @@ body, * {
     --ws-row-pad-h:     8px;   /* movers/ranked row horizontal padding */
     --ws-row-gap:       2px;   /* margin-bottom between movers rows */
     --ws-tab-pad:       8px;   /* padding inside #tab-*-content panes */
+
+    /* Per-asset identity colors (section stripe, header, chart line) */
+    --asset-1-color:      #0d6efd;  --asset-1-color-dark: #639aff;
+    --asset-2-color:      #26a671;  --asset-2-color-dark: #4cbb9f;
+    --asset-3-color:      #ef5350;  --asset-3-color-dark: #f47c7c;
 }
 
 /* ── TradingView section container ────────────────────────────── */
@@ -74,6 +79,39 @@ html[data-theme="dark"] .tv-section-header--section {
 html[data-theme="dark"] .tv-section-header--section .tv-chevron {
     color: #639aff;
 }
+
+/* ── Asset section header — name label after ticker ──────────── */
+.asset-header-name {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Per-asset identity: left stripe on container ─────────────── */
+.tv-section-container--asset-1 { border-left: 3px solid var(--asset-1-color); }
+.tv-section-container--asset-2 { border-left: 3px solid var(--asset-2-color); }
+.tv-section-container--asset-3 { border-left: 3px solid var(--asset-3-color); }
+html[data-theme="dark"] .tv-section-container--asset-1 { border-left-color: var(--asset-1-color-dark); }
+html[data-theme="dark"] .tv-section-container--asset-2 { border-left-color: var(--asset-2-color-dark); }
+html[data-theme="dark"] .tv-section-container--asset-3 { border-left-color: var(--asset-3-color-dark); }
+
+/* ── Per-asset identity: header + chevron color ───────────────── */
+.tv-section-header--asset-1,
+.tv-section-header--asset-1 .tv-chevron { color: var(--asset-1-color); }
+.tv-section-header--asset-2,
+.tv-section-header--asset-2 .tv-chevron { color: var(--asset-2-color); }
+.tv-section-header--asset-3,
+.tv-section-header--asset-3 .tv-chevron { color: var(--asset-3-color); }
+html[data-theme="dark"] .tv-section-header--asset-1,
+html[data-theme="dark"] .tv-section-header--asset-1 .tv-chevron { color: var(--asset-1-color-dark); }
+html[data-theme="dark"] .tv-section-header--asset-2,
+html[data-theme="dark"] .tv-section-header--asset-2 .tv-chevron { color: var(--asset-2-color-dark); }
+html[data-theme="dark"] .tv-section-header--asset-3,
+html[data-theme="dark"] .tv-section-header--asset-3 .tv-chevron { color: var(--asset-3-color-dark); }
 
 /* ── TradingView thin divider — replaces Bootstrap hr ─────────── */
 .tv-divider {
