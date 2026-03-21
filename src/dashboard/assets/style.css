@@ -104,6 +104,35 @@ body, * {
     box-shadow: none !important;
 }
 
+/* ── Ghost button (secondary actions: Add Tag, Create Tag) ──── */
+.tv-ghost-btn,
+.tv-ghost-btn:visited {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-secondary) !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 4px 8px !important;
+    cursor: pointer !important;
+    border-radius: 4px !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    transition: color 0.12s ease, background 0.12s ease !important;
+    line-height: 1.6 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+.tv-ghost-btn:hover {
+    color: var(--text-primary) !important;
+    background: var(--bg-strip-hover) !important;
+    text-decoration: none !important;
+}
+
+.tv-ghost-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 /* ── Apply button ─────────────────────────────────────────────── */
 .tv-apply-btn,
 .tv-apply-btn:visited {

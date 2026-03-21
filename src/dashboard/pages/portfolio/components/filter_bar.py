@@ -37,34 +37,31 @@ def workspace_filter_bar():
         # Spacer pushes advanced filter to the right
         html.Div(style={"marginLeft": "auto"}),
         
-        # Tag buttons
+        # Tag buttons (secondary — ghost style)
         dbc.Button(
             [html.I(className="fa-solid fa-tag me-1"), "Add Tag"],
             id="btn-add-tag",
-            className="tv-adv-btn",
+            className="tv-ghost-btn",
             size="sm",
             n_clicks=0,
         ),
-        
-        html.Div(className="tv-vert-divider"),
-       
+
         dbc.Button(
             [html.I(className="fa-solid fa-plus me-1"), "Create Tag"],
             id="btn-create-tag",
-            className="tv-adv-btn",
+            className="tv-ghost-btn",
             size="sm",
             n_clicks=0,
         ),
-        
-        
+
         # Vertical divider
         html.Div(className="tv-vert-divider"),
-        
-         # Advanced filter toggle
+
+        # Advanced filter toggle (primary action — filled)
         dbc.Button(
             [html.I(className="fa-solid fa-sliders me-1"), "Advanced Filter"],
             id="workspace-adv-filter-btn",
-            className="tv-adv-btn",
+            className="tv-apply-btn",
             size="sm",
             n_clicks=0,
         ),

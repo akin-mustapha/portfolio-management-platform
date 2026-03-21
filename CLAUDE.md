@@ -90,6 +90,12 @@ Do not implement gold layer tables speculatively. Only build what a dashboard qu
 
 **Migrations** — Any new or changed table requires an Alembic migration. See `docs/03-engineering/doc-commands.md`.
 
+**Dashboard callbacks** — Before adding any callback output, search for existing `Output('component-id', 'property')` patterns to avoid duplicates. For layout direction (horizontal vs vertical), confirm with the user before implementing — default to side-by-side for chart pairs.
+
+**Schema changes** — Never reference columns from unapplied migrations in application code. Confirm migrations are applied before writing code that reads those columns.
+
+**Refactoring** — Do not remove variables that appear unused without first searching templates, callbacks, and conditional logic (especially theme variables like `ct`). After any multi-file refactor, run the test suite and verify all imports resolve — Prefect workers and the dashboard app may resolve imports differently.
+
 ---
 
 ## Git & Branching
@@ -109,3 +115,5 @@ Full workflow: `docs/03-engineering/doc-project-workflow.md`
 - `/database` — schema reference, query help, migration guidance
 - `/financial-analyst` — metrics catalogue, dashboard KPI suggestions
 - `/project-navigation` — navigating the codebase (incomplete)
+- `/dashboard` — layout rules, component IDs, callback safety checks, theme wiring
+- `/pipeline` — pipeline pattern, failure modes, pipeline inventory, migration safety

@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "python -m pytest tests/ --tb=short -q 2>&1 | tail -5"
+      }
+    ]
+  }
+}

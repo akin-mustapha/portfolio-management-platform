@@ -254,6 +254,8 @@ class PortfolioPerformanceScatterPlot:
 class _BaseRankedBarChart:
     sort_ascending: bool = True
     y_axis_side: str = "left"
+    color_scale = px.colors.diverging.RdYlGn
+    use_range_color: bool = True
 
     def render(self, data, theme="light", x_col="profit"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
@@ -262,29 +264,29 @@ class _BaseRankedBarChart:
         df = df.sort_values(x_col, ascending=self.sort_ascending)
         max_val = df[x_col].abs().max() or 1
 
-        fig = px.bar(
-            df,
-            x=x_col,
-            y="ticker",
-            orientation="h",
-            text="label",
-            labels=[x_col, "name"],
-            color=x_col,
-            color_continuous_scale=px.colors.diverging.RdYlGn,
-            range_color=[-max_val, max_val],
+        bar_kwargs = dict(
+            data_frame=df, x=x_col, y="ticker", orientation="h",
+            text="label", labels=[x_col, "name"], color=x_col,
+            color_continuous_scale=self.color_scale,
         )
+        if self.use_range_color:
+            bar_kwargs["range_color"] = [-max_val, max_val]
+        fig = px.bar(**bar_kwargs)
 
         fig.update_traces(
             marker=dict(line=dict(width=0)),
             texttemplate="%{text}",
-            textposition="inside",
+            textposition="auto",
             textfont=dict(color=ct["font_color"], size=13),
         )
 
+        n = len(df)
+        chart_h = max(200, n * 28 + 20)
+
         fig.update_layout(
             template="plotly_white",
-            margin=dict(l=2, r=2, t=2, b=2),
-            height=CHART_HEIGHT,
+            margin=dict(l=2, r=80, t=2, b=2),
+            height=chart_h,
             xaxis_title=None,
             yaxis_title=None,
             yaxis=dict(side=self.y_axis_side, showgrid=False, zeroline=False, showticklabels=False),
@@ -309,6 +311,21 @@ class WinnersPlotlyBarChart(_BaseRankedBarChart):
 class LosersPlotlyBarChart(_BaseRankedBarChart):
     sort_ascending = False
     y_axis_side = "right"
+
+
+class DailyMoversBarChart(_BaseRankedBarChart):
+    sort_ascending = True
+    y_axis_side = "left"
+
+
+class VaRBarChart(_BaseRankedBarChart):
+    sort_ascending = True
+    y_axis_side = "right"
+    color_scale = px.colors.sequential.OrRd
+    use_range_color = False
+
+    def render(self, data, theme="light"):
+        return super().render(data, theme=theme, x_col="var_95_1d")
 
 class PositionWeightPlotlyDonutChart:
     def render (self, data, theme="light"):

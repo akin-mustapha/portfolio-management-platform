@@ -9,7 +9,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # ===== Postgres Repos =====
 class PostgresAssetQueryRepository:
   def __init__(self):
-    self.client = SQLModelClient(database_url=DATABASE_URL)
+    self._client = SQLModelClient(database_url=DATABASE_URL)
 
   def get_most_recent_asset_data(self):
     sql = """
@@ -37,6 +37,9 @@ class PostgresAssetQueryRepository:
           ft.ma_50d,
           fs.dca_bias,
           fr.cumulative_return,
+          fr.daily_return,
+          fs.ma_crossover_signal,
+          ft.var_95_1d,
           TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
       FROM analytics.fact_valuation fv
       JOIN latest ON fv.asset_id = latest.asset_id AND fv.date_id = latest.max_date_id
@@ -46,7 +49,7 @@ class PostgresAssetQueryRepository:
       LEFT JOIN analytics.fact_signal fs ON fs.asset_id = fv.asset_id AND fs.date_id = fv.date_id
       LEFT JOIN analytics.fact_return fr ON fr.asset_id = fv.asset_id AND fr.date_id = fv.date_id
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql)
       res = res.fetchall()
     return res
@@ -67,7 +70,7 @@ class PostgresAssetQueryRepository:
         AND da.ticker IN ({placeholders})
       ORDER BY da.ticker, fp.date_id ASC
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql, params)
     return res.fetchall()
 
@@ -87,13 +90,13 @@ class PostgresAssetQueryRepository:
       WHERE fv.date_id >= TO_CHAR(CURRENT_DATE - INTERVAL '30 days', 'YYYYMMDD')::INTEGER
       ORDER BY da.ticker, fv.date_id ASC
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql)
     return res.fetchall()
 
 class PostgresSnapshotQueryRepository:
   def __init__(self):
-    self.client = SQLModelClient(database_url=DATABASE_URL)
+    self._client = SQLModelClient(database_url=DATABASE_URL)
 
   def select_asset_snapshot(self, params=None):
     sql = """
@@ -101,7 +104,7 @@ class PostgresSnapshotQueryRepository:
     FROM portfolio.asset a
     INNER JOIN portfolio.asset_snapshot at ON a.id = at.asset_id
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql, params or {})
     return res.fetchall()
 
@@ -117,7 +120,7 @@ class PostgresSnapshotQueryRepository:
     ORDER BY profit DESC
     LIMIT 10
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql)
     return res.fetchall()
 
@@ -131,6 +134,8 @@ class PostgresSnapshotQueryRepository:
         fpd.unrealized_pnl                            AS investments_unrealized_pnl,
         dp.base_currency                              AS currency,
         fpd.cash_available                            AS cash_available_to_trade,
+        COALESCE(fpd.cash_reserved, 0)               AS cash_reserved_for_orders,
+        COALESCE(fpd.cash_in_pies, 0)                AS cash_in_pies,
         COALESCE(fpd.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
         COALESCE(fpd.daily_change_pct, 0)             AS daily_change_pct,
         COALESCE(fpd.daily_change_abs, 0)             AS daily_change_abs
@@ -139,7 +144,7 @@ class PostgresSnapshotQueryRepository:
     WHERE dp.portfolio_id = 'trading212'
     ORDER BY data_date ASC
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql)
     return res.fetchall()
 
@@ -169,7 +174,7 @@ class PostgresSnapshotQueryRepository:
           AND LOWER(da.ticker) = :ticker
         ORDER BY fv.date_id ASC
       """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql, {"ticker": ticker.lower(), "start_date": start_date, "end_date": end_date})
     return res.fetchall()
 
@@ -188,7 +193,7 @@ class SQLiteAssetQueryRepository(PostgresAssetQueryRepository):
         AND ticker IN ({placeholders})
       ORDER BY ticker, created_timestamp ASC
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql, params)
     return res.fetchall()
 
@@ -205,6 +210,6 @@ class SQLiteSnapshotQueryRepository(PostgresSnapshotQueryRepository):
     ORDER BY profit DESC
     LIMIT 10
     """
-    with self.client as client:
+    with self._client as client:
       res = client.execute(sql)
     return res.fetchall()

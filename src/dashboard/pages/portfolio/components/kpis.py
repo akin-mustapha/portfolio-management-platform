@@ -50,6 +50,10 @@ def kpi_row(data=None):
     cash = data.get("cash", 0)
     cash_pct = (cash / value * 100) if value else 0
     cash_is_zero = not cash
+    cash_reserved = data.get("cash_reserved", 0)
+    cash_in_pies = data.get("cash_in_pies", 0)
+    cash_reserved_pct = (cash_reserved / value * 100) if value else 0
+    cash_in_pies_pct = (cash_in_pies / value * 100) if value else 0
     daily_change_pct = data.get("daily_change_pct")
     portfolio_vol = data.get("portfolio_vol")
 
@@ -63,7 +67,9 @@ def kpi_row(data=None):
             dbc.Col(xs=6, md=True),
             dbc.Col(xs=6, md=True),
             dbc.Col(xs=6, md=True),
+            dbc.Col(xs=6, md=True),
             dbc.Col(html.Span("Risk", className="kpi-group-label"), xs=6, md=True),
+            dbc.Col(html.Span("Cash", className="kpi-group-label"), xs=6, md=True),
             dbc.Col(xs=6, md=True),
             dbc.Col(xs=6, md=True),
         ], className="mb-1 d-none d-md-flex g-3"),
@@ -98,13 +104,13 @@ def kpi_row(data=None):
                 "Daily Change",
                 _fmt_pct(daily_change_pct) if daily_change_pct is not None else "—",
                 change_sign=1 if (daily_change_pct or 0) > 0 else (-1 if (daily_change_pct or 0) < 0 else 0),
-            ), xs=6, md=True, className="kpi-group-separator-col"),
+            ), xs=6, md=True),
             dbc.Col(_dark_kpi_card(
                 "Volatility 30D",
                 f"{portfolio_vol:.4f}" if portfolio_vol is not None else "—",
                 unit="weighted",
                 change_sign=0,
-            ), xs=6, md=True),
+            ), xs=6, md=True, className="kpi-group-separator-col"),
             dbc.Col(_dark_kpi_card(
                 "Cash Available",
                 _fmt_currency(cash, currency_sign),
@@ -112,6 +118,20 @@ def kpi_row(data=None):
                 change_str=_fmt_pct(cash_pct),
                 change_sign=0,
                 extra_class="kpi-card-zero" if cash_is_zero else "",
+            ), xs=6, md=True, className="kpi-group-separator-col"),
+            dbc.Col(_dark_kpi_card(
+                "Cash Reserved",
+                _fmt_currency(cash_reserved, currency_sign),
+                unit=unit,
+                change_str=_fmt_pct(cash_reserved_pct),
+                change_sign=0,
+            ), xs=6, md=True),
+            dbc.Col(_dark_kpi_card(
+                "Cash in Pies",
+                _fmt_currency(cash_in_pies, currency_sign),
+                unit=unit,
+                change_str=_fmt_pct(cash_in_pies_pct),
+                change_sign=0,
             ), xs=6, md=True),
         ], className="g-3"),
     ], className="mb-4")

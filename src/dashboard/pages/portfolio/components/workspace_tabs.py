@@ -12,12 +12,15 @@ from .charts import (
     LosersPnLPlotlyLineChart,
     PortfolioDrawdownPlotlyLineChart,
     PositionProfitabilityPlotlyDonutChart,
+    VaRBarChart,
+    DailyMoversBarChart,
 )
 from .asset_charts import (
     PriceStructurePlotlyLineChart,
     AssetValuePlotlyLineChart,
     RiskContextPlotlyLineChart,
     DCABiasPlotlyLineChart,
+    ProfitRangePlotlyLineChart,
 )
 
 _GRAPH_CONFIG = {"displayModeBar": False}
@@ -53,6 +56,7 @@ def portfolio_tab_content(view_model=None, theme="light"):
     position_weight_series = view_model.get("position_weight_series", [])
     winners = view_model.get("winners", [])
     losers = view_model.get("losers", [])
+    daily_movers = view_model.get("daily_movers", [])
 
     return html.Div([
         # ─────────────────────────────────────────────
@@ -85,25 +89,7 @@ def portfolio_tab_content(view_model=None, theme="light"):
         ], className="mb-6 workspace-chart-grid"),
 
         # ─────────────────────────────────────────────
-        # Row: Position Weight
-        # ─────────────────────────────────────────────
-        html.Hr(className="tv-divider"),
-        dbc.Row([
-            dbc.Col(
-                _chart_section(
-                    "Position Weight",
-                    dcc.Graph(
-                        id="position_weight_donut_chart",
-                        figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
-                        config=_GRAPH_CONFIG,
-                    ),
-                ),
-                width=4,
-            ),
-        ], className="mb-6 workspace-chart-grid"),
-
-        # ─────────────────────────────────────────────
-        # Row: Winners | Losers
+        # Row: Winners | Losers + Position Weight
         # ─────────────────────────────────────────────
         html.Hr(className="tv-divider"),
         dbc.Row([
@@ -130,6 +116,31 @@ def portfolio_tab_content(view_model=None, theme="light"):
                 ),
             ),
 
+            dbc.Col(
+                _chart_section(
+                    "Position Weight",
+                    dcc.Graph(
+                        id="position_weight_donut_chart",
+                        figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    ),
+                ),
+            ),
+
+        ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "1fr 1fr 25%"}),
+
+        html.Hr(className="tv-divider"),
+        dbc.Row([
+            dbc.Col(
+                _chart_section(
+                    "Today's Movers",
+                    dcc.Graph(
+                        id="daily_movers_chart",
+                        figure=DailyMoversBarChart().render(daily_movers, theme=theme, x_col="daily_return"),
+                        config=_GRAPH_CONFIG,
+                    )
+                ),
+            ),
         ], className="mb-6 workspace-chart-grid"),
 
     ], id="tab-portfolio-content", className='workspace-wrapper')
@@ -151,22 +162,30 @@ def valuation_tab_content(asset_history=None, theme="light"):
 
     return html.Div([
         html.Div([
-            _chart_section("Price", 
+            _chart_section("Price",
                 dcc.Graph(
                     id="workspace-price-graph",
                     figure=PriceStructurePlotlyLineChart().render(asset_history, theme=theme),
                     config=_GRAPH_CONFIG,
                 ),
             ),
-                
-            _chart_section("Asset Value", 
+
+            _chart_section("Asset Value",
                 dcc.Graph(
                     id="workspace-value-graph",
                     figure=AssetValuePlotlyLineChart().render(asset_history, theme=theme),
                     config=_GRAPH_CONFIG,
                 )
-        ),
-            
+            ),
+
+            _chart_section("Profit Range (30D)",
+                dcc.Graph(
+                    id="workspace-profit-range-graph",
+                    figure=ProfitRangePlotlyLineChart().render(asset_history, theme=theme),
+                    config=_GRAPH_CONFIG,
+                )
+            ),
+
         ], className="workspace-chart-grid"),
         
         
@@ -202,6 +221,7 @@ def risk_tab_content(view_model=None, theme="light"):
     losers_pnl = view_model.get("losers_pnl", [])
     drawdown_series = view_model.get("portfolio_drawdown", {})
     profitability_data_vm = view_model.get("profitability")
+    var_data = view_model.get("var_by_position", [])
 
     return html.Div([
         # ─────────────────────────────────────────────
@@ -242,6 +262,20 @@ def risk_tab_content(view_model=None, theme="light"):
                     dcc.Graph(
                         id="losers_pnl_chart",
                         figure=LosersPnLPlotlyLineChart().render(losers_pnl, theme=theme),
+                        config=_GRAPH_CONFIG,
+                    )
+                ),
+            ),
+        ], className="mb-6 workspace-chart-grid"),
+
+        html.Hr(className="tv-divider"),
+        dbc.Row([
+            dbc.Col(
+                _chart_section(
+                    "Value at Risk by Position",
+                    dcc.Graph(
+                        id="var_by_position_chart",
+                        figure=VaRBarChart().render(var_data, theme=theme),
                         config=_GRAPH_CONFIG,
                     )
                 ),

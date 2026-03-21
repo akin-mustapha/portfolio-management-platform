@@ -79,9 +79,6 @@ class Trading212AssetTransformationSilver(Transformation):
       transform
     """
     bronze_asset_df = pd.DataFrame(data)
-    bronze_asset_df.rename({
-      "ticker": "external_id"
-    })
 
     # REMOVE NULL
     df = bronze_asset_df[bronze_asset_df["ticker"].notna()]

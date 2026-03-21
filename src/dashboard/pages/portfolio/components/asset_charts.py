@@ -277,4 +277,70 @@ class DCABiasPlotlyLineChart:
         fig.update_yaxes(showspikes=True, spikesnap="cursor",
                          spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1)
         return fig
-        
+
+
+class ProfitRangePlotlyLineChart:
+    def render(self, data, theme="light"):
+        asset_data = data.get("asset_profit_range")
+        if not asset_data or not asset_data.get("dates"):
+            return go.Figure()
+
+        df = pd.DataFrame(asset_data).sort_values("dates")
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
+
+        is_positive = (df["values"].iloc[-1] or 0) >= 0
+        line_color = "#1a9e6e" if is_positive else "#e04040"
+
+        fig = go.Figure()
+
+        # Band lower boundary (invisible fill reference)
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=df["low_30d"],
+            mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
+            showlegend=False, hoverinfo="skip",
+        ))
+        # Band upper boundary (filled to lower)
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=df["high_30d"],
+            mode="lines", line=dict(color="rgba(150,150,150,0.3)", width=0),
+            fill="tonexty", fillcolor="rgba(150,150,150,0.1)",
+            showlegend=False, hoverinfo="skip",
+        ))
+        # Profit line on top
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=df["values"],
+            mode="lines",
+            line=dict(color=line_color, width=1.5),
+            hovertemplate="%{y:,.2f}<extra></extra>",
+            showlegend=False,
+        ))
+        fig.add_hline(y=0, line_dash="dot", line_color="rgba(0,0,0,0.25)", line_width=1)
+
+        fig.update_layout(
+            template="plotly_white", height=CHART_HEIGHT,
+            hovermode="x unified",
+            margin=dict(l=20, r=60, t=40, b=65),
+            xaxis_title=None, yaxis_title=None,
+            font=dict(size=11, color=t["font_color"]),
+            paper_bgcolor=t["paper_bgcolor"], plot_bgcolor=t["plot_bgcolor"],
+            yaxis=dict(side="right", tickformat=",.2f", showgrid=False, zeroline=False),
+            xaxis=dict(
+                showgrid=False, type="date",
+                rangeselector=dict(
+                    buttons=[
+                        dict(count=1, label="1M", step="month", stepmode="backward"),
+                        dict(count=3, label="3M", step="month", stepmode="backward"),
+                        dict(count=6, label="6M", step="month", stepmode="backward"),
+                        dict(count=1, label="1Y", step="year", stepmode="backward"),
+                        dict(step="all", label="All"),
+                    ],
+                    bgcolor=t["rs_bg"], activecolor=t["rs_active"],
+                    borderwidth=0, font=dict(size=11), y=-0.25, x=0,
+                ),
+            ),
+        )
+        fig.update_xaxes(showspikes=True, spikemode="across", spikesnap="cursor",
+                         spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1)
+        fig.update_yaxes(showspikes=True, spikesnap="cursor",
+                         spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1)
+        return fig

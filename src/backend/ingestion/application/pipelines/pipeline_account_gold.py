@@ -40,7 +40,7 @@ class AccountGoldSource(Source):
 
     def extract(self):
         sql = """
-            ;WITH cte_fx AS (
+            WITH cte_fx AS (
             SELECT data_timestamp::DATE, SUM(fx_impact) AS fx_impact_total
             FROM staging.asset sa
             GROUP BY data_timestamp::DATE

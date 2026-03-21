@@ -20,6 +20,10 @@ def asset_table(data=None):
     df["recent_profit_high_30d"] = df["recent_profit_high_30d"].round(decimals)
     # df["price_vs_ma_50"] = df["price_vs_ma_50"].round(decimals)
     df["dca_bias"] = df["dca_bias"].round(decimals)
+    if "cumulative_return" in df.columns:
+        df["cumulative_return"] = df["cumulative_return"].round(decimals)
+    if "daily_return" in df.columns:
+        df["daily_return"] = df["daily_return"].round(decimals)
 
     POSITIVE_COLOR = "#26a671"
     NEGATIVE_COLOR = "#ef5350"
@@ -39,6 +43,8 @@ def asset_table(data=None):
         columnDefs=[
             {
                 "field": "trend",
+                "pinned": "left",
+                "suppressMovable": True,
                 "minWidth": 116, "width": 116,
                 "cellRenderer": "TrendSparkline",
                 "cellStyle": {"padding": "0", "overflow": "hidden"},
@@ -46,6 +52,9 @@ def asset_table(data=None):
             },
             {
                 "field": "ticker",
+                "headerName": "Ticker",
+                "pinned": "left",
+                "suppressMovable": True,
                 "minWidth": 70, "width": 70,
                 "headerTooltip": "Asset name or ticker symbol."
             },
@@ -57,12 +66,14 @@ def asset_table(data=None):
             },
             {
                 "field": "value",
+                "headerName": "Value",
                 "minWidth": 90, "width": 90,
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": "Current total value of your position (price × quantity)."
             },
             {
                 "field": "profit",
+                "headerName": "P&L",
                 "minWidth": 80, "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
@@ -74,14 +85,42 @@ def asset_table(data=None):
                 "cellStyle": pnl_style(),
             },
             {
+                "field": "cumulative_return",
+                "headerName": "Cumul. Return",
+                "minWidth": 108, "width": 108,
+                "type": "numericColumn",
+                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "headerTooltip": "Total return % since position opened.",
+                "cellStyle": pnl_style(),
+            },
+            {
+                "field": "daily_return",
+                "headerName": "Daily Return",
+                "minWidth": 96, "width": 96,
+                "type": "numericColumn",
+                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "headerTooltip": "Single-day % price change.",
+                "cellStyle": pnl_style(),
+            },
+            {
+                "field": "ma_crossover_signal",
+                "headerName": "MA Signal",
+                "minWidth": 94, "width": 94,
+                "valueFormatter": {"function": "params.value == null ? '—' : params.value > 0 ? '↑ Bullish' : '↓ Bearish'"},
+                "cellStyle": pnl_style(),
+                "headerTooltip": "MA crossover signal. ↑ Bullish = MA20 above MA50 (short-term uptrend). ↓ Bearish = MA20 below MA50.",
+            },
+            {
                 "field": "price",
+                "headerName": "Price",
                 "minWidth": 80, "width": 80,
                 "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
                 "headerTooltip": "Latest market price of the asset."
             },
             {
                 "field": "weight_pct",
-                "minWidth": 80, "width": 80,
+                "headerName": "Weight %",
+                "minWidth": 84, "width": 84,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
                 "headerTooltip": "Weight in relation to portfolio value"
@@ -178,6 +217,7 @@ def asset_table(data=None):
             "rowBuffer": 10,
             "rowHeight": 32,
             "headerHeight": 36,
+            "unSortIcon": True,
         },
         style={"height": "100%"},
     )

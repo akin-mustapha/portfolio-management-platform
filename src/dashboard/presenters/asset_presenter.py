@@ -18,12 +18,13 @@ class AssetPresenter:
         }
 
     def present_asset_history(self, data: dict) -> dict:
-        
+
         return {
             "asset_price": self._asset_price_series_vm(data.get("asset_history", [])),
             "asset_value": self._asset_value_series_vm(data.get("asset_history", [])),
             "asset_risk": self._asset_risk_series_vm(data.get("asset_history", [])),
             "asset_dca_bias": self._asset_dca_bias_series_vm(data.get("asset_history", [])),
+            "asset_profit_range": self._asset_profit_range_series_vm(data.get("asset_history", [])),
         }
     # ---------- Table ----------
 
@@ -66,4 +67,12 @@ class AssetPresenter:
         return {
             "dates": [r["data_date"] for r in rows],
             "values": [r["dca_bias"] for r in rows],
+        }
+
+    def _asset_profit_range_series_vm(self, rows: list[dict]) -> dict:
+        return {
+            "dates":    [r["data_date"] for r in rows],
+            "values":   [r["profit"] for r in rows],
+            "high_30d": [r.get("recent_profit_high_30d") for r in rows],
+            "low_30d":  [r.get("recent_profit_low_30d") for r in rows],
         }

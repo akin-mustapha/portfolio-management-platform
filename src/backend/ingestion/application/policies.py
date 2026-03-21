@@ -123,7 +123,7 @@ class FullLoader(ABC):
     pass
 
   @abstractmethod
-  def _loader(self):
+  def _loader(self, data):
     pass
 
   def _exposition_abstraction(self):

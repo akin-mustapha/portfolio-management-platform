@@ -32,6 +32,8 @@ class PortfolioPresenter:
             "winners_pnl": self._winners_pnl_vm(assets_history),
             "losers_pnl": self._losers_pnl_vm(assets_history),
             "profitability": self._profitablity_vm(assets),
+            "var_by_position": self._var_bar_vm(assets),
+            "daily_movers":    self._daily_movers_vm(assets),
         }
         
     def _kpi(self, snapshot: dict) -> dict:
@@ -42,6 +44,8 @@ class PortfolioPresenter:
             "unrealized_pnl": snapshot.get('investments_unrealized_pnl', 0),
             "total_cost": snapshot.get('investments_total_cost', 0),
             "cash": snapshot.get('cash_available_to_trade', 0),
+            "cash_reserved": snapshot.get("cash_reserved_for_orders", 0),
+            "cash_in_pies":  snapshot.get("cash_in_pies", 0),
             "daily_change_pct": snapshot.get('daily_change_pct'),
             "portfolio_vol": snapshot.get('portfolio_volatility_weighted'),
         }
@@ -63,6 +67,16 @@ class PortfolioPresenter:
     def _profitablity_vm(self, assets: list[dict]) -> dict:
 
         return assets
+
+    def _var_bar_vm(self, assets):
+        items = [{"ticker": a["ticker"], "var_95_1d": a.get("var_95_1d"), "label": a["ticker"]}
+                 for a in assets if a.get("var_95_1d") is not None]
+        return sorted(items, key=lambda x: x["var_95_1d"], reverse=True)[:10]
+
+    def _daily_movers_vm(self, assets):
+        items = [{"ticker": a["ticker"], "daily_return": a.get("daily_return"), "label": a["ticker"]}
+                 for a in assets if a.get("daily_return") is not None]
+        return sorted(items, key=lambda x: abs(x["daily_return"]), reverse=True)[:15]
     # ---------- Line Chart ----------
 
     def _portfolio_value_series_vm(self, rows: list[dict]) -> dict:
@@ -100,8 +114,8 @@ class PortfolioPresenter:
             key=lambda x: x["weight_pct"],
             reverse=True,
         )
-        top = items[:8]
-        rest_items = items[8:]
+        top = items[:14]
+        rest_items = items[14:]
         rest = sum(i["weight_pct"] for i in rest_items)
         if rest > 0:
             breakdown = "<br>".join(
@@ -145,7 +159,7 @@ class PortfolioPresenter:
             def _label(a):
                 roi = round(a.get("pnl_pct") or 0, 2)
                 roi_str = ("+" if roi >= 0 else "") + str(roi) + "%"
-                return f"{a['ticker']}  €{round(a['profit'], 2)}  {roi_str}"
+                return f"{a['ticker']} {roi_str}"
 
             items = sorted(
                 [{"ticker": a["ticker"]
@@ -172,7 +186,7 @@ class PortfolioPresenter:
             def _label(a):
                 roi = round(a.get("pnl_pct") or 0, 2)
                 roi_str = ("+" if roi >= 0 else "") + str(roi) + "%"
-                return f"{a['ticker']}  €{round(a['profit'], 2)}  {roi_str}"
+                return f"{a['ticker']} {roi_str}"
 
             items = sorted(
                 [{"ticker": a["ticker"]
