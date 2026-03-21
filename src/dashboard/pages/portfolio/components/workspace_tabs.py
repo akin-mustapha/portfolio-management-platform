@@ -132,7 +132,7 @@ def portfolio_tab_content(view_model=None, theme="light"):
                     html.Hr(className="tv-divider"),
                     html.Div([
                         html.Div([
-                            html.Div("Today's Movers", className="tv-section-header", style={"padding": "12px 0 8px"}),
+                            html.Div("Today's Movers", className="tv-section-header"),
                             dbc.Select(
                                 id="daily-movers-n-dropdown",
                                 options=[{"label": f"Top {n}", "value": n} for n in range(5, 31, 5)],

@@ -6,12 +6,31 @@ body, * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* ── Workspace spacing tokens ─────────────────────────────────
+   Change one value here to adjust spacing consistently across
+   section containers, headers, dividers, chart rows, and movers.
+   ─────────────────────────────────────────────────────────── */
+:root {
+    --ws-section-pad-v: 12px;  /* vertical padding inside .tv-section-container */
+    --ws-section-pad-h: 12px;  /* horizontal padding inside .tv-section-container */
+    --ws-section-gap:   12px;  /* margin-bottom between section containers */
+    --ws-header-pad-v:  10px;  /* vertical padding in .tv-section-header */
+    --ws-header-pad-h:  6px;   /* horizontal padding in .tv-section-header */
+    --ws-divider-v:     12px;  /* vertical margin above/below .tv-divider */
+    --ws-chart-gap:     8px;   /* gap between charts in .workspace-chart-grid */
+    --ws-chart-pad-h:   12px;  /* horizontal padding in .workspace-chart-grid */
+    --ws-row-pad-v:     5px;   /* movers/ranked row vertical padding */
+    --ws-row-pad-h:     8px;   /* movers/ranked row horizontal padding */
+    --ws-row-gap:       2px;   /* margin-bottom between movers rows */
+    --ws-tab-pad:       8px;   /* padding inside #tab-*-content panes */
+}
+
 /* ── TradingView section container ────────────────────────────── */
 .tv-section-container {
     border: 1px solid var(--border-tv);
     border-radius: 8px;
-    margin-bottom: 12px;
-    padding: 0 8px 8px;
+    margin-bottom: var(--ws-section-gap);
+    padding: 0 var(--ws-section-pad-h) var(--ws-section-pad-v);
 }
 
 /* Divider between section header and content when expanded */
@@ -29,7 +48,7 @@ body, * {
     gap: 4px;
     margin-bottom: 0;
     cursor: default;
-    padding: 12px 14px;
+    padding: var(--ws-header-pad-v) var(--ws-header-pad-h);
     user-select: none;
 }
 
@@ -60,7 +79,7 @@ html[data-theme="dark"] .tv-section-header--section .tv-chevron {
 .tv-divider {
     border: none;
     border-top: 1px solid var(--border-tv);
-    margin: 16px 0 12px 0;
+    margin: var(--ws-divider-v) 0 calc(var(--ws-divider-v) - 4px) 0;
 }
 
 /* ── Daily Movers inline-bar table ───────────────────────────── */
@@ -94,7 +113,7 @@ html[data-theme="dark"] .tv-section-header--section .tv-chevron {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 0 4px 6px;
+    padding: 0 var(--ws-row-pad-h) var(--ws-row-gap);
 }
 
 .movers-panel-label--gain { color: #26a671; }
@@ -104,9 +123,9 @@ html[data-theme="dark"] .tv-section-header--section .tv-chevron {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 8px;
+    padding: var(--ws-row-pad-v) var(--ws-row-pad-h);
     border-radius: 3px;
-    margin-bottom: 2px;
+    margin-bottom: var(--ws-row-gap);
     font-size: 12px;
 }
 
@@ -130,7 +149,7 @@ html[data-theme="dark"] .tv-section-header--section .tv-chevron {
 .movers-empty {
     color: var(--text-muted);
     font-size: 12px;
-    padding: 8px 4px;
+    padding: var(--ws-row-pad-v) var(--ws-row-pad-h);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -628,8 +647,8 @@ html[data-theme="dark"] .asset-ticker-tag {
 .workspace-chart-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 8px;
-    padding: 8px 12px;
+    gap: var(--ws-chart-gap);
+    padding: var(--ws-section-pad-v) var(--ws-chart-pad-h);
     --bs-gutter-x: 0;
 }
 
@@ -914,7 +933,7 @@ html[data-theme="dark"] .top-nav-link:hover {
 #tab-risk-content,
 #tab-opportunities-content {
     margin: 0;
-    padding: 8px;
+    padding: var(--ws-tab-pad);
 }
 
 /* Tab icons via CSS ::before (Font Awesome unicode) */
