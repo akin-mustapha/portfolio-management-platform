@@ -107,6 +107,17 @@ def kpi_row(data=None):
     realized_pct = _pnl_pct(realized_pnl, total_invested)
 
     return html.Div([
+        # Group labels — desktop only
+        dbc.Row([
+            dbc.Col(html.Span("Performance", className="kpi-group-label"), xs=6, md=True),
+            dbc.Col(xs=6, md=True),
+            dbc.Col(xs=6, md=True),
+            dbc.Col(xs=6, md=True),
+            dbc.Col(html.Span("Cash", className="kpi-group-label"), xs=6, md=True),
+            dbc.Col(xs=6, md=True),
+            dbc.Col(xs=6, md=True),
+        ], className="mb-1 d-none d-md-flex g-3"),
+
         dbc.Row([
             dbc.Col(_dark_kpi_card(
                 "Portfolio Value",
