@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use this SKILL when doing code review
+description: Use this skill when doing a code review — checking for bugs, unsafe patterns, or violations of project rules.
 ---
 
 ## Code Review Checklist

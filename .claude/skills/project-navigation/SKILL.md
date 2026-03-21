@@ -1,6 +1,6 @@
 ---
 name: project-navigation
-description: Use this skill whenever you need to navigate this project directory.
+description: Use this skill to locate files, understand the src/ layout, or map a feature to its layer when the project structure is unfamiliar.
 ---
 
 # Why
