@@ -5,11 +5,11 @@ asset profile tab population.
 from dash import ALL, MATCH, Output, Input, State, callback, ctx
 from dash.exceptions import PreventUpdate
 
-from .components.kpis import secondary_asset_kpi_row, secondary_asset_tag_row
-from .charts.portfolio_charts import _ranked_panel
-from ...controllers.asset_profile_controller import AssetProfileController
-from ...controllers.portfolio_controller import PortfolioController
-from ._callback_helpers import (
+from ..components.organisms.secondary_kpi import secondary_asset_kpi_row, secondary_asset_tag_row
+from ..charts.portfolio_charts import _ranked_panel
+from ....controllers.asset_profile_controller import AssetProfileController
+from ....controllers.portfolio_controller import PortfolioController
+from ._helpers import (
     _date_window,
     _fetch_snapshots,
     _fetch_asset_metadata,

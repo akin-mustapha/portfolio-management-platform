@@ -5,10 +5,10 @@ Both re-render tabs/table when the user changes the active filter.
 from dash import Output, Input, State, callback, no_update
 from dash.exceptions import PreventUpdate
 
-from .components.kpis import kpi_row
-from .components.tables import asset_table
-from .tabs import portfolio_tab_content, risk_tab_content, opportunities_tab_content
-from ._callback_helpers import (
+from ..components.organisms.kpi_row import kpi_row
+from ..components.organisms.asset_table import asset_table
+from ..tabs import portfolio_tab_content, risk_tab_content, opportunities_tab_content
+from ._helpers import (
     _date_window,
     _filter_vm_by_timeframe,
     _fetch_snapshots,

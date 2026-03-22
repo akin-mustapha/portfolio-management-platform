@@ -1,3 +1,6 @@
+"""
+Settings callbacks — settings modal open/close and credential management.
+"""
 import base64
 import requests as http
 from urllib.parse import urljoin

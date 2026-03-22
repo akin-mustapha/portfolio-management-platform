@@ -4,7 +4,7 @@ Tags modal callbacks — open, save, and close the Edit Tags overlay.
 from dash import ALL, Output, Input, State, callback, ctx, no_update
 from dash.exceptions import PreventUpdate
 
-from ...controllers.asset_profile_controller import AssetProfileController
+from ....controllers.asset_profile_controller import AssetProfileController
 
 _MODAL_SHOW = {"display": "flex"}
 _MODAL_HIDE = {"display": "none"}

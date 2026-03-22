@@ -5,11 +5,11 @@ These callbacks fetch from the database and populate the main page containers.
 from dash import Output, Input, State, callback
 from dash.exceptions import PreventUpdate
 
-from .components.kpis import kpi_row
-from .components.tables import asset_table
-from .charts.portfolio_charts import daily_movers_table
-from .tabs import portfolio_tab_content, risk_tab_content, opportunities_tab_content
-from ...controllers.portfolio_controller import PortfolioController
+from ..components.organisms.kpi_row import kpi_row
+from ..components.organisms.asset_table import asset_table
+from ..charts.portfolio_charts import daily_movers_table
+from ..tabs import portfolio_tab_content, risk_tab_content, opportunities_tab_content
+from ....controllers.portfolio_controller import PortfolioController
 
 
 # ── 1. Initial page load ──────────────────────────────────────────

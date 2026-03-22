@@ -1,9 +1,7 @@
 """
 Shared utilities used across portfolio callback modules.
 
-Imported by:
-  callbacks_data.py, callbacks_filters.py, callbacks_selection.py,
-  theme_callbacks.py (via callbacks.py re-export)
+Imported by: data.py, filters.py, selection.py, theme.py
 """
 from datetime import date, timedelta
 
@@ -11,8 +9,8 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 from dash.exceptions import PreventUpdate
 
-from .components.kpis import secondary_asset_kpi_row, secondary_asset_tag_row
-from .charts.asset_charts import (
+from ..components.organisms.secondary_kpi import secondary_asset_kpi_row, secondary_asset_tag_row
+from ..charts.asset_charts import (
     PriceStructurePlotlyLineChart,
     AssetValuePlotlyLineChart,
     ProfitRangePlotlyLineChart,
@@ -20,8 +18,8 @@ from .charts.asset_charts import (
     DCABiasPlotlyLineChart,
     FXReturnAttributionDonutChart,
 )
-from ...controllers.asset_controller import AssetController
-from ...controllers.asset_profile_controller import AssetProfileController
+from ....controllers.asset_controller import AssetController
+from ....controllers.asset_profile_controller import AssetProfileController
 
 
 # ── Constants ─────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 """
-Workspace tab widget — assembles the 4-tab panel.
+Organism — workspace tab widget. Assembles the 4-tab panel.
 
 Tab content lives in pages/portfolio/tabs/:
   tab_portfolio.py      → Valuation tab
@@ -9,7 +9,7 @@ Tab content lives in pages/portfolio/tabs/:
 """
 import dash_bootstrap_components as dbc
 
-from ..tabs import (
+from ...tabs import (
     portfolio_tab_content,
     risk_tab_content,
     opportunities_tab_content,

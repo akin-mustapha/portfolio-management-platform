@@ -2,10 +2,10 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from .callbacks import load_portfolio_page  # noqa: F401 — registers callback
-from .components.kpis import kpi_row
-from .components.tables import asset_table
-from .components.filter_bar import workspace_filter_bar, workspace_advanced_filter
-from .components.workspace_tabs import workspace_tabs
+from .components.organisms.kpi_row import kpi_row
+from .components.organisms.asset_table import asset_table
+from .components.organisms.filter_bar import workspace_filter_bar, workspace_advanced_filter
+from .components.organisms.workspace_tabs import workspace_tabs
 
 
 # ─────────────────────────────────────────────

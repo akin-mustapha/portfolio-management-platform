@@ -10,7 +10,7 @@ from ..charts.portfolio_charts import (
     PortfolioFXAttributionDonutChart,
     daily_movers_table,
 )
-from ..components.kpis import secondary_kpi_row
+from ..components.organisms.secondary_kpi import secondary_kpi_row
 from ._helpers import _GRAPH_CONFIG, _chart_section, _loading_placeholder
 
 
