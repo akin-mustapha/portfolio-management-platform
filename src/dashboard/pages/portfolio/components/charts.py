@@ -729,6 +729,60 @@ class PortfolioPNLPlotlyLineChart:
 
 
 
+class PortfolioFXAttributionDonutChart:
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        fx_impact = data.get("fx_impact_total") or 0
+        unrealized_pnl = data.get("unrealized_pnl") or 0
+        price_return = unrealized_pnl - fx_impact
+
+        abs_fx = abs(fx_impact)
+        abs_price = abs(price_return)
+        total = abs_fx + abs_price
+
+        if total == 0:
+            fig = go.Figure()
+            fig.update_layout(
+                paper_bgcolor=ct["paper_bgcolor"],
+                plot_bgcolor=ct["plot_bgcolor"],
+                height=CHART_HEIGHT_1,
+                margin=dict(l=2, r=2, t=2, b=2),
+                annotations=[dict(text="No FX data", x=0.5, y=0.5, showarrow=False,
+                                  font=dict(size=12, color=ct["font_color"]))],
+            )
+            return fig
+
+        fx_sign = "+" if fx_impact >= 0 else ""
+        colors = ["#0d6efd", "rgba(13,110,253,0.25)"]
+
+        fig = go.Figure(go.Pie(
+            labels=["FX Return", "Price Return"],
+            values=[abs_fx, abs_price],
+            hole=0.6,
+            marker=dict(colors=colors, line=dict(width=0)),
+            textinfo="none",
+            hovertemplate="<b>%{label}</b><br>%{percent}<extra></extra>",
+            showlegend=True,
+        ))
+        fig.update_layout(
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
+            font=dict(size=11, color=ct["font_color"]),
+            height=CHART_HEIGHT_1,
+            margin=dict(l=2, r=2, t=2, b=40),
+            legend=dict(
+                orientation="h", yanchor="bottom", y=-0.25,
+                xanchor="center", x=0.5, font=dict(size=10, color=ct["font_color"]),
+            ),
+            annotations=[dict(
+                text=f"{fx_sign}{fx_impact:,.2f}<br><span style='font-size:9px'>Portfolio FX</span>",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=11, color=ct["font_color"]),
+            )],
+        )
+        return fig
+
+
 def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light") -> go.Figure:
     ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
     dates = series.get("dates", [])

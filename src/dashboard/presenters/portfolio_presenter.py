@@ -15,6 +15,7 @@ class PortfolioPresenter:
         assets = data.get("assets", [])
         assets_history = data.get("assets_history", [])
         portfolio_history = data.get("portfolio_history", [])
+        available_tags = data.get("available_tags", [])
         return {
             "kpi": self._kpi(snapshot, portfolio_history),
             "asset_table": self._asset_table_vm(assets),
@@ -35,6 +36,8 @@ class PortfolioPresenter:
             "profitability": self._profitablity_vm(assets),
             "var_by_position": self._var_bar_vm(assets),
             "daily_movers":    self._daily_movers_vm(assets),
+            "portfolio_fx_attribution": self._portfolio_fx_attribution_vm(portfolio_history),
+            "available_tags": available_tags,
         }
         
     def _daily_change_series(self, history: list[dict]) -> dict:
@@ -113,6 +116,15 @@ class PortfolioPresenter:
             "total_pnl": [r["investments_unrealized_pnl"] + r["investments_realized_pnl"] for r in rows],
         }
         
+    def _portfolio_fx_attribution_vm(self, rows: list[dict]) -> dict:
+        if not rows:
+            return {"fx_impact_total": 0, "unrealized_pnl": 0}
+        latest = rows[-1]
+        return {
+            "fx_impact_total": latest.get("fx_impact_total") or 0,
+            "unrealized_pnl": latest.get("investments_unrealized_pnl") or 0,
+        }
+
     def _portfolio_drawdown_vm(self, rows: list[dict]) -> dict:
         dates = [r["data_date"] for r in rows]
         values = [r["total_value"] for r in rows]

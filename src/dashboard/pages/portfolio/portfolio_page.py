@@ -47,14 +47,14 @@ def portfolio_layout():
                     className="workspace-panel-left",
                     children=[
                         html.Div(
+                            id="workspace-table-statusbar",
+                            className="workspace-table-statusbar",
+                            children="Loading assets…",
+                        ),
+                        html.Div(
                             id="portfolio_page_asset_table_container",
                             children=asset_table(None),
                             style={"flex": "1", "minHeight": "0", "overflow": "hidden"},
-                        ),
-                        html.Div(
-                            id="workspace-table-footer",
-                            className="workspace-table-footer",
-                            children="Loading assets…",
                         ),
                     ],
                 ),

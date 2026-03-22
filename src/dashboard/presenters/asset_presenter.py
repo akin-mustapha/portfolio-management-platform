@@ -25,6 +25,7 @@ class AssetPresenter:
             "asset_risk": self._asset_risk_series_vm(data.get("asset_history", [])),
             "asset_dca_bias": self._asset_dca_bias_series_vm(data.get("asset_history", [])),
             "asset_profit_range": self._asset_profit_range_series_vm(data.get("asset_history", [])),
+            "asset_fx_attribution": self._asset_fx_attribution_vm(data.get("asset_history", [])),
         }
     # ---------- Table ----------
 
@@ -75,4 +76,13 @@ class AssetPresenter:
             "values":   [r["profit"] for r in rows],
             "high_30d": [r.get("recent_profit_high_30d") for r in rows],
             "low_30d":  [r.get("recent_profit_low_30d") for r in rows],
+        }
+
+    def _asset_fx_attribution_vm(self, rows: list[dict]) -> dict:
+        if not rows:
+            return {"fx_impact": 0, "profit": 0}
+        latest = rows[-1]
+        return {
+            "fx_impact": latest.get("fx_impact") or 0,
+            "profit": latest.get("profit") or 0,
         }

@@ -182,6 +182,72 @@ class DCABiasPlotlyLineChart:
         return fig
 
 
+class FXReturnAttributionDonutChart:
+    def render(self, data, theme="light", accent_color=None):
+        attribution = data.get("asset_fx_attribution", {})
+        fx_impact = attribution.get("fx_impact") or 0
+        profit = attribution.get("profit") or 0
+        price_return = profit - fx_impact
+
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
+
+        # Use absolute values for the donut; show signed values in hover
+        abs_fx = abs(fx_impact)
+        abs_price = abs(price_return)
+        total = abs_fx + abs_price
+
+        if total == 0:
+            fig = go.Figure()
+            fig.update_layout(
+                paper_bgcolor=t["paper_bgcolor"],
+                plot_bgcolor=t["plot_bgcolor"],
+                font=dict(size=11, color=t["font_color"]),
+                height=CHART_HEIGHT,
+                margin=dict(l=2, r=2, t=2, b=2),
+                annotations=[dict(text="No FX data", x=0.5, y=0.5, showarrow=False, font_size=12)],
+            )
+            return fig
+
+        fx_sign = "+" if fx_impact >= 0 else ""
+        price_sign = "+" if price_return >= 0 else ""
+        colors = [
+            accent_color or "#0d6efd",
+            _hex_to_rgba(accent_color, 0.35) if accent_color else "rgba(150,150,150,0.4)",
+        ]
+
+        fig = go.Figure(go.Pie(
+            labels=["FX Return", "Price Return"],
+            values=[abs_fx, abs_price],
+            customdata=[[fx_impact, price_return]],
+            hovertemplate=(
+                "<b>%{label}</b><br>"
+                "Amount: %{customdata[0]:+,.2f}<br>"
+                "Share: %{percent}<extra></extra>"
+            ),
+            hole=0.6,
+            marker=dict(colors=colors, line=dict(width=0)),
+            textinfo="none",
+            showlegend=True,
+        ))
+        fig.update_layout(
+            paper_bgcolor=t["paper_bgcolor"],
+            plot_bgcolor=t["plot_bgcolor"],
+            font=dict(size=11, color=t["font_color"]),
+            height=CHART_HEIGHT,
+            margin=dict(l=2, r=2, t=2, b=40),
+            legend=dict(
+                orientation="h", yanchor="bottom", y=-0.25,
+                xanchor="center", x=0.5, font=dict(size=10),
+            ),
+            annotations=[dict(
+                text=f"{fx_sign}{fx_impact:,.2f}<br><span style='font-size:9px'>FX</span>",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=11, color=t["font_color"]),
+            )],
+        )
+        return fig
+
+
 class ProfitRangePlotlyLineChart:
     def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_profit_range")
