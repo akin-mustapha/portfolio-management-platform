@@ -14,6 +14,7 @@ def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
     if view_model is None:
         return _loading_placeholder("tab-opportunities-content", "Loading opportunities charts…")
 
+    currency_symbol = (kpi_data or {}).get("currency_symbol", "")
     position_distribution = view_model.get("position_distribution", [])
     winners_pnl           = view_model.get("winners_pnl", [])
 
@@ -44,7 +45,7 @@ def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
                             "Position Performance Map",
                             dcc.Graph(
                                 id="portfolio_performance_map",
-                                figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme),
+                                figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme, currency=currency_symbol),
                                 config=_GRAPH_CONFIG,
                             ),
                         )),

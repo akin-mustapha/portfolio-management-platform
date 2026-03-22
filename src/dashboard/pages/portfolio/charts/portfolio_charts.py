@@ -98,7 +98,7 @@ class LosersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     fill = "tozerox"
 
 class PortfolioPerformanceScatterPlot:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", currency=""):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         if not data:
             return go.Figure()
@@ -181,9 +181,9 @@ class PortfolioPerformanceScatterPlot:
                 "<b>%{customdata[0]}</b><br>"
                 "%{customdata[1]}<br>"
                 "ROI: %{x:.1f}%<br>"
-                "Total Return: £%{customdata[2]:,.0f}<br>"
+                f"Total Return: {currency}%{{customdata[2]:,.0f}}<br>"
                 "Weight: %{y:.1f}%<br>"
-                "Value: £%{marker.color:,.0f}"
+                f"Value: {currency}%{{marker.color:,.0f}}"
                 "<extra></extra>"
             )
         )
@@ -563,7 +563,7 @@ class PortfolioPerformancePlotlyLineChart:
         return fig
 
 class PortfolioPNLPlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", currency=""):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data).sort_values("dates")
 
@@ -622,7 +622,7 @@ class PortfolioPNLPlotlyLineChart:
             plot_bgcolor=ct["plot_bgcolor"],
             yaxis=dict(
                 side="right",
-                title=dict(text="P&L (€)", font=dict(size=9), standoff=4),
+                title=dict(text=f"P&L ({currency})", font=dict(size=9), standoff=4),
                 tickformat=",.0f", showgrid=False, zeroline=False,
             ),
             xaxis=dict(showgrid=False, type="date"),

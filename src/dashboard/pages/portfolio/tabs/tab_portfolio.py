@@ -18,6 +18,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
     if view_model is None:
         return _loading_placeholder("tab-portfolio-content", "Loading portfolio charts…")
 
+    currency_symbol = (kpi_data or {}).get("currency_symbol", "")
     value_series          = view_model.get("portfolio_value_series", {})
     pnl_series            = view_model.get("portfolio_pnl_series", {})
     _position_weight_data  = view_model.get("position_weight_series", {})
@@ -61,7 +62,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                             "Portfolio P&L",
                             dcc.Graph(
                                 id="pnl_chart",
-                                figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme),
+                                figure=PortfolioPNLPlotlyLineChart().render(pnl_series, theme=theme, currency=currency_symbol),
                                 config=_GRAPH_CONFIG,
                             ),
                         )),

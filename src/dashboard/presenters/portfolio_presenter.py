@@ -1,3 +1,6 @@
+_CURRENCY_SYMBOLS = {"EUR": "€", "USD": "$", "GBP": "£"}
+
+
 class PortfolioPresenter:
     """
     Presenter for the Portfolio Dashboard screen.
@@ -49,9 +52,11 @@ class PortfolioPresenter:
         }
 
     def _kpi(self, snapshot: dict, history: list[dict] | None = None) -> dict:
+        currency = snapshot.get('currency', "")
         return {
             "value": snapshot.get('total_value', 0),
-            "currency": snapshot.get('currency', "#"),
+            "currency": currency,
+            "currency_symbol": _CURRENCY_SYMBOLS.get(currency, "#"),
             "realized_pnl": snapshot.get('investments_realized_pnl', 0),
             "unrealized_pnl": snapshot.get('investments_unrealized_pnl', 0),
             "total_cost": snapshot.get('investments_total_cost', 0),
