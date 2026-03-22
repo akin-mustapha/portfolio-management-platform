@@ -51,21 +51,23 @@ Reference: `docs/02-architecture/design/ingestion/doc-pipelines.md`
 | --- | --- | --- |
 | `raw` | Bronze | Append-only, partitioned by date, data as received |
 | `staging` | Silver | Typed, deduplicated, computed metrics |
-| `analytics` | Gold | Built to answer dashboard questions (not yet built) |
+| `analytics` | Gold | Kimball star schema — built to answer dashboard questions |
 
 Schema migrations are managed with Alembic.
 Schema detail: `docs/02-architecture/design/schema/`
 
 ---
 
-## Gold Layer — Not Yet Built
+## Gold Layer
 
-`pipeline_asset_gold.py` exists but is a copy of the silver pipeline — it does not write to `analytics`. The gold layer is being designed **dashboard-question-first**: define what the dashboard needs to show, then build the tables to answer those questions.
+The gold layer is built. The `analytics` schema, all dimension tables, and all six fact tables (`fact_price`, `fact_valuation`, `fact_return`, `fact_technical`, `fact_signal`, `fact_portfolio_daily`) exist and are fully migrated. Both `pipeline_asset_gold.py` and `pipeline_account_gold.py` are implemented and write to these tables.
+
+**Current gap — orchestration:** The gold pipelines are not yet called by any Prefect flow. The tables exist but are empty at runtime until a flow is wired up.
 
 Dashboard questions are tracked in: `docs/02-architecture/design/ui-design.md`
-Planned schema (draft only, not final): `docs/02-architecture/design/schema/schema-analytics.md`
+Schema reference: `docs/02-architecture/design/schema/schema-analytics.md`
 
-Do not implement gold layer tables speculatively. Only build what a dashboard question requires.
+Do not add gold layer tables or columns speculatively. Only build what a dashboard question requires.
 
 ---
 
@@ -74,7 +76,7 @@ Do not implement gold layer tables speculatively. Only build what a dashboard qu
 - The docs and code are not fully aligned. Treat docs as design intent.
 - `doc-data-model.md` describes the tagging model but some field names have drifted (e.g. `tag_type` in docs is `Category` in code).
 - `schema-staging.md` is the most accurate schema doc.
-- Gold layer docs describe a planned design, not current state.
+- `schema-analytics.md` reflects the current implemented schema (post-migration-007).
 
 ---
 
