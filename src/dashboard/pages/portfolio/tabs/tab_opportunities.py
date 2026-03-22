@@ -65,4 +65,4 @@ def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
         # ── Asset detail — populated on row selection ──────────────
         html.Div(id="opportunities-asset-detail-sections"),
 
-    ], id="tab-opportunities-content", className="workspace-wrapper")
+    ], className="workspace-wrapper")

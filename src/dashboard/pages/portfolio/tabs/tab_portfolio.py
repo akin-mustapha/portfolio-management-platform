@@ -20,7 +20,9 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
 
     value_series          = view_model.get("portfolio_value_series", {})
     pnl_series            = view_model.get("portfolio_pnl_series", {})
-    position_weight_series = view_model.get("position_weight_series", [])
+    _position_weight_data  = view_model.get("position_weight_series", {})
+    position_weight_series = _position_weight_data.get("series", [])
+    position_weight_avg    = _position_weight_data.get("avg_weight_pct", 0)
     fx_attribution        = view_model.get("portfolio_fx_attribution", {})
     winners               = view_model.get("winners", [])
     losers                = view_model.get("losers", [])
@@ -89,7 +91,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                             "Position Weight",
                             dcc.Graph(
                                 id="position_weight_donut_chart",
-                                figure=PositionWeightPlotlyDonutChart().render(position_weight_series, theme=theme),
+                                figure=PositionWeightPlotlyDonutChart().render(position_weight_series, avg_weight=position_weight_avg, theme=theme),
                                 config=_GRAPH_CONFIG,
                             ),
                         )),
@@ -130,4 +132,4 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
         # ── Asset detail — populated on row selection ──────────────
         html.Div(id="asset-detail-sections"),
 
-    ], id="tab-portfolio-content", className="workspace-wrapper")
+    ], className="workspace-wrapper")

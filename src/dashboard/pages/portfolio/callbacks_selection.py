@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 from .components.kpis import secondary_asset_kpi_row, secondary_asset_tag_row
 from .charts.portfolio_charts import _ranked_panel
 from ...controllers.asset_profile_controller import AssetProfileController
-from ...presenters.portfolio_presenter import PortfolioPresenter
+from ...controllers.portfolio_controller import PortfolioController
 from ._callback_helpers import (
     _date_window,
     _fetch_snapshots,
@@ -83,9 +83,7 @@ def on_winners_losers_sort_change(sort_by, cached_data):
     if not assets:
         raise PreventUpdate
 
-    presenter = PortfolioPresenter()
-    winners = presenter._top_winner_bar_vm(assets, sort_by=sort_by)
-    losers  = presenter._top_losers_bar_vm(assets, sort_by=sort_by)
+    winners, losers = PortfolioController().get_ranked_bars(assets, sort_by=sort_by)
 
     return (
         _ranked_panel(winners, sort_by, True),

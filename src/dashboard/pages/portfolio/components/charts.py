@@ -402,7 +402,7 @@ class VaRBarChart(_BaseRankedBarChart):
         return super().render(data, theme=theme, x_col="var_95_1d")
 
 class PositionWeightPlotlyDonutChart:
-    def render (self, data, theme="light"):
+    def render (self, data, avg_weight=0, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         if not data:
             return go.Figure()
@@ -415,24 +415,26 @@ class PositionWeightPlotlyDonutChart:
         fig = go.Figure(go.Pie(
             labels=labels,
             values=values,
-            hole=0.4,
+            hole=0.6,
             customdata=customdata,
-            textinfo="percent+label",
-            textfont=dict(color="#ffffff", size=10),
+            textinfo="none",
+            marker=dict(line=dict(width=0)),
             hovertemplate="%{label}: %{percent}%{customdata}<extra></extra>",
         ))
-        fig.update_traces(textposition='inside')
         fig.update_layout(
             colorway=px.colors.sequential.Bluyl_r,
             # colorway=px.colors.sequential.Agsunset,
             height=CHART_HEIGHT_1,
-            # width=300,
-            margin=dict(l=2, r=2, t=2, b=2),
+            margin=dict(l=2, r=2, t=2, b=40),
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
             font=dict(size=10, color=ct["font_color"]),
             showlegend=False,
-            legend=dict(font=dict(color=ct["font_color"], size=9)),
+            annotations=[dict(
+                text=f"{avg_weight}%<br><span style='font-size:9px'>Avg Weight</span>",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=11, color=ct["font_color"]),
+            )],
         )
         return fig
 

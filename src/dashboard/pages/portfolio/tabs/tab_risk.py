@@ -91,4 +91,4 @@ def risk_tab_content(view_model=None, theme="light", kpi_data=None):
         # ── Asset detail — populated on row selection ──────────────
         html.Div(id="risk-asset-detail-sections"),
 
-    ], id="tab-risk-content", className="workspace-wrapper")
+    ], className="workspace-wrapper")

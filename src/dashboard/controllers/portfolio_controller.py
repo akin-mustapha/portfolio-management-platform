@@ -47,3 +47,8 @@ class PortfolioController:
             "available_tags": available_tags,
         }
         return self._presenter.present(data)
+
+    def get_ranked_bars(self, assets: list[dict], sort_by: str = "profit") -> tuple:
+        winners = self._presenter._top_winner_bar_vm(assets, sort_by=sort_by)
+        losers  = self._presenter._top_losers_bar_vm(assets, sort_by=sort_by)
+        return winners, losers

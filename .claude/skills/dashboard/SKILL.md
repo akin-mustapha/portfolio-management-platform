@@ -14,6 +14,8 @@ This provides the context needed to work on the dashboard correctly and avoid th
 3. **Never remove `theme-store` or `privacy-store` reads.** These stores are used across many callbacks — they are not dead code even if a specific function doesn't appear to use the value.
 4. **Confirm layout direction before implementing.** If the user says "side by side", confirm it means `dbc.Row` + two `dbc.Col(width=6)`. Do not assume.
 5. **`dcc.Loading` can break table rendering.** Use with caution around AG Grid or complex table components — test that the component still renders after wrapping.
+6. **Callbacks must not instantiate presenters directly.** The pattern is: callback → controller → presenter. Presenters are called only from within their paired controller. If a callback needs a re-sort or re-filter on cached data, add a method to the relevant controller — do not reach into the presenter from a callback.
+7. **Tab content functions must not carry the placeholder ID.** `_loading_placeholder(tab_id, ...)` creates the stable DOM anchor with that ID. The full content function (called with real data) must return a plain `html.Div` without that ID — otherwise every callback trigger nests a duplicate ID inside the placeholder.
 
 # Dashboard Structure
 

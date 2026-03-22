@@ -58,8 +58,8 @@ class PortfolioPresenter:
             "cash": snapshot.get('cash_available_to_trade', 0),
             "cash_reserved": snapshot.get("cash_reserved_for_orders", 0),
             "cash_in_pies":  snapshot.get("cash_in_pies", 0),
-            "daily_change_pct": snapshot.get('daily_change_pct'),
-            "portfolio_vol": snapshot.get('portfolio_volatility_weighted'),
+            "daily_change_pct": round(snapshot['daily_change_pct'], 2) if snapshot.get('daily_change_pct') is not None else None,
+            "portfolio_vol": round(snapshot['portfolio_volatility_weighted'], 2) if snapshot.get('portfolio_volatility_weighted') is not None else None,
             "daily_change_series": self._daily_change_series(history or []),
         }
 
@@ -139,12 +139,13 @@ class PortfolioPresenter:
 
     # ---------- Position Weight ----------
 
-    def _position_weight_series_vm(self, assets: list[dict]) -> list[dict]:
+    def _position_weight_series_vm(self, assets: list[dict]) -> dict:
         items = sorted(
             [{"ticker": a["ticker"], "weight_pct": a["weight_pct"]} for a in assets],
             key=lambda x: x["weight_pct"],
             reverse=True,
         )
+        avg_weight_pct = round(sum(i["weight_pct"] for i in items) / len(items), 1) if items else 0
         top = items[:14]
         rest_items = items[14:]
         rest = sum(i["weight_pct"] for i in rest_items)
@@ -156,7 +157,7 @@ class PortfolioPresenter:
         for item in top:
             item.setdefault("breakdown", "")
         top.sort(key=lambda x: x["weight_pct"])
-        return top
+        return {"series": top, "avg_weight_pct": avg_weight_pct}
 
     # ---------- Position Distribution ----------
 

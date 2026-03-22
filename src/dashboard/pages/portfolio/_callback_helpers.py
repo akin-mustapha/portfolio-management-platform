@@ -96,8 +96,8 @@ def _fetch_asset_metadata(selected_rows: list) -> dict:
                 "tags":      vm.get("current_tags", []),
                 "industry":  "—",
                 "sector":    "—",
-                "price":     row.get("price"),
-                "avg_price": row.get("avg_price"),
+                "price":     round(row["price"], 2) if row.get("price") is not None else None,
+                "avg_price": round(row["avg_price"], 2) if row.get("avg_price") is not None else None,
             }
     return result
 
