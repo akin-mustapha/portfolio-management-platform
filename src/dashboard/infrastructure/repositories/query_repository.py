@@ -156,7 +156,7 @@ class PostgresSnapshotQueryRepository:
         COALESCE(fpd.fx_impact_total, 0)              AS fx_impact_total
     FROM analytics.fact_portfolio_daily fpd
     JOIN analytics.dim_portfolio dp ON dp.id = fpd.portfolio_id
-    WHERE dp.portfolio_id = 'trading212'
+    WHERE dp.portfolio_id = 21641310
     ORDER BY data_date ASC
     """
     with self._client as client:
