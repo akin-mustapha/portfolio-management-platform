@@ -32,3 +32,11 @@
 .sidebar-nav-item:hover .sidebar-nav-icon {
     opacity: 1;
 }
+
+.rebalance-drawer {
+    border-left: 1px solid var(--border-split);
+}
+
+.rebalance-drawer-inner {
+    padding: 0 0 var(--ws-section-pad-v) 0;
+}
