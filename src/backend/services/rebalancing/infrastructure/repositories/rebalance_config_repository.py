@@ -25,27 +25,27 @@ class PostgresRebalanceConfigRepository(BaseTableRepository):
         super().__init__("rebalance_config", schema_name="portfolio", field_map=field_map)
 
     def select_all_active_with_ticker(self) -> list[dict]:
-        """Load all active configs joined with portfolio.asset to get ticker.
+        """All current assets LEFT JOIN rebalance_config.
+        Assets with no config row get default values via COALESCE.
         portfolio.asset is SCD2 — to_timestamp IS NULL identifies current records.
         """
         sql = """
             SELECT
-                rc.id,
-                rc.asset_id,
+                a.id                                          AS asset_id,
                 a.ticker,
-                rc.target_weight_pct,
-                rc.min_weight_pct,
-                rc.max_weight_pct,
-                rc.risk_tolerance,
-                rc.rebalance_threshold_pct,
-                rc.correction_days,
-                rc.momentum_bias,
-                rc.is_active
-            FROM portfolio.rebalance_config rc
-            JOIN portfolio.asset a
-                ON a.id = rc.asset_id
-               AND a.to_timestamp IS NULL
-            WHERE rc.is_active = TRUE
+                rc.id,
+                COALESCE(rc.target_weight_pct,       0.0)    AS target_weight_pct,
+                COALESCE(rc.min_weight_pct,          0.0)    AS min_weight_pct,
+                COALESCE(rc.max_weight_pct,          100.0)  AS max_weight_pct,
+                COALESCE(rc.risk_tolerance,          50)     AS risk_tolerance,
+                COALESCE(rc.rebalance_threshold_pct, 2.0)    AS rebalance_threshold_pct,
+                COALESCE(rc.correction_days,         3)      AS correction_days,
+                COALESCE(rc.momentum_bias,           0)      AS momentum_bias,
+                COALESCE(rc.is_active,               TRUE)   AS is_active
+            FROM portfolio.asset a
+            LEFT JOIN portfolio.rebalance_config rc ON rc.asset_id = a.id
+            WHERE a.to_timestamp IS NULL
+            ORDER BY a.ticker
         """
         with self._client as client:
             result = client.execute(sql)

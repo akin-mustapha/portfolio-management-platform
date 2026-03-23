@@ -17,6 +17,17 @@ TIMEFRAMES = [
 def workspace_filter_bar():
     return html.Div([
 
+        # Rebalancing panel toggle
+        dbc.Button(
+            html.I(className="fa-solid fa-scale-balanced"),
+            id="rebalance-panel-toggle-btn",
+            className="tv-ghost-btn",
+            size="sm",
+            n_clicks=0,
+            title="Toggle rebalancing panel",
+        ),
+        html.Div(className="tv-vert-divider"),
+
         # Timeframe strip
         dcc.RadioItems(
             id="workspace-timeframe-selector",

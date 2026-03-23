@@ -12,11 +12,12 @@ Sub-modules:
   ui.py         → collapse toggles (no data dependency)
   theme.py      → theme/privacy toggles, chart re-theme, clientside resize
   settings.py   → settings modal and credential management
+  rebalancing.py → rebalance panel toggle, config save, plan generation
 
 Shared utilities (not callbacks):
   _helpers.py   → constants, date window, fetch, build compare rows
 """
-from . import data, filters, selection, tags, ui, theme, settings  # noqa: F401
+from . import data, filters, selection, tags, ui, theme, settings, rebalancing  # noqa: F401
 
 # Re-exported for portfolio_page.py: `from .callbacks import load_portfolio_page`
 from .data import load_portfolio_page  # noqa: F401

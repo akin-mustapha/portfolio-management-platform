@@ -32,3 +32,133 @@
 .sidebar-nav-item:hover .sidebar-nav-icon {
     opacity: 1;
 }
+
+/* ── Rebalancing drawer ─────────────────────────────────────────────────── */
+
+.workspace-with-rebalance {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    gap: 0;
+}
+
+.rebalance-drawer {
+    flex: 0 0 25%;
+    min-width: 0;
+    background: var(--bg-sidebar);
+    /* border-left: 1px solid var(--border-split); */
+    
+    border: 1px solid var(--border-tv);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rebalance-drawer-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.rebalance-panel-header {
+    padding: var(--ws-header-pad-v) var(--ws-section-pad-h) 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rebalance-panel-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.rebalance-asset-card {
+    padding: var(--ws-header-pad-v) var(--ws-section-pad-h);
+    border-bottom: 1px solid var(--border-split);
+}
+
+.rebalance-asset-card:last-child {
+    border-bottom: none;
+}
+
+.rebalance-asset-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--ws-section-gap);
+}
+
+.rebalance-slider-row {
+    margin-bottom: 6px;
+}
+
+.rebalance-slider-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.rebalance-slider .rc-slider-track {
+    background-color: #0d6efd;
+}
+
+.rebalance-panel-footer {
+    padding: var(--ws-header-pad-v) var(--ws-section-pad-h) 4px;
+    display: flex;
+    align-items: center;
+}
+
+.rebalance-status-text {
+    display: block;
+    padding: 0 var(--ws-section-pad-h) 6px;
+    font-size: 11px;
+    min-height: 16px;
+}
+
+/* Plan summary */
+
+.rebalance-plan-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px var(--ws-section-pad-h);
+    font-size: 11px;
+}
+
+.rebalance-plan-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 48px;
+}
+
+.rebalance-plan-action {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    min-width: 52px;
+    text-align: center;
+}
+
+.rebalance-action-reduce {
+    background: rgba(239, 83, 80, 0.15);
+    color: #ef5350;
+}
+
+.rebalance-action-increase {
+    background: rgba(38, 166, 113, 0.15);
+    color: #26a671;
+}
+
+.rebalance-plan-detail {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
