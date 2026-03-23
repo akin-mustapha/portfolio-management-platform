@@ -5,6 +5,7 @@ from dash.exceptions import PreventUpdate
 from backend.services.rebalancing.rebalancing_service_builder import build_rebalancing_service
 from backend.services.rebalancing.domain.entities import RebalanceConfig
 
+from ..components.organisms.rebalance_panel import build_asset_sliders, render_plan_summary
 from ..components.organisms.rebalance_panel import build_single_asset_sliders, render_plan_summary
 
 
@@ -25,6 +26,49 @@ def toggle_rebalance_panel(n_clicks, current_style):
 
 @callback(
     Output("rebalance-config-store", "data"),
+    Input("portfolio_page_location", "pathname"),
+)
+def load_rebalance_data(_pathname):
+    service = build_rebalancing_service()
+    configs = service.load_configs()
+    plan = service.get_latest_plan()
+    return {
+        "configs": [
+            {
+                "id": c.id,
+                "asset_id": c.asset_id,
+                "ticker": c.ticker,
+                "target_weight_pct": c.target_weight_pct,
+                "min_weight_pct": c.min_weight_pct,
+                "max_weight_pct": c.max_weight_pct,
+                "risk_tolerance": c.risk_tolerance,
+                "rebalance_threshold_pct": c.rebalance_threshold_pct,
+                "correction_days": c.correction_days,
+                "momentum_bias": c.momentum_bias,
+                "is_active": c.is_active,
+            }
+            for c in configs
+        ],
+        "plan": plan,
+    }
+
+
+# ── 3. Render sliders and plan summary from store ─────────────────────────────
+
+@callback(
+    Output("rebalance-panel-body", "children"),
+    Output("rebalance-panel-plan-summary", "children"),
+    Input("rebalance-config-store", "data"),
+)
+def render_panel(store_data):
+    if not store_data:
+        raise PreventUpdate
+    sliders = build_asset_sliders(store_data.get("configs", []))
+    plan_summary = render_plan_summary(store_data.get("plan"))
+    return sliders, plan_summary
+
+
+# ── 4. Save slider values to DB ───────────────────────────────────────────────
     Output("rebalance-asset-select", "options"),
     Input("portfolio_page_location", "pathname"),
 )
@@ -101,6 +145,14 @@ def save_configs(n_clicks, values, ids, store_data):
     if not n_clicks or not store_data:
         raise PreventUpdate
 
+    # Build {ticker: {field: value}} from the pattern-matched sliders
+    asset_fields: dict[str, dict] = {}
+    for slider_id, value in zip(ids, values):
+        index = slider_id["index"]          # e.g. "NVDA|target_weight_pct"
+        ticker, field = index.split("|", 1)
+        asset_fields.setdefault(ticker, {})[field] = value
+
+    # Build asset_id lookup from store
     asset_fields: dict[str, dict] = {}
     for slider_id, value in zip(ids, values):
         index = slider_id["index"]
@@ -139,6 +191,7 @@ def save_configs(n_clicks, values, ids, store_data):
         return f"Error: {e}"
 
 
+# ── 5. Generate plan on demand ────────────────────────────────────────────────
 # ── 6. Generate plan on demand ────────────────────────────────────────────────
 
 @callback(

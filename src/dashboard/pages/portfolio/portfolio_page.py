@@ -6,6 +6,7 @@ from .components.organisms.kpi_row import kpi_row
 from .components.organisms.asset_table import asset_table
 from .components.organisms.filter_bar import workspace_filter_bar, workspace_advanced_filter
 from .components.organisms.workspace_tabs import workspace_tabs
+from .components.organisms.rebalance_panel import rebalance_drawer_content
 
 
 # ─────────────────────────────────────────────
@@ -19,6 +20,7 @@ def portfolio_layout():
         dcc.Store(id="workspace-selected-asset", data=[]),
         dcc.Store(id="workspace-timeframe", data="1Y"),
         dcc.Store(id="assign-tag-modal-ticker"),
+        dcc.Store(id="rebalance-config-store"),
 
         # ── Row 1: KPI Summary (always portfolio-scoped) ──────────
         dbc.Row([
@@ -35,12 +37,14 @@ def portfolio_layout():
         workspace_filter_bar(),
         workspace_advanced_filter(),
 
-        # ── Row 3: Analysis Workspace (resizable split panels) ────
-        html.Div(
-            id="workspace-split",
-            className="workspace-split",
-            **{"data-initialized": ""},
-            children=[
+        # ── Row 3: Analysis Workspace + Rebalance Drawer ──────────
+        html.Div([
+
+            html.Div(
+                id="workspace-split",
+                className="workspace-split",
+                **{"data-initialized": ""},
+                children=[
                 # Left panel: asset table + footer
                 html.Div(
                     id="workspace-left",
@@ -99,5 +103,16 @@ def portfolio_layout():
                     ],
                 ),
             ],
-        ),
+            ),
+
+            # Rebalance config drawer (hidden by default, shown via toggle, RIGHT side)
+            html.Div(
+                id="rebalance-panel-wrapper",
+                className="rebalance-drawer",
+                style={"display": "none"},
+                children=rebalance_drawer_content(),
+            ),
+
+        ], className="workspace-with-rebalance"),
+
     ], id="portfolio-page-root")
