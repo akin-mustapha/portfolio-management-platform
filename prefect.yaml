@@ -49,6 +49,14 @@ deployments:
       - interval: 3600          # hourly
 
 
+  - name: rebalance_plan
+    entrypoint: src/orchestration/prefect/flow_rebalance_plan.py:flow_rebalance_plan
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 86400          # daily
+        anchor_date: "2026-01-01T07:00:00Z"
+
   # - name: trading_212_asset_event_producer
   #   entrypoint: src/orchestration/prefect/asset_flow_event_producer.py:trading_212_asset_event_producer
   #   work_pool:
