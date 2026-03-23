@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
 
 
@@ -23,6 +24,7 @@ class AccountRecord(BaseModel):
     investments_realized_pnl: float
     investments_unrealized_pnl: float
     business_key: str
+    snapshot_id: Optional[str] = None
 
     @field_validator("external_id", mode="before")
     @classmethod

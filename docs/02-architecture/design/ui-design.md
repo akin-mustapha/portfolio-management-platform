@@ -11,10 +11,10 @@ The portfolio page is split into four tabs:
 
 | Tab | Primary tables |
 |---|---|
-| Portfolio | `fact_portfolio_daily`, `fact_valuation` |
-| Valuation | `fact_price`, `fact_return`, `fact_signal` |
+| Valuation | `fact_portfolio_daily`, `fact_valuation`, `fact_price`, `fact_return`, `fact_signal` |
 | Risk | `fact_technical`, `fact_valuation` (`position_weight_pct`) |
 | Opportunities | `fact_signal`, `fact_technical` (`pct_drawdown`, `volatility_*`) |
+| Asset Profile | `portfolio.asset`, `portfolio.tag`, `portfolio.asset_tag` |
 
 ---
 

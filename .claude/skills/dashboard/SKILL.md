@@ -14,26 +14,54 @@ This provides the context needed to work on the dashboard correctly and avoid th
 3. **Never remove `theme-store` or `privacy-store` reads.** These stores are used across many callbacks — they are not dead code even if a specific function doesn't appear to use the value.
 4. **Confirm layout direction before implementing.** If the user says "side by side", confirm it means `dbc.Row` + two `dbc.Col(width=6)`. Do not assume.
 5. **`dcc.Loading` can break table rendering.** Use with caution around AG Grid or complex table components — test that the component still renders after wrapping.
+6. **Callbacks must not instantiate presenters directly.** The pattern is: callback → controller → presenter. Presenters are called only from within their paired controller. If a callback needs a re-sort or re-filter on cached data, add a method to the relevant controller — do not reach into the presenter from a callback.
+7. **Tab content functions must not carry the placeholder ID.** `_loading_placeholder(tab_id, ...)` creates the stable DOM anchor with that ID. The full content function (called with real data) must return a plain `html.Div` without that ID — otherwise every callback trigger nests a duplicate ID inside the placeholder.
 
 # Dashboard Structure
 
 ```
 src/dashboard/
   app.py                          — Dash app init, registers pages
-  layouts/                        — Top-level shell (sidebar, horizontal bar)
+  assets/                         — CSS (split by concern)
+    theme.css                     — light/dark colour variables
+    base.css                      — typography + spacing tokens
+    layout.css                    — navbar, split panels, filter bar
+    components.css                — buttons, badges, tabs, modals (11 sections)
+    charts.css                    — chart grids + chart headers
+    ag-grid-finance.css           — AG Grid table styling
+  components/                     — shared UI atoms across all pages
+    atoms/
+      buttons.py                  — privacy_toggle_btn and shared buttons
+  layouts/                        — top-level shell (navbar, page router)
   pages/portfolio/
-    portfolio_page.py             — Page layout definition
-    callbacks.py                  — All data callbacks (7 callbacks)
-    theme_callbacks.py            — Theme + privacy toggle callbacks
+    portfolio_page.py             — page layout definition
+    callbacks.py                  — orchestrator: imports all callback sub-modules
+    callbacks_data.py             — page load + daily movers
+    callbacks_filters.py          — timeframe selector + tag filter
+    callbacks_selection.py        — row selection, compare mode, asset profile
+    callbacks_tags.py             — edit tags modal (open / save / close)
+    callbacks_ui.py               — collapse toggles (no data dependency)
+    _callback_helpers.py          — shared: date window, fetch, build_compare_rows
+    theme_callbacks.py            — theme + privacy toggle callbacks
+    settings_callbacks.py         — settings modal callbacks
+    tabs/                         — one file per tab (layout only, no callbacks)
+      tab_portfolio.py            — Valuation tab
+      tab_risk.py                 — Risk tab
+      tab_opportunities.py        — Opportunities tab
+      tab_asset_profile.py        — Asset Profile tab
+      _helpers.py                 — _chart_section, _loading_placeholder, _GRAPH_CONFIG
+    charts/                       — front door for chart imports
+      portfolio_charts.py         — all portfolio chart classes (18 classes/helpers)
+      asset_charts.py             — asset comparison chart classes (6 classes)
     components/
       kpis.py                     — KPI row builder
       tables.py                   — Asset AG Grid table
-      charts.py                   — Winners/losers bar charts
-      asset_charts.py             — Per-asset workspace charts
-      filter_bar.py               — Timeframe selector + advanced filters
-      workspace_tabs.py           — Tab content builders (portfolio/valuation/risk/opportunities)
-  controllers/                    — Fetch + assemble view models
-  presenters/                     — Shape data for display
+      charts.py                   — portfolio chart implementations (edit chart logic here)
+      asset_charts.py             — asset chart implementations (edit chart logic here)
+      filter_bar.py               — timeframe selector + advanced filters
+      workspace_tabs.py           — tab assembler (calls tabs/ for content)
+  controllers/                    — fetch + assemble view models
+  presenters/                     — shape data for display
   infrastructure/repositories/    — SQL queries
 ```
 

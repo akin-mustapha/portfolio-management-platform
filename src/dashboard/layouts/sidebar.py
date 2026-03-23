@@ -1,7 +1,7 @@
 
 from dash import html
 import dash_bootstrap_components as dbc
-from ..ui.buttons import privacy_toggle_btn
+from ..components.atoms.buttons import privacy_toggle_btn
 
 
 def _nav_item(icon_class, label, href):

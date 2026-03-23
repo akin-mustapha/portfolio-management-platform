@@ -1,3 +1,4 @@
+"""Portfolio-level Plotly chart implementations."""
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -35,7 +36,6 @@ CHART_THEMES = {
         "rs_active": "#1c2a4a",
     },
 }
-
 
 
 class _PnLPlotlyLineChart:
@@ -96,8 +96,9 @@ class WinnersPnLPlotlyLineChart(_PnLPlotlyLineChart):
 class LosersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     colorway = px.colors.sequential.Brwnyl_r
     fill = "tozerox"
+
 class PortfolioPerformanceScatterPlot:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", currency=""):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         if not data:
             return go.Figure()
@@ -136,7 +137,6 @@ class PortfolioPerformanceScatterPlot:
             line_dash="dash"
         )
 
-        # Quadrant label midpoints in data coordinates
         left_mid = (ret_min + 0) / 2 if ret_min < 0 else ret_min - 0.5
         right_mid = (0 + ret_max) / 2
         low_mid = (0 + threshold) / 2
@@ -158,7 +158,6 @@ class PortfolioPerformanceScatterPlot:
                 opacity=0.7,
             )
 
-        # Threshold line labels
         fig.add_annotation(
             x=0, y=weight_max,
             text="0% return",
@@ -177,59 +176,35 @@ class PortfolioPerformanceScatterPlot:
             xanchor="right", yanchor="bottom",
         )
 
-        # Ticker labels on hover
         fig.update_traces(
             hovertemplate=(
                 "<b>%{customdata[0]}</b><br>"
                 "%{customdata[1]}<br>"
                 "ROI: %{x:.1f}%<br>"
-                "Total Return: £%{customdata[2]:,.0f}<br>"
+                f"Total Return: {currency}%{{customdata[2]:,.0f}}<br>"
                 "Weight: %{y:.1f}%<br>"
-                "Value: £%{marker.color:,.0f}"
+                f"Value: {currency}%{{marker.color:,.0f}}"
                 "<extra></extra>"
             )
         )
-        
-        # fig.add_shape(
-        #     type="rect",
-        #     x0=0,
-        #     x1=df["profit"].max(),
-        #     y0=threshold,
-        #     y1=df["weight_pct"].max(),
-        #     fillcolor="rgba(0,200,CHART_HEIGHT_1,0.08)",  # green
-        #     line_width=0,
-        # )
+
         fig.add_shape(
             type="rect",
-            x0=0,
-            x1=ret_max,
-            y0=threshold,
-            y1=weight_max,
+            x0=0, x1=ret_max, y0=threshold, y1=weight_max,
             fillcolor=px.colors.sequential.Bluyl_r[1],
-            opacity=0.1,
-            line_width=0,
+            opacity=0.1, line_width=0,
         )
-
         fig.add_shape(
             type="rect",
-            x0=0,
-            x1=ret_max,
-            y0=0,
-            y1=threshold,
+            x0=0, x1=ret_max, y0=0, y1=threshold,
             fillcolor=px.colors.sequential.Agsunset[1],
-            opacity=0.1, # yellow
-            line_width=0,
+            opacity=0.1, line_width=0,
         )
-
         fig.add_shape(
             type="rect",
-            x0=ret_min,
-            x1=0,
-            y0=threshold,
-            y1=weight_max,
+            x0=ret_min, x1=0, y0=threshold, y1=weight_max,
             fillcolor=px.colors.sequential.Agsunset[4],
-            opacity=0.1,  # red
-            line_width=0,
+            opacity=0.1, line_width=0,
         )
         fig.update_layout(
             template="plotly_white",
@@ -238,12 +213,9 @@ class PortfolioPerformanceScatterPlot:
             height=280,
             xaxis_title="ROI %",
             yaxis_title="% Weight",
-            # xaxis_title=None,
-            # yaxis_title=None,
             yaxis=dict(side="right", showgrid=False, zeroline=False),
             xaxis=dict(showgrid=False, zeroline=False),
             font=dict(size=11, color=ct["font_color"]),
-            # bargap=0.3,
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
             showlegend=False,
@@ -350,8 +322,7 @@ def _ranked_panel(data, sort_by="profit", is_gain=True):
 
 
 def daily_movers_table(data, n=5):
-    """Inline-bar movers table: two panels (Gainers / Losers), each with n rows.
-    Bar fill is a CSS gradient proportional to the move within each panel."""
+    """Inline-bar movers table: two panels (Gainers / Losers), each with n rows."""
     if not data:
         return html.Div()
 
@@ -402,7 +373,7 @@ class VaRBarChart(_BaseRankedBarChart):
         return super().render(data, theme=theme, x_col="var_95_1d")
 
 class PositionWeightPlotlyDonutChart:
-    def render (self, data, theme="light"):
+    def render(self, data, avg_weight=0, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         if not data:
             return go.Figure()
@@ -415,29 +386,30 @@ class PositionWeightPlotlyDonutChart:
         fig = go.Figure(go.Pie(
             labels=labels,
             values=values,
-            hole=0.4,
+            hole=0.6,
             customdata=customdata,
-            textinfo="percent+label",
-            textfont=dict(color="#ffffff", size=10),
+            textinfo="none",
+            marker=dict(line=dict(width=0)),
             hovertemplate="%{label}: %{percent}%{customdata}<extra></extra>",
         ))
-        fig.update_traces(textposition='inside')
         fig.update_layout(
             colorway=px.colors.sequential.Bluyl_r,
-            # colorway=px.colors.sequential.Agsunset,
             height=CHART_HEIGHT_1,
-            # width=300,
-            margin=dict(l=2, r=2, t=2, b=2),
+            margin=dict(l=2, r=2, t=2, b=40),
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
             font=dict(size=10, color=ct["font_color"]),
             showlegend=False,
-            legend=dict(font=dict(color=ct["font_color"], size=9)),
+            annotations=[dict(
+                text=f"{avg_weight}%<br><span style='font-size:9px'>Avg Weight</span>",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=11, color=ct["font_color"]),
+            )],
         )
         return fig
 
 class PositionProfitabilityPlotlyDonutChart:
-    def render (self, data, theme="light"):
+    def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         if not data:
             return go.Figure()
@@ -537,17 +509,14 @@ class PortfolioPerformancePlotlyLineChart:
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=df["costs"],
+            x=df["dates"], y=df["costs"],
             name="Invested",
             mode="lines",
             line=dict(color="rgba(0,0,0,0)", width=0),
-            showlegend=False,
-            hoverinfo="skip",
+            showlegend=False, hoverinfo="skip",
         ))
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=df["values"],
+            x=df["dates"], y=df["values"],
             name="Portfolio Value",
             mode="lines",
             line=dict(width=1.5),
@@ -556,8 +525,7 @@ class PortfolioPerformancePlotlyLineChart:
             showlegend=True,
         ))
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=df["costs"],
+            x=df["dates"], y=df["costs"],
             name="Invested",
             mode="lines",
             line=dict(width=1, dash="dot", color="rgba(150,150,150,0.6)"),
@@ -566,11 +534,8 @@ class PortfolioPerformancePlotlyLineChart:
         ))
 
         fig.add_hline(
-            y=ref_value,
-            line_dash="dot",
-            line_color="rgba(0,0,0,0.25)",
-            line_width=0.1,
-            opacity=0.2,
+            y=ref_value, line_dash="dot",
+            line_color="rgba(0,0,0,0.25)", line_width=0.1, opacity=0.2,
         )
 
         fig.update_layout(
@@ -579,78 +544,45 @@ class PortfolioPerformancePlotlyLineChart:
             height=CHART_HEIGHT_1,
             hovermode="x unified",
             margin=dict(l=2, r=2, t=2, b=2),
-            xaxis_title=None,
-            yaxis_title=None,
-            title=None,
+            xaxis_title=None, yaxis_title=None, title=None,
             showlegend=True,
             legend=dict(
-                orientation="h",
-                x=1, y=1,
+                orientation="h", x=1, y=1,
                 xanchor="right", yanchor="bottom",
                 font=dict(size=9, color=ct["font_color"]),
-                bgcolor="rgba(0,0,0,0)",
-                borderwidth=0,
+                bgcolor="rgba(0,0,0,0)", borderwidth=0,
             ),
             font=dict(size=11, color=ct["font_color"]),
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
-            yaxis=dict(
-                side="right",
-                tickformat=",.0f",
-                showgrid=False,
-                zeroline=False,
-            ),
-            xaxis=dict(
-                showgrid=False,
-                type="date",
-                # rangeselector=dict(
-                #     buttons=[
-                #         dict(count=1, label="1M", step="month", stepmode="backward"),
-                #         dict(count=3, label="3M", step="month", stepmode="backward"),
-                #         dict(count=6, label="6M", step="month", stepmode="backward"),
-                #         dict(count=1, label="1Y", step="year", stepmode="backward"),
-                #         dict(step="all", label="All"),
-                #     ],
-                #     bgcolor=ct["rs_bg"],
-                #     activecolor=ct["rs_active"],
-                #     borderwidth=0,
-                #     font=dict(size=11),
-                #     y=-0.25,
-                #     x=0,
-                # ),
-            ),
+            yaxis=dict(side="right", tickformat=",.0f", showgrid=False, zeroline=False),
+            xaxis=dict(showgrid=False, type="date"),
         )
 
         _apply_spike_config(fig)
         return fig
 
 class PortfolioPNLPlotlyLineChart:
-    def render(self, data, theme="light"):
+    def render(self, data, theme="light", currency=""):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         df = pd.DataFrame(data).sort_values("dates")
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=[0] * len(df),
-            mode="lines",
-            line=dict(color="rgba(0,0,0,0)", width=0),
-            showlegend=False,
-            hoverinfo="skip",
+            x=df["dates"], y=[0] * len(df),
+            mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
+            showlegend=False, hoverinfo="skip",
         ))
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=df["values"],
+            x=df["dates"], y=df["values"],
             name="Unrealized",
-            mode="lines",
-            line=dict(width=1.5),
+            mode="lines", line=dict(width=1.5),
             fill="tonexty",
             hovertemplate="Unrealized: %{y:,.2f}<extra></extra>",
             showlegend=True,
         ))
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=df["realized"],
+            x=df["dates"], y=df["realized"],
             name="Realized",
             mode="lines",
             line=dict(width=1, dash="dot", color="rgba(150,150,150,0.6)"),
@@ -658,8 +590,7 @@ class PortfolioPNLPlotlyLineChart:
             showlegend=True,
         ))
         fig.add_trace(go.Scatter(
-            x=df["dates"],
-            y=df["total_pnl"],
+            x=df["dates"], y=df["total_pnl"],
             name="Total P&L",
             mode="lines",
             line=dict(width=1.5, color="rgba(100,180,100,0.8)"),
@@ -668,65 +599,91 @@ class PortfolioPNLPlotlyLineChart:
         ))
 
         fig.add_hline(
-            y=df["values"].iloc[0],
-            line_dash="dot",
-            line_color="rgba(0,0,0,0.25)",
-            line_width=1,
+            y=df["values"].iloc[0], line_dash="dot",
+            line_color="rgba(0,0,0,0.25)", line_width=1,
         )
 
         fig.update_layout(
             template="plotly_white",
             colorway=px.colors.sequential.Bluyl_r,
-            # height=350,
             height=CHART_HEIGHT_1,
             hovermode="x unified",
             margin=dict(l=5, r=5, t=5, b=5),
-            xaxis_title=None,
-            yaxis_title=None,
-            title=None,
+            xaxis_title=None, yaxis_title=None, title=None,
             showlegend=True,
             legend=dict(
-                orientation="h",
-                x=1, y=1,
+                orientation="h", x=1, y=1,
                 xanchor="right", yanchor="bottom",
                 font=dict(size=9, color=ct["font_color"]),
-                bgcolor="rgba(0,0,0,0)",
-                borderwidth=0,
+                bgcolor="rgba(0,0,0,0)", borderwidth=0,
             ),
             font=dict(size=11, color=ct["font_color"]),
             paper_bgcolor=ct["paper_bgcolor"],
             plot_bgcolor=ct["plot_bgcolor"],
             yaxis=dict(
                 side="right",
-                title=dict(text="P&L (€)", font=dict(size=9), standoff=4),
-                tickformat=",.0f",
-                showgrid=False,
-                zeroline=False,
+                title=dict(text=f"P&L ({currency})", font=dict(size=9), standoff=4),
+                tickformat=",.0f", showgrid=False, zeroline=False,
             ),
-            xaxis=dict(
-                showgrid=False,
-                type="date",
-                # rangeselector=dict(
-                #     buttons=[
-                #         dict(count=1, label="1M", step="month", stepmode="backward"),
-                #         dict(count=3, label="3M", step="month", stepmode="backward"),
-                #         dict(count=6, label="6M", step="month", stepmode="backward"),
-                #         dict(count=1, label="1Y", step="year", stepmode="backward"),
-                #         dict(step="all", label="All"),
-                #     ],
-                #     bgcolor=ct["rs_bg"],
-                #     activecolor=ct["rs_active"],
-                #     borderwidth=0,
-                #     font=dict(size=11),
-                #     y=-0.25,
-                #     x=0,
-                # ),
-            ),
+            xaxis=dict(showgrid=False, type="date"),
         )
 
         _apply_spike_config(fig)
         return fig
 
+
+class PortfolioFXAttributionDonutChart:
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        fx_impact = data.get("fx_impact_total") or 0
+        unrealized_pnl = data.get("unrealized_pnl") or 0
+        price_return = unrealized_pnl - fx_impact
+
+        abs_fx = abs(fx_impact)
+        abs_price = abs(price_return)
+        total = abs_fx + abs_price
+
+        if total == 0:
+            fig = go.Figure()
+            fig.update_layout(
+                paper_bgcolor=ct["paper_bgcolor"],
+                plot_bgcolor=ct["plot_bgcolor"],
+                height=CHART_HEIGHT_1,
+                margin=dict(l=2, r=2, t=2, b=2),
+                annotations=[dict(text="No FX data", x=0.5, y=0.5, showarrow=False,
+                                  font=dict(size=12, color=ct["font_color"]))],
+            )
+            return fig
+
+        fx_sign = "+" if fx_impact >= 0 else ""
+        colors = ["#0d6efd", "rgba(13,110,253,0.25)"]
+
+        fig = go.Figure(go.Pie(
+            labels=["FX Return", "Price Return"],
+            values=[abs_fx, abs_price],
+            hole=0.6,
+            marker=dict(colors=colors, line=dict(width=0)),
+            textinfo="none",
+            hovertemplate="<b>%{label}</b><br>%{percent}<extra></extra>",
+            showlegend=True,
+        ))
+        fig.update_layout(
+            paper_bgcolor=ct["paper_bgcolor"],
+            plot_bgcolor=ct["plot_bgcolor"],
+            font=dict(size=11, color=ct["font_color"]),
+            height=CHART_HEIGHT_1,
+            margin=dict(l=2, r=2, t=2, b=40),
+            legend=dict(
+                orientation="h", yanchor="bottom", y=-0.25,
+                xanchor="center", x=0.5, font=dict(size=10, color=ct["font_color"]),
+            ),
+            annotations=[dict(
+                text=f"{fx_sign}{fx_impact:,.2f}<br><span style='font-size:9px'>Portfolio FX</span>",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=11, color=ct["font_color"]),
+            )],
+        )
+        return fig
 
 
 def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light") -> go.Figure:
@@ -749,10 +706,8 @@ def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light")
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=dates, y=zeros,
-        mode="lines",
-        line=dict(color="rgba(0,0,0,0)", width=0),
-        showlegend=False,
-        hoverinfo="skip",
+        mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
+        showlegend=False, hoverinfo="skip",
     ))
     fig.add_trace(go.Scatter(
         x=dates, y=values,
@@ -760,12 +715,10 @@ def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light")
         line=dict(color=line_color, width=1.5),
         fill="tonexty",
         fillcolor=fill_color,
-        showlegend=False,
-        hoverinfo="skip",
+        showlegend=False, hoverinfo="skip",
     ))
     fig.update_layout(
-        height=22,
-        width=56,
+        height=22, width=56,
         margin=dict(l=0, r=0, t=0, b=0),
         paper_bgcolor=ct["paper_bgcolor"],
         plot_bgcolor=ct["plot_bgcolor"],

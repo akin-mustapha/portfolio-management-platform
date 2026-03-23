@@ -1,3 +1,4 @@
+"""Organism — AG Grid asset table (the main portfolio data grid)."""
 import dash_ag_grid as dag
 import pandas as pd
 from dash import html
@@ -69,7 +70,7 @@ def asset_table(data=None):
                 "field": "value",
                 "headerName": "Value",
                 "minWidth": 90, "width": 90,
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": "Current total value of your position (price × quantity)."
             },
             {
@@ -77,10 +78,10 @@ def asset_table(data=None):
                 "headerName": "P&L",
                 "minWidth": 80, "width": 80,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
                     "Unrealised profit or loss. "
-                    "Green means you’re up, red means drawdown. "
+                    "Green means you're up, red means drawdown. "
                     "Use alongside drawdown and volatility."
                 ),
                 "cellStyle": pnl_style(),
@@ -90,7 +91,7 @@ def asset_table(data=None):
                 "headerName": "P&L %",
                 "minWidth": 80, "width": 80,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Unrealised P&L as a percentage of cost basis. Comparable across positions.",
                 "cellStyle": pnl_style(),
             },
@@ -99,7 +100,7 @@ def asset_table(data=None):
                 "headerName": "Cumul. Return",
                 "minWidth": 108, "width": 108,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Total return % since position opened.",
                 "cellStyle": pnl_style(),
             },
@@ -108,7 +109,7 @@ def asset_table(data=None):
                 "headerName": "Daily Return",
                 "minWidth": 96, "width": 96,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Single-day % price change.",
                 "cellStyle": pnl_style(),
             },
@@ -124,14 +125,14 @@ def asset_table(data=None):
                 "field": "price",
                 "headerName": "Price",
                 "minWidth": 80, "width": 80,
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": "Latest market price of the asset."
             },
             {
                 "field": "avg_price",
                 "headerName": "Avg Cost",
                 "minWidth": 84, "width": 84,
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": "Average price paid (DCA average). Compare against current price to understand DCA Bias.",
             },
             {
@@ -139,7 +140,7 @@ def asset_table(data=None):
                 "headerName": "Weight %",
                 "minWidth": 84, "width": 84,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Weight in relation to portfolio value"
             },
             {
@@ -147,7 +148,7 @@ def asset_table(data=None):
                 "headerName": "30D High",
                 "minWidth": 88, "width": 88,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
                     "Highest price reached in the last 30 days. "
                     "Use to judge how far price has pulled back."
@@ -158,7 +159,7 @@ def asset_table(data=None):
                 "headerName": "% DD",
                 "minWidth": 72, "width": 72,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘.2%’)(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": (
                     "% Drawdown: Percentage decline from the recent high. "
                     "More negative = deeper drawdown."
@@ -170,7 +171,7 @@ def asset_table(data=None):
                 "headerName": "Vol 30D",
                 "minWidth": 80, "width": 80,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘,.4f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
                 "headerTooltip": (
                     "Volatility 30D: 30-day volatility measure. "
                     "Higher values indicate larger price swings."
@@ -182,7 +183,7 @@ def asset_table(data=None):
                 "headerName": "VaR 95%",
                 "minWidth": 84, "width": 84,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘,.2f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": "Value at Risk (95% confidence, 1-day). Maximum expected daily loss under normal conditions.",
                 "cellStyle": pnl_style(),
             },
@@ -191,7 +192,7 @@ def asset_table(data=None):
                 "headerName": "DCA Bias",
                 "minWidth": 84, "width": 84,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format(‘.4f’)(params.value)"},
+                "valueFormatter": {"function": "d3.format('.4f')(params.value)"},
                 "headerTooltip": (
                     "Dollar-Cost Averaging bias score. "
                     "Higher values suggest better conditions to average in."
@@ -202,7 +203,7 @@ def asset_table(data=None):
                 "field": "data_date",
                 "headerName": "Date",
                 "minWidth": 100, "width": 100,
-                "valueFormatter": {"function": "params.value ? new Date(params.value).toLocaleDateString(‘en-GB’, {year: ‘numeric’, month: ‘short’, day: ‘numeric’}) : ‘’"},
+                "valueFormatter": {"function": "params.value ? new Date(params.value).toLocaleDateString('en-GB', {year: 'numeric', month: 'short', day: 'numeric'}) : ''"},
                 "headerTooltip": "Date this data snapshot was generated."
             },
         ],

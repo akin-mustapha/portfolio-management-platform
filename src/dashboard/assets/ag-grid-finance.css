@@ -238,9 +238,42 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
     background-color: var(--bg-panel);
     border: 1px solid var(--border-main);
     border-radius: 20px;
-    padding: 3px 10px;
-    width: 200px;
+    padding: 5px 10px;
+    width: auto;
     overflow: hidden;
+}
+
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: auto;
+    overflow: hidden;
+}
+
+.tag-badge__value {
+    font-size: 0.65rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+.tag-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tag-row::-webkit-scrollbar {
+    display: none;
 }
 
 .kpi-badge__label {
@@ -267,7 +300,7 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
 
 /* Daily Change badge variant — wider to contain the inline sparkline */
 .kpi-badge--with-spark {
-    width: 200px;
+    width: auto;
 }
 
 /* Edit Tags action button — ghost pill style */

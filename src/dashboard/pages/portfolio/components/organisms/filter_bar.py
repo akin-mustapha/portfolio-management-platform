@@ -1,3 +1,4 @@
+"""Organism — workspace filter bar and advanced filter panel."""
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
@@ -15,7 +16,7 @@ TIMEFRAMES = [
 
 def workspace_filter_bar():
     return html.Div([
-        
+
         # Timeframe strip
         dcc.RadioItems(
             id="workspace-timeframe-selector",
@@ -33,18 +34,22 @@ def workspace_filter_bar():
             },
         ),
         html.Div(className="tv-vert-divider"),
-        
+
+        # Tag filter dropdown
+        dcc.Dropdown(
+            id="workspace-tag-filter",
+            options=[],
+            value=None,
+            multi=True,
+            placeholder="Filter by tag…",
+            clearable=True,
+            style={"minWidth": "180px", "fontSize": "12px"},
+            className="tv-tag-filter",
+        ),
+        html.Div(className="tv-vert-divider"),
+
         # Spacer pushes advanced filter to the right
         html.Div(style={"marginLeft": "auto"}),
-        
-        # Tag buttons (secondary — ghost style)
-        dbc.Button(
-            [html.I(className="fa-solid fa-tag me-1"), "Add Tag"],
-            id="btn-add-tag",
-            className="tv-ghost-btn",
-            size="sm",
-            n_clicks=0,
-        ),
 
         dbc.Button(
             [html.I(className="fa-solid fa-plus me-1"), "Create Tag"],

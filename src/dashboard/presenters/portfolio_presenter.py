@@ -1,3 +1,6 @@
+_CURRENCY_SYMBOLS = {"EUR": "€", "USD": "$", "GBP": "£"}
+
+
 class PortfolioPresenter:
     """
     Presenter for the Portfolio Dashboard screen.
@@ -15,6 +18,7 @@ class PortfolioPresenter:
         assets = data.get("assets", [])
         assets_history = data.get("assets_history", [])
         portfolio_history = data.get("portfolio_history", [])
+        available_tags = data.get("available_tags", [])
         return {
             "kpi": self._kpi(snapshot, portfolio_history),
             "asset_table": self._asset_table_vm(assets),
@@ -35,6 +39,8 @@ class PortfolioPresenter:
             "profitability": self._profitablity_vm(assets),
             "var_by_position": self._var_bar_vm(assets),
             "daily_movers":    self._daily_movers_vm(assets),
+            "portfolio_fx_attribution": self._portfolio_fx_attribution_vm(portfolio_history),
+            "available_tags": available_tags,
         }
         
     def _daily_change_series(self, history: list[dict]) -> dict:
@@ -46,17 +52,19 @@ class PortfolioPresenter:
         }
 
     def _kpi(self, snapshot: dict, history: list[dict] | None = None) -> dict:
+        currency = snapshot.get('currency', "")
         return {
             "value": snapshot.get('total_value', 0),
-            "currency": snapshot.get('currency', "#"),
+            "currency": currency,
+            "currency_symbol": _CURRENCY_SYMBOLS.get(currency, "#"),
             "realized_pnl": snapshot.get('investments_realized_pnl', 0),
             "unrealized_pnl": snapshot.get('investments_unrealized_pnl', 0),
             "total_cost": snapshot.get('investments_total_cost', 0),
             "cash": snapshot.get('cash_available_to_trade', 0),
             "cash_reserved": snapshot.get("cash_reserved_for_orders", 0),
             "cash_in_pies":  snapshot.get("cash_in_pies", 0),
-            "daily_change_pct": snapshot.get('daily_change_pct'),
-            "portfolio_vol": snapshot.get('portfolio_volatility_weighted'),
+            "daily_change_pct": round(snapshot['daily_change_pct'], 2) if snapshot.get('daily_change_pct') is not None else None,
+            "portfolio_vol": round(snapshot['portfolio_volatility_weighted'], 2) if snapshot.get('portfolio_volatility_weighted') is not None else None,
             "daily_change_series": self._daily_change_series(history or []),
         }
 
@@ -113,6 +121,15 @@ class PortfolioPresenter:
             "total_pnl": [r["investments_unrealized_pnl"] + r["investments_realized_pnl"] for r in rows],
         }
         
+    def _portfolio_fx_attribution_vm(self, rows: list[dict]) -> dict:
+        if not rows:
+            return {"fx_impact_total": 0, "unrealized_pnl": 0}
+        latest = rows[-1]
+        return {
+            "fx_impact_total": latest.get("fx_impact_total") or 0,
+            "unrealized_pnl": latest.get("investments_unrealized_pnl") or 0,
+        }
+
     def _portfolio_drawdown_vm(self, rows: list[dict]) -> dict:
         dates = [r["data_date"] for r in rows]
         values = [r["total_value"] for r in rows]
@@ -127,12 +144,13 @@ class PortfolioPresenter:
 
     # ---------- Position Weight ----------
 
-    def _position_weight_series_vm(self, assets: list[dict]) -> list[dict]:
+    def _position_weight_series_vm(self, assets: list[dict]) -> dict:
         items = sorted(
             [{"ticker": a["ticker"], "weight_pct": a["weight_pct"]} for a in assets],
             key=lambda x: x["weight_pct"],
             reverse=True,
         )
+        avg_weight_pct = round(sum(i["weight_pct"] for i in items) / len(items), 1) if items else 0
         top = items[:14]
         rest_items = items[14:]
         rest = sum(i["weight_pct"] for i in rest_items)
@@ -144,7 +162,7 @@ class PortfolioPresenter:
         for item in top:
             item.setdefault("breakdown", "")
         top.sort(key=lambda x: x["weight_pct"])
-        return top
+        return {"series": top, "avg_weight_pct": avg_weight_pct}
 
     # ---------- Position Distribution ----------
 

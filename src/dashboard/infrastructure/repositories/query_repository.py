@@ -41,6 +41,7 @@ class PostgresAssetQueryRepository:
           fr.daily_return,
           fs.ma_crossover_signal,
           ft.var_95_1d,
+          COALESCE(fv.fx_impact, 0)                     AS fx_impact,
           TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
       FROM analytics.fact_valuation fv
       JOIN latest ON fv.asset_id = latest.asset_id AND fv.date_id = latest.max_date_id
@@ -73,6 +74,18 @@ class PostgresAssetQueryRepository:
     """
     with self._client as client:
       res = client.execute(sql, params)
+    return res.fetchall()
+
+  def get_asset_tags(self):
+    sql = """
+      SELECT da.ticker, t.name AS tag_name
+      FROM analytics.dim_asset da
+      JOIN portfolio.asset pa ON LOWER(da.ticker) = LOWER(pa.ticker)
+      JOIN portfolio.asset_tag at ON pa.id = at.asset_id AND at.is_active = true
+      JOIN portfolio.tag t ON at.tag_id = t.id AND t.is_active = true
+    """
+    with self._client as client:
+      res = client.execute(sql)
     return res.fetchall()
 
   def get_asset_history(self):
@@ -139,10 +152,11 @@ class PostgresSnapshotQueryRepository:
         COALESCE(fpd.cash_in_pies, 0)                AS cash_in_pies,
         COALESCE(fpd.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
         COALESCE(fpd.daily_change_pct, 0)             AS daily_change_pct,
-        COALESCE(fpd.daily_change_abs, 0)             AS daily_change_abs
+        COALESCE(fpd.daily_change_abs, 0)             AS daily_change_abs,
+        COALESCE(fpd.fx_impact_total, 0)              AS fx_impact_total
     FROM analytics.fact_portfolio_daily fpd
     JOIN analytics.dim_portfolio dp ON dp.id = fpd.portfolio_id
-    WHERE dp.portfolio_id = 'trading212'
+    WHERE dp.portfolio_id = '21641310'
     ORDER BY data_date ASC
     """
     with self._client as client:
@@ -163,6 +177,7 @@ class PostgresSnapshotQueryRepository:
             fp.avg_price,
             fp.price,
             fv.unrealized_pnl                             AS profit,
+            COALESCE(fv.fx_impact, 0)                     AS fx_impact,
             ft.volatility_30d,
             ft.pct_drawdown,
             TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date

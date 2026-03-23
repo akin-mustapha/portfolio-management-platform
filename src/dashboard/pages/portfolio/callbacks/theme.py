@@ -1,6 +1,10 @@
+"""
+Theme callbacks — theme/privacy toggles, chart background patching,
+clientside resize and ResizeObserver wiring.
+"""
 from dash import Output, Input, State, callback, clientside_callback, no_update, Patch
 
-from .callbacks import (
+from ._helpers import (
     _build_compare_rows,
     _date_window,
     _fetch_snapshots,

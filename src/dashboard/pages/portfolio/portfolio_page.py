@@ -2,10 +2,10 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from .callbacks import load_portfolio_page  # noqa: F401 — registers callback
-from .components.kpis import kpi_row
-from .components.tables import asset_table
-from .components.filter_bar import workspace_filter_bar, workspace_advanced_filter
-from .components.workspace_tabs import workspace_tabs
+from .components.organisms.kpi_row import kpi_row
+from .components.organisms.asset_table import asset_table
+from .components.organisms.filter_bar import workspace_filter_bar, workspace_advanced_filter
+from .components.organisms.workspace_tabs import workspace_tabs
 
 
 # ─────────────────────────────────────────────
@@ -47,14 +47,14 @@ def portfolio_layout():
                     className="workspace-panel-left",
                     children=[
                         html.Div(
+                            id="workspace-table-statusbar",
+                            className="workspace-table-statusbar",
+                            children="Loading assets…",
+                        ),
+                        html.Div(
                             id="portfolio_page_asset_table_container",
                             children=asset_table(None),
                             style={"flex": "1", "minHeight": "0", "overflow": "hidden"},
-                        ),
-                        html.Div(
-                            id="workspace-table-footer",
-                            className="workspace-table-footer",
-                            children="Loading assets…",
                         ),
                     ],
                 ),
