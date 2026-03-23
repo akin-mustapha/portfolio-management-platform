@@ -22,7 +22,7 @@ logging.basicConfig(
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-
+portfolio_id = 21641310
 
 # ---------------------------------------------------------------------------
 # Source
@@ -39,18 +39,20 @@ class AccountGoldSource(Source):
         self._client = SQLModelClient(DATABASE_URL)
 
     def extract(self):
-        sql = """
+        sql = f"""
             WITH cte_fx AS (
-            SELECT data_timestamp::DATE, SUM(fx_impact) AS fx_impact_total
-            FROM staging.asset sa
-            GROUP BY data_timestamp::DATE
+                SELECT
+                        data_timestamp::DATE
+                    ,   SUM(fx_impact) AS fx_impact_total
+                FROM staging.asset sa
+                GROUP BY data_timestamp::DATE
             )
             , cte_account AS (
-            SELECT
-                ROW_NUMBER()OVER(PARTITION BY data_timestamp::DATE ORDER BY data_timestamp DESC) AS rn
-                , *
-            FROM staging.account
-            ORDER BY data_timestamp DESC
+                SELECT
+                        ROW_NUMBER()OVER(PARTITION BY data_timestamp::DATE ORDER BY data_timestamp DESC) AS rn
+                    ,   *
+                FROM staging.account
+                ORDER BY data_timestamp DESC
             )
             SELECT
                 TO_CHAR(a.data_timestamp, 'YYYYMMDD')::INTEGER          AS date_id,
@@ -80,7 +82,7 @@ class AccountGoldSource(Source):
             CROSS JOIN (
                 SELECT id
                 FROM analytics.dim_portfolio
-                WHERE portfolio_id = 'trading212'
+                WHERE portfolio_id = '{portfolio_id}'
             ) dp
             LEFT JOIN cte_fx fx
             ON fx.data_timestamp = a.data_timestamp::DATE
@@ -147,7 +149,12 @@ class PipelineAccountGold(BaseGoldPipeline):
         with self._db as db:
             db.execute("""
                 INSERT INTO analytics.dim_portfolio (portfolio_id, name, base_currency)
-                VALUES ('trading212', 'Trading212', 'GBP')
+                SELECT DISTINCT ON (external_id)
+                    external_id AS portfolio_id,
+                    broker      AS name,
+                    currency    AS base_currency
+                FROM staging.account
+                ORDER BY external_id, data_timestamp DESC
                 ON CONFLICT (portfolio_id) DO NOTHING
             """)
 
