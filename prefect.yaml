@@ -10,9 +10,24 @@ pull:
 
 deployments:
 
-  # Unified pipeline: bronze → silver → computed silver → gold → mark processed
-  - name: t212_pipeline
-    entrypoint: src/orchestration/prefect/flow_t212_pipeline.py:flow_t212_pipeline
+  - name: t212_bronze
+    entrypoint: src/orchestration/prefect/flow_t212_bronze.py:flow_t212_bronze
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  - name: t212_silver
+    entrypoint: src/orchestration/prefect/flow_t212_silver.py:flow_t212_silver
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  - name: t212_gold
+    entrypoint: src/orchestration/prefect/flow_t212_gold.py:flow_t212_gold
     work_pool:
       name: asset-monitoring-pool
     schedules:

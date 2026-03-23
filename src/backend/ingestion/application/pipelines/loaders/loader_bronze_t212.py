@@ -3,6 +3,7 @@ import uuid
 import json
 from datetime import datetime
 from dotenv import load_dotenv
+from sqlalchemy import text
 
 from ....application.policies import FullLoader
 
@@ -40,7 +41,7 @@ class FullLoaderPostgresT212(FullLoader):
       "id": str(uuid.uuid4()),
       "ingested_date": ingested_time,
       "account_data": json.dumps(data.get("account_data", {})),
-      "position_data": json.dumps(data.get("position_data", {}))
+      "position_data": json.dumps(data.get("position_data", []))
     }
 
     with self._client as client:
@@ -59,8 +60,6 @@ class FullLoaderPostgresT212(FullLoader):
     return None
 
   def _exposition_abstraction(self):
-    from sqlalchemy import text
-
     drop_account = "DROP VIEW IF EXISTS raw.v_bronze_account"
     create_account = f"""
       CREATE VIEW raw.v_bronze_account AS
@@ -84,11 +83,8 @@ class FullLoaderPostgresT212(FullLoader):
           external_id || '_' || currency || '_' || ingested_timestamp AS business_key
       FROM cte
     """
-    with self._client.engine.connect() as conn:
-      conn.execute(text(drop_account))
-      conn.execute(text(create_account))
-      conn.commit()
-
+    
+    
     drop_position = "DROP VIEW IF EXISTS raw.v_bronze_position"
     create_position = f"""
       CREATE OR REPLACE VIEW raw.v_bronze_position AS
@@ -113,7 +109,12 @@ class FullLoaderPostgresT212(FullLoader):
               (pos->'walletImpact'->>'unrealizedProfitLoss')::NUMERIC        AS unrealized_pnl,
               (pos->'walletImpact'->>'fxImpact')::NUMERIC                    AS fx_impact
           FROM {self._table_name} t,
-               jsonb_array_elements(t.position_data) AS pos
+               jsonb_array_elements(
+                   CASE WHEN jsonb_typeof(t.position_data) = 'array'
+                        THEN t.position_data
+                        ELSE '[]'::jsonb
+                   END
+               ) AS pos
       )
       SELECT
           *,
@@ -121,6 +122,9 @@ class FullLoaderPostgresT212(FullLoader):
       FROM cte
     """
     with self._client.engine.connect() as conn:
+      conn.execute(text(drop_account))
+      conn.execute(text(create_account))
       conn.execute(text(drop_position))
       conn.execute(text(create_position))
       conn.commit()
+      
