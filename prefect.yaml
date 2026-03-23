@@ -10,23 +10,14 @@ pull:
 
 deployments:
 
-  # Asset pipeline: bronze → silver → computed silver
-  - name: t212_asset
-    entrypoint: src/orchestration/prefect/flow_t212_asset.py:flow_t212_asset
+  # Unified pipeline: bronze → silver → computed silver → gold → mark processed
+  - name: t212_pipeline
+    entrypoint: src/orchestration/prefect/flow_t212_pipeline.py:flow_t212_pipeline
     work_pool:
       name: asset-monitoring-pool
     schedules:
-      - interval: 3600          # hourly, starts on the hour
+      - interval: 3600          # hourly
         anchor_date: "2024-01-01T00:00:00Z"
-
-  # Account pipeline: bronze → silver (offset 5 min so it doesn't overlap with asset)
-  - name: t212_account
-    entrypoint: src/orchestration/prefect/flow_t212_account.py:flow_t212_account
-    work_pool:
-      name: asset-monitoring-pool
-    schedules:
-      - interval: 3600          # hourly, starts at :05 past the hour
-        anchor_date: "2024-01-01T00:05:00Z"
 
   - name: t212_asset_portfolio_sync
     entrypoint: src/orchestration/prefect/asset_flow_portfolio.py:flow_t212_asset_portfolio_sync
@@ -37,13 +28,6 @@ deployments:
 
   - name: t212_enrichment_synchronization
     entrypoint: src/orchestration/prefect/enrichment_synchronization.py:flow_t212_enrichment_sychronization
-    work_pool:
-      name: asset-monitoring-pool
-    schedules:
-      - interval: 3600          # hourly
-
-  - name: t212_bronze
-    entrypoint: src/orchestration/prefect/flow_t212_bronze.py:flow_t212_bronze
     work_pool:
       name: asset-monitoring-pool
     schedules:
