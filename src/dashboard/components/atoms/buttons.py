@@ -1,9 +1,9 @@
+"""
+Reusable button atoms — used in the top navbar and any page that needs them.
+Add new shared buttons here (not in page-level components).
+"""
 import dash_bootstrap_components as dbc
 from dash import html
-
-# toggle button outside sidebar
-btn_side_toggle = dbc.Button("☰", id="sidebar-toggle",color="primary",
-                        style={"position": "fixed", "top": "1rem", "left": "1rem", "zIndex": 999})
 
 
 def privacy_toggle_btn():

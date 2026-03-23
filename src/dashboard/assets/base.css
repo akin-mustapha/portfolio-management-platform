@@ -1,0 +1,33 @@
+/* ══════════════════════════════════════════════════════════════
+   base.css — Typography + Spacing Tokens + Asset Identity Colors
+   Loaded first. Defines the design foundation everything else uses.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Global typography ────────────────────────────────────────── */
+body, * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Workspace spacing tokens ─────────────────────────────────
+   Change one value here to adjust spacing consistently across
+   section containers, headers, dividers, chart rows, and movers.
+   ─────────────────────────────────────────────────────────── */
+:root {
+    --ws-section-pad-v: 12px;  /* vertical padding inside .tv-section-container */
+    --ws-section-pad-h: 12px;  /* horizontal padding inside .tv-section-container */
+    --ws-section-gap:   12px;  /* margin-bottom between section containers */
+    --ws-header-pad-v:  10px;  /* vertical padding in .tv-section-header */
+    --ws-header-pad-h:  6px;   /* horizontal padding in .tv-section-header */
+    --ws-divider-v:     12px;  /* vertical margin above/below .tv-divider */
+    --ws-chart-gap:     8px;   /* gap between charts in .workspace-chart-grid */
+    --ws-chart-pad-h:   12px;  /* horizontal padding in .workspace-chart-grid */
+    --ws-row-pad-v:     5px;   /* movers/ranked row vertical padding */
+    --ws-row-pad-h:     8px;   /* movers/ranked row horizontal padding */
+    --ws-row-gap:       2px;   /* margin-bottom between movers rows */
+    --ws-tab-pad:       8px;   /* padding inside #tab-*-content panes */
+
+    /* Per-asset identity colors (section stripe, header, chart line) */
+    --asset-1-color:      #0d6efd;  --asset-1-color-dark: #639aff;
+    --asset-2-color:      #26a671;  --asset-2-color-dark: #4cbb9f;
+    --asset-3-color:      #ef5350;  --asset-3-color-dark: #f47c7c;
+}

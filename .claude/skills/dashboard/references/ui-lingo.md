@@ -106,18 +106,22 @@ These are the live IDs in the dashboard. Use these exact strings when describing
 - `workspace-timeframe` — selected timeframe string
 
 **Charts**
-- `winners_chart`, `losers_chart` — top winners/losers bar charts
-- `winners_pnl_chart`, `losers_pnl_chart` — PnL variants
-- `value_chart`, `pnl_chart` — portfolio value and PnL line charts
-- `position_weight_donut_chart`, `profitability_donut_chart` — donut charts
-- `portfolio_performance_map` — treemap / heatmap
-- `portfolio_drawdown_chart` — drawdown line chart
-- `workspace-price-graph`, `workspace-value-graph`, `workspace-risk-graph`, `workspace-dca-graph` — asset-level charts
+- `value_chart`, `pnl_chart` — portfolio value and P&L line charts (Valuation tab)
+- `position_weight_donut_chart`, `portfolio_fx_attribution_chart` — allocation + FX attribution donuts (Valuation tab)
+- `portfolio_drawdown_chart`, `profitability_donut_chart` — drawdown + P&L profitability (Risk tab)
+- `losers_pnl_chart`, `var_by_position_chart` — unprofitable positions + VaR (Risk tab)
+- `portfolio_performance_map`, `winners_pnl_chart` — scatter + winners P&L (Opportunities tab)
+
+**Ranked panels (not charts — HTML rows)**
+- `winners-table`, `losers-table` — top winners/losers ranked rows (Valuation tab)
+- `daily-movers-table` — today's movers list (Valuation tab)
 
 **Containers (filled by callbacks)**
 - `portfolio_kpi_container` — KPI row
 - `portfolio_page_asset_table_container` — asset table
-- `tab-portfolio-content`, `tab-valuation-content`, `tab-risk-content`, `tab-opportunities-content` — tab panels
+- `tab-portfolio-content` — Valuation tab panel
+- `tab-risk-content` — Risk tab panel
+- `tab-opportunities-content` — Opportunities tab panel
 
 **Layout / workspace**
 - `workspace-split` — the drag-to-resize split panel
