@@ -1,10 +1,12 @@
 """Rebalancing config panel — left drawer with per-asset sliders."""
+"""Rebalancing config panel — right drawer with per-asset sliders."""
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 
 def rebalance_drawer_content():
     """Static shell — sliders are populated dynamically by the render_panel_body callback."""
+    """Static shell — asset dropdown + slider body populated dynamically."""
     return html.Div([
 
         # Header
@@ -21,6 +23,30 @@ def rebalance_drawer_content():
         html.Div(id="rebalance-panel-body", children=[
             html.P("Loading config…", className="text-muted", style={"fontSize": "12px", "padding": "8px"}),
         ]),
+        # Asset selector
+        html.Div([
+            dcc.Dropdown(
+                id="rebalance-asset-select",
+                options=[],
+                value=None,
+                placeholder="Select asset…",
+                clearable=False,
+                style={"fontSize": "12px"},
+                className="tv-tag-filter",
+            ),
+        ], style={"padding": "0 var(--ws-section-pad-h) 8px"}),
+
+        # Slider body — populated when asset is selected
+        html.Div(
+            id="rebalance-panel-body",
+            children=[
+                html.P(
+                    "Select an asset to configure.",
+                    className="text-muted",
+                    style={"fontSize": "12px", "padding": "8px var(--ws-section-pad-h)"},
+                ),
+            ],
+        ),
 
         html.Hr(className="tv-divider"),
 
@@ -106,12 +132,72 @@ def build_asset_sliders(configs: list[dict]) -> list:
             ], className="rebalance-asset-card")
         )
     return cards
+def build_single_asset_sliders(cfg: dict) -> list:
+    """Build slider card for a single asset config dict."""
+    ticker = cfg["ticker"]
+    return [
+        html.Div(ticker, className="rebalance-asset-name",
+                 style={"padding": "8px var(--ws-section-pad-h) 4px", "fontWeight": "600",
+                        "fontSize": "12px", "color": "var(--text-primary)"}),
+
+        html.Div([
+            _slider_row(
+                "Target Weight %",
+                {"type": "rebalance-slider", "index": f"{ticker}|target_weight_pct"},
+                0, 100, 0.5, cfg.get("target_weight_pct", 0),
+            ),
+
+            html.Div([
+                html.Div([
+                    html.Span("Min %", className="rebalance-slider-label"),
+                    dcc.Slider(
+                        id={"type": "rebalance-slider", "index": f"{ticker}|min_weight_pct"},
+                        min=0, max=100, step=0.5,
+                        value=cfg.get("min_weight_pct", 0),
+                        marks=None,
+                        tooltip={"placement": "bottom", "always_visible": False},
+                        className="rebalance-slider",
+                    ),
+                ], style={"flex": "1", "marginRight": "8px"}),
+                html.Div([
+                    html.Span("Max %", className="rebalance-slider-label"),
+                    dcc.Slider(
+                        id={"type": "rebalance-slider", "index": f"{ticker}|max_weight_pct"},
+                        min=0, max=100, step=0.5,
+                        value=cfg.get("max_weight_pct", 100),
+                        marks=None,
+                        tooltip={"placement": "bottom", "always_visible": False},
+                        className="rebalance-slider",
+                    ),
+                ], style={"flex": "1"}),
+            ], style={"display": "flex"}, className="rebalance-slider-row"),
+
+            _slider_row(
+                "Risk Tolerance",
+                {"type": "rebalance-slider", "index": f"{ticker}|risk_tolerance"},
+                0, 100, 1, cfg.get("risk_tolerance", 50),
+            ),
+            _slider_row(
+                "Correction Days",
+                {"type": "rebalance-slider", "index": f"{ticker}|correction_days"},
+                1, 7, 1, cfg.get("correction_days", 3),
+                marks={i: str(i) for i in range(1, 8)},
+            ),
+            _slider_row(
+                "Momentum Bias",
+                {"type": "rebalance-slider", "index": f"{ticker}|momentum_bias"},
+                -100, 100, 1, cfg.get("momentum_bias", 0),
+            ),
+        ], style={"padding": "0 var(--ws-section-pad-h)"}),
+    ]
 
 
 def render_plan_summary(plan: dict | None) -> list:
     """Render the latest rebalance plan as a read-only summary."""
     if not plan or not plan.get("plan_json"):
         return [html.P("No plan generated yet.", className="text-muted", style={"fontSize": "12px"})]
+        return [html.P("No plan generated yet.", className="text-muted",
+                       style={"fontSize": "12px", "padding": "8px var(--ws-section-pad-h)"})]
 
     pj = plan["plan_json"]
     rows = [
@@ -120,6 +206,7 @@ def render_plan_summary(plan: dict | None) -> list:
             f"{plan.get('created_date', '')} · {pj.get('summary', '')}",
             className="text-muted d-block mb-2",
             style={"fontSize": "11px"},
+            style={"fontSize": "11px", "padding": "0 var(--ws-section-pad-h)"},
         ),
     ]
     for action in pj.get("actions", []):

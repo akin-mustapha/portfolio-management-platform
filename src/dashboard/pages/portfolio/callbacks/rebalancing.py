@@ -6,6 +6,7 @@ from backend.services.rebalancing.rebalancing_service_builder import build_rebal
 from backend.services.rebalancing.domain.entities import RebalanceConfig
 
 from ..components.organisms.rebalance_panel import build_asset_sliders, render_plan_summary
+from ..components.organisms.rebalance_panel import build_single_asset_sliders, render_plan_summary
 
 
 # ── 1. Toggle panel visibility ────────────────────────────────────────────────
@@ -68,6 +69,69 @@ def render_panel(store_data):
 
 
 # ── 4. Save slider values to DB ───────────────────────────────────────────────
+    Output("rebalance-asset-select", "options"),
+    Input("portfolio_page_location", "pathname"),
+)
+def load_rebalance_data(_pathname):
+    try:
+        service = build_rebalancing_service()
+        configs = service.load_configs()
+        plan = service.get_latest_plan()
+        options = [{"label": c.ticker, "value": c.ticker} for c in configs]
+        store = {
+            "configs": [
+                {
+                    "id": c.id,
+                    "asset_id": c.asset_id,
+                    "ticker": c.ticker,
+                    "target_weight_pct": c.target_weight_pct,
+                    "min_weight_pct": c.min_weight_pct,
+                    "max_weight_pct": c.max_weight_pct,
+                    "risk_tolerance": c.risk_tolerance,
+                    "rebalance_threshold_pct": c.rebalance_threshold_pct,
+                    "correction_days": c.correction_days,
+                    "momentum_bias": c.momentum_bias,
+                    "is_active": c.is_active,
+                }
+                for c in configs
+            ],
+            "plan": plan,
+        }
+        return store, options
+    except Exception as e:
+        return {"configs": [], "plan": None, "error": str(e)}, []
+
+
+# ── 3. Render sliders for selected asset ──────────────────────────────────────
+
+@callback(
+    Output("rebalance-panel-body", "children"),
+    Input("rebalance-asset-select", "value"),
+    State("rebalance-config-store", "data"),
+    prevent_initial_call=True,
+)
+def render_selected_asset_sliders(ticker, store_data):
+    if not ticker or not store_data:
+        raise PreventUpdate
+    cfg = next((c for c in store_data.get("configs", []) if c["ticker"] == ticker), None)
+    if not cfg:
+        raise PreventUpdate
+    return build_single_asset_sliders(cfg)
+
+
+# ── 4. Render plan summary on store load ──────────────────────────────────────
+
+@callback(
+    Output("rebalance-panel-plan-summary", "children"),
+    Input("rebalance-config-store", "data"),
+)
+def render_plan_on_load(store_data):
+    if not store_data:
+        raise PreventUpdate
+    return render_plan_summary(store_data.get("plan"))
+
+
+# ── 5. Save slider values to DB ───────────────────────────────────────────────
 
 @callback(
     Output("rebalance-panel-status", "children"),
@@ -89,6 +153,15 @@ def save_configs(n_clicks, values, ids, store_data):
         asset_fields.setdefault(ticker, {})[field] = value
 
     # Build asset_id lookup from store
+    asset_fields: dict[str, dict] = {}
+    for slider_id, value in zip(ids, values):
+        index = slider_id["index"]
+        parts = index.split("|", 1)
+        if len(parts) != 2:
+            continue
+        ticker, field = parts
+        asset_fields.setdefault(ticker, {})[field] = value
+
     asset_id_by_ticker = {c["ticker"]: c["asset_id"] for c in store_data.get("configs", [])}
     existing_by_ticker = {c["ticker"]: c for c in store_data.get("configs", [])}
 
@@ -119,6 +192,7 @@ def save_configs(n_clicks, values, ids, store_data):
 
 
 # ── 5. Generate plan on demand ────────────────────────────────────────────────
+# ── 6. Generate plan on demand ────────────────────────────────────────────────
 
 @callback(
     Output("rebalance-panel-plan-summary", "children", allow_duplicate=True),
