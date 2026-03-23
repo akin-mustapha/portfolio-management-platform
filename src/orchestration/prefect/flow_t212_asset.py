@@ -7,13 +7,6 @@ logger = loggers.get_logger(__name__)
 
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
-def task_asset_bronze():
-    pipeline = PipelineFactory.get("asset_bronze")
-    logger.info("Running asset bronze pipeline")
-    pipeline.run()
-
-
-@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_asset_silver():
     pipeline = PipelineFactory.get("asset_silver")
     logger.info("Running asset silver pipeline")
@@ -36,8 +29,7 @@ def task_asset_gold():
 
 @flow
 def flow_t212_asset():
-    logger.info("Starting asset flow: bronze → silver → computed silver → gold")
-    task_asset_bronze()
+    logger.info("Starting asset flow: silver → computed silver → gold")
     task_asset_silver()
     task_asset_computed_silver()
     task_asset_gold()

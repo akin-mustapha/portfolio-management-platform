@@ -9,7 +9,7 @@ from ..molecules.kpi_card import _dark_kpi_card
 def kpi_row(data=None):
     data = data or {}
     currency = data.get("currency", "")
-    unit = "EUR" if currency == "EUR" else "USD"
+    unit = currency
     currency_sign = data.get("currency_symbol", "#")
 
     value = data.get("value", 0)

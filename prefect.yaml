@@ -42,6 +42,14 @@ deployments:
     schedules:
       - interval: 3600          # hourly
 
+  - name: t212_bronze
+    entrypoint: src/orchestration/prefect/flow_t212_bronze.py:flow_t212_bronze
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+
+
   # - name: trading_212_asset_event_producer
   #   entrypoint: src/orchestration/prefect/asset_flow_event_producer.py:trading_212_asset_event_producer
   #   work_pool:

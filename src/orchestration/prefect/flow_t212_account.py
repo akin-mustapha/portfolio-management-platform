@@ -7,13 +7,6 @@ logger = loggers.get_logger(__name__)
 
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
-def task_account_bronze():
-    pipeline = PipelineFactory.get("account_bronze")
-    logger.info("Running account bronze pipeline")
-    pipeline.run()
-
-
-@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_account_silver():
     pipeline = PipelineFactory.get("account_silver")
     logger.info("Running account silver pipeline")
@@ -36,8 +29,7 @@ def task_account_gold():
 
 @flow
 def flow_t212_account():
-    logger.info("Starting account flow: bronze → silver → computed silver → gold")
-    task_account_bronze()
+    logger.info("Starting account flow: silver → computed silver → gold")
     task_account_silver()
     task_account_computed_silver()
     task_account_gold()

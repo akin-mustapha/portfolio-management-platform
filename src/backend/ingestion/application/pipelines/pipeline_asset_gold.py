@@ -23,6 +23,9 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+portfolio_id = 21641310
+
+
 
 # ---------------------------------------------------------------------------
 # Source
@@ -39,7 +42,7 @@ class AssetGoldSource(Source):
         self._client = SQLModelClient(DATABASE_URL)
 
     def extract(self):
-        sql = """
+        sql = f"""
             WITH cte_asset AS (
                 SELECT
                     ROW_NUMBER() OVER (
@@ -97,7 +100,7 @@ class AssetGoldSource(Source):
             CROSS JOIN (
                 SELECT id
                 FROM analytics.dim_portfolio
-                WHERE portfolio_id = 'trading212'
+                WHERE portfolio_id = '{portfolio_id}'
             ) dp
             WHERE a.rn = 1
         """

@@ -9,6 +9,7 @@ from ..application.pipelines.pipeline_asset_computed_silver import PipelineAsset
 from ..application.pipelines.pipeline_account_computed_silver import PipelineAccountComputedSilver
 from ..application.pipelines.pipeline_asset_gold import PipelineAssetGold
 from ..application.pipelines.pipeline_account_gold import PipelineAccountGold
+from ..application.pipelines.pipeline_bronze_t212 import PipelineT212Bronze
 from ..application.pipelines.portfolio_enrichment_synchronizer import enrichment_sychronization
 
 class PipelineFactory:
@@ -23,8 +24,8 @@ class PipelineFactory:
     "account_computed_silver": PipelineAccountComputedSilver,
     "account_gold": PipelineAccountGold,
     "enrichment_sychronization": enrichment_sychronization,
+    "t212_bronze": PipelineT212Bronze,
   }
   @classmethod
   def get(self, name: str) -> Pipeline:
-    print(self._registry.get(name))
     return self._registry.get(name.lower())()
