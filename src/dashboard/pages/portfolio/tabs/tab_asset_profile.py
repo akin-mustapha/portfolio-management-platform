@@ -13,10 +13,10 @@ def _summary_prop(label, value_id):
 def asset_profile_tab_content():
     return html.Div([
 
-        # ── Section 1: Position snapshot strip ────────────────────
+        # ── Position snapshot strip ────────────────────────────────
         html.Div(id="profile-snapshot-strip", className="mb-3"),
 
-        # ── Section 2: Price + MA chart ───────────────────────────
+        # ── Price + MA chart ───────────────────────────────────────
         dcc.Graph(
             id="profile-price-ma-chart",
             config={"displayModeBar": False},
@@ -24,29 +24,29 @@ def asset_profile_tab_content():
             className="mb-4",
         ),
 
-        # ── Read-only summary card ─────────────────────────────────
+        # ── Asset metadata card ────────────────────────────────────
         html.Div([
-            html.Div("Asset Details", className="summary-card-header"),
+            html.Div("Asset Details", className="tv-section-header"),
 
             # Row 1: identity
             dbc.Row([
-                dbc.Col(_summary_prop("Ticker",          "profile-ticker"),          width=2),
-                dbc.Col(_summary_prop("Name",            "profile-name"),            width=3),
-                dbc.Col(_summary_prop("Description",     "profile-description"),     width=4),
-                dbc.Col(_summary_prop("First Seen",      "profile-created"),         width=2),
-                dbc.Col(_summary_prop("Last Ingestion",  "profile-last-ingestion"),  width=1),
+                dbc.Col(_summary_prop("Ticker",         "profile-ticker"),         width=2),
+                dbc.Col(_summary_prop("Name",           "profile-name"),           width=3),
+                dbc.Col(_summary_prop("Description",    "profile-description"),    width=4),
+                dbc.Col(_summary_prop("First Seen",     "profile-created"),        width=2),
+                dbc.Col(_summary_prop("Last Ingestion", "profile-last-ingestion"), width=1),
             ], className="g-3 mb-3"),
 
             html.Hr(className="tv-divider"),
 
             # Row 2: classification
             dbc.Row([
-                dbc.Col(_summary_prop("Tags",      "profile-summary-tags"),      width=3),
-                dbc.Col(_summary_prop("Category",  "profile-summary-category"),  width=3),
-                dbc.Col(_summary_prop("Industry",  "profile-summary-industry"),  width=3),
-                dbc.Col(_summary_prop("Sector",    "profile-summary-sector"),    width=3),
+                dbc.Col(_summary_prop("Tags",     "profile-summary-tags"),     width=3),
+                dbc.Col(_summary_prop("Category", "profile-summary-category"), width=3),
+                dbc.Col(_summary_prop("Industry", "profile-summary-industry"), width=3),
+                dbc.Col(_summary_prop("Sector",   "profile-summary-sector"),   width=3),
             ], className="g-3"),
 
-        ], className="profile-summary-card mb-4"),
+        ], className="tv-section-container"),
 
-    ], id="tab-tags-content")
+    ], className="workspace-wrapper", id="tab-tags-content")

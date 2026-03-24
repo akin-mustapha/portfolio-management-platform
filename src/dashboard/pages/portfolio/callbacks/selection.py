@@ -1,12 +1,10 @@
 """
-Selection callbacks — asset row selection, compare mode, winners/losers sort,
-asset profile tab population.
+Selection callbacks — asset row selection, compare mode, winners/losers sort.
 """
 from dash import ALL, MATCH, Output, Input, State, callback, ctx, no_update, html
 from dash.exceptions import PreventUpdate
 
 from ..components.atoms.badges import _kpi_badge
-from ..components.organisms.secondary_kpi import secondary_asset_kpi_row, secondary_asset_tag_row
 from ..charts.portfolio_charts import _ranked_panel, PortfolioPerformanceScatterPlot
 from ..charts.asset_charts import PriceWithMAPlotlyLineChart
 from ....controllers.asset_profile_controller import AssetProfileController
@@ -29,7 +27,6 @@ from ._helpers import (
     Output("asset-detail-sections", "children"),
     Output("risk-asset-detail-sections", "children"),
     Output("opportunities-asset-detail-sections", "children"),
-    Output("workspace-tabs", "active_tab"),
     Input("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
     State("theme-store", "data"),
@@ -37,7 +34,7 @@ from ._helpers import (
 )
 def on_asset_row_selected(selected_rows, timeframe, theme):
     if not selected_rows:
-        return [], None, None, None, no_update
+        return [], None, None, None
 
     tickers = [r.get("ticker") for r in selected_rows if r.get("ticker")][:3]
     if not tickers:
@@ -54,7 +51,6 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
         _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val",  names_map=names_map, metadata_map=metadata_map),
         _build_compare_rows(snapshots, _RISK_METRICS,      current_theme, ns="risk", names_map=names_map, metadata_map=metadata_map),
         _build_compare_rows(snapshots, _OPPS_METRICS,      current_theme, ns="opps", names_map=names_map, metadata_map=metadata_map),
-        "tab-tags",
     )
 
 
@@ -126,7 +122,7 @@ def on_winners_losers_sort_change(sort_by, cached_data):
     )
 
 
-# ── 6. Asset Profile tab — populate on row selection (read-only) ──
+# ── 6. Asset Profile tab — populate metadata on row selection ──────
 
 @callback(
     Output("profile-ticker",           "children"),
@@ -164,7 +160,7 @@ def on_asset_profile_selected(selected_rows):
     )
 
 
-# ── 7. Asset Profile deep-dive — snapshot strip + price/MA chart ──
+# ── 7. Asset Profile — price/MA chart + snapshot strip ────────────
 
 def _fmt_signed(v, fmt=".2f"):
     if v is None:
@@ -174,11 +170,11 @@ def _fmt_signed(v, fmt=".2f"):
 
 
 @callback(
-    Output("profile-snapshot-strip",  "children"),
-    Output("profile-price-ma-chart",  "figure"),
-    Input("portfolio-asset-table",    "selectedRows"),
-    State("workspace-timeframe",      "data"),
-    State("theme-store",              "data"),
+    Output("profile-snapshot-strip", "children"),
+    Output("profile-price-ma-chart", "figure"),
+    Input("portfolio-asset-table",   "selectedRows"),
+    State("workspace-timeframe",     "data"),
+    State("theme-store",             "data"),
     prevent_initial_call=True,
 )
 def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
@@ -188,18 +184,17 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
     row = selected_rows[0]
     current_theme = theme or "light"
 
-    # ── Section 1: snapshot strip ──────────────────────────────────
-    value  = row.get("value")
-    profit = row.get("profit")
+    value   = row.get("value")
+    profit  = row.get("profit")
     pnl_pct = row.get("pnl_pct")
     cum_ret = row.get("cumulative_return")
     weight  = row.get("weight_pct")
     dca     = row.get("dca_bias")
 
-    profit_str, profit_sign   = _fmt_signed(profit,  ",.2f")
-    pnl_str,    pnl_sign      = _fmt_signed(pnl_pct, ".2f")
-    ret_str,    ret_sign      = _fmt_signed(cum_ret,  ".2f")
-    dca_str,    dca_sign      = _fmt_signed(dca,      ".3f")
+    profit_str, profit_sign = _fmt_signed(profit,  ",.2f")
+    pnl_str,    pnl_sign    = _fmt_signed(pnl_pct, ".2f")
+    ret_str,    ret_sign    = _fmt_signed(cum_ret,  ".2f")
+    dca_str,    dca_sign    = _fmt_signed(dca,      ".3f")
 
     strip = html.Div([
         _kpi_badge("Value",    f"£{value:,.2f}" if value is not None else "—"),
@@ -210,7 +205,6 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
         _kpi_badge("DCA Bias", dca_str,           change_sign=dca_sign),
     ], className="kpi-badge-row")
 
-    # ── Section 2: price + MA chart ────────────────────────────────
     ticker = row.get("ticker")
     if not ticker:
         return strip, {}

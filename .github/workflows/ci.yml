@@ -1,4 +1,4 @@
-name: ci_test_asset_monitoring
+name: ci
 on: [push, pull_request]
 
 jobs:
@@ -15,6 +15,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -e .
-      - name: Run tests
+      - name: Run Linter
+        run: |
+          ruff check .
+      - name: Run Units
         run: |
           pytest tests/

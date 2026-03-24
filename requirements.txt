@@ -26,3 +26,5 @@ dash-bootstrap-components
 nbformat>=4.2.0
 # KAFKA
 confluent-kafka
+# Linting
+ruff
