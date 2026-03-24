@@ -12,7 +12,10 @@ def _top_navbar():
             html.Div(
                 [
                     html.Div(
-                        html.I(className="fa-solid fa-gauge-high text-white", style={"fontSize": "0.85rem"}),
+                        html.I(
+                            className="fa-solid fa-gauge-high text-white",
+                            style={"fontSize": "0.85rem"},
+                        ),
                         style={
                             "width": "28px",
                             "height": "28px",
@@ -31,7 +34,12 @@ def _top_navbar():
             # Nav links
             dbc.Nav(
                 [
-                    dbc.NavLink("Portfolio", href="/portfolio", active="exact", className="top-nav-link"),
+                    dbc.NavLink(
+                        "Portfolio",
+                        href="/portfolio",
+                        active="exact",
+                        className="top-nav-link",
+                    ),
                 ],
                 className="d-flex flex-row gap-1 ms-4",
             ),
@@ -48,7 +56,9 @@ def _top_navbar():
                     ),
                     html.Div(
                         html.Button(
-                            html.I(id="theme-toggle-icon", className="fa-solid fa-moon"),
+                            html.I(
+                                id="theme-toggle-icon", className="fa-solid fa-moon"
+                            ),
                             id="theme-toggle-btn",
                             n_clicks=0,
                             className="theme-toggle-btn",
@@ -64,19 +74,28 @@ def _top_navbar():
         className="top-navbar",
     )
 
-@callback(Output("page-content", "children"), Output("active-page", "data"), [Input("url", "pathname")])
+
+@callback(
+    Output("page-content", "children"),
+    Output("active-page", "data"),
+    [Input("url", "pathname")],
+)
 def render_page_content(pathname):
-  if pathname == "/portfolio":
-    return portfolio_layout(), pathname
-# If the user tries to reach a different page, return a 404 message
-  return html.Div(
-    [
-      html.H1("404: Not found", className="text-danger"),
-      html.Hr(),
-      html.P(f"The pathname {pathname} was not recognised..."),
-    ],
-    className="p-3 bg-light rounded-3",
-  ), pathname
+    if pathname == "/portfolio":
+        return portfolio_layout(), pathname
+    # If the user tries to reach a different page, return a 404 message
+    return (
+        html.Div(
+            [
+                html.H1("404: Not found", className="text-danger"),
+                html.Hr(),
+                html.P(f"The pathname {pathname} was not recognised..."),
+            ],
+            className="p-3 bg-light rounded-3",
+        ),
+        pathname,
+    )
+
 
 # Layout
 layout = dbc.Container(
@@ -90,7 +109,7 @@ layout = dbc.Container(
         _top_navbar(),
         dbc.Card(
             dbc.CardBody(html.Div(id="page-content")),
-            className="shadow-sm border-0 rounded-0"
+            className="shadow-sm border-0 rounded-0",
         ),
         dbc.Modal(
             [
@@ -101,7 +120,10 @@ layout = dbc.Container(
                             # Left sidebar — col-3
                             dbc.Col(
                                 [
-                                    html.Div("API Setup", className="settings-nav-item settings-nav-item--active"),
+                                    html.Div(
+                                        "API Setup",
+                                        className="settings-nav-item settings-nav-item--active",
+                                    ),
                                 ],
                                 width=3,
                                 className="settings-sidebar",
@@ -109,11 +131,17 @@ layout = dbc.Container(
                             # Right content — col-9
                             dbc.Col(
                                 [
-                                    html.P("API Configuration", className="settings-section-label"),
+                                    html.P(
+                                        "API Configuration",
+                                        className="settings-section-label",
+                                    ),
                                     # URL row
                                     html.Div(
                                         [
-                                            html.Label("Base URL", className="settings-field-label"),
+                                            html.Label(
+                                                "Base URL",
+                                                className="settings-field-label",
+                                            ),
                                             dbc.Input(
                                                 id="settings-api-url-input",
                                                 type="url",
@@ -126,7 +154,10 @@ layout = dbc.Container(
                                     # Key row
                                     html.Div(
                                         [
-                                            html.Label("API Key", className="settings-field-label"),
+                                            html.Label(
+                                                "API Key",
+                                                className="settings-field-label",
+                                            ),
                                             html.Div(
                                                 [
                                                     dbc.Input(
@@ -136,7 +167,10 @@ layout = dbc.Container(
                                                         className="settings-api-input",
                                                     ),
                                                     html.Button(
-                                                        html.I(id="settings-key-eye-icon", className="fa-solid fa-eye"),
+                                                        html.I(
+                                                            id="settings-key-eye-icon",
+                                                            className="fa-solid fa-eye",
+                                                        ),
                                                         id="settings-key-eye-btn",
                                                         n_clicks=0,
                                                         className="settings-eye-btn",
@@ -151,7 +185,10 @@ layout = dbc.Container(
                                     # Secret token row
                                     html.Div(
                                         [
-                                            html.Label("Secret Token", className="settings-field-label"),
+                                            html.Label(
+                                                "Secret Token",
+                                                className="settings-field-label",
+                                            ),
                                             html.Div(
                                                 [
                                                     dbc.Input(
@@ -161,7 +198,10 @@ layout = dbc.Container(
                                                         className="settings-api-input",
                                                     ),
                                                     html.Button(
-                                                        html.I(id="settings-secret-eye-icon", className="fa-solid fa-eye"),
+                                                        html.I(
+                                                            id="settings-secret-eye-icon",
+                                                            className="fa-solid fa-eye",
+                                                        ),
                                                         id="settings-secret-eye-btn",
                                                         n_clicks=0,
                                                         className="settings-eye-btn",
@@ -176,25 +216,52 @@ layout = dbc.Container(
                                     # Action buttons
                                     html.Div(
                                         [
-                                            html.Button("Connect", id="settings-connect-btn", n_clicks=0, className="settings-connect-btn"),
-                                            html.Button("Save", id="settings-save-btn", n_clicks=0, className="tv-apply-btn"),
-                                            html.Span(id="settings-save-status", className="settings-save-status"),
+                                            html.Button(
+                                                "Connect",
+                                                id="settings-connect-btn",
+                                                n_clicks=0,
+                                                className="settings-connect-btn",
+                                            ),
+                                            html.Button(
+                                                "Save",
+                                                id="settings-save-btn",
+                                                n_clicks=0,
+                                                className="tv-apply-btn",
+                                            ),
+                                            html.Span(
+                                                id="settings-save-status",
+                                                className="settings-save-status",
+                                            ),
                                         ],
                                         className="settings-actions-row",
                                     ),
                                     # Connection status
                                     html.Div(
                                         [
-                                            html.Span(id="settings-status-dot", className="settings-status-dot settings-status-dot--disconnected"),
-                                            html.Span(id="settings-status-label", children="Disconnected", className="settings-status-label"),
+                                            html.Span(
+                                                id="settings-status-dot",
+                                                className="settings-status-dot settings-status-dot--disconnected",
+                                            ),
+                                            html.Span(
+                                                id="settings-status-label",
+                                                children="Disconnected",
+                                                className="settings-status-label",
+                                            ),
                                         ],
                                         className="settings-status-row",
                                     ),
                                     # Last ingestion run
                                     html.Div(
                                         [
-                                            html.Span("Last ingestion run", className="settings-meta-label"),
-                                            html.Span(id="settings-last-run", children="—", className="settings-meta-value"),
+                                            html.Span(
+                                                "Last ingestion run",
+                                                className="settings-meta-label",
+                                            ),
+                                            html.Span(
+                                                id="settings-last-run",
+                                                children="—",
+                                                className="settings-meta-value",
+                                            ),
                                         ],
                                         className="settings-meta-row",
                                     ),

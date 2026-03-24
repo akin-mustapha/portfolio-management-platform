@@ -7,9 +7,9 @@ from shared.database.client import SQLModelClient
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -57,7 +57,9 @@ class SQLiteDatabaseClient:
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in unique_key)
+            updates = ", ".join(
+                f"{k} = :{k}" for k in record.keys() if k not in unique_key
+            )
             sql = f"""
                 INSERT INTO {self._entity_name} ({columns})
                 VALUES ({placeholders})
@@ -93,7 +95,9 @@ class SQLiteDatabaseClient:
 class PostgresDatabaseClient:
     def __init__(self, entity_name, schema_name: str):
         self._client = SQLModelClient(DATABASE_URL)
-        self._entity_name = f"{schema_name}.{entity_name}" if schema_name else entity_name
+        self._entity_name = (
+            f"{schema_name}.{entity_name}" if schema_name else entity_name
+        )
 
     def select(self, params: Dict):
         where_clause = " AND ".join(f"{k} = :{k}" for k in params.keys())
@@ -134,7 +138,9 @@ class PostgresDatabaseClient:
         for record in records:
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in unique_key)
+            updates = ", ".join(
+                f"{k} = :{k}" for k in record.keys() if k not in unique_key
+            )
             sql = f"""
                 INSERT INTO {self._entity_name} ({columns})
                 VALUES ({placeholders})

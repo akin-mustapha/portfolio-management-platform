@@ -5,6 +5,7 @@ from ..infrastructure.repositories.repository_factory import RepositoryFactory
 
 load_dotenv()
 
+
 class AssetController:
     def __init__(self):
         self._presenter = AssetPresenter()
@@ -15,9 +16,7 @@ class AssetController:
 
         df_asset_snapshot = pd.DataFrame([dict(r._mapping) for r in asset_snapshot])
 
-        data = {
-            "asset_history": df_asset_snapshot.to_dict(orient="records")
-        }
+        data = {"asset_history": df_asset_snapshot.to_dict(orient="records")}
 
         view_model = self._presenter.present_asset_history(data)
         return view_model

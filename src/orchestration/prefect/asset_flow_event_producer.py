@@ -1,4 +1,3 @@
-import logging
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
 from prefect.logging import get_run_logger
@@ -9,10 +8,11 @@ from backend.ingestion.factories.event_producer_factory import EventProducerFact
 def task_run_trading_212_asset_event_producer():
     producer = EventProducerFactory.get("trading212AssetEventProducer")
     producer.run()
+
+
 @flow
 def trading_212_asset_event_producer():
     logging = get_run_logger()
     logging.info("Starting Flow")
     task_run_trading_212_asset_event_producer()
     logging.info("End")
-

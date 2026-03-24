@@ -12,6 +12,7 @@ def task_trading212_bronze():
     logger.info("Running unified bronze pipeline")
     pipeline.run()
 
+
 @flow
 def flow_t212_bronze():
     logger.info("Ingestion Trading212 Snapshot")

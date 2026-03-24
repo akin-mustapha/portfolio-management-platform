@@ -1,4 +1,5 @@
 """Organism — AG Grid asset table (the main portfolio data grid)."""
+
 import dash_ag_grid as dag
 import pandas as pd
 from dash import html
@@ -32,8 +33,14 @@ def asset_table(data=None):
     def pnl_style(positive_color=POSITIVE_COLOR, negative_color=NEGATIVE_COLOR):
         return {
             "styleConditions": [
-                {"condition": "params.value > 0", "style": {"color": positive_color, "fontWeight": "600"}},
-                {"condition": "params.value < 0", "style": {"color": negative_color, "fontWeight": "600"}},
+                {
+                    "condition": "params.value > 0",
+                    "style": {"color": positive_color, "fontWeight": "600"},
+                },
+                {
+                    "condition": "params.value < 0",
+                    "style": {"color": negative_color, "fontWeight": "600"},
+                },
             ]
         }
 
@@ -46,36 +53,41 @@ def asset_table(data=None):
                 "field": "trend",
                 "pinned": "left",
                 "suppressMovable": True,
-                "minWidth": 116, "width": 116,
+                "minWidth": 116,
+                "width": 116,
                 "cellRenderer": "TrendSparkline",
                 "cellStyle": {"padding": "0", "overflow": "hidden"},
-                "headerTooltip": "30-day price trend. Green = Bullish (MA30 > MA50), Red = Bearish."
+                "headerTooltip": "30-day price trend. Green = Bullish (MA30 > MA50), Red = Bearish.",
             },
             {
                 "field": "ticker",
                 "headerName": "Ticker",
                 "pinned": "left",
                 "suppressMovable": True,
-                "minWidth": 70, "width": 70,
-                "headerTooltip": "Asset name or ticker symbol."
+                "minWidth": 70,
+                "width": 70,
+                "headerTooltip": "Asset name or ticker symbol.",
             },
             {
                 "field": "name",
-                "minWidth": 100, "width": 130,
+                "minWidth": 100,
+                "width": 130,
                 "tooltipField": "name",
-                "headerTooltip": "Brief description of the asset. Context only — not a trading signal."
+                "headerTooltip": "Brief description of the asset. Context only — not a trading signal.",
             },
             {
                 "field": "value",
                 "headerName": "Value",
-                "minWidth": 90, "width": 90,
+                "minWidth": 90,
+                "width": 90,
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
-                "headerTooltip": "Current total value of your position (price × quantity)."
+                "headerTooltip": "Current total value of your position (price × quantity).",
             },
             {
                 "field": "profit",
                 "headerName": "P&L",
-                "minWidth": 80, "width": 80,
+                "minWidth": 80,
+                "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -88,7 +100,8 @@ def asset_table(data=None):
             {
                 "field": "pnl_pct",
                 "headerName": "P&L %",
-                "minWidth": 80, "width": 80,
+                "minWidth": 80,
+                "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Unrealised P&L as a percentage of cost basis. Comparable across positions.",
@@ -97,7 +110,8 @@ def asset_table(data=None):
             {
                 "field": "cumulative_return",
                 "headerName": "Cumul. Return",
-                "minWidth": 108, "width": 108,
+                "minWidth": 108,
+                "width": 108,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Total return % since position opened.",
@@ -106,7 +120,8 @@ def asset_table(data=None):
             {
                 "field": "daily_return",
                 "headerName": "Daily Return",
-                "minWidth": 96, "width": 96,
+                "minWidth": 96,
+                "width": 96,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": "Single-day % price change.",
@@ -115,37 +130,44 @@ def asset_table(data=None):
             {
                 "field": "ma_crossover_signal",
                 "headerName": "MA Signal",
-                "minWidth": 94, "width": 94,
-                "valueFormatter": {"function": "params.value == null ? '—' : params.value > 0 ? '↑ Bullish' : '↓ Bearish'"},
+                "minWidth": 94,
+                "width": 94,
+                "valueFormatter": {
+                    "function": "params.value == null ? '—' : params.value > 0 ? '↑ Bullish' : '↓ Bearish'"
+                },
                 "cellStyle": pnl_style(),
                 "headerTooltip": "MA crossover signal. ↑ Bullish = MA20 above MA50 (short-term uptrend). ↓ Bearish = MA20 below MA50.",
             },
             {
                 "field": "price",
                 "headerName": "Price",
-                "minWidth": 80, "width": 80,
+                "minWidth": 80,
+                "width": 80,
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
-                "headerTooltip": "Latest market price of the asset."
+                "headerTooltip": "Latest market price of the asset.",
             },
             {
                 "field": "avg_price",
                 "headerName": "Avg Cost",
-                "minWidth": 84, "width": 84,
+                "minWidth": 84,
+                "width": 84,
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": "Average price paid (DCA average). Compare against current price to understand DCA Bias.",
             },
             {
                 "field": "weight_pct",
                 "headerName": "Weight %",
-                "minWidth": 84, "width": 84,
+                "minWidth": 84,
+                "width": 84,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
-                "headerTooltip": "Weight in relation to portfolio value"
+                "headerTooltip": "Weight in relation to portfolio value",
             },
             {
                 "field": "recent_profit_high_30d",
                 "headerName": "30D High",
-                "minWidth": 88, "width": 88,
+                "minWidth": 88,
+                "width": 88,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -156,7 +178,8 @@ def asset_table(data=None):
             {
                 "field": "pct_drawdown",
                 "headerName": "% DD",
-                "minWidth": 72, "width": 72,
+                "minWidth": 72,
+                "width": 72,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": (
@@ -168,7 +191,8 @@ def asset_table(data=None):
             {
                 "field": "volatility_30d",
                 "headerName": "Vol 30D",
-                "minWidth": 80, "width": 80,
+                "minWidth": 80,
+                "width": 80,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.4f')(params.value)"},
                 "headerTooltip": (
@@ -180,7 +204,8 @@ def asset_table(data=None):
             {
                 "field": "var_95_1d",
                 "headerName": "VaR 95%",
-                "minWidth": 84, "width": 84,
+                "minWidth": 84,
+                "width": 84,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": "Value at Risk (95% confidence, 1-day). Maximum expected daily loss under normal conditions.",
@@ -189,7 +214,8 @@ def asset_table(data=None):
             {
                 "field": "dca_bias",
                 "headerName": "DCA Bias",
-                "minWidth": 84, "width": 84,
+                "minWidth": 84,
+                "width": 84,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.4f')(params.value)"},
                 "headerTooltip": (
@@ -201,9 +227,12 @@ def asset_table(data=None):
             {
                 "field": "data_date",
                 "headerName": "Date",
-                "minWidth": 100, "width": 100,
-                "valueFormatter": {"function": "params.value ? new Date(params.value).toLocaleDateString('en-GB', {year: 'numeric', month: 'short', day: 'numeric'}) : ''"},
-                "headerTooltip": "Date this data snapshot was generated."
+                "minWidth": 100,
+                "width": 100,
+                "valueFormatter": {
+                    "function": "params.value ? new Date(params.value).toLocaleDateString('en-GB', {year: 'numeric', month: 'short', day: 'numeric'}) : ''"
+                },
+                "headerTooltip": "Date this data snapshot was generated.",
             },
         ],
         defaultColDef={
@@ -213,7 +242,11 @@ def asset_table(data=None):
         },
         columnSize="autoSize",
         dashGridOptions={
-            "rowSelection": {"mode": "multiRow", "maxSelectedRows": 3, "enableSelectionWithoutKeys": True},
+            "rowSelection": {
+                "mode": "multiRow",
+                "maxSelectedRows": 3,
+                "enableSelectionWithoutKeys": True,
+            },
             "selectionColumnDef": {"width": 36, "minWidth": 36, "maxWidth": 36},
             "tooltipInteraction": True,
             "enableBrowserTooltips": False,

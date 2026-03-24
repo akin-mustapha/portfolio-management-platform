@@ -18,16 +18,17 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Extract
 # Load
 
+
 class FullLoaderPostgresT212(FullLoader):
 
-  def __init__(self, table_name):
-    super().__init__(table_name)
-    self._client = SQLModelClient(DATABASE_URL)
+    def __init__(self, table_name):
+        super().__init__(table_name)
+        self._client = SQLModelClient(DATABASE_URL)
 
-  def _loader(self, data: list[dict]):
-    ingested_time = datetime.now().date()
-    # for record in data:
-    sql=f"""
+    def _loader(self, data: list[dict]):
+        ingested_time = datetime.now().date()
+        # for record in data:
+        sql = f"""
       INSERT INTO {self._table_name} (
           id
         , ingested_date
@@ -37,31 +38,31 @@ class FullLoaderPostgresT212(FullLoader):
       VALUES ((:id), (:ingested_date), (:account_data), (:position_data))
     """
 
-    params = {
-      "id": str(uuid.uuid4()),
-      "ingested_date": ingested_time,
-      "account_data": json.dumps(data.get("account_data", {})),
-      "position_data": json.dumps(data.get("position_data", []))
-    }
+        params = {
+            "id": str(uuid.uuid4()),
+            "ingested_date": ingested_time,
+            "account_data": json.dumps(data.get("account_data", {})),
+            "position_data": json.dumps(data.get("position_data", [])),
+        }
 
-    with self._client as client:
-      client.execute(sql, params=params)
+        with self._client as client:
+            client.execute(sql, params=params)
 
-  def _create_partition(self):
-    sql = f"""
+    def _create_partition(self):
+        sql = f"""
       CREATE TABLE IF NOT EXISTS {self._partition_name}
       PARTITION OF {self._table_name}
       FOR VALUES FROM (:day) TO (:next_day);
     """
 
-    with self._client as client:
-      client.execute(sql, {"day": self._day, "next_day": self._next_day})
+        with self._client as client:
+            client.execute(sql, {"day": self._day, "next_day": self._next_day})
 
-    return None
+        return None
 
-  def _exposition_abstraction(self):
-    drop_account = "DROP VIEW IF EXISTS raw.v_bronze_account"
-    create_account = f"""
+    def _exposition_abstraction(self):
+        drop_account = "DROP VIEW IF EXISTS raw.v_bronze_account"
+        create_account = f"""
       CREATE VIEW raw.v_bronze_account AS
       WITH cte AS (
           SELECT
@@ -83,10 +84,9 @@ class FullLoaderPostgresT212(FullLoader):
           external_id || '_' || currency || '_' || ingested_timestamp AS business_key
       FROM cte
     """
-    
-    
-    drop_position = "DROP VIEW IF EXISTS raw.v_bronze_position"
-    create_position = f"""
+
+        drop_position = "DROP VIEW IF EXISTS raw.v_bronze_position"
+        create_position = f"""
       CREATE OR REPLACE VIEW raw.v_bronze_position AS
       WITH cte AS (
           SELECT
@@ -121,10 +121,9 @@ class FullLoaderPostgresT212(FullLoader):
           snapshot_id || '_' || ticker || '_' || ingested_timestamp AS business_key
       FROM cte
     """
-    with self._client.engine.connect() as conn:
-      conn.execute(text(drop_account))
-      conn.execute(text(create_account))
-      conn.execute(text(drop_position))
-      conn.execute(text(create_position))
-      conn.commit()
-      
+        with self._client.engine.connect() as conn:
+            conn.execute(text(drop_account))
+            conn.execute(text(create_account))
+            conn.execute(text(drop_position))
+            conn.execute(text(create_position))
+            conn.commit()

@@ -2,6 +2,7 @@
 Theme callbacks — theme/privacy toggles, chart background patching,
 clientside resize and ResizeObserver wiring.
 """
+
 from dash import Output, Input, State, callback, clientside_callback, no_update, Patch
 
 from ._helpers import (
@@ -13,8 +14,8 @@ from ._helpers import (
     _OPPS_METRICS,
 )
 
-
 # ── Privacy toggle ───────────────────────────────────────────────────────────
+
 
 @callback(
     Output("privacy-store", "data"),
@@ -43,6 +44,7 @@ clientside_callback(
 
 # ── Theme toggle ─────────────────────────────────────────────────────────────
 
+
 @callback(
     Output("theme-store", "data"),
     Input("theme-toggle-btn", "n_clicks"),
@@ -68,6 +70,7 @@ clientside_callback(
 
 # ── Patch portfolio chart backgrounds on theme change ────────────────────────
 
+
 @callback(
     Output("value_chart", "figure"),
     Output("pnl_chart", "figure"),
@@ -89,21 +92,25 @@ def update_chart_theme(theme):
     def patch():
         p = Patch()
         p["layout"]["paper_bgcolor"] = bg
-        p["layout"]["plot_bgcolor"]  = bg
+        p["layout"]["plot_bgcolor"] = bg
         p["layout"]["font"]["color"] = fc
         return p
 
     return (
-        patch(), patch(),  # value_chart, pnl_chart
-        patch(), patch(),  # losers_pnl_chart, winners_pnl_chart
-        patch(), patch(),  # position_weight_donut_chart, profitability_donut_chart
-        patch(),           # portfolio_performance_map
-        patch(),           # portfolio_drawdown_chart
-        patch(),           # var_by_position_chart
+        patch(),
+        patch(),  # value_chart, pnl_chart
+        patch(),
+        patch(),  # losers_pnl_chart, winners_pnl_chart
+        patch(),
+        patch(),  # position_weight_donut_chart, profitability_donut_chart
+        patch(),  # portfolio_performance_map
+        patch(),  # portfolio_drawdown_chart
+        patch(),  # var_by_position_chart
     )
 
 
 # ── Rebuild workspace (asset) charts on theme change ─────────────────────────
+
 
 @callback(
     Output("asset-detail-sections", "children", allow_duplicate=True),
@@ -124,13 +131,21 @@ def update_workspace_chart_theme(theme, selected_assets, timeframe, asset_store)
     start_date, end_date = _date_window(timeframe or "1Y")
 
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
-    asset_rows = (asset_store or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    asset_rows = (
+        (asset_store or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
+    )
     names_map = {r["ticker"]: r.get("name", "") for r in asset_rows if r.get("ticker")}
 
     return (
-        _build_compare_rows(snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map),
-        _build_compare_rows(snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map),
-        _build_compare_rows(snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map),
+        _build_compare_rows(
+            snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map
+        ),
+        _build_compare_rows(
+            snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map
+        ),
+        _build_compare_rows(
+            snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map
+        ),
     )
 
 

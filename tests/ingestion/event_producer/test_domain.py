@@ -1,7 +1,6 @@
 
 
 import pytest
-from datetime import datetime, UTC
 
 from backend.ingestion.domain.models import Event
 

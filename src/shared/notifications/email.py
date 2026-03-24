@@ -32,12 +32,16 @@ class EmailClient:
             ValueError: if any required env var is missing.
             smtplib.SMTPException: on delivery failure.
         """
-        missing = [k for k, v in {
-            "SMTP_HOST": self._host,
-            "SMTP_USER": self._user,
-            "SMTP_PASSWORD": self._password,
-            "NOTIFICATION_EMAIL": self._to,
-        }.items() if not v]
+        missing = [
+            k
+            for k, v in {
+                "SMTP_HOST": self._host,
+                "SMTP_USER": self._user,
+                "SMTP_PASSWORD": self._password,
+                "NOTIFICATION_EMAIL": self._to,
+            }.items()
+            if not v
+        ]
         if missing:
             raise ValueError(f"Missing email env vars: {', '.join(missing)}")
 

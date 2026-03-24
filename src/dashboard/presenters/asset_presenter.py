@@ -14,7 +14,7 @@ class AssetPresenter:
         return {
             "kpi": None,
             "asset_filter": self._asset_filter_vm(data.get("asset_data", [])),
-            "asset_data": data.get("asset_data")
+            "asset_data": data.get("asset_data"),
         }
 
     def present_asset_history(self, data: dict) -> dict:
@@ -23,10 +23,17 @@ class AssetPresenter:
             "asset_price": self._asset_price_series_vm(data.get("asset_history", [])),
             "asset_value": self._asset_value_series_vm(data.get("asset_history", [])),
             "asset_risk": self._asset_risk_series_vm(data.get("asset_history", [])),
-            "asset_dca_bias": self._asset_dca_bias_series_vm(data.get("asset_history", [])),
-            "asset_profit_range": self._asset_profit_range_series_vm(data.get("asset_history", [])),
-            "asset_fx_attribution": self._asset_fx_attribution_vm(data.get("asset_history", [])),
+            "asset_dca_bias": self._asset_dca_bias_series_vm(
+                data.get("asset_history", [])
+            ),
+            "asset_profit_range": self._asset_profit_range_series_vm(
+                data.get("asset_history", [])
+            ),
+            "asset_fx_attribution": self._asset_fx_attribution_vm(
+                data.get("asset_history", [])
+            ),
         }
+
     # ---------- Table ----------
 
     def _asset_filter_vm(self, assets: list[dict]) -> dict:
@@ -37,8 +44,8 @@ class AssetPresenter:
             }
 
         return {
-            "fields": ['ticker'],
-            "rows": [a.get('ticker') for a in assets],
+            "fields": ["ticker"],
+            "rows": [a.get("ticker") for a in assets],
         }
 
     # ---------- Line Chart ----------
@@ -47,15 +54,16 @@ class AssetPresenter:
         return {
             "dates": [r["data_date"] for r in rows],
             "values": [r["price"] for r in rows],
-            # y=["price", "ma_30d", "ma_50d"],
-            "title": "Price"
+            "ma_30d": [r.get("ma_30d") for r in rows],
+            "ma_50d": [r.get("ma_50d") for r in rows],
+            "title": "Price",
         }
 
     def _asset_value_series_vm(self, rows: list[dict]) -> dict:
         return {
             "dates": [r["data_date"] for r in rows],
             "values": [r["value"] for r in rows],
-            "title": "Asset Value Over Time"
+            "title": "Asset Value Over Time",
         }
 
     def _asset_risk_series_vm(self, rows: list[dict]) -> dict:
@@ -72,10 +80,10 @@ class AssetPresenter:
 
     def _asset_profit_range_series_vm(self, rows: list[dict]) -> dict:
         return {
-            "dates":    [r["data_date"] for r in rows],
-            "values":   [r["profit"] for r in rows],
+            "dates": [r["data_date"] for r in rows],
+            "values": [r["profit"] for r in rows],
             "high_30d": [r.get("recent_profit_high_30d") for r in rows],
-            "low_30d":  [r.get("recent_profit_low_30d") for r in rows],
+            "low_30d": [r.get("recent_profit_low_30d") for r in rows],
         }
 
     def _asset_fx_attribution_vm(self, rows: list[dict]) -> dict:

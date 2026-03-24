@@ -1,1 +1,1 @@
-from .models import Data, Event
+from .models import Data, Event  # noqa: F401

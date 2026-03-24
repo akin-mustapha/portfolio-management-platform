@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class AssetInstrument(BaseModel):
-    model_config = ConfigDict(extra='allow')
+    model_config = ConfigDict(extra="allow")
     ticker: str
     name: str
     isin: str
@@ -11,7 +11,7 @@ class AssetInstrument(BaseModel):
 
 
 class AssetWalletImpact(BaseModel):
-    model_config = ConfigDict(extra='allow')
+    model_config = ConfigDict(extra="allow")
     currency: str
     totalCost: float
     currentValue: float
@@ -25,7 +25,8 @@ class AssetAPIRecord(BaseModel):
     Checks that required fields are present — extra fields are allowed to
     avoid breaking on new API additions. Used in the bronze pipeline only.
     """
-    model_config = ConfigDict(extra='allow')
+
+    model_config = ConfigDict(extra="allow")
     instrument: AssetInstrument
     quantity: float
     currentPrice: float

@@ -40,52 +40,54 @@ fields:
   "fx_impact": "fx_impact"
 """
 
-class AssetMapper(Mapper):
-  def map(self, data, schema):
-    schema_dict = yaml.load(schema, Loader=yaml.SafeLoader)
-    fields = schema_dict.get("fields")
-    mapped_data = []
-    for asset in data:
-      instrument = asset.get("instrument", {})
-      wallet_impact = asset.get('walletImpact', {})
-      data = {
-        "ticker": instrument.get('ticker'),
-        "name": instrument.get('name'),
-        "quantity": asset.get('quantity', 0),
-        "quantity_in_pies": asset.get('quantityInPies', 0),
-        "current_price": asset.get('currentPrice', 0),
-        "quantity_available_for_trading": asset.get('quantityAvailableForTrading', 0),
-        "average_price_paid": asset.get('averagePricePaid', 0),
-        "current_value": wallet_impact.get('currentValue', 0),
-        "total_cost": wallet_impact.get('totalCost', 0),
-        "unrealized_profit_loss": wallet_impact.get('unrealizedProfitLoss', 0),
-        "fx_impact": wallet_impact.get('fxImpact', 0),
-        "currency": instrument.get('currency', ''),
-        "local_currency": wallet_impact.get('currency', ''),
-      }
-      data = {
-        col: data.get(source)
-        for col, source in fields.items()
-        if data.get(source) != None
 
-        }
-      data["source_name"] = "Trading 212"
-      data["created_timestamp"] = datetime.now(UTC)
-      mapped_data.append(data)
-    return mapped_data
+class AssetMapper(Mapper):
+    def map(self, data, schema):
+        schema_dict = yaml.load(schema, Loader=yaml.SafeLoader)
+        fields = schema_dict.get("fields")
+        mapped_data = []
+        for asset in data:
+            instrument = asset.get("instrument", {})
+            wallet_impact = asset.get("walletImpact", {})
+            data = {
+                "ticker": instrument.get("ticker"),
+                "name": instrument.get("name"),
+                "quantity": asset.get("quantity", 0),
+                "quantity_in_pies": asset.get("quantityInPies", 0),
+                "current_price": asset.get("currentPrice", 0),
+                "quantity_available_for_trading": asset.get(
+                    "quantityAvailableForTrading", 0
+                ),
+                "average_price_paid": asset.get("averagePricePaid", 0),
+                "current_value": wallet_impact.get("currentValue", 0),
+                "total_cost": wallet_impact.get("totalCost", 0),
+                "unrealized_profit_loss": wallet_impact.get("unrealizedProfitLoss", 0),
+                "fx_impact": wallet_impact.get("fxImpact", 0),
+                "currency": instrument.get("currency", ""),
+                "local_currency": wallet_impact.get("currency", ""),
+            }
+            data = {
+                col: data.get(source)
+                for col, source in fields.items()
+                if data.get(source) is not None
+            }
+            data["source_name"] = "Trading 212"
+            data["created_timestamp"] = datetime.now(UTC)
+            mapped_data.append(data)
+        return mapped_data
 
 
 class Trading212AssetConsumer(EventConsumer):
-  mapper = AssetMapper()
-  def run(self, data):
-    result = self.mapper.map(data, asset_schema)
-    destination = DestinationFactory.get("asset", 'staging')
+    mapper = AssetMapper()
 
-    destination.insert(result)
+    def run(self, data):
+        result = self.mapper.map(data, asset_schema)
+        destination = DestinationFactory.get("asset", "staging")
 
-    # mapper = AssetSnapshotMapper()
-    # result = mapper.map(data, asset_snapshot_schema)
-    # destination = DestinationFactory.get("asset_snapshot", "porfolio")
+        destination.insert(result)
 
+        # mapper = AssetSnapshotMapper()
+        # result = mapper.map(data, asset_snapshot_schema)
+        # destination = DestinationFactory.get("asset_snapshot", "porfolio")
 
-    print('::consumed')
+        print("::consumed")

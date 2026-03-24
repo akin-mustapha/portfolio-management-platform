@@ -11,10 +11,8 @@ class RebalanceConfig:
     target_weight_pct: float
     min_weight_pct: float
     max_weight_pct: float
-    risk_tolerance: int
     rebalance_threshold_pct: float
     correction_days: int
-    momentum_bias: int
     is_active: bool = True
 
     def to_record(self):
@@ -24,10 +22,8 @@ class RebalanceConfig:
             "target_weight_pct": self.target_weight_pct,
             "min_weight_pct": self.min_weight_pct,
             "max_weight_pct": self.max_weight_pct,
-            "risk_tolerance": self.risk_tolerance,
             "rebalance_threshold_pct": self.rebalance_threshold_pct,
             "correction_days": self.correction_days,
-            "momentum_bias": self.momentum_bias,
             "is_active": self.is_active,
         }
 
