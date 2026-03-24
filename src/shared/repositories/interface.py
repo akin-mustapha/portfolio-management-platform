@@ -3,7 +3,12 @@ from typing import Dict, Iterable
 
 
 class RepositoryInterface(ABC):
-    def __init__(self, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None):
+    def __init__(
+        self,
+        entity_name: str,
+        schema_name: str = None,
+        field_map: Dict[str, str] = None,
+    ):
         self._entity_name = entity_name
         self._schema_name = schema_name
         self._field_map = field_map or {}

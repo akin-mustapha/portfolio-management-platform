@@ -1,4 +1,5 @@
 """Organism — primary KPI row (full portfolio summary header)."""
+
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -27,64 +28,122 @@ def kpi_row(data=None):
     unrealized_pct = _pnl_pct(unrealized_pnl, total_invested)
     realized_pct = _pnl_pct(realized_pnl, total_invested)
 
-    return html.Div([
-        # Group labels — desktop only
-        dbc.Row([
-            dbc.Col(html.Span("Performance", className="kpi-group-label"), xs=6, md=True),
-            dbc.Col(xs=6, md=True),
-            dbc.Col(xs=6, md=True),
-            dbc.Col(xs=6, md=True),
-            dbc.Col(html.Span("Cash", className="kpi-group-label"), xs=6, md=True),
-            dbc.Col(xs=6, md=True),
-            dbc.Col(xs=6, md=True),
-        ], className="mb-1 d-none d-md-flex g-3"),
-
-        dbc.Row([
-            dbc.Col(_dark_kpi_card(
-                "Portfolio Value",
-                _fmt_currency(value, currency_sign),
-                unit=unit,
-            ), xs=6, md=True),
-            dbc.Col(_dark_kpi_card(
-                "Total Invested",
-                _fmt_currency(total_invested, currency_sign),
-                unit=unit,
-            ), xs=6, md=True),
-            dbc.Col(_dark_kpi_card(
-                "Unrealized P&L",
-                _fmt_currency(unrealized_pnl, currency_sign),
-                unit=unit,
-                change_str=_fmt_pct(unrealized_pct) if unrealized_pct is not None else "",
-                change_sign=1 if unrealized_pnl > 0 else (-1 if unrealized_pnl < 0 else 0),
-            ), xs=6, md=True),
-            dbc.Col(_dark_kpi_card(
-                "Realized P&L",
-                _fmt_currency(realized_pnl, currency_sign),
-                unit=unit,
-                change_str=_fmt_pct(realized_pct) if realized_pct is not None else "",
-                change_sign=1 if realized_pnl > 0 else (-1 if realized_pnl < 0 else 0),
-            ), xs=6, md=True),
-            dbc.Col(_dark_kpi_card(
-                "Cash Available",
-                _fmt_currency(cash, currency_sign),
-                unit=unit,
-                change_str=_fmt_pct(cash_pct),
-                change_sign=0,
-                extra_class="kpi-card-zero" if cash_is_zero else "",
-            ), xs=6, md=True),
-            dbc.Col(_dark_kpi_card(
-                "Cash Reserved",
-                _fmt_currency(cash_reserved, currency_sign),
-                unit=unit,
-                change_str=_fmt_pct(cash_reserved_pct),
-                change_sign=0,
-            ), xs=6, md=True),
-            dbc.Col(_dark_kpi_card(
-                "Cash in Pies",
-                _fmt_currency(cash_in_pies, currency_sign),
-                unit=unit,
-                change_str=_fmt_pct(cash_in_pies_pct),
-                change_sign=0,
-            ), xs=6, md=True),
-        ], className="g-3"),
-    ], className="mb-4")
+    return html.Div(
+        [
+            # Group labels — desktop only
+            dbc.Row(
+                [
+                    dbc.Col(
+                        html.Span("Performance", className="kpi-group-label"),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(xs=6, md=True),
+                    dbc.Col(xs=6, md=True),
+                    dbc.Col(xs=6, md=True),
+                    dbc.Col(
+                        html.Span("Cash", className="kpi-group-label"), xs=6, md=True
+                    ),
+                    dbc.Col(xs=6, md=True),
+                    dbc.Col(xs=6, md=True),
+                ],
+                className="mb-1 d-none d-md-flex g-3",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Portfolio Value",
+                            _fmt_currency(value, currency_sign),
+                            unit=unit,
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Total Invested",
+                            _fmt_currency(total_invested, currency_sign),
+                            unit=unit,
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Unrealized P&L",
+                            _fmt_currency(unrealized_pnl, currency_sign),
+                            unit=unit,
+                            change_str=(
+                                _fmt_pct(unrealized_pct)
+                                if unrealized_pct is not None
+                                else ""
+                            ),
+                            change_sign=(
+                                1
+                                if unrealized_pnl > 0
+                                else (-1 if unrealized_pnl < 0 else 0)
+                            ),
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Realized P&L",
+                            _fmt_currency(realized_pnl, currency_sign),
+                            unit=unit,
+                            change_str=(
+                                _fmt_pct(realized_pct)
+                                if realized_pct is not None
+                                else ""
+                            ),
+                            change_sign=(
+                                1
+                                if realized_pnl > 0
+                                else (-1 if realized_pnl < 0 else 0)
+                            ),
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Cash Available",
+                            _fmt_currency(cash, currency_sign),
+                            unit=unit,
+                            change_str=_fmt_pct(cash_pct),
+                            change_sign=0,
+                            extra_class="kpi-card-zero" if cash_is_zero else "",
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Cash Reserved",
+                            _fmt_currency(cash_reserved, currency_sign),
+                            unit=unit,
+                            change_str=_fmt_pct(cash_reserved_pct),
+                            change_sign=0,
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                    dbc.Col(
+                        _dark_kpi_card(
+                            "Cash in Pies",
+                            _fmt_currency(cash_in_pies, currency_sign),
+                            unit=unit,
+                            change_str=_fmt_pct(cash_in_pies_pct),
+                            change_sign=0,
+                        ),
+                        xs=6,
+                        md=True,
+                    ),
+                ],
+                className="g-3",
+            ),
+        ],
+        className="mb-4",
+    )

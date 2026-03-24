@@ -3,12 +3,11 @@ import dash_bootstrap_components as dbc
 from .layouts.layout import layout
 from .api.credentials_routes import credentials_bp
 
-
 plotly_config = {
-  "staticPlot": True,
-  "scrollZoom": True,
-  "displayModeBar": False,
-  "editable": True,
+    "staticPlot": True,
+    "scrollZoom": True,
+    "displayModeBar": False,
+    "editable": True,
 }
 
 
@@ -20,14 +19,14 @@ app = Dash(
         dbc.themes.COSMO,
         dbc.icons.FONT_AWESOME,
         "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
-    ]
-    )
+    ],
+)
 
 app.layout = layout
 app.server.register_blueprint(credentials_bp)
 
 # Anti-FOUC: read stored theme from localStorage and apply before first paint
-app.index_string = '''<!DOCTYPE html>
+app.index_string = """<!DOCTYPE html>
 <html>
 <head>
     {%metas%}
@@ -56,13 +55,8 @@ app.index_string = '''<!DOCTYPE html>
         {%renderer%}
     </footer>
 </body>
-</html>'''
+</html>"""
 
 
 if __name__ == "__main__":
-    app.run(
-        host='0.0.0.0',
-        port=8050,
-        debug=True,
-        # dev_tools_ui=False
-    )
+    app.run(host="0.0.0.0", port=8050, debug=True, dev_tools_ui=False)

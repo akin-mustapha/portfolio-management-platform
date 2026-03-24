@@ -13,7 +13,7 @@
      8. KPI Cards                     (.kpi-card, .kpi-badge, .kpi-badge-row)
      9. Settings Modal                (.settings-modal, .settings-*)
     10. Edit Tags Modal               (.ws-modal-*)
-    11. Asset Profile                 (.profile-summary-card, .profile-summary-prop)
+    11. Asset Profile                 (.profile-summary-prop)
    ══════════════════════════════════════════════════════════════ */
 
 
@@ -434,29 +434,9 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
    6. Daily Movers Table
    ══════════════════════════════════════════════════════════════ */
 
-.movers-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    position: relative;
-}
-
 .movers-table-scroll {
     max-height: 200px;
     overflow-y: auto;
-}
-
-.movers-n-dropdown {
-    font-size: 11px;
-    height: 28px;
-    padding: 2px 6px;
-    width: 80px;
-    background: var(--bg-panel);
-    color: var(--text-primary);
-    border: 1px solid var(--border-main);
-    border-radius: 4px;
-    cursor: pointer;
 }
 
 .movers-panel-label {
@@ -567,7 +547,8 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
 #tab-valuation-content,
 #tab-portfolio-content,
 #tab-risk-content,
-#tab-opportunities-content {
+#tab-opportunities-content,
+#tab-tags-content {
     margin: 0;
     padding: var(--ws-tab-pad);
 }
@@ -1047,22 +1028,6 @@ html[data-theme="dark"] .ws-modal-overlay {
    11. Asset Profile
    Summary card (AWS Console style) + outline accordion
    ══════════════════════════════════════════════════════════════ */
-
-.profile-summary-card {
-    border: 1px solid var(--border-main);
-    border-radius: 4px;
-    padding: 20px;
-    background: var(--bg-panel);
-}
-
-.profile-summary-card .summary-card-header {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-secondary);
-    margin-bottom: 14px;
-}
 
 .profile-summary-prop {
     display: flex;

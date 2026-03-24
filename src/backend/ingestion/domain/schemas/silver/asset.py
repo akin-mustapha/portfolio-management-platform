@@ -10,6 +10,7 @@ class AssetRecord(BaseModel):
     records with empty identity fields. Used in _to_records() of the
     silver pipeline — invalid records are logged and skipped.
     """
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     data_timestamp: datetime

@@ -3,7 +3,6 @@
 import pytest
 from typing import Any
 from backend.ingestion.application.policies import Origin
-from backend.ingestion.domain.models import Event
 
 class TestOrigin:
   @pytest.fixture

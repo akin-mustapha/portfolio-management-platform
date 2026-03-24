@@ -67,8 +67,5 @@ src/dashboard/
 
 # UI Reference
 
-See `./references/ui-lingo.md` for:
-- Layout vocabulary (what "side by side" means in code)
-- Component names and their Dash equivalents
-- All chart IDs and container IDs
-- Theme colours for dark/light mode
+See `docs/02-architecture/design/ui-design.md`
+

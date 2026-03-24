@@ -1,5 +1,4 @@
 
-import logging
 import os
 from dotenv import load_dotenv
 from random import randint
@@ -8,7 +7,6 @@ from datetime import UTC, datetime
 from src.infra.database.client import SQLModelClient
 from src.app.domain.models.models import Asset, AssetTag, Tag
 from src.infra.repositories.entity_repository import EntityRepositoryFactory
-from src.infra.repositories.repositories import DomainRepositoryFactory
 from src.infra.repositories.query_repository import ItemSQLQueryRepository
 from src.shared.utils.custom_logger import customer_logger
 from src.app.services.portfolio.service import PortfolioService

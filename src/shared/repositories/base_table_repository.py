@@ -7,9 +7,9 @@ from .interface import RepositoryInterface
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -18,7 +18,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 class BaseTableRepository(RepositoryInterface):
-    def __init__(self, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None):
+    def __init__(
+        self,
+        entity_name: str,
+        schema_name: str = None,
+        field_map: Dict[str, str] = None,
+    ):
         """
         :param entity_name: Table name in DB
         :param schema_name: Schema name (Postgres only; omit for SQLite)
@@ -79,7 +84,9 @@ class BaseTableRepository(RepositoryInterface):
             db_unique_key = [self._field_map.get(k, k) for k in unique_key]
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in db_unique_key)
+            updates = ", ".join(
+                f"{k} = :{k}" for k in record.keys() if k not in db_unique_key
+            )
             sql = f"""
               INSERT INTO {self._table} ({columns})
               VALUES ({placeholders})

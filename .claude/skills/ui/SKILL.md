@@ -21,6 +21,7 @@ The visual language is spread across 8 CSS files and 3 Python files. This skill 
    - Layout: `.rebalance-drawer`, `.sidebar-nav-item`
    - Modals: `.ws-modal-card` (Edit Tags), `.settings-modal` (Settings)
 6. **Spacing comes from tokens.** Use `var(--ws-*)` variables for section/chart/row spacing — don't hardcode padding and gap values that duplicate what's in `base.css`.
+7. **Always ensure theme is set properly on the chart**
 
 # Visual Language Summary
 

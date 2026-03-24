@@ -14,9 +14,9 @@ from ...domain.schemas.gold.asset_gold import AssetGoldRecord
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -26,10 +26,10 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 portfolio_id = 21641310
 
 
-
 # ---------------------------------------------------------------------------
 # Source
 # ---------------------------------------------------------------------------
+
 
 class AssetGoldSource(Source):
     """
@@ -113,6 +113,7 @@ class AssetGoldSource(Source):
 # Transformation
 # ---------------------------------------------------------------------------
 
+
 class AssetGoldTransformation(Transformation):
     """
     Converts SQLAlchemy Row objects from the source into plain dicts.
@@ -127,67 +128,100 @@ class AssetGoldTransformation(Transformation):
 # Destinations — each projects only the columns its fact table needs
 # ---------------------------------------------------------------------------
 
+
 class FactPriceDestination(Destination):
-    _COLUMNS = {'date_id', 'asset_id', 'portfolio_id', 'price', 'avg_price'}
+    _COLUMNS = {"date_id", "asset_id", "portfolio_id", "price", "avg_price"}
 
     def __init__(self):
         self._repository = RepositoryFactory.get("fact_price", schema_name="analytics")
 
     def load(self, data: List[Dict]) -> None:
         records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=['date_id', 'asset_id'])
+        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
 
 
 class FactValuationDestination(Destination):
     _COLUMNS = {
-        'date_id', 'asset_id', 'portfolio_id',
-        'value', 'cost_basis', 'unrealized_pnl', 'unrealized_pnl_pct',
-        'realized_pnl', 'position_weight_pct', 'fx_impact',
+        "date_id",
+        "asset_id",
+        "portfolio_id",
+        "value",
+        "cost_basis",
+        "unrealized_pnl",
+        "unrealized_pnl_pct",
+        "realized_pnl",
+        "position_weight_pct",
+        "fx_impact",
     }
 
     def __init__(self):
-        self._repository = RepositoryFactory.get("fact_valuation", schema_name="analytics")
+        self._repository = RepositoryFactory.get(
+            "fact_valuation", schema_name="analytics"
+        )
 
     def load(self, data: List[Dict]) -> None:
         records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=['date_id', 'asset_id'])
+        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
 
 
 class FactReturnDestination(Destination):
-    _COLUMNS = {'date_id', 'asset_id', 'portfolio_id', 'daily_return', 'cumulative_return'}
+    _COLUMNS = {
+        "date_id",
+        "asset_id",
+        "portfolio_id",
+        "daily_return",
+        "cumulative_return",
+    }
 
     def __init__(self):
         self._repository = RepositoryFactory.get("fact_return", schema_name="analytics")
 
     def load(self, data: List[Dict]) -> None:
         records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=['date_id', 'asset_id'])
+        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
 
 
 class FactTechnicalDestination(Destination):
     _COLUMNS = {
-        'date_id', 'asset_id', 'portfolio_id',
-        'pct_drawdown', 'value_high', 'value_low',
-        'ma_20d', 'ma_30d', 'ma_50d',
-        'volatility_20d', 'volatility_30d', 'volatility_50d',
-        'var_95_1d', 'profit_range_30d',
-        'recent_profit_high_30d', 'recent_profit_low_30d',
-        'recent_value_high_30d', 'recent_value_low_30d',
+        "date_id",
+        "asset_id",
+        "portfolio_id",
+        "pct_drawdown",
+        "value_high",
+        "value_low",
+        "ma_20d",
+        "ma_30d",
+        "ma_50d",
+        "volatility_20d",
+        "volatility_30d",
+        "volatility_50d",
+        "var_95_1d",
+        "profit_range_30d",
+        "recent_profit_high_30d",
+        "recent_profit_low_30d",
+        "recent_value_high_30d",
+        "recent_value_low_30d",
     }
 
     def __init__(self):
-        self._repository = RepositoryFactory.get("fact_technical", schema_name="analytics")
+        self._repository = RepositoryFactory.get(
+            "fact_technical", schema_name="analytics"
+        )
 
     def load(self, data: List[Dict]) -> None:
         records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=['date_id', 'asset_id'])
+        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
 
 
 class FactSignalDestination(Destination):
     _COLUMNS = {
-        'date_id', 'asset_id', 'portfolio_id',
-        'dca_bias', 'ma_crossover_signal',
-        'price_above_ma_20d', 'price_above_ma_50d',
+        "date_id",
+        "asset_id",
+        "portfolio_id",
+        "dca_bias",
+        "ma_crossover_signal",
+        "price_above_ma_20d",
+        "price_above_ma_50d",
     }
 
     def __init__(self):
@@ -195,12 +229,13 @@ class FactSignalDestination(Destination):
 
     def load(self, data: List[Dict]) -> None:
         records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=['date_id', 'asset_id'])
+        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
 
 
 # ---------------------------------------------------------------------------
 # Pipeline
 # ---------------------------------------------------------------------------
+
 
 class PipelineAssetGold(BaseGoldPipeline):
     _pipeline_name = "pipeline_asset_gold"

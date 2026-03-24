@@ -14,9 +14,9 @@ from ...domain.schemas.gold.account_gold import AccountGoldRecord
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -27,6 +27,7 @@ portfolio_id = 21641310
 # ---------------------------------------------------------------------------
 # Source
 # ---------------------------------------------------------------------------
+
 
 class AccountGoldSource(Source):
     """
@@ -97,6 +98,7 @@ class AccountGoldSource(Source):
 # Transformation
 # ---------------------------------------------------------------------------
 
+
 class AccountGoldTransformation(Transformation):
     """
     Converts SQLAlchemy Row objects to plain dicts.
@@ -111,26 +113,40 @@ class AccountGoldTransformation(Transformation):
 # Destination
 # ---------------------------------------------------------------------------
 
+
 class FactPortfolioDailyDestination(Destination):
     _COLUMNS = {
-        'date_id', 'portfolio_id',
-        'total_value', 'total_cost', 'unrealized_pnl', 'unrealized_pnl_pct',
-        'realized_pnl', 'daily_change_abs', 'daily_change_pct',
-        'cash_available', 'cash_reserved', 'cash_in_pies', 'cash_deployment_ratio',
-        'fx_impact_total', 'portfolio_volatility_weighted',
+        "date_id",
+        "portfolio_id",
+        "total_value",
+        "total_cost",
+        "unrealized_pnl",
+        "unrealized_pnl_pct",
+        "realized_pnl",
+        "daily_change_abs",
+        "daily_change_pct",
+        "cash_available",
+        "cash_reserved",
+        "cash_in_pies",
+        "cash_deployment_ratio",
+        "fx_impact_total",
+        "portfolio_volatility_weighted",
     }
 
     def __init__(self):
-        self._repository = RepositoryFactory.get("fact_portfolio_daily", schema_name="analytics")
+        self._repository = RepositoryFactory.get(
+            "fact_portfolio_daily", schema_name="analytics"
+        )
 
     def load(self, data: List[Dict]) -> None:
         records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=['date_id', 'portfolio_id'])
+        self._repository.upsert(records=records, unique_key=["date_id", "portfolio_id"])
 
 
 # ---------------------------------------------------------------------------
 # Pipeline
 # ---------------------------------------------------------------------------
+
 
 class PipelineAccountGold(BaseGoldPipeline):
     _pipeline_name = "pipeline_account_gold"

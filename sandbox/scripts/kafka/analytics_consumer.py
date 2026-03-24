@@ -3,8 +3,7 @@ import os
 from dotenv import load_dotenv
 import json
 import logging
-from typing import Dict, List
-from datetime import datetime, UTC, date
+from datetime import date
 from dataclasses import dataclass
 
 from src.services.ingestion.infra.repositories.table_repository_factory import TableRepositoryFactory
@@ -203,9 +202,6 @@ class AnalyticsConsumer:
         except json.JSONDecodeError as e:
             logging.error("Failed to decode message: %s", e)
             return
-
-        data = self._query_repo.select_all_asset_not_updated_since()
-        data = self._query_repo.calc_asset_price_daily()
 
         print(event)
 

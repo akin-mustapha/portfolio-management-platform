@@ -1,6 +1,5 @@
 import yfinance as yf
-from sqlmodel import Session, create_engine, text, SQLModel
-import pandas as pd
+from sqlmodel import create_engine, SQLModel
 from src.services.ingestion.app.sources import Trading212AllInstrumentSource 
 
 if __name__ == "__main__":

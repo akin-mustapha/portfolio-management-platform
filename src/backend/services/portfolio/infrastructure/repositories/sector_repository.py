@@ -1,5 +1,6 @@
 from shared.repositories.base_table_repository import BaseTableRepository
 
+
 class PostgresSectorRepository(BaseTableRepository):
     def __init__(self, db_type: str = "postgres"):
         # Domain field -> DB column mapping

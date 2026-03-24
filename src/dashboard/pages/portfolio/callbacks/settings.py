@@ -1,6 +1,7 @@
 """
 Settings callbacks — settings modal open/close and credential management.
 """
+
 import base64
 import requests as http
 from urllib.parse import urljoin
@@ -87,7 +88,10 @@ def save_credentials(n_clicks, key_value, secret_value, url_value):
 )
 def test_connection(n_clicks, key_value, secret_value, url_value):
     if not key_value or not key_value.strip():
-        return "settings-status-dot settings-status-dot--disconnected", "No key provided"
+        return (
+            "settings-status-dot settings-status-dot--disconnected",
+            "No key provided",
+        )
     try:
         raw = f"{key_value.strip()}:{(secret_value or '').strip()}"
         token = base64.b64encode(raw.encode()).decode()
@@ -100,9 +104,15 @@ def test_connection(n_clicks, key_value, secret_value, url_value):
         )
         if resp.status_code == 200:
             return "settings-status-dot settings-status-dot--connected", "Connected"
-        return "settings-status-dot settings-status-dot--disconnected", f"Error {resp.status_code}"
+        return (
+            "settings-status-dot settings-status-dot--disconnected",
+            f"Error {resp.status_code}",
+        )
     except Exception:
-        return "settings-status-dot settings-status-dot--disconnected", "Connection failed"
+        return (
+            "settings-status-dot settings-status-dot--disconnected",
+            "Connection failed",
+        )
 
 
 # Toggle show/hide on the API key input

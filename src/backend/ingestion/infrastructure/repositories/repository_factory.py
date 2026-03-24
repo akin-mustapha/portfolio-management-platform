@@ -14,7 +14,9 @@ class RepositoryFactory:
     }
 
     @classmethod
-    def get(cls, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None) -> RepositoryInterface:
+    def get(
+        cls, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None
+    ) -> RepositoryInterface:
         repo_class = cls.registry.get(DATABASE_TYPE)
         if not repo_class:
             raise ValueError(f"No repository for database type: {DATABASE_TYPE}")

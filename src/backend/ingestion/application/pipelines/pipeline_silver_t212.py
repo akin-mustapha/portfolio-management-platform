@@ -1,9 +1,10 @@
 """
-  Unified Silver Pipeline for Trading212
+Unified Silver Pipeline for Trading212
 
-  Reads a full snapshot from raw.t212_snapshot (account + positions together)
-  and writes to staging.asset and staging.account in a single run.
+Reads a full snapshot from raw.t212_snapshot (account + positions together)
+and writes to staging.asset and staging.account in a single run.
 """
+
 import os
 import logging
 from dotenv import load_dotenv
@@ -22,9 +23,9 @@ from ...domain.schemas.silver.account import AccountRecord
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -35,6 +36,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # ─────────────────────────────────────────────
 # Source
 # ─────────────────────────────────────────────
+
 
 class Trading212SilverSource(Source):
     def __init__(self):
@@ -65,6 +67,7 @@ class Trading212SilverSource(Source):
 # Transformations
 # ─────────────────────────────────────────────
 
+
 class Trading212AssetTransformationSilver(Transformation):
     def transform(self, snapshots: List[Any]) -> List[Dict]:
         records = []
@@ -81,27 +84,29 @@ class Trading212AssetTransformationSilver(Transformation):
                 ticker = full_ticker.split("_")[0]
                 wallet = pos.get("walletImpact", {})
 
-                records.append({
-                    "external_id":       full_ticker,
-                    "ticker":            ticker,
-                    "name":              pos["instrument"]["name"],
-                    "description":       pos["instrument"]["name"],
-                    "broker":            "Trading 212",
-                    "currency":          pos["instrument"]["currency"],
-                    "local_currency":    wallet.get("currency", ""),
-                    "share":             pos.get("quantity", 0.0),
-                    "price":             pos.get("currentPrice", 0.0),
-                    "avg_price":         pos.get("averagePricePaid", 0.0),
-                    "value":             wallet.get("currentValue", 0.0),
-                    "cost":              wallet.get("totalCost", 0.0),
-                    "profit":            wallet.get("unrealizedProfitLoss", 0.0),
-                    "fx_impact":         wallet.get("fxImpact") or 0.0,
-                    "quantity_in_pies":  pos.get("quantityInPies") or 0.0,
-                    "snapshot_id":       snapshot_id,
-                    "business_key":      f"{snapshot_id}_{full_ticker}_{ingested_timestamp}",
-                    "data_timestamp":    ingested_timestamp,
-                    "updated_timestamp": datetime.now(UTC),
-                })
+                records.append(
+                    {
+                        "external_id": full_ticker,
+                        "ticker": ticker,
+                        "name": pos["instrument"]["name"],
+                        "description": pos["instrument"]["name"],
+                        "broker": "Trading 212",
+                        "currency": pos["instrument"]["currency"],
+                        "local_currency": wallet.get("currency", ""),
+                        "share": pos.get("quantity", 0.0),
+                        "price": pos.get("currentPrice", 0.0),
+                        "avg_price": pos.get("averagePricePaid", 0.0),
+                        "value": wallet.get("currentValue", 0.0),
+                        "cost": wallet.get("totalCost", 0.0),
+                        "profit": wallet.get("unrealizedProfitLoss", 0.0),
+                        "fx_impact": wallet.get("fxImpact") or 0.0,
+                        "quantity_in_pies": pos.get("quantityInPies") or 0.0,
+                        "snapshot_id": snapshot_id,
+                        "business_key": f"{snapshot_id}_{full_ticker}_{ingested_timestamp}",
+                        "data_timestamp": ingested_timestamp,
+                        "updated_timestamp": datetime.now(UTC),
+                    }
+                )
         return records
 
 
@@ -118,28 +123,35 @@ class Trading212AccountTransformationSilver(Transformation):
             cash = account.get("cash", {})
             investments = account.get("investments", {})
 
-            records.append({
-                "external_id":                  external_id,
-                "cash_in_pies":                 cash.get("inPies", 0.0),
-                "cash_available_to_trade":      cash.get("availableToTrade", 0.0),
-                "cash_reserved_for_orders":     cash.get("reservedForOrders", 0.0),
-                "broker":                       "Trading 212",
-                "currency":                     currency,
-                "total_value":                  account.get("totalValue", 0.0),
-                "investments_total_cost":       investments.get("totalCost", 0.0),
-                "investments_realized_pnl":     investments.get("realizedProfitLoss", 0.0),
-                "investments_unrealized_pnl":   investments.get("unrealizedProfitLoss", 0.0),
-                "snapshot_id":                  row.snapshot_id,
-                "business_key":                 f"{external_id}_{currency}_{row.ingested_timestamp}",
-                "data_timestamp":               row.ingested_timestamp,
-                "updated_timestamp":            datetime.now(UTC),
-            })
+            records.append(
+                {
+                    "external_id": external_id,
+                    "cash_in_pies": cash.get("inPies", 0.0),
+                    "cash_available_to_trade": cash.get("availableToTrade", 0.0),
+                    "cash_reserved_for_orders": cash.get("reservedForOrders", 0.0),
+                    "broker": "Trading 212",
+                    "currency": currency,
+                    "total_value": account.get("totalValue", 0.0),
+                    "investments_total_cost": investments.get("totalCost", 0.0),
+                    "investments_realized_pnl": investments.get(
+                        "realizedProfitLoss", 0.0
+                    ),
+                    "investments_unrealized_pnl": investments.get(
+                        "unrealizedProfitLoss", 0.0
+                    ),
+                    "snapshot_id": row.snapshot_id,
+                    "business_key": f"{external_id}_{currency}_{row.ingested_timestamp}",
+                    "data_timestamp": row.ingested_timestamp,
+                    "updated_timestamp": datetime.now(UTC),
+                }
+            )
         return records
 
 
 # ─────────────────────────────────────────────
 # Destinations
 # ─────────────────────────────────────────────
+
 
 class AssetSilverDestination(Destination):
     def __init__(self):
@@ -160,6 +172,7 @@ class AccountSilverDestination(Destination):
 # ─────────────────────────────────────────────
 # Pipeline
 # ─────────────────────────────────────────────
+
 
 class PipelineT212Silver(Pipeline):
     _pipeline_name = "t212_silver"
