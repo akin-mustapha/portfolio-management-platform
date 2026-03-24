@@ -17,7 +17,10 @@ jobs:
           pip install -e .
       - name: Run Linter
         run: |
-          ruff check .
+          ruff check .    
+      - name: Run Formatter
+        run: |
+          python3 -m black src/
       - name: Run Units
         run: |
           pytest tests/

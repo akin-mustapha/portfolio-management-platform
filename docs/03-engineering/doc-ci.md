@@ -1,4 +1,6 @@
-# Linting
+# Continues integration
+
+## Linting
 
 Project use Ruff lint to check for error and ensure code consistency
 
@@ -30,4 +32,13 @@ ruff rule F821
 
 ```sh
 ruff check --fix
+```
+
+## Formatting
+
+```yaml
+      - name: Run Formatter
+        run: |
+          python3 -m black src/
+
 ```
