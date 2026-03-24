@@ -24,12 +24,15 @@ def populate_asset_dropdown(store_data):
 @callback(
     Output("rebalance-panel-body", "children"),
     Input("rebalance-asset-select", "value"),
+    State("rebalance-config-store", "data"),
 )
-def render_sliders_for_asset(ticker):
+def render_sliders_for_asset(ticker, store_data):
     from dash import html as _html
     if not ticker:
         return _html.P("Select an asset above.", className="text-muted", style={"fontSize": "12px", "padding": "8px"})
-    return build_asset_sliders([{"ticker": ticker}])
+    configs = (store_data or {}).get("configs", [])
+    cfg = next((c for c in configs if c["ticker"] == ticker), {"ticker": ticker})
+    return build_asset_sliders([cfg])
 
 
 # ── 1. Toggle panel visibility ────────────────────────────────────────────────
@@ -49,6 +52,7 @@ def toggle_rebalance_panel(n_clicks, current_style):
 
 @callback(
     Output("rebalance-config-store", "data"),
+    Output("rebalance-panel-plan-summary", "children"),
     Input("portfolio_page_location", "pathname"),
 )
 def load_rebalance_data(_pathname):
@@ -56,9 +60,9 @@ def load_rebalance_data(_pathname):
         service = build_rebalancing_service()
         configs = service.load_configs()
         plan = service.get_latest_plan()
-        return _build_store(configs, plan)
+        return _build_store(configs, plan), render_plan_summary(plan)
     except Exception as e:
-        return {"configs": [], "plan": None, "error": str(e)}
+        return {"configs": [], "plan": None, "error": str(e)}, render_plan_summary(None)
 
 
 

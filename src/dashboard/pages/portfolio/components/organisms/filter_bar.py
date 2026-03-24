@@ -18,6 +18,16 @@ TIMEFRAMES = [
 
 def workspace_filter_bar():
     return html.Div([
+        # Advanced filter toggle (primary action — filled)
+        dbc.Button(
+            [html.I(className="fa-solid fa-sliders me-1"), "Advanced Filter"],
+            id="workspace-adv-filter-btn",
+            className="tv-apply-btn",
+            size="sm",
+            n_clicks=0,
+        ),
+        
+        html.Div(className="tv-vert-divider"),
 
         # Timeframe strip
         dcc.RadioItems(
@@ -26,14 +36,6 @@ def workspace_filter_bar():
             value="1Y",
             className="tv-timeframe-strip",
             inputStyle={"display": "none"},
-            labelStyle={
-                "cursor": "pointer",
-                "padding": "4px 10px",
-                "fontSize": "12px",
-                "fontWeight": "500",
-                "borderRadius": "4px",
-                "userSelect": "none",
-            },
         ),
         html.Div(className="tv-vert-divider"),
 
@@ -44,17 +46,7 @@ def workspace_filter_bar():
             placeholder="Filter by tag…",
             style={"minWidth": "180px", "fontSize": "12px"},
         ),
-        html.Div(className="tv-vert-divider"),
         
-        # Advanced filter toggle (primary action — filled)
-        dbc.Button(
-            [html.I(className="fa-solid fa-sliders me-1"), "Advanced Filter"],
-            id="workspace-adv-filter-btn",
-            className="tv-apply-btn",
-            size="sm",
-            n_clicks=0,
-        ),
-
         # Spacer pushes advanced filter to the right
         html.Div(style={"marginLeft": "auto"}),
 

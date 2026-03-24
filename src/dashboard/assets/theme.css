@@ -4,6 +4,12 @@
    ============================================================ */
 
 :root {
+  /* ── Semantic color tokens ───────────────────────────────── */
+  --color-primary:  #0d6efd;   /* Bootstrap primary blue — nav active, focus, grid headers */
+  --color-positive: #26a671;   /* Gain / positive sentiment */
+  --color-negative: #ef5350;   /* Loss / negative sentiment */
+  --color-teal:     #26a69a;   /* Neutral teal — profile tag chips */
+
   --bg-app: #ffffff;
   --bg-sidebar: #f8f9fa;
   --bg-kpi-card: #f8f9fa;
@@ -32,6 +38,11 @@
 }
 
 html[data-theme="dark"] {
+  --color-primary:  #639aff;
+  --color-positive: #4cbb9f;
+  --color-negative: #f47c7c;
+  --color-teal:     #4db6ac;
+
   --bg-app: #1e222d;
   --bg-sidebar: #161b27;
   --bg-kpi-card: #252d3d;
@@ -103,7 +114,7 @@ html[data-theme="dark"] .form-select {
 }
 
 html[data-theme="dark"] .form-select:focus {
-  border-color: #0d6efd !important;
+  border-color: var(--color-primary) !important;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
 }
 
@@ -130,7 +141,7 @@ html[data-theme="dark"] .text-muted {
 }
 
 .theme-toggle-btn:hover {
-  color: #0d6efd;
+  color: var(--color-primary);
 }
 
 .theme-toggle-btn:focus {

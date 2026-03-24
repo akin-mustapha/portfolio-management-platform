@@ -46,7 +46,7 @@
 
 .top-nav-link.active {
     background: rgba(13, 110, 253, 0.1);
-    color: #0d6efd !important;
+    color: var(--color-primary) !important;
     font-weight: 600;
 }
 
@@ -131,7 +131,7 @@ html[data-theme="dark"] .top-nav-link:hover {
 
 .split-divider:hover,
 .split-divider.dragging {
-    background: #0d6efd;
+    background: var(--color-primary);
 }
 
 .workspace-panel-right {

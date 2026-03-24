@@ -2,7 +2,7 @@
 from dash import dcc, html
 
 from ..atoms.formatters import _fmt_pct
-from ...charts.portfolio_charts import daily_change_sparkline
+from ...charts.sparklines import daily_change_sparkline
 
 
 def _daily_change_card(daily_change_pct, daily_change_series, theme="light"):
