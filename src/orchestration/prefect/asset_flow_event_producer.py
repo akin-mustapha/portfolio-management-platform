@@ -3,7 +3,7 @@ from prefect import flow, task
 from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
 from prefect.logging import get_run_logger
-from backend.ingestion.factories.event_producer_factory import EventProducerFactory
+from pipelines.factories.event_producer_factory import EventProducerFactory
 
 
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)

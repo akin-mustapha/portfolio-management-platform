@@ -2,7 +2,7 @@
 import os
 import logging
 
-from backend.ingestion.infrastructure.kafka.consumer_adapter import KafkaAdapter
+from pipelines.infrastructure.kafka.consumer_adapter import KafkaAdapter
 
 # ───────────────────────── Logging ─────────────────────────
 
