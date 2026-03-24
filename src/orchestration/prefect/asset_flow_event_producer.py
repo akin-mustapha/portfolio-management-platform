@@ -1,6 +1,4 @@
-import logging
 from prefect import flow, task
-from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
 from prefect.logging import get_run_logger
 from pipelines.factories.event_producer_factory import EventProducerFactory
@@ -10,14 +8,11 @@ from pipelines.factories.event_producer_factory import EventProducerFactory
 def task_run_trading_212_asset_event_producer():
     producer = EventProducerFactory.get("trading212AssetEventProducer")
     producer.run()
+
+
 @flow
 def trading_212_asset_event_producer():
     logging = get_run_logger()
     logging.info("Starting Flow")
     task_run_trading_212_asset_event_producer()
     logging.info("End")
-
-    
-if __name__ == "__main__": 
-    trading_212_asset_event_producer.serve(
-        name="trading_212_asset_event_producer", interval=timedelta(seconds=600))  # Runs every 5mins

@@ -1,0 +1,218 @@
+"""
+Unified Silver Pipeline for Trading212
+
+Reads a full snapshot from raw.t212_snapshot (account + positions together)
+and writes to staging.asset and staging.account in a single run.
+"""
+
+import os
+import logging
+from dotenv import load_dotenv
+from datetime import datetime, UTC
+from typing import List, Dict, Any
+
+from ...application.policies import Pipeline
+from ...application.protocols import Source, Destination, Transformation
+from ...application.validators.schema_validator import SchemaValidator
+
+from shared.database.client import SQLModelClient
+from ...infrastructure.repositories.repository_factory import RepositoryFactory
+from ...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
+from ...domain.schemas.silver.asset import AssetRecord
+from ...domain.schemas.silver.account import AccountRecord
+
+logging.basicConfig(
+    level=logging.INFO,
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
+)
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+
+# ─────────────────────────────────────────────
+# Source
+# ─────────────────────────────────────────────
+
+
+class Trading212SilverSource(Source):
+    def __init__(self):
+        self._client = SQLModelClient(DATABASE_URL)
+
+    def extract(self) -> List[Any]:
+        sql = """
+          SELECT
+              id                AS snapshot_id,
+              ingested_timestamp,
+              ingested_date,
+              account_data,
+              position_data
+          FROM raw.t212_snapshot
+          WHERE processed_at IS NOT NULL
+            AND ingested_date > (
+                SELECT COALESCE(MAX(data_timestamp::DATE), '1900-01-01')
+                FROM staging.asset
+            )
+          ORDER BY ingested_timestamp ASC
+        """
+        with self._client as db:
+            result = db.execute(sql)
+        return result.fetchall()
+
+
+# ─────────────────────────────────────────────
+# Transformations
+# ─────────────────────────────────────────────
+
+
+class Trading212AssetTransformationSilver(Transformation):
+    def transform(self, snapshots: List[Any]) -> List[Dict]:
+        records = []
+        for row in snapshots:
+            snapshot_id = row.snapshot_id
+            ingested_timestamp = row.ingested_timestamp
+            positions = row.position_data  # psycopg2 deserialises JSONB → Python list
+
+            for pos in positions:
+                if not pos.get("instrument", {}).get("ticker"):
+                    continue
+
+                full_ticker = pos["instrument"]["ticker"]
+                ticker = full_ticker.split("_")[0]
+                wallet = pos.get("walletImpact", {})
+
+                records.append(
+                    {
+                        "external_id": full_ticker,
+                        "ticker": ticker,
+                        "name": pos["instrument"]["name"],
+                        "description": pos["instrument"]["name"],
+                        "broker": "Trading 212",
+                        "currency": pos["instrument"]["currency"],
+                        "local_currency": wallet.get("currency", ""),
+                        "share": pos.get("quantity", 0.0),
+                        "price": pos.get("currentPrice", 0.0),
+                        "avg_price": pos.get("averagePricePaid", 0.0),
+                        "value": wallet.get("currentValue", 0.0),
+                        "cost": wallet.get("totalCost", 0.0),
+                        "profit": wallet.get("unrealizedProfitLoss", 0.0),
+                        "fx_impact": wallet.get("fxImpact") or 0.0,
+                        "quantity_in_pies": pos.get("quantityInPies") or 0.0,
+                        "snapshot_id": snapshot_id,
+                        "business_key": f"{snapshot_id}_{full_ticker}_{ingested_timestamp}",
+                        "data_timestamp": ingested_timestamp,
+                        "updated_timestamp": datetime.now(UTC),
+                    }
+                )
+        return records
+
+
+class Trading212AccountTransformationSilver(Transformation):
+    def transform(self, snapshots: List[Any]) -> List[Dict]:
+        records = []
+        for row in snapshots:
+            account = row.account_data  # psycopg2 deserialises JSONB → Python dict
+            if not account:
+                continue
+
+            external_id = str(account.get("id", ""))
+            currency = account.get("currency", "")
+            cash = account.get("cash", {})
+            investments = account.get("investments", {})
+
+            records.append(
+                {
+                    "external_id": external_id,
+                    "cash_in_pies": cash.get("inPies", 0.0),
+                    "cash_available_to_trade": cash.get("availableToTrade", 0.0),
+                    "cash_reserved_for_orders": cash.get("reservedForOrders", 0.0),
+                    "broker": "Trading 212",
+                    "currency": currency,
+                    "total_value": account.get("totalValue", 0.0),
+                    "investments_total_cost": investments.get("totalCost", 0.0),
+                    "investments_realized_pnl": investments.get(
+                        "realizedProfitLoss", 0.0
+                    ),
+                    "investments_unrealized_pnl": investments.get(
+                        "unrealizedProfitLoss", 0.0
+                    ),
+                    "snapshot_id": row.snapshot_id,
+                    "business_key": f"{external_id}_{currency}_{row.ingested_timestamp}",
+                    "data_timestamp": row.ingested_timestamp,
+                    "updated_timestamp": datetime.now(UTC),
+                }
+            )
+        return records
+
+
+# ─────────────────────────────────────────────
+# Destinations
+# ─────────────────────────────────────────────
+
+
+class AssetSilverDestination(Destination):
+    def __init__(self):
+        self._repository = RepositoryFactory.get("asset", schema_name="staging")
+
+    def load(self, data: List[Dict]) -> None:
+        self._repository.upsert(records=data, unique_key=["business_key"])
+
+
+class AccountSilverDestination(Destination):
+    def __init__(self):
+        self._repository = RepositoryFactory.get("account", schema_name="staging")
+
+    def load(self, data: List[Dict]) -> None:
+        self._repository.upsert(records=data, unique_key=["business_key"])
+
+
+# ─────────────────────────────────────────────
+# Pipeline
+# ─────────────────────────────────────────────
+
+
+class PipelineT212Silver(Pipeline):
+    _pipeline_name = "t212_silver"
+
+    def __init__(self):
+        self._source = Trading212SilverSource()
+        self._asset_transformation = Trading212AssetTransformationSilver()
+        self._account_transformation = Trading212AccountTransformationSilver()
+        self._asset_validator = SchemaValidator(AssetRecord)
+        self._account_validator = SchemaValidator(AccountRecord)
+        self._asset_destination = AssetSilverDestination()
+        self._account_destination = AccountSilverDestination()
+        self._dead_letter = DeadLetterDestination()
+
+    def run(self):
+        snapshots = self._source.extract()
+
+        if not snapshots:
+            logging.warning(f"[{self._pipeline_name}] NO RECORD")
+            return
+
+        asset_data = self._asset_transformation.transform(snapshots)
+        account_data = self._account_transformation.transform(snapshots)
+
+        asset_result = self._asset_validator.validate(asset_data)
+        account_result = self._account_validator.validate(account_data)
+
+        for result, name in [
+            (asset_result, f"{self._pipeline_name}_asset"),
+            (account_result, f"{self._pipeline_name}_account"),
+        ]:
+            if result.invalid:
+                for r in result.invalid:
+                    r.pipeline_name = name
+                self._dead_letter.load(result.invalid)
+                logging.warning(f"[{name}] {len(result.invalid)} records rejected")
+
+        self._asset_destination.load([r.model_dump() for r in asset_result.valid])
+        self._account_destination.load([r.model_dump() for r in account_result.valid])
+
+
+if __name__ == "__main__":
+    PipelineT212Silver().run()

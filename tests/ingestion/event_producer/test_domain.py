@@ -1,7 +1,6 @@
 
 
 import pytest
-from datetime import datetime, UTC
 
 from pipelines.domain.models import Event
 

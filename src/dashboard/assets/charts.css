@@ -1,0 +1,98 @@
+/* ══════════════════════════════════════════════════════════════
+   charts.css — Chart Containers & Grids
+   Covers: chart grid layout, chart header, responsive sizing.
+   Edit here for chart layout changes. Chart colors live in theme.css.
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace Chart Header
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-chart-header {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    flex-shrink: 0;
+    min-height: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace Chart Grid — responsive 2-col → 1-col
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: var(--ws-chart-gap);
+    padding: var(--ws-section-pad-v) var(--ws-chart-pad-h);
+    --bs-gutter-x: 0;
+}
+
+.workspace-chart-grid > * {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.workspace-chart-grid.chart-grid-single {
+    grid-template-columns: 1fr;
+}
+
+.workspace-chart-grid-kpi {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px;
+    padding: 4px 12px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace Chart Grid — thirds (line + donut side-by-side)
+   Uses container queries so the split responds to panel width,
+   not viewport width.
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-wrapper {
+    container-type: inline-size;
+    container-name: chart-area;
+    width: 100%;
+}
+
+/* Default: stacked (mobile-first for the container) */
+.workspace-chart-grid-thirds {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    max-width: 100%;
+    padding: 8px 12px;
+}
+
+.workspace-chart-grid-thirds #portfolio_performance_map {
+    max-width: 100%;
+    width: 100% !important;
+}
+
+.workspace-chart-grid-thirds > div {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* Side-by-side when panel is wide enough */
+@container chart-area (min-width: 900px) {
+    .workspace-chart-grid-thirds {
+        grid-template-columns: 1fr 30%;
+        max-width: 100%;
+    }
+
+    .workspace-chart-grid-thirds > div:first-child {
+        align-items: flex-start;
+        max-width: 100%;
+    }
+
+    .workspace-chart-grid-thirds > div:last-child {
+        align-items: flex-end;
+        max-width: 100%;
+    }
+}

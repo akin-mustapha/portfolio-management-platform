@@ -22,7 +22,7 @@
 
 .finance-grid .ag-header-row {
     background-color: transparent;
-    color: #0d6efd;
+    color: var(--color-primary);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -40,7 +40,7 @@
 }
 
 .finance-grid .ag-header-cell-text {
-    color: #0d6efd;
+    color: var(--color-primary);
 }
 
 /* Sort arrow icons */
@@ -51,7 +51,7 @@
 .finance-grid .ag-header-cell:hover .ag-sort-indicator-icon,
 .finance-grid .ag-sort-indicator-icon.ag-sort-ascending-icon,
 .finance-grid .ag-sort-indicator-icon.ag-sort-descending-icon {
-    color: #0d6efd;
+    color: var(--color-primary);
 }
 
 /* ── Body rows ──────────────────────────────────────────── */
@@ -101,13 +101,17 @@
 }
 
 /* ── Checkbox ───────────────────────────────────────────── */
+/* AG Grid uses custom-rendered checkboxes, not native — override AG Grid CSS variables */
 .finance-grid .ag-checkbox-input-wrapper {
-    accent-color: #3b82f6;
+    --ag-checkbox-checked-background-color: var(--color-primary);
+    --ag-checkbox-checked-border-color: var(--color-primary);
 }
 
-html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="checkbox"] {
-    color-scheme: dark;
-    accent-color: #3b82f6;
+html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper {
+    --ag-checkbox-unchecked-background-color: var(--bg-kpi-card);
+    --ag-checkbox-unchecked-border-color: var(--border-main);
+    --ag-checkbox-checked-background-color: var(--asset-1-color-dark);
+    --ag-checkbox-checked-border-color: var(--asset-1-color-dark);
 }
 
 /* ── Scrollbar ──────────────────────────────────────────── */
@@ -190,8 +194,8 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
     white-space: nowrap;
 }
 
-.kpi-change-positive { color: #26a69a; }
-.kpi-change-negative { color: #ef5350; }
+.kpi-change-positive { color: var(--color-teal); }
+.kpi-change-negative { color: var(--color-negative); }
 .kpi-change-neutral  { color: var(--text-muted); }
 
 /* KPI group labels (Performance / Risk) */
@@ -220,4 +224,106 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
 /* Zero-value cash card — dimmed subtle indicator */
 .kpi-card-zero {
     opacity: 0.38;
+}
+
+/* Secondary KPI badge row — sits inside portfolio section collapse */
+.kpi-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.kpi-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: auto;
+    overflow: hidden;
+}
+
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: auto;
+    overflow: hidden;
+}
+
+.tag-badge__value {
+    font-size: 0.65rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+.tag-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tag-row::-webkit-scrollbar {
+    display: none;
+}
+
+.kpi-badge__label {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.kpi-badge__value {
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+.kpi-badge__unit {
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* Daily Change badge variant — wider to contain the inline sparkline */
+.kpi-badge--with-spark {
+    width: auto;
+}
+
+/* Edit Tags action button — ghost pill style */
+.kpi-badge--action {
+    background: none !important;
+    border: 1px solid var(--border-main) !important;
+    border-radius: 20px !important;
+    padding: 3px 10px !important;
+    font-size: 0.72rem !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer;
+    box-shadow: none !important;
+    height: auto !important;
+    line-height: inherit !important;
+    width: auto !important;
+    text-decoration: none !important;
+}
+
+.kpi-badge--action:hover {
+    background: var(--bg-strip-hover) !important;
+    color: var(--text-primary) !important;
 }

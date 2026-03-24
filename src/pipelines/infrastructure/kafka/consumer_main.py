@@ -1,4 +1,3 @@
-
 import os
 import logging
 
@@ -18,4 +17,4 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-  KafkaAdapter().run()
+    KafkaAdapter().run()

@@ -7,9 +7,9 @@ from .interface import RepositoryInterface
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -18,7 +18,12 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 class BaseTableRepository(RepositoryInterface):
-    def __init__(self, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None):
+    def __init__(
+        self,
+        entity_name: str,
+        schema_name: str = None,
+        field_map: Dict[str, str] = None,
+    ):
         """
         :param entity_name: Table name in DB
         :param schema_name: Schema name (Postgres only; omit for SQLite)
@@ -47,7 +52,7 @@ class BaseTableRepository(RepositoryInterface):
         """Map domain-friendly fields to DB column names. Passthrough when no field_map."""
         if not self._field_map:
             return data
-        return {v: data.get(k) for k, v in self._field_map.items()}
+        return {self._field_map.get(k, k): v for k, v in data.items()}
 
     def _from_db_fields(self, data: Dict) -> Dict:
         """Map DB column names back to domain-friendly fields. Passthrough when no field_map."""
@@ -60,6 +65,7 @@ class BaseTableRepository(RepositoryInterface):
         if not isinstance(records, list):
             records = [records]
 
+        res = None
         for record in records:
             record = self._to_db_fields(record)
             columns = ", ".join(record.keys())
@@ -69,15 +75,18 @@ class BaseTableRepository(RepositoryInterface):
             with self._client as client:
                 res = client.execute(sql, record)
                 logging.info(f"Inserted record into {self._table}")
-            return res
+        return res
 
     def upsert(self, records: Iterable[Dict], unique_key: list[str]):
+        res = None
         for record in records:
             record = self._to_db_fields(record)
             db_unique_key = [self._field_map.get(k, k) for k in unique_key]
             columns = ", ".join(record.keys())
             placeholders = ", ".join(f":{k}" for k in record.keys())
-            updates = ", ".join(f"{k} = :{k}" for k in record.keys() if k not in db_unique_key)
+            updates = ", ".join(
+                f"{k} = :{k}" for k in record.keys() if k not in db_unique_key
+            )
             sql = f"""
               INSERT INTO {self._table} ({columns})
               VALUES ({placeholders})
@@ -87,7 +96,7 @@ class BaseTableRepository(RepositoryInterface):
             with self._client as client:
                 res = client.execute(sql, record)
                 logging.info(f"Upserted record into {self._table}")
-            return res
+        return res
 
     def select(self, params: Dict):
         db_params = self._to_db_fields(params)
@@ -107,6 +116,17 @@ class BaseTableRepository(RepositoryInterface):
         logging.info(f"Selecting all records from {self._table}")
         with self._client as client:
             result = client.execute(sql)
+        results = result.fetchall()
+        logging.info(f"Count of records fetched: {result.rowcount}")
+        return [self._from_db_fields(dict(r._mapping)) for r in results]
+
+    def select_all_by(self, params: Dict):
+        db_params = self._to_db_fields(params)
+        filters = [f"{key} = :{key}" for key in db_params.keys()]
+        sql = f"SELECT * FROM {self._table} WHERE {' AND '.join(filters)}"
+        logging.info(f"Selecting records from {self._table}")
+        with self._client as client:
+            result = client.execute(sql, db_params)
         results = result.fetchall()
         logging.info(f"Count of records fetched: {result.rowcount}")
         return [self._from_db_fields(dict(r._mapping)) for r in results]

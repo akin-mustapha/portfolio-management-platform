@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
 
 
@@ -9,6 +10,7 @@ class AccountRecord(BaseModel):
     records with empty identity fields. Used in _to_records() of the
     silver pipeline — invalid records are logged and skipped.
     """
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     data_timestamp: datetime
@@ -23,6 +25,14 @@ class AccountRecord(BaseModel):
     investments_realized_pnl: float
     investments_unrealized_pnl: float
     business_key: str
+    snapshot_id: Optional[str] = None
+
+    @field_validator("external_id", mode="before")
+    @classmethod
+    def coerce_external_id_to_str(cls, v) -> str:
+        if v is None:
+            raise ValueError("external_id must not be None")
+        return str(v)
 
     @field_validator("business_key", "external_id", "currency")
     @classmethod

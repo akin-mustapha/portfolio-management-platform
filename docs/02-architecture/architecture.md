@@ -21,6 +21,25 @@ Four layers. Each has a single responsibility.
 Dash application. Reads from the analytics (gold) layer via backend services.
 Does no data transformation — only displays what services provide.
 
+Internal structure:
+
+```
+assets/          — CSS split by concern: theme, base, layout, components, charts, ag-grid
+components/      — shared UI utilities reusable across pages
+layouts/         — top-level shell: navbar, page router, settings modal
+pages/portfolio/ — portfolio page: layout, tabs, callbacks, charts
+  tabs/          — one file per tab: Valuation, Risk, Opportunities, Asset Profile
+  charts/        — chart implementations: portfolio_charts, asset_charts
+  callbacks/     — callbacks package split by concern: data, filters, selection, tags, ui, theme, settings
+  components/    — atomic design: atoms → molecules → organisms
+    atoms/       — pure primitives: value formatters, badge elements
+    molecules/   — atoms with a single job: KPI cards
+    organisms/   — full sections: KPI row, table, filter bar, tab assembler
+controllers/     — orchestrate data fetch and presenter calls
+presenters/      — transform DB data into dashboard-ready view models
+infrastructure/  — SQL queries against analytics schema
+```
+
 ## Orchestration (`src/orchestration/`)
 
 Prefect. Defines when and in what order pipelines run.

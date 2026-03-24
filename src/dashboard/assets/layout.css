@@ -1,0 +1,205 @@
+/* ══════════════════════════════════════════════════════════════
+   layout.css — Structural Layout
+   Covers: top navbar, workspace split panels, filter bar, table
+   utility bar. Edit here for anything that positions major areas.
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════
+   Top Navbar
+   ══════════════════════════════════════════════════════════════ */
+
+.top-navbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 16px;
+    height: 48px;
+    background: var(--bg-app, #f8f9fa);
+    border-bottom: 1px solid var(--border-tv, #e9ecef);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.top-nav-brand {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary, #212529);
+    white-space: nowrap;
+}
+
+.top-nav-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted, #6c757d) !important;
+    padding: 4px 10px !important;
+    border-radius: 6px;
+    transition: background 0.12s, color 0.12s;
+}
+
+.top-nav-link:hover {
+    background: var(--bg-hover, rgba(13, 110, 253, 0.06));
+    color: var(--text-primary, #212529) !important;
+}
+
+.top-nav-link.active {
+    background: rgba(13, 110, 253, 0.1);
+    color: var(--color-primary) !important;
+    font-weight: 600;
+}
+
+.top-util-btn {
+    padding: 4px 8px;
+    color: var(--text-muted, #adb5bd);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.12s;
+    border: none;
+    background: transparent;
+}
+
+.top-util-btn:hover {
+    color: var(--text-primary, #212529);
+}
+
+html[data-theme="dark"] .top-navbar {
+    background: var(--bg-sidebar);
+    border-bottom-color: var(--border-main);
+}
+
+html[data-theme="dark"] .top-nav-brand {
+    color: var(--text-primary);
+}
+
+html[data-theme="dark"] .top-nav-link {
+    color: var(--text-nav) !important;
+}
+
+html[data-theme="dark"] .top-nav-link:hover {
+    background: var(--bg-strip-hover);
+    color: var(--text-primary) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace Split Panel
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-split {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    min-height: 500px;
+    overflow: hidden;
+}
+
+.workspace-panel-left {
+    width: var(--left-panel-width, 420px);
+    min-width: 280px;
+    max-width: 60%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.workspace-panel-left .finance-grid {
+    flex: 1;
+    min-height: 0;
+}
+
+.workspace-table-statusbar {
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border-split);
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-app);
+}
+
+.split-divider {
+    width: 5px;
+    background: var(--border-split);
+    cursor: col-resize;
+    flex-shrink: 0;
+    transition: background 0.1s;
+}
+
+.split-divider:hover,
+.split-divider.dragging {
+    background: var(--color-primary);
+}
+
+.workspace-panel-right {
+    flex: 1;
+    min-width: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Workspace Filter Bar
+   ══════════════════════════════════════════════════════════════ */
+
+.workspace-filter-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 7px;
+    border-top: 1px solid var(--border-tv);
+    border-bottom: 1px solid var(--border-tv);
+    background: var(--bg-filter-bar);
+    margin-bottom: 8px;
+}
+
+.workspace-filter-bar .tv-vert-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border-tv);
+    flex-shrink: 0;
+}
+
+html[data-theme="dark"] .asset-filter-bar {
+    background: var(--bg-filter-bar) !important;
+    border-color: var(--border-tv) !important;
+}
+
+html[data-theme="dark"] .tv-vert-divider {
+    background: var(--border-tv) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Table Utility Bar (below asset table, left panel)
+   ══════════════════════════════════════════════════════════════ */
+
+.table-util-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 6px;
+    border-top: 1px solid var(--border-split, #dee2e6);
+    background: var(--bg-app, #f8f9fa);
+    flex-shrink: 0;
+}
+
+.table-util-btn {
+    padding: 4px 8px;
+    color: var(--text-muted, #adb5bd);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.12s;
+}
+
+.table-util-btn:hover {
+    color: var(--text-primary, #212529);
+}

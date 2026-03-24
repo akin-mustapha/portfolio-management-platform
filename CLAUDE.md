@@ -14,7 +14,7 @@ A personal stock portfolio monitoring system. It pulls data from Trading212, pro
 
 Four layers. Keep changes within one layer per task.
 
-```
+```text
 Frontend        src/dashboard/            Dash UI — reads from services
 Orchestration   src/orchestration/        Prefect — schedules pipelines
 Backend         src/backend/ingestion/    ETL pipelines and Kafka events
@@ -48,24 +48,26 @@ Reference: `docs/02-architecture/design/ingestion/doc-pipelines.md`
 ## Storage — Medallion Architecture
 
 | Schema | Layer | What It Holds |
-|--------|-------|---------------|
+| --- | --- | --- |
 | `raw` | Bronze | Append-only, partitioned by date, data as received |
 | `staging` | Silver | Typed, deduplicated, computed metrics |
-| `analytics` | Gold | Built to answer dashboard questions (not yet built) |
+| `analytics` | Gold | Kimball star schema — built to answer dashboard questions |
 
 Schema migrations are managed with Alembic.
 Schema detail: `docs/02-architecture/design/schema/`
 
 ---
 
-## Gold Layer — Not Yet Built
+## Gold Layer
 
-`pipeline_asset_gold.py` exists but is a copy of the silver pipeline — it does not write to `analytics`. The gold layer is being designed **dashboard-question-first**: define what the dashboard needs to show, then build the tables to answer those questions.
+The gold layer is built. The `analytics` schema, all dimension tables, and all six fact tables (`fact_price`, `fact_valuation`, `fact_return`, `fact_technical`, `fact_signal`, `fact_portfolio_daily`) exist and are fully migrated. Both `pipeline_asset_gold.py` and `pipeline_account_gold.py` are implemented and write to these tables.
+
+**Current gap — orchestration:** The gold pipelines are not yet called by any Prefect flow. The tables exist but are empty at runtime until a flow is wired up.
 
 Dashboard questions are tracked in: `docs/02-architecture/design/ui-design.md`
-Planned schema (draft only, not final): `docs/02-architecture/design/schema/schema-analytics.md`
+Schema reference: `docs/02-architecture/design/schema/schema-analytics.md`
 
-Do not implement gold layer tables speculatively. Only build what a dashboard question requires.
+Do not add gold layer tables or columns speculatively. Only build what a dashboard question requires.
 
 ---
 
@@ -74,7 +76,7 @@ Do not implement gold layer tables speculatively. Only build what a dashboard qu
 - The docs and code are not fully aligned. Treat docs as design intent.
 - `doc-data-model.md` describes the tagging model but some field names have drifted (e.g. `tag_type` in docs is `Category` in code).
 - `schema-staging.md` is the most accurate schema doc.
-- Gold layer docs describe a planned design, not current state.
+- `schema-analytics.md` reflects the current implemented schema (post-migration-007).
 
 ---
 
@@ -89,6 +91,12 @@ Do not implement gold layer tables speculatively. Only build what a dashboard qu
 **No over-engineering** — Don't add abstractions, error handling, or configurability beyond what the task needs.
 
 **Migrations** — Any new or changed table requires an Alembic migration. See `docs/03-engineering/doc-commands.md`.
+
+**Dashboard callbacks** — Before adding any callback output, search for existing `Output('component-id', 'property')` patterns to avoid duplicates. For layout direction (horizontal vs vertical), confirm with the user before implementing — default to side-by-side for chart pairs.
+
+**Schema changes** — Never reference columns from unapplied migrations in application code. Confirm migrations are applied before writing code that reads those columns.
+
+**Refactoring** — Do not remove variables that appear unused without first searching templates, callbacks, and conditional logic (especially theme variables like `ct`). After any multi-file refactor, run the test suite and verify all imports resolve — Prefect workers and the dashboard app may resolve imports differently.
 
 ---
 
@@ -106,6 +114,9 @@ Full workflow: `docs/03-engineering/doc-project-workflow.md`
 
 ## Skills Available
 
-- `/database` — schema reference, query help, migration guidance
+- `/database` — schema reference for all three layers, query rules, migration commands
+- `/pipeline` — pipeline pattern, failure modes, pipeline inventory, migration safety
+- `/dashboard` — layout rules, component IDs, callback safety checks, theme wiring
+- `/docs` — doc map, trustworthiness ratings, update checklist by change type
 - `/financial-analyst` — metrics catalogue, dashboard KPI suggestions
 - `/project-navigation` — navigating the codebase (incomplete)

@@ -1,6 +1,4 @@
-import logging
 from prefect import flow, task
-from datetime import timedelta
 from prefect.cache_policies import NO_CACHE
 from pipelines.factories.pipeline_factory import PipelineFactory
 
@@ -8,10 +6,12 @@ from shared.utils.custom_logger import customer_logger
 
 logging = customer_logger("asset_snapshot_flow_run")
 
+
 @task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
 def task_asset_portfolio_sync():
     pipeline = PipelineFactory.get("asset_portfolio")
     pipeline.run()
+
 
 @flow
 def flow_t212_asset_portfolio_sync():
@@ -19,8 +19,3 @@ def flow_t212_asset_portfolio_sync():
     logging.info("Starting data ingestion process")
     task_asset_portfolio_sync()
     logging.info("End data ingestion process")
-
-    
-if __name__ == "__main__": 
-    flow_t212_asset_portfolio_sync.serve(
-        name="t212_asset_portfolio_sync", interval=timedelta(seconds=3600))  # Runs every 5mins

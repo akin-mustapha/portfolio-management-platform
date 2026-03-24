@@ -1,0 +1,13 @@
+/* ══════════════════════════════════════════════════════════════
+   style.css — SPLIT INTO SEPARATE FILES (2025-03-22)
+
+   This file has been decomposed for maintainability.
+   Do NOT add new styles here. Use the appropriate file:
+
+     base.css        → typography, :root spacing tokens, asset colors
+     layout.css      → navbar, workspace split panels, filter bar, table util bar
+     components.css  → buttons, badges, tabs, modals, section containers, movers
+     charts.css      → chart grids, chart headers
+     theme.css       → light/dark color variables (unchanged)
+     ag-grid-finance.css → AG Grid table styling (unchanged)
+   ══════════════════════════════════════════════════════════════ */

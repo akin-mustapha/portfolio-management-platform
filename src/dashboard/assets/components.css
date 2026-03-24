@@ -1,0 +1,1095 @@
+/* ══════════════════════════════════════════════════════════════
+   components.css — UI Components
+   Grouped by component type. Each section is independently editable.
+
+   Sections (Ctrl+F to jump):
+     1. Section Containers & Headers  (.tv-section-container, .tv-section-header)
+     2. Dividers                      (.tv-divider)
+     3. Buttons                       (.tv-apply-btn, .tv-ghost-btn, .tv-adv-btn, .top-util-btn)
+     4. Badges & Tags                 (.profile-tag-chip, .asset-ticker-tag)
+     5. Filter Bar Controls           (.tv-timeframe-strip, date pickers)
+     6. Daily Movers Table            (.movers-*)
+     7. Tab Bar                       (.workspace-tab, .workspace-tab-bar)
+     8. KPI Cards                     (.kpi-card, .kpi-badge, .kpi-badge-row)
+     9. Settings Modal                (.settings-modal, .settings-*)
+    10. Edit Tags Modal               (.ws-modal-*)
+    11. Asset Profile                 (.profile-summary-prop)
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════
+   1. Section Containers & Headers
+   ══════════════════════════════════════════════════════════════ */
+
+.tv-section-container {
+    border: 1px solid var(--border-tv);
+    border-radius: 8px;
+    margin-bottom: var(--ws-section-gap);
+    padding: 0 var(--ws-section-pad-h) var(--ws-section-pad-v);
+}
+
+/* Divider between section header and content when expanded */
+.tv-section-header + .collapse.show {
+    border-top: 1px solid var(--border-tv);
+}
+
+.tv-section-header {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 0;
+    cursor: default;
+    padding: var(--ws-header-pad-v) var(--ws-header-pad-h);
+    user-select: none;
+}
+
+.tv-section-header .tv-chevron {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* Section-level headers (collapsible) — blue accent */
+.tv-section-header--section {
+    color: var(--color-primary);
+}
+
+.tv-section-header--section .tv-chevron {
+    color: var(--color-primary);
+}
+
+html[data-theme="dark"] .tv-section-header--section {
+    color: var(--color-primary);
+}
+
+html[data-theme="dark"] .tv-section-header--section .tv-chevron {
+    color: var(--color-primary);
+}
+
+/* Asset section header — name label after ticker */
+.asset-header-name {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Per-asset identity: left stripe on container */
+.tv-section-container--asset-1 { border-left: 3px solid var(--asset-1-color); }
+.tv-section-container--asset-2 { border-left: 3px solid var(--asset-2-color); }
+.tv-section-container--asset-3 { border-left: 3px solid var(--asset-3-color); }
+html[data-theme="dark"] .tv-section-container--asset-1 { border-left-color: var(--asset-1-color-dark); }
+html[data-theme="dark"] .tv-section-container--asset-2 { border-left-color: var(--asset-2-color-dark); }
+html[data-theme="dark"] .tv-section-container--asset-3 { border-left-color: var(--asset-3-color-dark); }
+
+/* Per-asset identity: header + chevron color */
+.tv-section-header--asset-1,
+.tv-section-header--asset-1 .tv-chevron { color: var(--asset-1-color); }
+.tv-section-header--asset-2,
+.tv-section-header--asset-2 .tv-chevron { color: var(--asset-2-color); }
+.tv-section-header--asset-3,
+.tv-section-header--asset-3 .tv-chevron { color: var(--asset-3-color); }
+html[data-theme="dark"] .tv-section-header--asset-1,
+html[data-theme="dark"] .tv-section-header--asset-1 .tv-chevron { color: var(--asset-1-color-dark); }
+html[data-theme="dark"] .tv-section-header--asset-2,
+html[data-theme="dark"] .tv-section-header--asset-2 .tv-chevron { color: var(--asset-2-color-dark); }
+html[data-theme="dark"] .tv-section-header--asset-3,
+html[data-theme="dark"] .tv-section-header--asset-3 .tv-chevron { color: var(--asset-3-color-dark); }
+
+
+/* ══════════════════════════════════════════════════════════════
+   2. Dividers
+   ══════════════════════════════════════════════════════════════ */
+
+/* TradingView thin divider — replaces Bootstrap hr */
+.tv-divider {
+    border: none;
+    border-top: 1px solid var(--border-tv);
+    margin: var(--ws-divider-v) 0 calc(var(--ws-divider-v) - 4px) 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   3. Buttons
+   ══════════════════════════════════════════════════════════════ */
+
+/* Apply button — primary solid blue */
+.tv-apply-btn,
+.tv-apply-btn:visited {
+    background: #2962ff !important;
+    border: 1px solid #2962ff !important;
+    border-radius: 4px !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 4px 16px !important;
+    cursor: pointer !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    transition: background 0.12s ease, border-color 0.12s ease !important;
+    line-height: 1.6 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+.tv-apply-btn:hover {
+    background: #eef2ff !important;
+    border-color: #a5b4fc !important;
+    color: #2962ff !important;
+    text-decoration: none !important;
+}
+
+.tv-apply-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Advanced filter button — outlined */
+.tv-adv-btn,
+.tv-adv-btn:visited {
+    background: transparent !important;
+    border: 1px solid var(--border-tv) !important;
+    border-radius: 4px !important;
+    color: var(--text-secondary) !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    padding: 4px 12px !important;
+    cursor: pointer !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    white-space: nowrap !important;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease !important;
+    line-height: 1.6 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+.tv-adv-btn:hover {
+    background: #eef2ff !important;
+    border-color: #a5b4fc !important;
+    color: #2962ff !important;
+    text-decoration: none !important;
+}
+
+.tv-adv-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Ghost button — no border, secondary actions (Add Tag, Create Tag) */
+.tv-ghost-btn,
+.tv-ghost-btn:visited {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-secondary) !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 4px 8px !important;
+    cursor: pointer !important;
+    border-radius: 4px !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    transition: color 0.12s ease, background 0.12s ease !important;
+    line-height: 1.6 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+.tv-ghost-btn:hover {
+    color: var(--text-primary) !important;
+    background: var(--bg-strip-hover) !important;
+    text-decoration: none !important;
+}
+
+.tv-ghost-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   4. Badges & Tags
+   ══════════════════════════════════════════════════════════════ */
+
+/* Profile tag chip — teal, used for asset tags in secondary KPI */
+.profile-tag-chip {
+    display: inline-block;
+    background: rgba(38, 166, 154, 0.08);
+    color: var(--color-teal);
+    border: 1px solid rgba(38, 166, 154, 0.25);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    margin: 2px 4px 2px 0;
+    letter-spacing: 0.04em;
+}
+
+html[data-theme="dark"] .profile-tag-chip {
+    background: rgba(38, 166, 154, 0.12);
+    color: var(--color-teal);
+    border-color: rgba(38, 166, 154, 0.3);
+}
+
+.profile-tags-list {
+    min-height: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+/* Asset ticker tag — blue, used for ticker labels */
+.asset-ticker-tag {
+    display: inline-block;
+    background: rgba(13, 110, 253, 0.08);
+    color: var(--color-primary);
+    border: 1px solid rgba(13, 110, 253, 0.2);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    letter-spacing: 0.04em;
+}
+
+html[data-theme="dark"] .asset-ticker-tag {
+    background: rgba(99, 154, 255, 0.12);
+    color: var(--color-primary);
+    border-color: rgba(99, 154, 255, 0.25);
+}
+
+/* Asset secondary KPI two-row layout */
+.asset-secondary-kpi .kpi-badge-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+.asset-tag-btn-row {
+    margin-top: 6px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   5. Filter Bar Controls
+   Timeframe strip, date pickers, collapse body
+   ══════════════════════════════════════════════════════════════ */
+
+/* Timeframe radio strip */
+.tv-timeframe-strip {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0;
+}
+
+.tv-timeframe-strip > div {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+
+.tv-timeframe-strip label {
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.tv-timeframe-strip label:hover {
+    background: var(--bg-strip-hover);
+    color: var(--text-primary);
+}
+
+.tv-timeframe-strip input[type="radio"]:checked + label {
+    background: var(--bg-strip-active);
+    color: #2962ff;
+    font-weight: 700;
+    border-bottom: 2px solid #2962ff;
+    border-radius: 4px 4px 0 0;
+    padding-bottom: 3px;
+}
+
+/* Collapse body — advanced filter row */
+.tv-collapse-body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 7px 14px;
+    border-top: 1px solid var(--border-tv);
+    background: var(--bg-filter-bar);
+    border-radius: 0 0 6px 6px;
+}
+
+.tv-filter-label {
+    color: var(--text-secondary);
+}
+
+.tv-date-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: Inter, system-ui, sans-serif;
+    white-space: nowrap;
+}
+
+/* DatePickerSingle compact style */
+.tv-single-picker,
+.tv-single-picker .SingleDatePicker {
+    display: inline-block !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.tv-single-picker [class*="SingleDatePickerInput"] {
+    border: 1px solid var(--border-tv) !important;
+    border-radius: 4px !important;
+    background: var(--bg-picker) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+}
+
+.tv-single-picker [class*="DateInput"]:not(input) {
+    width: 84px !important;
+    background: transparent !important;
+}
+
+.tv-single-picker input {
+    font-size: 12px !important;
+    font-family: Inter, system-ui, sans-serif !important;
+    color: var(--text-primary) !important;
+    padding: 3px 5px !important;
+    border: none !important;
+    border-bottom: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    line-height: 1.4 !important;
+}
+
+.tv-single-picker input::placeholder {
+    color: var(--text-muted) !important;
+}
+
+.tv-single-picker input:focus {
+    outline: none !important;
+    border-bottom: none !important;
+}
+
+.tv-single-picker [class*="SingleDatePickerInput"]:focus-within {
+    border-color: #2962ff !important;
+    box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.12) !important;
+}
+
+/* Hide calendar icon and fang */
+.tv-single-picker [class*="calendarIcon"],
+.tv-single-picker [class*="DateInput_fang"] {
+    display: none !important;
+}
+
+.tv-single-picker .SingleDatePicker_picker {
+    z-index: 9999 !important;
+}
+
+/* Date picker dark mode */
+html[data-theme="dark"] .tv-collapse-body {
+    background: var(--bg-filter-bar) !important;
+    border-color: var(--border-tv) !important;
+}
+
+html[data-theme="dark"] .tv-single-picker [class*="SingleDatePickerInput"] {
+    background-color: var(--bg-kpi-card) !important;
+    border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .tv-single-picker [class*="DateInput"] {
+    background-color: var(--bg-kpi-card) !important;
+    color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .tv-single-picker input {
+    background-color: var(--bg-kpi-card) !important;
+    color: var(--text-primary) !important;
+}
+
+html[data-theme="dark"] .tv-single-picker input::placeholder {
+    color: var(--text-muted) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   6. Daily Movers Table
+   ══════════════════════════════════════════════════════════════ */
+
+.movers-table-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.movers-panel-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 var(--ws-row-pad-h) var(--ws-row-gap);
+}
+
+.movers-panel-label--gain { color: var(--color-positive); }
+.movers-panel-label--loss { color: var(--color-negative); }
+
+.movers-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--ws-row-pad-v) var(--ws-row-pad-h);
+    border-radius: 3px;
+    margin-bottom: var(--ws-row-gap);
+    font-size: 12px;
+}
+
+.movers-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.movers-value--gain {
+    color: var(--color-positive);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.movers-value--loss {
+    color: var(--color-negative);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.movers-empty {
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: var(--ws-row-pad-v) var(--ws-row-pad-h);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   7. Tab Bar
+   NOTE: dbc.Tabs 2.0.x puts id + className directly on the <ul>
+   so .workspace-tab-bar IS the <ul class="nav nav-tabs"> element.
+   The .tab-content div is a SIBLING to this <ul>, not a child.
+   ══════════════════════════════════════════════════════════════ */
+
+#workspace-tabs,
+.workspace-tab-bar {
+    border-bottom: 1px solid var(--border-split, #dee2e6) !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+    gap: 2px;
+}
+
+.workspace-tab .nav-link {
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted, #6c757d) !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 7px 12px !important;
+    margin-bottom: -1px;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.workspace-tab .nav-link:hover {
+    color: var(--text-primary, #212529) !important;
+    background: rgba(13, 110, 253, 0.05) !important;
+    border-radius: 4px 4px 0 0 !important;
+    border-bottom: 2px solid transparent !important;
+}
+
+/* Active tab — blue text + blue 2px underline */
+.workspace-tab .nav-link.active,
+.workspace-tab--active .nav-link {
+    color: var(--color-primary) !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid var(--color-primary) !important;
+    border-radius: 0 !important;
+}
+
+/* tab-content is a SIBLING to the <ul> */
+#workspace-tabs + .tab-content,
+.workspace-tab-bar + .tab-content {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#workspace-tabs + .tab-content .tab-pane,
+.workspace-tab-bar + .tab-content .tab-pane {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Spacing for tab content wrappers */
+#tab-valuation-content,
+#tab-portfolio-content,
+#tab-risk-content,
+#tab-opportunities-content,
+#tab-tags-content {
+    margin: 0;
+    padding: var(--ws-tab-pad);
+}
+
+/* Tab icons via CSS ::before (Font Awesome unicode) */
+.workspace-tab:nth-child(1) .nav-link::before { content: "\f0b1\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.workspace-tab:nth-child(2) .nav-link::before { content: "\f201\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.workspace-tab:nth-child(3) .nav-link::before { content: "\e23f\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+.workspace-tab:nth-child(4) .nav-link::before { content: "\f002\00a0"; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+
+/* Tab bar dark theme */
+html[data-theme="dark"] #workspace-tabs,
+html[data-theme="dark"] .workspace-tab-bar {
+    border-bottom-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .workspace-tab .nav-link {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .workspace-tab .nav-link:hover {
+    color: var(--text-primary) !important;
+    background: var(--bg-strip-hover) !important;
+}
+
+html[data-theme="dark"] .workspace-tab .nav-link.active,
+html[data-theme="dark"] .workspace-tab--active .nav-link {
+    color: var(--color-primary) !important;
+    border-bottom-color: var(--color-primary) !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   8. KPI Cards
+   ══════════════════════════════════════════════════════════════ */
+
+/* NOTE: KPI card styles are defined in kpis.py via inline dbc.Card
+   props and className. Add shared overrides here if needed. */
+
+
+/* ══════════════════════════════════════════════════════════════
+   9. Settings Modal
+   ══════════════════════════════════════════════════════════════ */
+
+.settings-modal .modal-dialog {
+    max-width: 500px;
+    width: 500px;
+}
+
+.settings-modal .modal-content {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.settings-modal .modal-header {
+    border-bottom: 1px solid var(--border-tv);
+    padding: 12px 16px;
+    flex-shrink: 0;
+}
+
+.settings-modal .modal-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.settings-modal .btn-close {
+    filter: var(--close-btn-filter, none);
+}
+
+.settings-modal-body {
+    padding: 0 !important;
+    flex: 1;
+    overflow: hidden;
+}
+
+.settings-sidebar {
+    background: var(--bg-sidebar, #f8f9fa);
+    border-right: 1px solid var(--border-tv);
+    padding: 12px 0;
+    height: 100%;
+}
+
+.settings-nav-item {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.1s, color 0.1s;
+}
+
+.settings-nav-item--active {
+    color: var(--text-primary);
+    background: var(--bg-strip-hover, rgba(13, 110, 253, 0.06));
+    border-left: 2px solid var(--color-primary);
+    padding-left: 14px;
+}
+
+.settings-content {
+    padding: 20px 20px 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+}
+
+.settings-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.settings-field-group {
+    margin-bottom: 14px;
+}
+
+.settings-field-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.settings-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.settings-api-input {
+    flex: 1;
+    font-size: 13px;
+    background: var(--bg-app) !important;
+    border: 1px solid var(--border-main) !important;
+    color: var(--text-primary) !important;
+    border-radius: 4px;
+    height: 32px;
+}
+
+.settings-api-input:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
+}
+
+.settings-eye-btn {
+    background: transparent;
+    border: 1px solid var(--border-main);
+    border-radius: 4px;
+    color: var(--text-muted);
+    padding: 5px 9px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    height: 32px;
+}
+
+.settings-eye-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-strip-hover, rgba(0,0,0,0.04));
+}
+
+.settings-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    margin-bottom: 20px;
+}
+
+.settings-connect-btn {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border-main);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.settings-connect-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(13, 110, 253, 0.06);
+}
+
+.settings-save-status {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+.settings-status-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.settings-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.settings-status-dot--connected {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.settings-status-dot--disconnected {
+    background: var(--text-muted, #adb5bd);
+}
+
+.settings-status-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.settings-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-meta-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 500;
+}
+
+.settings-meta-value {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .settings-modal .btn-close {
+    filter: invert(1) grayscale(1);
+}
+
+html[data-theme="dark"] .settings-sidebar {
+    background: var(--bg-sidebar);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   10. Edit Tags Modal (workspace-localized overlay)
+   ══════════════════════════════════════════════════════════════ */
+
+.ws-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+}
+
+.ws-modal-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+    border-radius: 12px;
+    width: 380px;
+    max-width: 90%;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-tv);
+    flex-shrink: 0;
+}
+
+.ws-modal-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.ws-modal-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.ws-modal-close:hover {
+    color: var(--text-primary);
+}
+
+.ws-modal-body {
+    padding: 16px;
+    flex: 1;
+    overflow: visible;
+}
+
+.ws-modal-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.ws-modal-footer {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-tv);
+}
+
+/* ws-modal dcc.Dropdown — className lands on the trigger <button>, not a parent div */
+/* Selectors that target button children are valid; content panel uses :has() */
+
+.ws-modal-dropdown {
+    background: var(--bg-app) !important;
+    border: 1px solid var(--border-main) !important;
+    border-radius: 4px !important;
+    min-height: 32px !important;
+    font-size: 13px !important;
+    color: var(--text-primary) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.ws-modal-dropdown[data-state='open'],
+.ws-modal-dropdown:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
+    outline: none !important;
+}
+
+.ws-modal-dropdown .dash-dropdown-placeholder {
+    color: var(--text-muted) !important;
+    font-size: 13px !important;
+}
+
+.ws-modal-dropdown .dash-dropdown-value {
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+}
+
+.ws-modal-dropdown .dash-dropdown-trigger-icon {
+    color: var(--text-muted) !important;
+    fill: var(--text-muted) !important;
+}
+
+/* Content panel and options — use :has() since ws-modal-dropdown is a sibling, not ancestor */
+.dash-dropdown-wrapper:has(.ws-modal-dropdown) .dash-dropdown-content {
+    z-index: 9999 !important;
+    margin-top: 2px !important;
+    font-size: 13px !important;
+}
+
+.dash-dropdown-wrapper:has(.ws-modal-dropdown) .dash-dropdown-option {
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+}
+
+/* ── Global dcc.Dropdown light mode: fix purple hover + selected state ── */
+.dash-dropdown-wrapper .dash-dropdown-option:hover,
+.dash-dropdown-wrapper .dash-dropdown-option:focus {
+    background-color: var(--bg-strip-hover) !important;
+    outline: none !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-option[aria-selected='true'] {
+    background-color: rgba(13, 110, 253, 0.10) !important;
+    color: var(--color-primary) !important;
+}
+
+/* ── Search container: replace Dash purple with project blue ── */
+.dash-dropdown-wrapper .dash-dropdown-search-container {
+    border-color: var(--border-tv) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-search-container:focus-within {
+    border-color: var(--color-primary) !important;
+    outline: 1px solid var(--color-primary) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
+    color: var(--color-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container {
+    background-color: var(--bg-kpi-card) !important;
+    border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container:focus-within {
+    border-color: var(--asset-1-color-dark) !important;
+    outline-color: var(--asset-1-color-dark) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
+    color: var(--asset-1-color-dark) !important;
+}
+
+/* ── Checkboxes in multi-select dropdown ── */
+.dash-dropdown-wrapper .dash-options-list-option-checkbox {
+    accent-color: var(--color-primary) !important;
+    outline-color: var(--color-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-options-list-option-checkbox {
+    accent-color: var(--asset-1-color-dark) !important;
+    outline-color: var(--asset-1-color-dark) !important;
+    border-color: var(--border-main) !important;
+    color-scheme: dark;
+}
+
+/* ── Select All / Deselect All action bar ── */
+.dash-dropdown-wrapper .dash-dropdown-actions {
+    border-top-color: var(--border-tv) !important;
+    border-bottom-color: var(--border-tv) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-action-button {
+    color: var(--text-secondary) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-action-button:hover {
+    color: var(--color-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-actions {
+    border-top-color: var(--border-main) !important;
+    border-bottom-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-action-button {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-action-button:hover {
+    color: var(--asset-1-color-dark) !important;
+}
+
+html[data-theme="dark"] .ws-modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   11. Asset Profile
+   Summary card (AWS Console style) + outline accordion
+   ══════════════════════════════════════════════════════════════ */
+
+.profile-summary-prop {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.profile-summary-prop .prop-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.profile-summary-prop .prop-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#profile-accordion .accordion-item {
+    background: transparent;
+    border: 1px solid var(--border-main);
+    border-radius: 6px !important;
+    margin-bottom: 6px;
+    overflow: hidden;
+}
+
+#profile-accordion .accordion-item:last-child {
+    margin-bottom: 0;
+}
+
+#profile-accordion .accordion-button {
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 12px 16px;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+}
+
+#profile-accordion .accordion-button:not(.collapsed) {
+    background: transparent;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-main);
+    border-radius: 6px 6px 0 0 !important;
+}
+
+#profile-accordion .accordion-button::after {
+    filter: var(--accordion-chevron-filter, none);
+}
+
+html[data-theme="dark"] #profile-accordion .accordion-button::after {
+    filter: invert(1) brightness(0.7);
+}
+
+#profile-accordion .accordion-body {
+    background: transparent;
+    padding: 12px 16px;
+}

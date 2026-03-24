@@ -1,10 +1,11 @@
 """
-  Asset Portfolio Pipeline
+Asset Portfolio Pipeline
 
-  Sync asset list from silver asset store to OLTP portfolio asset table
+Sync asset list from silver asset store to OLTP portfolio asset table
 
-  Source -> Destination (no transformation)
+Source -> Destination (no transformation)
 """
+
 import os
 import logging
 from dataclasses import dataclass, asdict
@@ -16,9 +17,9 @@ from ...application.policies import Pipeline
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -27,16 +28,16 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 @dataclass
-class Asset():
-  ticker: str
-  name: str
-  broker: str
-  currency: str
+class Asset:
+    ticker: str
+    name: str
+    broker: str
+    currency: str
 
 
 class AssetPortfolioSource(Source):
-  def extract(self) -> list:
-    sql = """
+    def extract(self) -> list:
+        sql = """
       SELECT ticker, name, broker, currency
       FROM (
           SELECT *,
@@ -48,27 +49,24 @@ class AssetPortfolioSource(Source):
       ) t
       WHERE rn = 1;
     """
-    with SQLModelClient(DATABASE_URL) as client:
-      res = client.execute(sql)
-      return res.fetchall()
+        with SQLModelClient(DATABASE_URL) as client:
+            res = client.execute(sql)
+            return res.fetchall()
 
 
 class AssetPortfolioDestination(Destination):
-  def load(self, data: list[dict]) -> None:
-    # INSERTION POLICY: IDEMPOTENT
-    merge_value_mapping = ",".join([
-        f"""(
+    def load(self, data: list[dict]) -> None:
+        # INSERTION POLICY: IDEMPOTENT
+        merge_value_mapping = ",".join([f"""(
             '{r.get('ticker')}'
           , '{r.get('name')}'
           , '{r.get('broker')}'
           , '{r.get('currency')}'
           )
-        """
-        for r in data
-      ])
+        """ for r in data])
 
-    destination_table_name = "portfolio.asset"
-    asset_upsert_sql = f"""
+        destination_table_name = "portfolio.asset"
+        asset_upsert_sql = f"""
       MERGE INTO {destination_table_name} AS tgt
       USING
         (
@@ -91,37 +89,39 @@ class AssetPortfolioDestination(Destination):
           SET to_timestamp = NOW();
     """
 
-    with SQLModelClient(DATABASE_URL) as client:
-      client.execute(asset_upsert_sql)
+        with SQLModelClient(DATABASE_URL) as client:
+            client.execute(asset_upsert_sql)
 
 
 class PipelineAssetPortfolio(Pipeline):
-  def __init__(self):
-    self._source = AssetPortfolioSource()
-    self._destination = AssetPortfolioDestination()
+    def __init__(self):
+        self._source = AssetPortfolioSource()
+        self._destination = AssetPortfolioDestination()
 
-  def run(self):
-    try:
-      data = self._source.extract()
+    def run(self):
+        try:
+            data = self._source.extract()
 
-      # DESTINATION Schema Contract
-      # Dataclass creates a boundary between source and destination physical storage
-      data = [
-        asdict(Asset(
-          ticker=row._mapping.get("ticker"),
-          name=row._mapping.get("name"),
-          broker=row._mapping.get("broker"),
-          currency=row._mapping.get("currency"),
-        ))
-        for row in data
-      ]
+            # DESTINATION Schema Contract
+            # Dataclass creates a boundary between source and destination physical storage
+            data = [
+                asdict(
+                    Asset(
+                        ticker=row._mapping.get("ticker"),
+                        name=row._mapping.get("name"),
+                        broker=row._mapping.get("broker"),
+                        currency=row._mapping.get("currency"),
+                    )
+                )
+                for row in data
+            ]
 
-      self._destination.load(data)
-      return None
+            self._destination.load(data)
+            return None
 
-    except Exception as e:
-      raise e
+        except Exception as e:
+            raise e
 
 
 if __name__ == "__main__":
-  PipelineAssetPortfolio().run()
+    PipelineAssetPortfolio().run()
