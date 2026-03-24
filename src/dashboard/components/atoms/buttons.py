@@ -2,6 +2,7 @@
 Reusable button atoms — used in the top navbar and any page that needs them.
 Add new shared buttons here (not in page-level components).
 """
+
 import dash_bootstrap_components as dbc
 from dash import html
 

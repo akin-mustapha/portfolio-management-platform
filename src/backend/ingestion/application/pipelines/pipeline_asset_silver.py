@@ -5,23 +5,23 @@ from datetime import datetime, UTC
 from typing import List, Dict
 import pandas as pd
 
-from...application.policies import BaseSilverPipeline
-from...application.protocols import Source
-from...application.protocols import Destination
-from...application.protocols import Transformation
-from...application.validators.schema_validator import SchemaValidator
+from ...application.policies import BaseSilverPipeline
+from ...application.protocols import Source
+from ...application.protocols import Destination
+from ...application.protocols import Transformation
+from ...application.validators.schema_validator import SchemaValidator
 
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
-from...infrastructure.repositories.repository_factory import RepositoryFactory
-from...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
-from...domain.schemas.silver.asset import AssetRecord
+from ...infrastructure.repositories.repository_factory import RepositoryFactory
+from ...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
+from ...domain.schemas.silver.asset import AssetRecord
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -29,13 +29,12 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
-
 class Trading212AssetSourceSilver(Source):
-  def __init__(self):
-    self._client = SQLModelClient(DATABASE_URL)
+    def __init__(self):
+        self._client = SQLModelClient(DATABASE_URL)
 
-  def extract(self):
-    sql = """
+    def extract(self):
+        sql = """
       SELECT
         ticker,
         instrument_name,
@@ -63,70 +62,71 @@ class Trading212AssetSourceSilver(Source):
         );
     """
 
-    with self._client as db:
-      result = db.execute(sql)
+        with self._client as db:
+            result = db.execute(sql)
 
-    # TODO: Convert result to data
-    return result.fetchall()
+        # TODO: Convert result to data
+        return result.fetchall()
 
 
 class Trading212AssetTransformationSilver(Transformation):
-  """
+    """
     Trading212AssetTransformationSilver
-  """
-  def transform(self, data: list[Dict]) -> list[Dict]:
     """
-      transform
-    """
-    bronze_asset_df = pd.DataFrame(data)
 
-    # REMOVE NULL
-    df = bronze_asset_df[bronze_asset_df["ticker"].notna()]
+    def transform(self, data: list[Dict]) -> list[Dict]:
+        """
+        transform
+        """
+        bronze_asset_df = pd.DataFrame(data)
 
-    asset_df = pd.DataFrame()
-    asset_df["external_id"] = df["ticker"]
-    asset_df["ticker"] = df["ticker"].apply(lambda x: x.split("_")[0])
-    asset_df["name"] = df["instrument_name"]
-    asset_df["description"] = df["instrument_name"]
-    asset_df["broker"] = "Trading 212"
-    asset_df["currency"] = df["instrument_currency"]
-    asset_df["local_currency"] = df["wallet_currency"]
-    asset_df["share"] = df["quantity"]
-    asset_df["price"] = df["current_price"]
-    asset_df["avg_price"] = df["average_price_paid"]
-    asset_df["value"] = df["current_value"]
-    asset_df["cost"] = df["total_cost"]
-    asset_df["profit"] = df["unrealized_pnl"]
-    asset_df["fx_impact"] = df["fx_impact"]
-    asset_df["quantity_in_pies"] = df["quantity_in_pies"]
-    asset_df["business_key"] = df["business_key"]
-    asset_df["updated_timestamp"] = datetime.now(UTC)
+        # REMOVE NULL
+        df = bronze_asset_df[bronze_asset_df["ticker"].notna()]
 
-    # Using ingested date as marker to sequential ordering of data
-    asset_df["data_timestamp"] = df['ingested_timestamp']
-    asset_dict = asset_df.to_dict("records")
-    return asset_dict
+        asset_df = pd.DataFrame()
+        asset_df["external_id"] = df["ticker"]
+        asset_df["ticker"] = df["ticker"].apply(lambda x: x.split("_")[0])
+        asset_df["name"] = df["instrument_name"]
+        asset_df["description"] = df["instrument_name"]
+        asset_df["broker"] = "Trading 212"
+        asset_df["currency"] = df["instrument_currency"]
+        asset_df["local_currency"] = df["wallet_currency"]
+        asset_df["share"] = df["quantity"]
+        asset_df["price"] = df["current_price"]
+        asset_df["avg_price"] = df["average_price_paid"]
+        asset_df["value"] = df["current_value"]
+        asset_df["cost"] = df["total_cost"]
+        asset_df["profit"] = df["unrealized_pnl"]
+        asset_df["fx_impact"] = df["fx_impact"]
+        asset_df["quantity_in_pies"] = df["quantity_in_pies"]
+        asset_df["business_key"] = df["business_key"]
+        asset_df["updated_timestamp"] = datetime.now(UTC)
+
+        # Using ingested date as marker to sequential ordering of data
+        asset_df["data_timestamp"] = df["ingested_timestamp"]
+        asset_dict = asset_df.to_dict("records")
+        return asset_dict
+
 
 class Trading212AssetDestination(Destination):
-  def __init__(self):
-      # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
-      self._repository = RepositoryFactory.get("asset", schema_name="staging")
+    def __init__(self):
+        # TODO: INJECT DEPENDENCY MAKES TESTING EASIER | ALLOWS TO CHANGE BEHAVIOUR
+        self._repository = RepositoryFactory.get("asset", schema_name="staging")
 
-  def load(self, data: List[Dict]) -> None:
-      self._repository.upsert(records=data, unique_key=['business_key'])
+    def load(self, data: List[Dict]) -> None:
+        self._repository.upsert(records=data, unique_key=["business_key"])
 
 
 class PipelineAssetSilver(BaseSilverPipeline):
-  _pipeline_name = "asset_silver"
+    _pipeline_name = "asset_silver"
 
-  def __init__(self):
-    self._source = Trading212AssetSourceSilver()
-    self._transformation = Trading212AssetTransformationSilver()
-    self._validator = SchemaValidator(AssetRecord)
-    self._destination = Trading212AssetDestination()
-    self._dead_letter = DeadLetterDestination()
-
+    def __init__(self):
+        self._source = Trading212AssetSourceSilver()
+        self._transformation = Trading212AssetTransformationSilver()
+        self._validator = SchemaValidator(AssetRecord)
+        self._destination = Trading212AssetDestination()
+        self._dead_letter = DeadLetterDestination()
 
 
 if __name__ == "__main__":
-  PipelineAssetSilver().run()
+    PipelineAssetSilver().run()

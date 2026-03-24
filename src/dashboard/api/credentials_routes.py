@@ -13,11 +13,13 @@ def get_credentials():
         repo = CredentialsRepository()
         row = repo.load(PROVIDER)
         if row:
-            return jsonify({
-                "api_key": row.get("api_key", ""),
-                "secret_token": row.get("secret_token", ""),
-                "api_url": row.get("api_url", ""),
-            })
+            return jsonify(
+                {
+                    "api_key": row.get("api_key", ""),
+                    "secret_token": row.get("secret_token", ""),
+                    "api_url": row.get("api_url", ""),
+                }
+            )
         return jsonify({"api_key": "", "api_url": ""})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

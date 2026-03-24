@@ -28,3 +28,5 @@ nbformat>=4.2.0
 confluent-kafka
 # Linting
 ruff
+# Formatting
+black

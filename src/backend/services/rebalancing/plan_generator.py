@@ -37,19 +37,23 @@ def generate_plan(
         for day in range(1, config.correction_days + 1):
             step_date = (date.today() + timedelta(days=day)).isoformat()
             step_target = round(actual - daily_correction * day, 2)
-            daily_steps.append({
-                "date": step_date,
-                "target_weight_pct": step_target,
-            })
+            daily_steps.append(
+                {
+                    "date": step_date,
+                    "target_weight_pct": step_target,
+                }
+            )
 
-        actions.append({
-            "ticker": config.ticker,
-            "current_weight_pct": round(actual, 2),
-            "target_weight_pct": config.target_weight_pct,
-            "drift_pct": round(drift, 2),
-            "action": action,
-            "daily_steps": daily_steps,
-        })
+        actions.append(
+            {
+                "ticker": config.ticker,
+                "current_weight_pct": round(actual, 2),
+                "target_weight_pct": config.target_weight_pct,
+                "drift_pct": round(drift, 2),
+                "action": action,
+                "daily_steps": daily_steps,
+            }
+        )
 
     if not actions:
         return None

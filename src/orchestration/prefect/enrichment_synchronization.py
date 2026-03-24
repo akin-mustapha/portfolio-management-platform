@@ -3,7 +3,9 @@ import logging
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
 
-from backend.ingestion.application.pipelines.portfolio_enrichment_synchronizer import enrichment_sychronization
+from backend.ingestion.application.pipelines.portfolio_enrichment_synchronizer import (
+    enrichment_sychronization,
+)
 
 from shared.utils.custom_logger import customer_logger
 
@@ -20,4 +22,3 @@ def flow_t212_enrichment_sychronization():
     logging.info("Starting the Data Enrichment Synchronization")
     task_enrichment_sychronization()
     logging.info("End process")
-

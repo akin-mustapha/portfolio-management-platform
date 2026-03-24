@@ -9,10 +9,11 @@ from backend.ingestion.factories.event_producer_factory import EventProducerFact
 def task_run_trading_212_asset_event_producer():
     producer = EventProducerFactory.get("trading212AssetEventProducer")
     producer.run()
+
+
 @flow
 def trading_212_asset_event_producer():
     logging = get_run_logger()
     logging.info("Starting Flow")
     task_run_trading_212_asset_event_producer()
     logging.info("End")
-

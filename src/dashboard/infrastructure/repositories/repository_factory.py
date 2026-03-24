@@ -1,6 +1,10 @@
 import os
 from .query_repository import PostgresAssetQueryRepository, SQLiteAssetQueryRepository
-from .query_repository import PostgresSnapshotQueryRepository, SQLiteSnapshotQueryRepository
+from .query_repository import (
+    PostgresSnapshotQueryRepository,
+    SQLiteSnapshotQueryRepository,
+)
+
 
 class RepositoryFactory:
     # Registry: table_name -> {db_type -> repository class}
@@ -12,7 +16,7 @@ class RepositoryFactory:
         "snapshot_query": {
             "postgres": PostgresSnapshotQueryRepository,
             "sqlite": SQLiteSnapshotQueryRepository,
-        }
+        },
     }
 
     @classmethod
@@ -23,5 +27,7 @@ class RepositoryFactory:
             raise ValueError(f"No repository registered for table: {table_name}")
         repo_class = table_entry.get(db_type)
         if not repo_class:
-            raise ValueError(f"No repository for table '{table_name}' and DB type '{db_type}'")
+            raise ValueError(
+                f"No repository for table '{table_name}' and DB type '{db_type}'"
+            )
         return repo_class()

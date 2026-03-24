@@ -9,4 +9,4 @@ load_dotenv()
 
 
 def build_portfolio_service():
-  return PortfolioService()
+    return PortfolioService()

@@ -17,7 +17,17 @@ Sub-modules:
 Shared utilities (not callbacks):
   _helpers.py   → constants, date window, fetch, build compare rows
 """
-from . import data, filters, selection, tags, ui, theme, settings, rebalancing  # noqa: F401
+
+from . import (
+    data,
+    filters,
+    selection,
+    tags,
+    ui,
+    theme,
+    settings,
+    rebalancing,
+)  # noqa: F401
 
 # Re-exported for portfolio_page.py: `from .callbacks import load_portfolio_page`
 from .data import load_portfolio_page  # noqa: F401

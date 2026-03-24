@@ -1,4 +1,3 @@
-
 from dash import html
 import dash_bootstrap_components as dbc
 from ..components.atoms.buttons import privacy_toggle_btn
@@ -22,7 +21,10 @@ vertical_sidebar = html.Div(
         html.Div(
             [
                 html.Div(
-                    html.I(className="fa-solid fa-gauge-high text-white", style={"fontSize": "0.9rem"}),
+                    html.I(
+                        className="fa-solid fa-gauge-high text-white",
+                        style={"fontSize": "0.9rem"},
+                    ),
                     style={
                         "width": "30px",
                         "height": "30px",
@@ -32,22 +34,21 @@ vertical_sidebar = html.Div(
                         "alignItems": "center",
                         "justifyContent": "center",
                         "flexShrink": "0",
-                    }
+                    },
                 ),
-                html.Div([
-                    html.Span("Asset", className="sidebar-brand-title fw-bold"),
-                    html.Br(),
-                    html.Span("Monitor", className="sidebar-brand-subtitle"),
-                ]),
+                html.Div(
+                    [
+                        html.Span("Asset", className="sidebar-brand-title fw-bold"),
+                        html.Br(),
+                        html.Span("Monitor", className="sidebar-brand-subtitle"),
+                    ]
+                ),
             ],
             className="d-flex align-items-center gap-2 px-3 py-3",
         ),
-
         html.Div(className="sidebar-divider"),
-
         # Navigation section label
         html.Div("MENU", className="sidebar-menu-label"),
-
         # Nav links
         dbc.Nav(
             [
@@ -59,7 +60,6 @@ vertical_sidebar = html.Div(
             pills=False,
             className="px-2 flex-grow-1",
         ),
-
         # Bottom utility icons
         html.Div(className="sidebar-divider sidebar-divider--bottom"),
         html.Div(

@@ -1,4 +1,5 @@
 """Organism — secondary KPI rows shown on each tab and on asset selection."""
+
 import dash_bootstrap_components as dbc
 from dash import html
 
@@ -12,16 +13,25 @@ def secondary_kpi_row(data=None, theme="light"):
     daily_change_series = data.get("daily_change_series")
     portfolio_vol = data.get("portfolio_vol")
 
-    return html.Div([
-        html.Div([
-            _daily_change_card(daily_change_pct, daily_change_series, theme),
-            _kpi_badge(
-                "Volatility 30D",
-                f"{portfolio_vol:.2f}" if portfolio_vol is not None else "—",
-                unit="weighted",
+    return html.Div(
+        [
+            html.Div(
+                [
+                    _daily_change_card(daily_change_pct, daily_change_series, theme),
+                    _kpi_badge(
+                        "Volatility 30D",
+                        f"{portfolio_vol:.2f}" if portfolio_vol is not None else "—",
+                        unit="weighted",
+                    ),
+                ],
+                className="kpi-badge-row",
             ),
-        ], className="kpi-badge-row"),
-    ], style={"paddingTop": "var(--ws-section-pad-v)", "marginBottom": "var(--ws-divider-v)"})
+        ],
+        style={
+            "paddingTop": "var(--ws-section-pad-v)",
+            "marginBottom": "var(--ws-divider-v)",
+        },
+    )
 
 
 def secondary_asset_kpi_row(ticker: str, metadata: dict):
@@ -32,14 +42,24 @@ def secondary_asset_kpi_row(ticker: str, metadata: dict):
     price_str = f"{price:.2f}" if price is not None else "—"
     avg_price_str = f"{avg_price:.2f}" if avg_price is not None else "—"
 
-    return html.Div([
-        html.Div([
-            _kpi_badge("Industry", industry),
-            _kpi_badge("Sector", sector),
-            _kpi_badge("Price", price_str),
-            _kpi_badge("AVG Price", avg_price_str),
-        ], className="kpi-badge-row"),
-    ], className="asset-secondary-kpi", style={"paddingTop": "var(--ws-section-pad-v)", "marginBottom": "var(--ws-divider-v)"})
+    return html.Div(
+        [
+            html.Div(
+                [
+                    _kpi_badge("Industry", industry),
+                    _kpi_badge("Sector", sector),
+                    _kpi_badge("Price", price_str),
+                    _kpi_badge("AVG Price", avg_price_str),
+                ],
+                className="kpi-badge-row",
+            ),
+        ],
+        className="asset-secondary-kpi",
+        style={
+            "paddingTop": "var(--ws-section-pad-v)",
+            "marginBottom": "var(--ws-divider-v)",
+        },
+    )
 
 
 def secondary_asset_tag_row(ticker: str, metadata: dict, accent: str = None):
@@ -48,7 +68,8 @@ def secondary_asset_tag_row(ticker: str, metadata: dict, accent: str = None):
     tag_badges = [_tag_badge(tag, accent=accent) for tag in tags]
 
     return html.Div(
-        tag_badges + [
+        tag_badges
+        + [
             dbc.Button(
                 [html.I(className="fa-solid fa-tag me-1"), "Edit Tags"],
                 id={"type": "assign-tag-btn", "index": ticker},
@@ -59,5 +80,8 @@ def secondary_asset_tag_row(ticker: str, metadata: dict, accent: str = None):
             ),
         ],
         className="tag-row",
-        style={"paddingTop": "var(--ws-section-pad-v)", "marginBottom": "var(--ws-divider-v)"},
+        style={
+            "paddingTop": "var(--ws-section-pad-v)",
+            "marginBottom": "var(--ws-divider-v)",
+        },
     )

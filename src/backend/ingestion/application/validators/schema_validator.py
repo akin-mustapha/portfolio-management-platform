@@ -22,12 +22,14 @@ class SchemaValidator:
             try:
                 valid.append(self._model(**row))
             except ValidationError as e:
-                invalid.append(RejectedRecord(
-                    pipeline_name=None,
-                    layer=self._layer,
-                    business_key=row.get("business_key"),
-                    raw_payload=row,
-                    error_type="schema_validation",
-                    error_message=str(e),
-                ))
+                invalid.append(
+                    RejectedRecord(
+                        pipeline_name=None,
+                        layer=self._layer,
+                        business_key=row.get("business_key"),
+                        raw_payload=row,
+                        error_type="schema_validation",
+                        error_message=str(e),
+                    )
+                )
         return ValidationResult(valid=valid, invalid=invalid)

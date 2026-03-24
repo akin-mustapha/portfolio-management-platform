@@ -7,6 +7,7 @@ Tab content lives in pages/portfolio/tabs/:
   tab_opportunities.py  → Opportunities tab
   tab_asset_profile.py  → Asset Profile tab
 """
+
 import dash_bootstrap_components as dbc
 
 from ...tabs import (

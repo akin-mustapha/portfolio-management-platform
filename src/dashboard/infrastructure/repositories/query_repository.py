@@ -6,13 +6,14 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+
 # ===== Postgres Repos =====
 class PostgresAssetQueryRepository:
-  def __init__(self):
-    self._client = SQLModelClient(database_url=DATABASE_URL)
+    def __init__(self):
+        self._client = SQLModelClient(database_url=DATABASE_URL)
 
-  def get_most_recent_asset_data(self):
-    sql = """
+    def get_most_recent_asset_data(self):
+        sql = """
       WITH latest AS (
           SELECT asset_id, MAX(date_id) AS max_date_id
           FROM analytics.fact_valuation
@@ -51,17 +52,17 @@ class PostgresAssetQueryRepository:
       LEFT JOIN analytics.fact_signal fs ON fs.asset_id = fv.asset_id AND fs.date_id = fv.date_id
       LEFT JOIN analytics.fact_return fr ON fr.asset_id = fv.asset_id AND fr.date_id = fv.date_id
     """
-    with self._client as client:
-      res = client.execute(sql)
-      res = res.fetchall()
-    return res
+        with self._client as client:
+            res = client.execute(sql)
+            res = res.fetchall()
+        return res
 
-  def get_portfolio_price_history(self, tickers: list):
-    if not tickers:
-      return []
-    placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
-    params = {f"t{i}": t for i, t in enumerate(tickers)}
-    sql = f"""
+    def get_portfolio_price_history(self, tickers: list):
+        if not tickers:
+            return []
+        placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
+        params = {f"t{i}": t for i, t in enumerate(tickers)}
+        sql = f"""
       SELECT
           da.ticker,
           fp.price,
@@ -72,24 +73,24 @@ class PostgresAssetQueryRepository:
         AND da.ticker IN ({placeholders})
       ORDER BY da.ticker, fp.date_id ASC
     """
-    with self._client as client:
-      res = client.execute(sql, params)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql, params)
+        return res.fetchall()
 
-  def get_asset_tags(self):
-    sql = """
+    def get_asset_tags(self):
+        sql = """
       SELECT da.ticker, t.name AS tag_name
       FROM analytics.dim_asset da
       JOIN portfolio.asset pa ON LOWER(da.ticker) = LOWER(pa.ticker)
       JOIN portfolio.asset_tag at ON pa.id = at.asset_id AND at.is_active = true
       JOIN portfolio.tag t ON at.tag_id = t.id AND t.is_active = true
     """
-    with self._client as client:
-      res = client.execute(sql)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql)
+        return res.fetchall()
 
-  def get_asset_history(self):
-    sql = """
+    def get_asset_history(self):
+        sql = """
       SELECT
           da.ticker,
           fv.unrealized_pnl                             AS profit,
@@ -104,26 +105,27 @@ class PostgresAssetQueryRepository:
       WHERE fv.date_id >= TO_CHAR(CURRENT_DATE - INTERVAL '30 days', 'YYYYMMDD')::INTEGER
       ORDER BY da.ticker, fv.date_id ASC
     """
-    with self._client as client:
-      res = client.execute(sql)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql)
+        return res.fetchall()
+
 
 class PostgresSnapshotQueryRepository:
-  def __init__(self):
-    self._client = SQLModelClient(database_url=DATABASE_URL)
+    def __init__(self):
+        self._client = SQLModelClient(database_url=DATABASE_URL)
 
-  def select_asset_snapshot(self, params=None):
-    sql = """
+    def select_asset_snapshot(self, params=None):
+        sql = """
     SELECT a.name, at.*
     FROM portfolio.asset a
     INNER JOIN portfolio.asset_snapshot at ON a.id = at.asset_id
     """
-    with self._client as client:
-      res = client.execute(sql, params or {})
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql, params or {})
+        return res.fetchall()
 
-  def select_top_10_profit_asset_snapshot(self):
-    sql = """
+    def select_top_10_profit_asset_snapshot(self):
+        sql = """
     SELECT a.name, a.description,
            avg(at.profit) as profit,
            avg(at.price) as price,
@@ -134,12 +136,12 @@ class PostgresSnapshotQueryRepository:
     ORDER BY profit DESC
     LIMIT 10
     """
-    with self._client as client:
-      res = client.execute(sql)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql)
+        return res.fetchall()
 
-  def get_unrealized_profit(self):
-    sql = """
+    def get_unrealized_profit(self):
+        sql = """
     SELECT
         TO_DATE(fpd.date_id::TEXT, 'YYYYMMDD')        AS data_date,
         fpd.total_value,
@@ -159,12 +161,12 @@ class PostgresSnapshotQueryRepository:
     WHERE dp.portfolio_id = '21641310'
     ORDER BY data_date ASC
     """
-    with self._client as client:
-      res = client.execute(sql)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql)
+        return res.fetchall()
 
-  def get_asset_snapshot(self, ticker, start_date, end_date):
-    sql = """
+    def get_asset_snapshot(self, ticker, start_date, end_date):
+        sql = """
         SELECT
             da.ticker,
             da.name                                       AS asset_description,
@@ -190,32 +192,40 @@ class PostgresSnapshotQueryRepository:
           AND LOWER(da.ticker) = :ticker
         ORDER BY fv.date_id ASC
       """
-    with self._client as client:
-      res = client.execute(sql, {"ticker": ticker.lower(), "start_date": start_date, "end_date": end_date})
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(
+                sql,
+                {
+                    "ticker": ticker.lower(),
+                    "start_date": start_date,
+                    "end_date": end_date,
+                },
+            )
+        return res.fetchall()
 
 
 # ===== SQLite Repos =====
 class SQLiteAssetQueryRepository(PostgresAssetQueryRepository):
-  def get_portfolio_price_history(self, tickers: list):
-    if not tickers:
-      return []
-    placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
-    params = {f"t{i}": t for i, t in enumerate(tickers)}
-    sql = f"""
+    def get_portfolio_price_history(self, tickers: list):
+        if not tickers:
+            return []
+        placeholders = ", ".join(f":t{i}" for i in range(len(tickers)))
+        params = {f"t{i}": t for i, t in enumerate(tickers)}
+        sql = f"""
       SELECT ticker, price, created_timestamp as data_date
       FROM asset
       WHERE created_timestamp >= datetime('now', '-30 days')
         AND ticker IN ({placeholders})
       ORDER BY ticker, created_timestamp ASC
     """
-    with self._client as client:
-      res = client.execute(sql, params)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql, params)
+        return res.fetchall()
+
 
 class SQLiteSnapshotQueryRepository(PostgresSnapshotQueryRepository):
-  def select_top_10_profit_asset_snapshot(self):
-    sql = """
+    def select_top_10_profit_asset_snapshot(self):
+        sql = """
     SELECT a.name, a.description,
            avg(at.profit) as profit,
            avg(at.price) as price,
@@ -226,6 +236,6 @@ class SQLiteSnapshotQueryRepository(PostgresSnapshotQueryRepository):
     ORDER BY profit DESC
     LIMIT 10
     """
-    with self._client as client:
-      res = client.execute(sql)
-    return res.fetchall()
+        with self._client as client:
+            res = client.execute(sql)
+        return res.fetchall()

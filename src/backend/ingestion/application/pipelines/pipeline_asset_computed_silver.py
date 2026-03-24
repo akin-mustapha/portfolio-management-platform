@@ -15,9 +15,9 @@ from ...infrastructure.repositories.repository_factory import RepositoryFactory
 
 logging.basicConfig(
     level=logging.INFO,
-    filename='logs/info.log',
-    filemode='a',
-    format='%(asctime)s - %(levelname)s - %(filename)s - %(message)s'
+    filename="logs/info.log",
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
 load_dotenv()
@@ -30,39 +30,39 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 @dataclass
 class AssetComputed:
-  asset_id: str
-  cost_basis: float
-  daily_return: float
-  cumulative_return: float
-  dca_bias: float
-  pct_drawdown: float
-  recent_value_high_30d: float
-  recent_value_low_30d: float
-  recent_profit_high_30d: float
-  recent_profit_low_30d: float
-  value_high: float
-  value_low: float
-  ma_20d: float
-  ma_30d: float
-  ma_50d: float
-  volatility_20d: float
-  volatility_30d: float
-  volatility_50d: float
-  pnl_pct: float
-  var_95_1d: float
-  profit_range_30d: float
-  ma_crossover_signal: float
-  position_weight_pct: float
+    asset_id: str
+    cost_basis: float
+    daily_return: float
+    cumulative_return: float
+    dca_bias: float
+    pct_drawdown: float
+    recent_value_high_30d: float
+    recent_value_low_30d: float
+    recent_profit_high_30d: float
+    recent_profit_low_30d: float
+    value_high: float
+    value_low: float
+    ma_20d: float
+    ma_30d: float
+    ma_50d: float
+    volatility_20d: float
+    volatility_30d: float
+    volatility_50d: float
+    pnl_pct: float
+    var_95_1d: float
+    profit_range_30d: float
+    ma_crossover_signal: float
+    position_weight_pct: float
 
 
 class Trading212AssetComputedSourceSilver(Source):
-  def __init__(self):
-    self._client = SQLModelClient(DATABASE_URL)
+    def __init__(self):
+        self._client = SQLModelClient(DATABASE_URL)
 
-  def extract(self):
-    # TODO - MOVE AGGREGATION TO PYTHON
-    table_name = 'staging.asset'
-    sql = f"""
+    def extract(self):
+        # TODO - MOVE AGGREGATION TO PYTHON
+        table_name = "staging.asset"
+        sql = f"""
             WITH account_snapshot AS (
             SELECT total_value
             FROM staging.account
@@ -164,106 +164,125 @@ class Trading212AssetComputedSourceSilver(Source):
             s.value / NULLIF((SELECT total_value FROM account_snapshot), 0) * 100 AS position_weight_pct
         FROM stats s
     """
-    with self._client as db:
-      result = db.execute(sql)
-    return result.fetchall()
+        with self._client as db:
+            result = db.execute(sql)
+        return result.fetchall()
 
 
 class Trading212AssetComputedTransformation(Transformation):
-  """
+    """
     Trading212AssetComputedTransformation:
-  """
-  # FIXME - COMPUTATION HERE
-  def transform(self, data: list[Dict]) -> list[AssetComputed]:
     """
-      transform:
-    """
-    transformed_data = []
-    for record in data:
-      record = dict(record._mapping)
-      rget = record.get
-      cost_basis=0 if (value := rget("cashflow")) is None else value
-      profit=0 if (value := rget("profit")) is None else value
-      asset_value=0 if (value := rget("value")) is None else value
-      volatility_30d=0 if (value := rget("volatility_30d")) is None else value
-      recent_profit_high_30d=0 if (value := rget("recent_profit_high_30d")) is None else value
-      recent_profit_low_30d=0 if (value := rget("recent_profit_low_30d")) is None else value
-      ma_20d=0 if (value := rget("ma_20d")) is None else value
-      ma_50d=0 if (value := rget("ma_50d")) is None else value
-      transformed_data.append(
-        AssetComputed(
-          asset_id=rget("asset_id"),
-          cost_basis=cost_basis,
-          daily_return=0 if (value := rget("daily_return")) is None else value,
-          cumulative_return=0 if (value := rget("cumulative_return")) is None else value,
-          dca_bias=0 if (value := rget("dca_bias")) is None else value,
-          pct_drawdown=0 if (value := rget("pct_drawdown")) is None else value,
-          recent_value_high_30d=0 if (value := rget("recent_value_high_30d")) is None else value,
-          recent_value_low_30d=0 if (value := rget("recent_value_low_30d")) is None else value,
-          recent_profit_high_30d=recent_profit_high_30d,
-          recent_profit_low_30d=recent_profit_low_30d,
-          value_high=0 if (value := rget("value_high")) is None else value,
-          value_low=0 if (value := rget("value_low")) is None else value,
-          ma_20d=ma_20d,
-          ma_30d=0 if (value := rget("ma_30d")) is None else value,
-          ma_50d=ma_50d,
-          volatility_20d=0 if (value := rget("volatility_20d")) is None else value,
-          volatility_30d=volatility_30d,
-          volatility_50d=0 if (value := rget("volatility_50d")) is None else value,
-          pnl_pct=0 if cost_basis == 0 else profit / cost_basis * 100,
-          var_95_1d=volatility_30d * asset_value * 1.65,
-          profit_range_30d=recent_profit_high_30d - recent_profit_low_30d,
-          ma_crossover_signal=ma_20d - ma_50d,
-          position_weight_pct=0 if (value := rget("position_weight_pct")) is None else value,
-        )
-      )
-    return transformed_data
+
+    # FIXME - COMPUTATION HERE
+    def transform(self, data: list[Dict]) -> list[AssetComputed]:
+        """
+        transform:
+        """
+        transformed_data = []
+        for record in data:
+            record = dict(record._mapping)
+            rget = record.get
+            cost_basis = 0 if (value := rget("cashflow")) is None else value
+            profit = 0 if (value := rget("profit")) is None else value
+            asset_value = 0 if (value := rget("value")) is None else value
+            volatility_30d = 0 if (value := rget("volatility_30d")) is None else value
+            recent_profit_high_30d = (
+                0 if (value := rget("recent_profit_high_30d")) is None else value
+            )
+            recent_profit_low_30d = (
+                0 if (value := rget("recent_profit_low_30d")) is None else value
+            )
+            ma_20d = 0 if (value := rget("ma_20d")) is None else value
+            ma_50d = 0 if (value := rget("ma_50d")) is None else value
+            transformed_data.append(
+                AssetComputed(
+                    asset_id=rget("asset_id"),
+                    cost_basis=cost_basis,
+                    daily_return=(
+                        0 if (value := rget("daily_return")) is None else value
+                    ),
+                    cumulative_return=(
+                        0 if (value := rget("cumulative_return")) is None else value
+                    ),
+                    dca_bias=0 if (value := rget("dca_bias")) is None else value,
+                    pct_drawdown=(
+                        0 if (value := rget("pct_drawdown")) is None else value
+                    ),
+                    recent_value_high_30d=(
+                        0 if (value := rget("recent_value_high_30d")) is None else value
+                    ),
+                    recent_value_low_30d=(
+                        0 if (value := rget("recent_value_low_30d")) is None else value
+                    ),
+                    recent_profit_high_30d=recent_profit_high_30d,
+                    recent_profit_low_30d=recent_profit_low_30d,
+                    value_high=0 if (value := rget("value_high")) is None else value,
+                    value_low=0 if (value := rget("value_low")) is None else value,
+                    ma_20d=ma_20d,
+                    ma_30d=0 if (value := rget("ma_30d")) is None else value,
+                    ma_50d=ma_50d,
+                    volatility_20d=(
+                        0 if (value := rget("volatility_20d")) is None else value
+                    ),
+                    volatility_30d=volatility_30d,
+                    volatility_50d=(
+                        0 if (value := rget("volatility_50d")) is None else value
+                    ),
+                    pnl_pct=0 if cost_basis == 0 else profit / cost_basis * 100,
+                    var_95_1d=volatility_30d * asset_value * 1.65,
+                    profit_range_30d=recent_profit_high_30d - recent_profit_low_30d,
+                    ma_crossover_signal=ma_20d - ma_50d,
+                    position_weight_pct=(
+                        0 if (value := rget("position_weight_pct")) is None else value
+                    ),
+                )
+            )
+        return transformed_data
+
 
 class Trading212AssetComputedDestination(Destination):
-  def __init__(self):
-      self._repository = RepositoryFactory.get("asset_computed", schema_name="staging")
+    def __init__(self):
+        self._repository = RepositoryFactory.get(
+            "asset_computed", schema_name="staging"
+        )
 
-  def load(self, data: List[Dict]) -> None:
-      self._repository.upsert(records=data, unique_key=['asset_id'])
+    def load(self, data: List[Dict]) -> None:
+        self._repository.upsert(records=data, unique_key=["asset_id"])
 
 
 class PipelineAssetComputedSilver(Pipeline):
-  def __init__(self):
-    self._source = Trading212AssetComputedSourceSilver()
-    self._transformation = Trading212AssetComputedTransformation()
-    self._destination = Trading212AssetComputedDestination()
+    def __init__(self):
+        self._source = Trading212AssetComputedSourceSilver()
+        self._transformation = Trading212AssetComputedTransformation()
+        self._destination = Trading212AssetComputedDestination()
 
-  def run(self):
-    # Fetch raw data from source
-    data = self._source.extract()
-    # Copy to prevent mutating object
+    def run(self):
+        # Fetch raw data from source
+        data = self._source.extract()
+        # Copy to prevent mutating object
 
-    try:
-      # Apply Transformation Logic
-      transformed_data: List[Any] = self._transformation.transform(data)
+        try:
+            # Apply Transformation Logic
+            transformed_data: List[Any] = self._transformation.transform(data)
 
-      # Mapping
-      data = [
-        asdict(
-          row
-        )
-        for row in transformed_data
-      ]
+            # Mapping
+            data = [asdict(row) for row in transformed_data]
 
-      # Save to Destination Table
-      self._destination.load(data)
-      return None
+            # Save to Destination Table
+            self._destination.load(data)
+            return None
 
-    except Exception as e:
-      # Update raw data
-      # data = replace(data, is_processed=False)
+        except Exception as e:
+            # Update raw data
+            # data = replace(data, is_processed=False)
 
-      # TODO REPLACE WITH ERROR MANAGEMENT
-      # Persist raw data
-      # self._sink.save(data)
+            # TODO REPLACE WITH ERROR MANAGEMENT
+            # Persist raw data
+            # self._sink.save(data)
 
-      raise e
+            raise e
 
 
 if __name__ == "__main__":
-  PipelineAssetComputedSilver().run()
+    PipelineAssetComputedSilver().run()

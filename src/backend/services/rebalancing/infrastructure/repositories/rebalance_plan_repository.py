@@ -28,7 +28,11 @@ class PostgresRebalancePlanRepository:
             "created_date": record["created_date"],
             "target_completion_date": record["target_completion_date"],
             "status": record["status"],
-            "plan_json": json.dumps(record["plan_json"]) if isinstance(record["plan_json"], dict) else record["plan_json"],
+            "plan_json": (
+                json.dumps(record["plan_json"])
+                if isinstance(record["plan_json"], dict)
+                else record["plan_json"]
+            ),
             "email_sent": record["email_sent"],
         }
         with self._client as client:
@@ -61,7 +65,9 @@ class PostgresRebalancePlanRepository:
         with self._client as client:
             result = client.execute(sql)
             rows = result.fetchall()
-        return {r._mapping["ticker"]: float(r._mapping["position_weight_pct"]) for r in rows}
+        return {
+            r._mapping["ticker"]: float(r._mapping["position_weight_pct"]) for r in rows
+        }
 
     def get_latest(self) -> dict | None:
         sql = """

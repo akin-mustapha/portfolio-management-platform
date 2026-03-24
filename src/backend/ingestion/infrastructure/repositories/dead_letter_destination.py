@@ -24,12 +24,17 @@ class DeadLetterDestination:
     """
 
     def __init__(self):
-        self._repository = RepositoryFactory.get("dead_letter", schema_name="monitoring")
+        self._repository = RepositoryFactory.get(
+            "dead_letter", schema_name="monitoring"
+        )
 
     def load(self, data: list) -> None:
         records = []
         for r in data:
             record = dataclasses.asdict(r)
-            record["raw_payload"] = Json(record["raw_payload"], dumps=lambda v: json.dumps(v, default=_json_default))
+            record["raw_payload"] = Json(
+                record["raw_payload"],
+                dumps=lambda v: json.dumps(v, default=_json_default),
+            )
             records.append(record)
         self._repository.insert(records=records)
