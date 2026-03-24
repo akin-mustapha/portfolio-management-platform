@@ -3,7 +3,6 @@
 import pytest
 from typing import Any
 from pipelines.application.policies import Origin
-from pipelines.domain.models import Event
 
 class TestOrigin:
   @pytest.fixture
