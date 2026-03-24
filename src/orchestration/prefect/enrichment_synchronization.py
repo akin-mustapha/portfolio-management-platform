@@ -1,7 +1,9 @@
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
 
-from pipelines.application.runners.portfolio_enrichment_synchronizer import enrichment_sychronization
+from pipelines.application.runners.portfolio_enrichment_synchronizer import (
+    enrichment_sychronization,
+)
 
 from shared.utils.custom_logger import customer_logger
 
