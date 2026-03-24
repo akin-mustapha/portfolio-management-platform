@@ -1,8 +1,6 @@
 import logging
 from confluent_kafka import Consumer
-from ...application.pipelines.events.trading212_asset_consumer import (
-    Trading212AssetConsumer,
-)
+from ...application.runners.events.trading212_asset_consumer import Trading212AssetConsumer
 import json
 
 logging.basicConfig(level="INFO")

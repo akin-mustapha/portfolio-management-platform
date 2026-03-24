@@ -1,8 +1,8 @@
 
 
 import pytest
-from backend.ingestion.application.policies import EventDestination as Destination
-from backend.ingestion.domain.models import Event
+from pipelines.application.policies import EventDestination as Destination
+from pipelines.domain.models import Event
 
 class TestDestination:
   @pytest.fixture

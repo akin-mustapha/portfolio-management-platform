@@ -2,7 +2,8 @@
 
 import pytest
 from typing import Any
-from backend.ingestion.application.policies import Origin
+from pipelines.application.policies import Origin
+from pipelines.domain.models import Event
 
 class TestOrigin:
   @pytest.fixture
