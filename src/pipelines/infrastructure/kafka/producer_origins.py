@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from ...application.policies import Origin
 
 # TODO: should depend on interface
-from backend.ingestion.infrastructure.api.api_client_trading212 import (
+from pipelines.infrastructure.api.api_client_trading212 import (
     Trading212APIClient,
 )
 

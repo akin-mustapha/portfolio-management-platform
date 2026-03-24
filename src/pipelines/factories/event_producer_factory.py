@@ -1,6 +1,6 @@
 from ..application.policies import EventProducer
 
-from ..application.pipelines.events.trading212_event_producer import (
+from ..application.runners.events.trading212_event_producer import (
     Trading212EventProducer,
 )
 
