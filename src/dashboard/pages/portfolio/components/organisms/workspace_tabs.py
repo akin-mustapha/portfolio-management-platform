@@ -37,14 +37,14 @@ def workspace_tabs(view_model=None, theme="light"):
                 tab_id="tab-risk",
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
-                children=risk_tab_content(),
+                children=risk_tab_content(view_model, theme),
             ),
             dbc.Tab(
                 label="Opportunities",
                 tab_id="tab-opportunities",
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
-                children=opportunities_tab_content(),
+                children=opportunities_tab_content(view_model, theme),
             ),
             dbc.Tab(
                 label="Asset Profile",

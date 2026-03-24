@@ -650,8 +650,17 @@ class PortfolioDrawdownPlotlyLineChart:
 class PortfolioPerformancePlotlyLineChart:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-        df = pd.DataFrame(data).sort_values("dates")
-
+        df = pd.DataFrame(data)
+        if df.empty or "dates" not in df.columns:
+            fig = go.Figure()
+            fig.update_layout(
+                paper_bgcolor=ct["paper_bgcolor"],
+                plot_bgcolor=ct["plot_bgcolor"],
+                font=dict(color=ct["font_color"]),
+                margin=dict(l=2, r=2, t=2, b=2),
+            )
+            return fig
+        df = df.sort_values("dates")
         ref_value = df["costs"].iloc[0]
 
         fig = go.Figure()

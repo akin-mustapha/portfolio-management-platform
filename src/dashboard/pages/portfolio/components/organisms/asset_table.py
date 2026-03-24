@@ -14,6 +14,21 @@ def asset_table(data=None):
 
     df = pd.DataFrame(data)
 
+    # PostgreSQL NUMERIC columns come back as Python Decimal objects (object dtype).
+    # Convert all numeric columns to float before any arithmetic to avoid
+    # "Expected numeric dtype, got object instead" in pandas 2.0+.
+    numeric_cols = [
+        "value", "profit", "price", "avg_price", "cost",
+        "weight_pct", "pnl_pct", "pct_drawdown", "volatility_30d",
+        "volatility_50d", "ma_30d", "ma_50d", "dca_bias",
+        "recent_profit_high_30d", "recent_profit_low_30d",
+        "var_95_1d", "cumulative_return", "daily_return",
+        "fx_impact", "ma_crossover_signal",
+    ]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
     # precision control
     decimals = 6
     df["weight_pct"] = df["weight_pct"].round(decimals)
