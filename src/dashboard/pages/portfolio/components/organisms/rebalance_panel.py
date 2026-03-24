@@ -5,8 +5,8 @@ from dash import dcc, html
 from ..atoms.dropdown import tv_dropdown
 
 
-def rebalance_drawer_content(configs: list[dict] | None = None):
-    """Drawer shell with sliders rendered directly from configs."""
+def rebalance_drawer_content():
+    """Drawer shell with asset selector. Sliders populated by callback."""
     return html.Div([
         # Header
         html.Div([
@@ -165,11 +165,8 @@ def _slider_row(label: str, slider_id, min_val, max_val, step, value, marks=None
             id=slider_id,
             min=min_val, max=max_val, step=step,
             value=value,
-            # marks=marks,
-            tooltip={
-                "always_visible": False,
-                # "style": {"color": "LightSteelBlue", "fontSize": "20px"},
-            },
+            marks=marks,
+            tooltip={"always_visible": False},
             updatemode='drag',
             className="rebalance-slider",
         ),

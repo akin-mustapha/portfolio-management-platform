@@ -1,5 +1,5 @@
 """Rebalancing panel callbacks — toggle, load, save, generate plan."""
-from dash import callback, Input, Output, State, ALL, no_update
+from dash import callback, html, Input, Output, State, ALL, no_update
 from dash.exceptions import PreventUpdate
 
 from backend.services.rebalancing.rebalancing_service_builder import build_rebalancing_service
@@ -27,9 +27,8 @@ def populate_asset_dropdown(store_data):
     State("rebalance-config-store", "data"),
 )
 def render_sliders_for_asset(ticker, store_data):
-    from dash import html as _html
     if not ticker:
-        return _html.P("Select an asset above.", className="text-muted", style={"fontSize": "12px", "padding": "8px"})
+        return html.P("Select an asset above.", className="text-muted", style={"fontSize": "12px", "padding": "8px"})
     configs = (store_data or {}).get("configs", [])
     cfg = next((c for c in configs if c["ticker"] == ticker), {"ticker": ticker})
     return build_asset_sliders([cfg])
@@ -113,10 +112,12 @@ def save_configs(n_clicks, values, ids, store_data):
             )
             service.upsert_config(config)
 
-        # Refresh store from DB so subsequent saves use up-to-date fallback values
-        refreshed_configs = service.load_configs()
-        refreshed_store = _build_store(refreshed_configs, store_data.get("plan"))
-        return "Saved ✓", refreshed_store
+        # Merge written values back into the store in-memory (upsert_config is a pure write)
+        updated_configs = [
+            {**c, **asset_fields.get(c["ticker"], {})}
+            for c in store_data.get("configs", [])
+        ]
+        return "Saved ✓", {**store_data, "configs": updated_configs}
     except Exception as e:
         return f"Error: {e}", no_update
 

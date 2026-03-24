@@ -16,7 +16,6 @@ from .components.organisms.rebalance_panel import rebalance_drawer_content
 # ─────────────────────────────────────────────
 
 def portfolio_layout():
-    configs = []
     return html.Div([
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
@@ -113,7 +112,7 @@ def portfolio_layout():
                 id="rebalance-panel-wrapper",
                 className="rebalance-drawer",
                 style={"display": "none"},
-                children=rebalance_drawer_content(configs),
+                children=rebalance_drawer_content(),
             ),
 
         ], className="workspace-with-rebalance"),

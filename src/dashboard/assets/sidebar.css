@@ -42,10 +42,6 @@
     font-size: 1rem;
 }
 
-html[data-theme="dark"] .sidebar-help-icon {
-    color: var(--text-muted);
-}
-
 /* ── Sidebar nav ─────────────────────────────────────────────────────────── */
 
 .sidebar-nav-item {
