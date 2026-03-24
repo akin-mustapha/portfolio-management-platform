@@ -54,19 +54,19 @@
 
 /* Section-level headers (collapsible) — blue accent */
 .tv-section-header--section {
-    color: #0d6efd;
+    color: var(--color-primary);
 }
 
 .tv-section-header--section .tv-chevron {
-    color: #0d6efd;
+    color: var(--color-primary);
 }
 
 html[data-theme="dark"] .tv-section-header--section {
-    color: #639aff;
+    color: var(--color-primary);
 }
 
 html[data-theme="dark"] .tv-section-header--section .tv-chevron {
-    color: #639aff;
+    color: var(--color-primary);
 }
 
 /* Asset section header — name label after ticker */
@@ -219,7 +219,7 @@ html[data-theme="dark"] .tv-section-header--asset-3 .tv-chevron { color: var(--a
 .profile-tag-chip {
     display: inline-block;
     background: rgba(38, 166, 154, 0.08);
-    color: #26a69a;
+    color: var(--color-teal);
     border: 1px solid rgba(38, 166, 154, 0.25);
     border-radius: 12px;
     font-size: 11px;
@@ -231,7 +231,7 @@ html[data-theme="dark"] .tv-section-header--asset-3 .tv-chevron { color: var(--a
 
 html[data-theme="dark"] .profile-tag-chip {
     background: rgba(38, 166, 154, 0.12);
-    color: #4db6ac;
+    color: var(--color-teal);
     border-color: rgba(38, 166, 154, 0.3);
 }
 
@@ -246,7 +246,7 @@ html[data-theme="dark"] .profile-tag-chip {
 .asset-ticker-tag {
     display: inline-block;
     background: rgba(13, 110, 253, 0.08);
-    color: #0d6efd;
+    color: var(--color-primary);
     border: 1px solid rgba(13, 110, 253, 0.2);
     border-radius: 12px;
     font-size: 11px;
@@ -257,7 +257,7 @@ html[data-theme="dark"] .profile-tag-chip {
 
 html[data-theme="dark"] .asset-ticker-tag {
     background: rgba(99, 154, 255, 0.12);
-    color: #639aff;
+    color: var(--color-primary);
     border-color: rgba(99, 154, 255, 0.25);
 }
 
@@ -294,6 +294,12 @@ html[data-theme="dark"] .asset-ticker-tag {
 
 .tv-timeframe-strip label {
     color: var(--text-secondary);
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
     transition: background 0.12s ease, color 0.12s ease;
 }
 
@@ -461,8 +467,8 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
     padding: 0 var(--ws-row-pad-h) var(--ws-row-gap);
 }
 
-.movers-panel-label--gain { color: #26a671; }
-.movers-panel-label--loss { color: #ef5350; }
+.movers-panel-label--gain { color: var(--color-positive); }
+.movers-panel-label--loss { color: var(--color-negative); }
 
 .movers-row {
     display: flex;
@@ -480,13 +486,13 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
 }
 
 .movers-value--gain {
-    color: #26a671;
+    color: var(--color-positive);
     font-weight: 500;
     font-variant-numeric: tabular-nums;
 }
 
 .movers-value--loss {
-    color: #ef5350;
+    color: var(--color-negative);
     font-weight: 500;
     font-variant-numeric: tabular-nums;
 }
@@ -536,11 +542,11 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
 /* Active tab — blue text + blue 2px underline */
 .workspace-tab .nav-link.active,
 .workspace-tab--active .nav-link {
-    color: #0d6efd !important;
+    color: var(--color-primary) !important;
     font-weight: 600 !important;
     background: transparent !important;
     border: none !important;
-    border-bottom: 2px solid #0d6efd !important;
+    border-bottom: 2px solid var(--color-primary) !important;
     border-radius: 0 !important;
 }
 
@@ -589,8 +595,8 @@ html[data-theme="dark"] .workspace-tab .nav-link:hover {
 
 html[data-theme="dark"] .workspace-tab .nav-link.active,
 html[data-theme="dark"] .workspace-tab--active .nav-link {
-    color: #639aff !important;
-    border-bottom-color: #639aff !important;
+    color: var(--color-primary) !important;
+    border-bottom-color: var(--color-primary) !important;
 }
 
 
@@ -666,7 +672,7 @@ html[data-theme="dark"] .workspace-tab--active .nav-link {
 .settings-nav-item--active {
     color: var(--text-primary);
     background: var(--bg-strip-hover, rgba(13, 110, 253, 0.06));
-    border-left: 2px solid #0d6efd;
+    border-left: 2px solid var(--color-primary);
     padding-left: 14px;
 }
 
@@ -717,7 +723,7 @@ html[data-theme="dark"] .workspace-tab--active .nav-link {
 }
 
 .settings-api-input:focus {
-    border-color: #0d6efd !important;
+    border-color: var(--color-primary) !important;
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
 }
 
@@ -759,8 +765,8 @@ html[data-theme="dark"] .workspace-tab--active .nav-link {
 }
 
 .settings-connect-btn:hover {
-    border-color: #0d6efd;
-    color: #0d6efd;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
     background: rgba(13, 110, 253, 0.06);
 }
 
@@ -904,8 +910,10 @@ html[data-theme="dark"] .settings-sidebar {
     border-top: 1px solid var(--border-tv);
 }
 
-/* ws-modal dcc.Dropdown — Dash 4 class names */
-.ws-modal-dropdown .dash-dropdown-wrapper {
+/* ws-modal dcc.Dropdown — className lands on the trigger <button>, not a parent div */
+/* Selectors that target button children are valid; content panel uses :has() */
+
+.ws-modal-dropdown {
     background: var(--bg-app) !important;
     border: 1px solid var(--border-main) !important;
     border-radius: 4px !important;
@@ -916,13 +924,10 @@ html[data-theme="dark"] .settings-sidebar {
     outline: none !important;
 }
 
-.ws-modal-dropdown[data-state='open'] .dash-dropdown-wrapper,
-.ws-modal-dropdown .dash-dropdown-wrapper:focus-within {
-    border-color: #0d6efd !important;
+.ws-modal-dropdown[data-state='open'],
+.ws-modal-dropdown:focus {
+    border-color: var(--color-primary) !important;
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
-}
-
-.ws-modal-dropdown .dash-dropdown-wrapper:focus {
     outline: none !important;
 }
 
@@ -941,39 +946,96 @@ html[data-theme="dark"] .settings-sidebar {
     fill: var(--text-muted) !important;
 }
 
-.ws-modal-dropdown .dash-dropdown-content {
-    background: var(--bg-panel) !important;
-    border: 1px solid var(--border-main) !important;
-    border-radius: 4px !important;
-    font-size: 13px !important;
+/* Content panel and options — use :has() since ws-modal-dropdown is a sibling, not ancestor */
+.dash-dropdown-wrapper:has(.ws-modal-dropdown) .dash-dropdown-content {
     z-index: 9999 !important;
     margin-top: 2px !important;
+    font-size: 13px !important;
 }
 
-.ws-modal-dropdown .dash-dropdown-option {
-    background: transparent !important;
-    color: var(--text-primary) !important;
-    font-size: 13px !important;
+.dash-dropdown-wrapper:has(.ws-modal-dropdown) .dash-dropdown-option {
     padding: 6px 10px !important;
-}
-
-.ws-modal-dropdown .dash-dropdown-option:hover,
-.ws-modal-dropdown .dash-dropdown-option:focus {
-    background: var(--bg-strip-hover) !important;
-    outline: none !important;
-}
-
-.ws-modal-dropdown .dash-dropdown-option[aria-selected='true'] {
-    background: rgba(13, 110, 253, 0.10) !important;
-    color: #0d6efd !important;
-}
-
-.ws-modal-dropdown .dash-dropdown-search {
-    background: var(--bg-app) !important;
-    color: var(--text-primary) !important;
-    border: none !important;
     font-size: 13px !important;
+}
+
+/* ── Global dcc.Dropdown light mode: fix purple hover + selected state ── */
+.dash-dropdown-wrapper .dash-dropdown-option:hover,
+.dash-dropdown-wrapper .dash-dropdown-option:focus {
+    background-color: var(--bg-strip-hover) !important;
     outline: none !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-option[aria-selected='true'] {
+    background-color: rgba(13, 110, 253, 0.10) !important;
+    color: var(--color-primary) !important;
+}
+
+/* ── Search container: replace Dash purple with project blue ── */
+.dash-dropdown-wrapper .dash-dropdown-search-container {
+    border-color: var(--border-tv) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-search-container:focus-within {
+    border-color: var(--color-primary) !important;
+    outline: 1px solid var(--color-primary) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
+    color: var(--color-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container {
+    background-color: var(--bg-kpi-card) !important;
+    border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container:focus-within {
+    border-color: var(--asset-1-color-dark) !important;
+    outline-color: var(--asset-1-color-dark) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
+    color: var(--asset-1-color-dark) !important;
+}
+
+/* ── Checkboxes in multi-select dropdown ── */
+.dash-dropdown-wrapper .dash-options-list-option-checkbox {
+    accent-color: var(--color-primary) !important;
+    outline-color: var(--color-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-options-list-option-checkbox {
+    accent-color: var(--asset-1-color-dark) !important;
+    outline-color: var(--asset-1-color-dark) !important;
+    border-color: var(--border-main) !important;
+    color-scheme: dark;
+}
+
+/* ── Select All / Deselect All action bar ── */
+.dash-dropdown-wrapper .dash-dropdown-actions {
+    border-top-color: var(--border-tv) !important;
+    border-bottom-color: var(--border-tv) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-action-button {
+    color: var(--text-secondary) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-action-button:hover {
+    color: var(--color-primary) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-actions {
+    border-top-color: var(--border-main) !important;
+    border-bottom-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-action-button {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-action-button:hover {
+    color: var(--asset-1-color-dark) !important;
 }
 
 html[data-theme="dark"] .ws-modal-overlay {

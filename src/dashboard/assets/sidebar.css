@@ -1,3 +1,49 @@
+/* ── Sidebar shell ──────────────────────────────────────────────────────────
+   Layout-only properties (width, height, position) remain inline in sidebar.py.
+   Color/shadow/typography is owned here so tokens are respected.
+   Dark overrides for #sidebar and .sidebar-divider live in theme.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+#sidebar {
+    background: var(--bg-sidebar);
+    box-shadow: 1px 0 0 var(--sidebar-shadow);
+}
+
+.sidebar-brand-title {
+    font-size: 0.85rem;
+    line-height: 1.1;
+}
+
+.sidebar-brand-subtitle {
+    font-size: 0.75rem;
+    line-height: 1.1;
+}
+
+.sidebar-divider {
+    height: 1px;
+    background: var(--border-main);
+    margin: 0 12px 8px;
+}
+
+.sidebar-divider--bottom {
+    margin: 8px 12px 0;
+}
+
+.sidebar-menu-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0 12px 6px;
+}
+
+.sidebar-help-icon {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+/* ── Sidebar nav ─────────────────────────────────────────────────────────── */
+
 .sidebar-nav-item {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: var(--text-nav);
@@ -11,14 +57,14 @@
 
 .sidebar-nav-item:hover {
     background: rgba(13, 110, 253, 0.06) !important;
-    color: #0d6efd !important;
+    color: var(--color-primary) !important;
 }
 
 .sidebar-nav-item.active {
     background: rgba(13, 110, 253, 0.08) !important;
-    color: #0d6efd !important;
+    color: var(--color-primary) !important;
     font-weight: 600;
-    border-left: 3px solid #0d6efd !important;
+    border-left: 3px solid var(--color-primary) !important;
 }
 
 .sidebar-nav-icon {
@@ -31,4 +77,201 @@
 .sidebar-nav-item.active .sidebar-nav-icon,
 .sidebar-nav-item:hover .sidebar-nav-icon {
     opacity: 1;
+}
+
+/* ── Rebalancing drawer ─────────────────────────────────────────────────── */
+
+.workspace-with-rebalance {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    gap: 0;
+}
+
+.rebalance-drawer {
+    flex: 0 0 280px;
+    min-width: 0;
+    background: var(--bg-sidebar);
+    border: 1px solid var(--border-tv);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rebalance-drawer-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    padding: var(--ws-header-pad-v) var(--ws-section-pad-h);
+    font-size: 12px;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+.rebalance-panel-header {
+    /* padding: var(--ws-header-pad-v) var(--ws-section-pad-h) 8px; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rebalance-panel-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.rebalance-asset-card {
+    /* padding: var(--ws-header-pad-v) var(--ws-section-pad-h); */
+    border-bottom: 1px solid var(--border-split);
+}
+
+.rebalance-asset-card:last-child {
+    border-bottom: none;
+}
+
+.rebalance-asset-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--ws-section-gap);
+}
+
+.rebalance-slider-row {
+    margin-bottom: 6px;
+}
+
+
+.rebalance-slider-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Track = grey background rail */
+.rebalance-slider .dash-slider-track {
+    background-color: var(--border-tv) !important;
+    height: 4px;
+}
+
+/* Range = blue filled portion between min and thumb */
+.rebalance-slider .dash-slider-range {
+    background-color: var(--color-primary) !important;
+    height: 4px;
+}
+
+/* Thumb */
+.rebalance-slider .dash-slider-thumb {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    width: 14px;
+    height: 14px;
+}
+
+.rebalance-slider .dash-slider-tooltip {
+    font-size: 11px;
+    justify-content: center;
+}
+
+.rebalance-slider .dash-slider-thumb:hover,
+.rebalance-slider .dash-slider-thumb:active {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+}
+
+/* Dark mode */
+html[data-theme="dark"] .rebalance-slider .dash-slider-track {
+    background-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .rebalance-slider .dash-slider-range {
+    background-color: var(--asset-1-color-dark) !important;
+}
+
+html[data-theme="dark"] .rebalance-slider .dash-slider-thumb {
+    border-color: var(--asset-1-color-dark);
+    background-color: var(--asset-1-color-dark);
+}
+
+html[data-theme="dark"] .rebalance-slider .dash-slider-thumb:hover,
+html[data-theme="dark"] .rebalance-slider .dash-slider-thumb:active {
+    box-shadow: 0 0 0 4px rgba(99, 154, 255, 0.2);
+}
+
+html[data-theme="dark"] .rebalance-slider .dash-slider-mark {
+    color: var(--text-secondary) !important;
+}
+
+html[data-theme="dark"] .rebalance-slider .dash-slider-mark-outside-selection {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] .rebalance-slider .dash-slider-mark:before {
+    background-color: var(--border-main) !important;
+}
+
+.rebalance-panel-footer {
+    padding: var(--ws-header-pad-v) var(--ws-section-pad-h) 4px;
+    display: flex;
+    align-items: center;
+}
+
+.rebalance-status-text {
+    display: block;
+    padding: 0 var(--ws-section-pad-h) 6px;
+    font-size: 11px;
+    min-height: 16px;
+}
+
+/* Plan summary */
+
+.rebalance-plan-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px var(--ws-section-pad-h);
+    font-size: 11px;
+}
+
+.rebalance-plan-ticker {
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 48px;
+}
+
+.rebalance-plan-action {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    min-width: 52px;
+    text-align: center;
+}
+
+.rebalance-action-reduce {
+    background: rgba(239, 83, 80, 0.15);
+    color: var(--color-negative);
+}
+
+.rebalance-action-increase {
+    background: rgba(38, 166, 113, 0.15);
+    color: var(--color-positive);
+}
+
+.rebalance-plan-detail {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* ── Rebalance asset dropdown ───────────────────────────────────────────────── */
+/* Styled via global .dash-dropdown and .dash-dropdown-wrapper rules in theme.css */
+
+.rebalance-asset-dropdown {
+    padding: 0 var(--ws-section-pad-h);
+    font-size: 12px;
+    font-family: Inter, system-ui, sans-serif;
 }

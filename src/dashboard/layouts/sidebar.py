@@ -35,24 +35,18 @@ vertical_sidebar = html.Div(
                     }
                 ),
                 html.Div([
-                    html.Span("Asset", className="sidebar-brand-title fw-bold", style={"fontSize": "0.85rem", "lineHeight": "1.1"}),
+                    html.Span("Asset", className="sidebar-brand-title fw-bold"),
                     html.Br(),
-                    html.Span("Monitor", className="sidebar-brand-subtitle", style={"fontSize": "0.75rem", "lineHeight": "1.1"}),
+                    html.Span("Monitor", className="sidebar-brand-subtitle"),
                 ]),
             ],
             className="d-flex align-items-center gap-2 px-3 py-3",
         ),
 
-        html.Div(className="sidebar-divider", style={"height": "1px", "background": "#e9ecef", "margin": "0 12px 8px"}),
+        html.Div(className="sidebar-divider"),
 
         # Navigation section label
-        html.Div("MENU", className="sidebar-menu-label", style={
-            "fontSize": "0.65rem",
-            "fontWeight": "700",
-            "letterSpacing": "0.08em",
-            "color": "#adb5bd",
-            "padding": "0 12px 6px",
-        }),
+        html.Div("MENU", className="sidebar-menu-label"),
 
         # Nav links
         dbc.Nav(
@@ -67,11 +61,11 @@ vertical_sidebar = html.Div(
         ),
 
         # Bottom utility icons
-        html.Div(className="sidebar-divider", style={"height": "1px", "background": "#e9ecef", "margin": "8px 12px"}),
+        html.Div(className="sidebar-divider sidebar-divider--bottom"),
         html.Div(
             [
                 html.Div(
-                    html.I(className="fa-solid fa-circle-question", style={"color": "#adb5bd", "fontSize": "1rem"}),
+                    html.I(className="fa-solid fa-circle-question sidebar-help-icon"),
                     className="px-3 py-2",
                 ),
                 privacy_toggle_btn(),
@@ -97,8 +91,6 @@ vertical_sidebar = html.Div(
         "position": "sticky",
         "top": "0",
         "overflowY": "auto",
-        "background": "#f8f9fa",
-        "boxShadow": "1px 0 0 #e9ecef",
         "paddingBottom": "1rem",
         "flexShrink": "0",
     },

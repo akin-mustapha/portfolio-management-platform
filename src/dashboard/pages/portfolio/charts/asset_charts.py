@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from .chart_theme import FALLBACK_ACCENT, MUTED_FILL
+
 CHART_THEMES = {
     "light": {"paper_bgcolor": "white",   "plot_bgcolor": "white",   "font_color": "#555555"},
     "dark":  {"paper_bgcolor": "#1e222d", "plot_bgcolor": "#1e222d", "font_color": "#9598a1"},
@@ -210,8 +212,8 @@ class FXReturnAttributionDonutChart:
 
         fx_sign = "+" if fx_impact >= 0 else ""
         colors = [
-            accent_color or "#0d6efd",
-            _hex_to_rgba(accent_color, 0.35) if accent_color else "rgba(150,150,150,0.4)",
+            accent_color or FALLBACK_ACCENT,
+            _hex_to_rgba(accent_color, 0.35) if accent_color else MUTED_FILL,
         ]
 
         fig = go.Figure(go.Pie(
@@ -255,8 +257,8 @@ class ProfitRangePlotlyLineChart:
 
         df = pd.DataFrame(asset_data).sort_values("dates")
         t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
-        band_color = _hex_to_rgba(accent_color, 0.08) if accent_color else "rgba(150,150,150,0.1)"
-        band_edge  = _hex_to_rgba(accent_color, 0.25) if accent_color else "rgba(150,150,150,0.3)"
+        band_color = _hex_to_rgba(accent_color, 0.08) if accent_color else _hex_to_rgba(FALLBACK_ACCENT, 0.08)
+        band_edge  = _hex_to_rgba(accent_color, 0.25) if accent_color else _hex_to_rgba(FALLBACK_ACCENT, 0.25)
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(

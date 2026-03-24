@@ -2,6 +2,8 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
+from ..atoms.dropdown import tv_dropdown
+
 
 TIMEFRAMES = [
     {"label": "1D", "value": "1D"},
@@ -16,6 +18,16 @@ TIMEFRAMES = [
 
 def workspace_filter_bar():
     return html.Div([
+        # Advanced filter toggle (primary action — filled)
+        dbc.Button(
+            [html.I(className="fa-solid fa-sliders me-1"), "Advanced Filter"],
+            id="workspace-adv-filter-btn",
+            className="tv-apply-btn",
+            size="sm",
+            n_clicks=0,
+        ),
+        
+        html.Div(className="tv-vert-divider"),
 
         # Timeframe strip
         dcc.RadioItems(
@@ -24,30 +36,17 @@ def workspace_filter_bar():
             value="1Y",
             className="tv-timeframe-strip",
             inputStyle={"display": "none"},
-            labelStyle={
-                "cursor": "pointer",
-                "padding": "4px 10px",
-                "fontSize": "12px",
-                "fontWeight": "500",
-                "borderRadius": "4px",
-                "userSelect": "none",
-            },
         ),
         html.Div(className="tv-vert-divider"),
 
         # Tag filter dropdown
-        dcc.Dropdown(
+        tv_dropdown(
             id="workspace-tag-filter",
-            options=[],
-            value=None,
             multi=True,
             placeholder="Filter by tag…",
-            clearable=True,
             style={"minWidth": "180px", "fontSize": "12px"},
-            className="tv-tag-filter",
         ),
-        html.Div(className="tv-vert-divider"),
-
+        
         # Spacer pushes advanced filter to the right
         html.Div(style={"marginLeft": "auto"}),
 
@@ -62,14 +61,16 @@ def workspace_filter_bar():
         # Vertical divider
         html.Div(className="tv-vert-divider"),
 
-        # Advanced filter toggle (primary action — filled)
+        # Rebalancing panel toggle
         dbc.Button(
-            [html.I(className="fa-solid fa-sliders me-1"), "Advanced Filter"],
-            id="workspace-adv-filter-btn",
-            className="tv-apply-btn",
+            html.I(className="fa-solid fa-scale-balanced"),
+            id="rebalance-panel-toggle-btn",
+            className="tv-ghost-btn",
             size="sm",
             n_clicks=0,
+            title="Toggle rebalancing panel",
         ),
+        html.Div(className="tv-vert-divider"),
 
     ], className="workspace-filter-bar")
 
