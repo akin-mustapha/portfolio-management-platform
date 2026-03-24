@@ -203,8 +203,6 @@ class AnalyticsConsumer:
             logging.error("Failed to decode message: %s", e)
             return
 
-        data = self._query_repo.calc_asset_price_daily()
-
         print(event)
 
 # ───────────────────────── Entrypoint ─────────────────────────
