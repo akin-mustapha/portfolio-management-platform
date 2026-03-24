@@ -1,6 +1,6 @@
 from prefect import flow, task
 from datetime import timedelta
-from backend.ingestion.factories.pipeline_factory import PipelineFactory
+from pipelines.factories.pipeline_factory import PipelineFactory
 from prefect.cache_policies import NO_CACHE
 
 from shared.utils.custom_logger import customer_logger
