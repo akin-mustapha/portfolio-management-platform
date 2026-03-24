@@ -6,7 +6,7 @@ from .components.atoms.dropdown import tv_dropdown
 from .callbacks import load_portfolio_page  # noqa: F401 — registers callback
 from .components.organisms.kpi_row import kpi_row
 from .components.organisms.asset_table import asset_table
-from .components.organisms.filter_bar import workspace_filter_bar, workspace_advanced_filter
+from .components.organisms.filter_bar import workspace_filter_bar, workspace_advanced_filter, column_visibility_popover, DEFAULT_VISIBLE_COLS
 from .components.organisms.workspace_tabs import workspace_tabs
 from .components.organisms.rebalance_panel import rebalance_drawer_content
 
@@ -23,6 +23,7 @@ def portfolio_layout():
         dcc.Store(id="workspace-timeframe", data="1Y"),
         dcc.Store(id="assign-tag-modal-ticker"),
         dcc.Store(id="rebalance-config-store"),
+        dcc.Store(id="column-visibility-store", data=DEFAULT_VISIBLE_COLS),
 
         # ── Row 1: KPI Summary (always portfolio-scoped) ──────────
         dbc.Row([
@@ -38,6 +39,7 @@ def portfolio_layout():
         # ── Row 2: Filter Controls ────────────────────────────────
         workspace_filter_bar(),
         workspace_advanced_filter(),
+        column_visibility_popover(),
 
         # ── Row 3: Analysis Workspace + Rebalance Drawer ──────────
         html.Div([

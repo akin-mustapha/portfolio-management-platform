@@ -56,16 +56,3 @@ def load_portfolio_page(pathname, cached_data, theme):
     )
 
 
-# ── 10. Daily movers pagination ───────────────────────────────────
-
-@callback(
-    Output("daily-movers-table", "children"),
-    Input("daily-movers-n-dropdown", "value"),
-    State("portfolio_page_asset_store", "data"),
-    prevent_initial_call=True,
-)
-def on_daily_movers_n_change(n, cached_data):
-    if not cached_data or not n:
-        raise PreventUpdate
-    movers = cached_data.get("view_model", {}).get("daily_movers", [])
-    return daily_movers_table(movers, n=int(n))

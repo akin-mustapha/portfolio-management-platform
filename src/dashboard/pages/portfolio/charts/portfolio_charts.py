@@ -301,9 +301,13 @@ def _ranked_panel(data, sort_by="profit", is_gain=True):
         rows.append(html.Div([
             html.Span(r["ticker"], className="movers-ticker"),
             html.Span(fmt(v), className=val_cls),
-        ], className="movers-row", style={
-            "background": f"linear-gradient(to right, {bg} {fill:.0f}%, transparent {fill:.0f}%)",
-        }))
+        ], id={"type": "chart-mover-row", "index": str(r["ticker"])},
+           n_clicks=0,
+           className="movers-row",
+           style={
+               "background": f"linear-gradient(to right, {bg} {fill:.0f}%, transparent {fill:.0f}%)",
+               "cursor": "pointer",
+           }))
 
     label = "Winners" if is_gain else "Losers"
     return html.Div([

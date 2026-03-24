@@ -110,15 +110,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
 
                     # Row 3: Daily movers
                     html.Div([
-                        html.Div([
-                            html.Div("Today's Movers", className="tv-section-header"),
-                            dbc.Select(
-                                id="daily-movers-n-dropdown",
-                                options=[{"label": f"Top {n}", "value": n} for n in range(5, 31, 5)],
-                                value=5,
-                                className="movers-n-dropdown",
-                            ),
-                        ], className="movers-header-row"),
+                        html.Div("Today's Movers", className="tv-section-header"),
                         html.Div(
                             id="daily-movers-table",
                             children=daily_movers_table(daily_movers, n=5),

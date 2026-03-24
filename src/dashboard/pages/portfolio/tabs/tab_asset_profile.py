@@ -1,6 +1,6 @@
-"""Asset Profile tab — read-only summary card with ticker metadata and tags."""
+"""Asset Profile tab — position snapshot, price/MA chart, and metadata card."""
 import dash_bootstrap_components as dbc
-from dash import html
+from dash import dcc, html
 
 
 def _summary_prop(label, value_id):
@@ -12,6 +12,17 @@ def _summary_prop(label, value_id):
 
 def asset_profile_tab_content():
     return html.Div([
+
+        # ── Section 1: Position snapshot strip ────────────────────
+        html.Div(id="profile-snapshot-strip", className="mb-3"),
+
+        # ── Section 2: Price + MA chart ───────────────────────────
+        dcc.Graph(
+            id="profile-price-ma-chart",
+            config={"displayModeBar": False},
+            style={"height": "220px"},
+            className="mb-4",
+        ),
 
         # ── Read-only summary card ─────────────────────────────────
         html.Div([

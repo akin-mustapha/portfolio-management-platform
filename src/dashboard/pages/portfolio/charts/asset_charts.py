@@ -85,6 +85,72 @@ class PriceStructurePlotlyLineChart:
         return fig
 
 
+class PriceWithMAPlotlyLineChart:
+    MA30_COLOR = "#7b8fa1"
+    MA50_COLOR = "#b0a090"
+
+    def render(self, data, theme="light", accent_color=None):
+        asset_data = data.get("asset_price", {})
+        df = pd.DataFrame({
+            "dates":  asset_data.get("dates", []),
+            "values": asset_data.get("values", []),
+            "ma_30d": asset_data.get("ma_30d", []),
+            "ma_50d": asset_data.get("ma_50d", []),
+        }).sort_values("dates")
+
+        if df.empty:
+            return go.Figure()
+
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
+        ref = df["values"].iloc[0]
+
+        fig = go.Figure()
+
+        # invisible reference trace for area fill anchor
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=[ref] * len(df),
+            mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
+            showlegend=False, hoverinfo="skip",
+        ))
+
+        # price area
+        line_kw = dict(width=1.5, color=accent_color) if accent_color else dict(width=1.5)
+        fill_kw = dict(fillcolor=_hex_to_rgba(accent_color, 0.10)) if accent_color else {}
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=df["values"],
+            mode="lines", name="Price",
+            line=line_kw, fill="tonexty",
+            hovertemplate="%{y:,.2f}<extra></extra>",
+            **fill_kw,
+        ))
+
+        # MA30
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=df["ma_30d"],
+            mode="lines", name="MA 30",
+            line=dict(width=1, color=self.MA30_COLOR, dash="dot"),
+            hovertemplate="MA30: %{y:,.2f}<extra></extra>",
+        ))
+
+        # MA50
+        fig.add_trace(go.Scatter(
+            x=df["dates"], y=df["ma_50d"],
+            mode="lines", name="MA 50",
+            line=dict(width=1, color=self.MA50_COLOR, dash="dot"),
+            hovertemplate="MA50: %{y:,.2f}<extra></extra>",
+        ))
+
+        layout = _base_layout(t)
+        layout["showlegend"] = True
+        layout["legend"] = dict(
+            orientation="h", yanchor="bottom", y=1.0,
+            xanchor="right", x=1, font=dict(size=10),
+        )
+        fig.update_layout(**layout)
+        _apply_spike_config(fig)
+        return fig
+
+
 class AssetValuePlotlyLineChart:
     def render(self, data, theme="light", accent_color=None):
         asset_data = data.get("asset_value")

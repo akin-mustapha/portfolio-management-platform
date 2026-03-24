@@ -45,10 +45,11 @@ class AssetPresenter:
 
     def _asset_price_series_vm(self, rows: list[dict]) -> dict:
         return {
-            "dates": [r["data_date"] for r in rows],
+            "dates":  [r["data_date"] for r in rows],
             "values": [r["price"] for r in rows],
-            # y=["price", "ma_30d", "ma_50d"],
-            "title": "Price"
+            "ma_30d": [r.get("ma_30d") for r in rows],
+            "ma_50d": [r.get("ma_50d") for r in rows],
+            "title": "Price",
         }
 
     def _asset_value_series_vm(self, rows: list[dict]) -> dict:
