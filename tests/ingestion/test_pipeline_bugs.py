@@ -60,7 +60,7 @@ class TestBug1AssetSilverRenameDeadCode:
         This passes before and after the fix because external_id is assigned
         directly — but ensures the rename bug has no side-effect on output.
         """
-        from backend.ingestion.application.pipelines.pipeline_asset_silver import (
+        from pipelines.application.runners.pipeline_asset_silver import (
             Trading212AssetTransformationSilver,
         )
 
@@ -96,7 +96,7 @@ class TestBug1AssetSilverRenameDeadCode:
         After the fix, the dead rename call must be absent from the source.
         FAILS before fix (line exists), PASSES after fix (line removed).
         """
-        from backend.ingestion.application.pipelines.pipeline_asset_silver import (
+        from pipelines.application.runners.pipeline_asset_silver import (
             Trading212AssetTransformationSilver,
         )
         src = inspect.getsource(Trading212AssetTransformationSilver.transform)
@@ -133,7 +133,7 @@ class TestBug2AssetComputedWhereClausePreventsUpdates:
         metrics after the first run.
         FAILS before fix (clause present), PASSES after fix (clause removed).
         """
-        from backend.ingestion.application.pipelines.pipeline_asset_computed_silver import (
+        from pipelines.application.runners.pipeline_asset_computed_silver import (
             Trading212AssetComputedSourceSilver,
         )
         src = inspect.getsource(Trading212AssetComputedSourceSilver.extract)
@@ -148,7 +148,7 @@ class TestBug2AssetComputedWhereClausePreventsUpdates:
         When the source returns records the pipeline must load them.
         This is a regression guard: verifies run() does not silently skip data.
         """
-        from backend.ingestion.application.pipelines.pipeline_asset_computed_silver import (
+        from pipelines.application.runners.pipeline_asset_computed_silver import (
             PipelineAssetComputedSilver,
             AssetComputed,
         )
@@ -225,7 +225,7 @@ class TestBug3AccountGoldLeadingSemicolon:
         The SQL must not contain the ';WITH' pattern.
         FAILS before fix, PASSES after fix.
         """
-        from backend.ingestion.application.pipelines.pipeline_account_gold import (
+        from pipelines.application.runners.pipeline_account_gold import (
             AccountGoldSource,
         )
         src = inspect.getsource(AccountGoldSource.extract)
@@ -240,7 +240,7 @@ class TestBug3AccountGoldLeadingSemicolon:
         start with 'WITH' to be a valid Common Table Expression.
         FAILS before fix, PASSES after fix.
         """
-        from backend.ingestion.application.pipelines.pipeline_account_gold import (
+        from pipelines.application.runners.pipeline_account_gold import (
             AccountGoldSource,
         )
         # Grab the raw SQL by instantiating a source and inspecting the method body
@@ -283,7 +283,7 @@ class TestBug4FullLoaderAbstractMethodSignature:
         how it is called inside load().
         FAILS before fix (param missing), PASSES after fix.
         """
-        from backend.ingestion.application.policies import FullLoader
+        from pipelines.application.policies import FullLoader
 
         sig = inspect.signature(FullLoader._loader)
         params = list(sig.parameters.keys())
@@ -303,7 +303,7 @@ class TestBug4FullLoaderAbstractMethodSignature:
         After the fix, the abstract signature makes the contract explicit and
         this scenario should never occur.
         """
-        from backend.ingestion.application.policies import FullLoader
+        from pipelines.application.policies import FullLoader
 
         class BrokenLoader(FullLoader):
             """Implements the broken abstract signature (no data param)."""
@@ -323,7 +323,7 @@ class TestBug4FullLoaderAbstractMethodSignature:
         A correct subclass implementation (with data param) must work end-to-end.
         This is the post-fix expected behaviour.
         """
-        from backend.ingestion.application.policies import FullLoader
+        from pipelines.application.policies import FullLoader
 
         received = []
 
