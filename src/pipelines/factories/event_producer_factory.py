@@ -1,6 +1,8 @@
 from ..application.policies import EventProducer
 
-from ..application.runners.events.trading212_event_producer import Trading212EventProducer
+from ..application.runners.events.trading212_event_producer import (
+    Trading212EventProducer,
+)
 
 from ..infrastructure.kafka.producer_origins import Trading212AssetAPIOrigin
 from ..infrastructure.kafka.producer_destination import Trading212KafkaDestination
