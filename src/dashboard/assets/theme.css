@@ -4,6 +4,12 @@
    ============================================================ */
 
 :root {
+  /* ── Semantic color tokens ───────────────────────────────── */
+  --color-primary:  #0d6efd;   /* Bootstrap primary blue — nav active, focus, grid headers */
+  --color-positive: #26a671;   /* Gain / positive sentiment */
+  --color-negative: #ef5350;   /* Loss / negative sentiment */
+  --color-teal:     #26a69a;   /* Neutral teal — profile tag chips */
+
   --bg-app: #ffffff;
   --bg-sidebar: #f8f9fa;
   --bg-kpi-card: #f8f9fa;
@@ -32,6 +38,11 @@
 }
 
 html[data-theme="dark"] {
+  --color-primary:  #639aff;
+  --color-positive: #4cbb9f;
+  --color-negative: #f47c7c;
+  --color-teal:     #4db6ac;
+
   --bg-app: #1e222d;
   --bg-sidebar: #161b27;
   --bg-kpi-card: #252d3d;
@@ -103,7 +114,7 @@ html[data-theme="dark"] .form-select {
 }
 
 html[data-theme="dark"] .form-select:focus {
-  border-color: #0d6efd !important;
+  border-color: var(--color-primary) !important;
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
 }
 
@@ -130,7 +141,7 @@ html[data-theme="dark"] .text-muted {
 }
 
 .theme-toggle-btn:hover {
-  color: #0d6efd;
+  color: var(--color-primary);
 }
 
 .theme-toggle-btn:focus {
@@ -158,33 +169,54 @@ html[data-theme="dark"] .tab-content {
 }
 
 /* ── Dash dcc.Dropdown dark mode ────────────────────────────── */
-html[data-theme="dark"] .dash-dropdown .Select-control {
+/* .dash-dropdown is the class on the trigger <button> rendered by dcc.Dropdown */
+
+/* Trigger button */
+html[data-theme="dark"] .dash-dropdown {
+  background-color: var(--bg-kpi-card) !important;
+  border-color: var(--border-main) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Value / placeholder text inside trigger */
+html[data-theme="dark"] .dash-dropdown .dash-dropdown-value,
+html[data-theme="dark"] .dash-dropdown .dash-dropdown-placeholder {
+  color: var(--text-primary) !important;
+}
+
+/* Chevron icon */
+html[data-theme="dark"] .dash-dropdown .dash-dropdown-trigger-icon {
+  color: var(--text-muted) !important;
+  fill: var(--text-muted) !important;
+}
+
+/* Content panel — sibling of trigger button, inside .dash-dropdown-wrapper */
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-content {
   background-color: var(--bg-kpi-card) !important;
   border-color: var(--border-main) !important;
 }
 
-html[data-theme="dark"] .dash-dropdown .Select-value-label,
-html[data-theme="dark"] .dash-dropdown .Select-placeholder,
-html[data-theme="dark"] .dash-dropdown .Select-input input {
-  color: var(--text-primary) !important;
-}
-
-html[data-theme="dark"] .dash-dropdown .Select-arrow {
-  border-top-color: var(--text-muted) !important;
-}
-
-html[data-theme="dark"] .dash-dropdown .Select-menu-outer {
+/* Search input inside content panel */
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search {
   background-color: var(--bg-kpi-card) !important;
+  color: var(--text-primary) !important;
   border-color: var(--border-main) !important;
 }
 
-html[data-theme="dark"] .dash-dropdown .Select-option {
+/* Options */
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option {
   background-color: var(--bg-kpi-card) !important;
   color: var(--text-primary) !important;
 }
 
-html[data-theme="dark"] .dash-dropdown .Select-option.is-focused {
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option:hover,
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option:focus {
   background-color: var(--bg-row-hover) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option[aria-selected='true'] {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+  color: var(--asset-1-color-dark) !important;
 }
 
 /* ── Privacy mode — blur sensitive KPI values ───────────────── */

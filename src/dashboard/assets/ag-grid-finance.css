@@ -22,7 +22,7 @@
 
 .finance-grid .ag-header-row {
     background-color: transparent;
-    color: #0d6efd;
+    color: var(--color-primary);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -40,7 +40,7 @@
 }
 
 .finance-grid .ag-header-cell-text {
-    color: #0d6efd;
+    color: var(--color-primary);
 }
 
 /* Sort arrow icons */
@@ -51,7 +51,7 @@
 .finance-grid .ag-header-cell:hover .ag-sort-indicator-icon,
 .finance-grid .ag-sort-indicator-icon.ag-sort-ascending-icon,
 .finance-grid .ag-sort-indicator-icon.ag-sort-descending-icon {
-    color: #0d6efd;
+    color: var(--color-primary);
 }
 
 /* ── Body rows ──────────────────────────────────────────── */
@@ -101,13 +101,17 @@
 }
 
 /* ── Checkbox ───────────────────────────────────────────── */
+/* AG Grid uses custom-rendered checkboxes, not native — override AG Grid CSS variables */
 .finance-grid .ag-checkbox-input-wrapper {
-    accent-color: #3b82f6;
+    --ag-checkbox-checked-background-color: var(--color-primary);
+    --ag-checkbox-checked-border-color: var(--color-primary);
 }
 
-html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="checkbox"] {
-    color-scheme: dark;
-    accent-color: #3b82f6;
+html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper {
+    --ag-checkbox-unchecked-background-color: var(--bg-kpi-card);
+    --ag-checkbox-unchecked-border-color: var(--border-main);
+    --ag-checkbox-checked-background-color: var(--asset-1-color-dark);
+    --ag-checkbox-checked-border-color: var(--asset-1-color-dark);
 }
 
 /* ── Scrollbar ──────────────────────────────────────────── */
@@ -190,8 +194,8 @@ html[data-theme="dark"] .finance-grid .ag-checkbox-input-wrapper input[type="che
     white-space: nowrap;
 }
 
-.kpi-change-positive { color: #26a69a; }
-.kpi-change-negative { color: #ef5350; }
+.kpi-change-positive { color: var(--color-teal); }
+.kpi-change-negative { color: var(--color-negative); }
 .kpi-change-neutral  { color: var(--text-muted); }
 
 /* KPI group labels (Performance / Risk) */

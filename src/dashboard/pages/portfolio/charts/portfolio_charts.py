@@ -5,6 +5,13 @@ import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 from dash import html
 
+from .chart_theme import (
+    NEGATIVE_COLOR, TEAL_COLOR,
+    POSITIVE_FILL, NEGATIVE_FILL, TEAL_FILL, NEGATIVE_SPARKLINE_FILL,
+    ANNOTATION_COLOR, MEDIAN_ANNOTATION_COLOR, PIE_TEXT_COLOR,
+    FX_CHART_COLORS, CHART_THEMES,
+)
+
 
 CHART_HEIGHT_1 = 200
 CHART_HEIGHT = 230
@@ -20,22 +27,6 @@ def _apply_spike_config(fig):
         spikedash="solid", spikecolor="rgba(0,0,0,0.2)", spikethickness=1,
     )
 
-CHART_THEMES = {
-    "light": {
-        "paper_bgcolor": "white",
-        "plot_bgcolor": "white",
-        "font_color": "#555555",
-        "rs_bg": "white",
-        "rs_active": "#f0f0f0",
-    },
-    "dark": {
-        "paper_bgcolor": "#1e222d",
-        "plot_bgcolor": "#1e222d",
-        "font_color": "#9598a1",
-        "rs_bg": "#252d3d",
-        "rs_active": "#1c2a4a",
-    },
-}
 
 
 class _PnLPlotlyLineChart:
@@ -132,7 +123,7 @@ class PortfolioPerformanceScatterPlot:
 
         fig.add_vline(
             x=0,
-            line_color="red",
+            line_color=NEGATIVE_COLOR,
             line_width=1,
             line_dash="dash"
         )
@@ -142,7 +133,7 @@ class PortfolioPerformanceScatterPlot:
         low_mid = (0 + threshold) / 2
         high_mid = (threshold + weight_max) / 2
 
-        label_font = dict(size=9, color="gray")
+        label_font = dict(size=9, color=ANNOTATION_COLOR)
         for text, x, y in [
             ("High Value Winners", right_mid, high_mid),
             ("Dead Weights",       left_mid,  high_mid),
@@ -163,7 +154,7 @@ class PortfolioPerformanceScatterPlot:
             text="0% return",
             showarrow=False,
             xref="x", yref="y",
-            font=dict(size=8, color="red"),
+            font=dict(size=8, color=NEGATIVE_COLOR),
             xanchor="left", yanchor="top",
             xshift=3,
         )
@@ -172,7 +163,7 @@ class PortfolioPerformanceScatterPlot:
             text=f"Median weight ({threshold:.1f}%)",
             showarrow=False,
             xref="x", yref="y",
-            font=dict(size=8, color="rgba(200,180,0,0.9)"),
+            font=dict(size=8, color=MEDIAN_ANNOTATION_COLOR),
             xanchor="right", yanchor="bottom",
         )
 
@@ -300,7 +291,7 @@ def _ranked_panel(data, sort_by="profit", is_gain=True):
     fmt = (lambda v: f"+{v:.2f}%" if v >= 0 else f"{v:.2f}%") if sort_by in _PCT_COLS \
         else (lambda v: f"+{v:,.2f}" if v >= 0 else f"{v:,.2f}")
 
-    bg      = "rgba(38,166,113,0.18)" if is_gain else "rgba(239,83,80,0.18)"
+    bg      = POSITIVE_FILL if is_gain else NEGATIVE_FILL
     val_cls = "movers-value--gain"     if is_gain else "movers-value--loss"
     lbl_cls = "movers-panel-label--gain" if is_gain else "movers-panel-label--loss"
 
@@ -337,7 +328,7 @@ def daily_movers_table(data, n=5):
 
     def _row(ticker, value, is_gain):
         fill = abs(value) / (gain_max if is_gain else loss_max) * 100
-        bg = "rgba(38,166,113,0.18)" if is_gain else "rgba(239,83,80,0.18)"
+        bg = POSITIVE_FILL if is_gain else NEGATIVE_FILL
         label = f"+{value:.2f}%" if is_gain else f"{value:.2f}%"
         return html.Div([
             html.Span(ticker, className="movers-ticker"),
@@ -428,7 +419,7 @@ class PositionProfitabilityPlotlyDonutChart:
             hole=0.4,
             customdata=df['count'].values,
             textinfo="percent+label",
-            textfont=dict(color="#ffffff", size=10),
+            textfont=dict(color=PIE_TEXT_COLOR, size=10),
             hovertemplate="%{label}: %{percent} (%{customdata} of " + str(total) + " positions)<extra></extra>",
         ))
 
@@ -439,7 +430,7 @@ class PositionProfitabilityPlotlyDonutChart:
             x=0.5, y=-0.08,
             xref="paper", yref="paper",
             showarrow=False,
-            font=dict(size=8, color="gray"),
+            font=dict(size=8, color=ANNOTATION_COLOR),
         )
 
         fig.update_layout(
@@ -656,7 +647,7 @@ class PortfolioFXAttributionDonutChart:
             return fig
 
         fx_sign = "+" if fx_impact >= 0 else ""
-        colors = ["#0d6efd", "rgba(13,110,253,0.25)"]
+        colors = FX_CHART_COLORS.get(theme, FX_CHART_COLORS["light"])
 
         fig = go.Figure(go.Pie(
             labels=["FX Return", "Price Return"],
@@ -686,44 +677,3 @@ class PortfolioFXAttributionDonutChart:
         return fig
 
 
-def daily_change_sparkline(series: dict, change_sign: int, theme: str = "light") -> go.Figure:
-    ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-    dates = series.get("dates", [])
-    values = series.get("values", [])
-
-    if change_sign > 0:
-        line_color = "#26a69a"
-        fill_color = "rgba(38,166,154,0.15)"
-    elif change_sign < 0:
-        line_color = "#ef5350"
-        fill_color = "rgba(239,83,80,0.15)"
-    else:
-        line_color = "rgba(150,150,150,0.6)"
-        fill_color = "rgba(150,150,150,0.10)"
-
-    zeros = [0] * len(dates)
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=dates, y=zeros,
-        mode="lines", line=dict(color="rgba(0,0,0,0)", width=0),
-        showlegend=False, hoverinfo="skip",
-    ))
-    fig.add_trace(go.Scatter(
-        x=dates, y=values,
-        mode="lines",
-        line=dict(color=line_color, width=1.5),
-        fill="tonexty",
-        fillcolor=fill_color,
-        showlegend=False, hoverinfo="skip",
-    ))
-    fig.update_layout(
-        height=22, width=56,
-        margin=dict(l=0, r=0, t=0, b=0),
-        paper_bgcolor=ct["paper_bgcolor"],
-        plot_bgcolor=ct["plot_bgcolor"],
-        xaxis=dict(visible=False, showgrid=False, zeroline=False, fixedrange=True),
-        yaxis=dict(visible=False, showgrid=False, zeroline=False, fixedrange=True),
-        dragmode=False,
-    )
-    return fig

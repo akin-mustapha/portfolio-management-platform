@@ -3,6 +3,8 @@ import dash_ag_grid as dag
 import pandas as pd
 from dash import html
 
+from ...charts.chart_theme import POSITIVE_COLOR, NEGATIVE_COLOR
+
 
 def asset_table(data=None):
 
@@ -26,9 +28,6 @@ def asset_table(data=None):
         df["cumulative_return"] = df["cumulative_return"].round(decimals)
     if "daily_return" in df.columns:
         df["daily_return"] = df["daily_return"].round(decimals)
-
-    POSITIVE_COLOR = "#26a671"
-    NEGATIVE_COLOR = "#ef5350"
 
     def pnl_style(positive_color=POSITIVE_COLOR, negative_color=NEGATIVE_COLOR):
         return {
