@@ -2,7 +2,7 @@ import os
 import logging
 from dotenv import load_dotenv
 from typing import List, Any, Dict
-from dataclasses import replace, dataclass, asdict
+from dataclasses import dataclass, asdict
 
 from ...application.protocols import Source
 from ...application.policies import Pipeline

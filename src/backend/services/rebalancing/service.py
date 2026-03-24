@@ -91,7 +91,7 @@ def _format_plan_email(plan: RebalancePlan) -> str:
     lines = [
         f"Rebalancing Plan — {plan.created_date}",
         f"Target completion: {plan.target_completion_date}",
-        f"",
+        "",
         plan.plan_json.get("summary", ""),
         f"Total portfolio drift: {plan.plan_json.get('total_drift_pct', 0):.1f}%",
         "",

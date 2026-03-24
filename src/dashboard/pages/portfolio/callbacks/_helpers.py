@@ -8,7 +8,6 @@ from datetime import date, timedelta
 
 import dash_bootstrap_components as dbc
 from dash import dcc, html
-from dash.exceptions import PreventUpdate
 
 from ..components.organisms.secondary_kpi import (
     secondary_asset_kpi_row,

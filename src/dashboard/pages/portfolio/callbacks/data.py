@@ -8,7 +8,6 @@ from dash.exceptions import PreventUpdate
 
 from ..components.organisms.kpi_row import kpi_row
 from ..components.organisms.asset_table import asset_table
-from ..charts.portfolio_charts import daily_movers_table
 from ..tabs import portfolio_tab_content, risk_tab_content, opportunities_tab_content
 from ....controllers.portfolio_controller import PortfolioController
 

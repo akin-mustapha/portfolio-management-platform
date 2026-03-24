@@ -18,16 +18,16 @@ Shared utilities (not callbacks):
   _helpers.py   → constants, date window, fetch, build compare rows
 """
 
-from . import (
-    data,
-    filters,
-    selection,
-    tags,
-    ui,
-    theme,
-    settings,
-    rebalancing,
-)  # noqa: F401
+from . import (  # noqa: F401
+    data,  # noqa: F401
+    filters,  # noqa: F401
+    selection,  # noqa: F401
+    tags,  # noqa: F401
+    ui,  # noqa: F401
+    theme,  # noqa: F401
+    settings,  # noqa: F401
+    rebalancing,  # noqa: F401
+)
 
 # Re-exported for portfolio_page.py: `from .callbacks import load_portfolio_page`
 from .data import load_portfolio_page  # noqa: F401

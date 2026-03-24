@@ -14,5 +14,5 @@ def customer_logger(log_name):
             format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
         )
         return logging
-    except Exception as e:
+    except Exception:
         raise

@@ -40,8 +40,4 @@ class KafkaAdapter:
 
             payload = event.get("payload")
 
-            # ─── API Error Handling ───
-            if isinstance(payload, dict):
-                error = payload.get("error")
-
             Trading212AssetConsumer().run(payload)

@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 
 from shared.repositories.base_table_repository import BaseTableRepository
-from shared.database.client import SQLModelClient
 
 load_dotenv()
 

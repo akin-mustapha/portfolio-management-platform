@@ -69,7 +69,7 @@ class AssetMapper(Mapper):
             data = {
                 col: data.get(source)
                 for col, source in fields.items()
-                if data.get(source) != None
+                if data.get(source) is not None
             }
             data["source_name"] = "Trading 212"
             data["created_timestamp"] = datetime.now(UTC)

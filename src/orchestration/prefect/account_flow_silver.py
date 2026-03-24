@@ -1,4 +1,3 @@
-import logging
 from prefect import flow, task
 from datetime import timedelta
 from backend.ingestion.factories.pipeline_factory import PipelineFactory

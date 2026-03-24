@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 from ..infrastructure.repositories.repository_factory import RepositoryFactory
 from ..presenters.portfolio_presenter import PortfolioPresenter

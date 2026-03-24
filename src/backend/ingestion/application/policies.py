@@ -1,7 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import asdict
-from datetime import date, timedelta, datetime, UTC
+from datetime import timedelta, datetime, UTC
 
 from .protocols import Source
 from .protocols import Destination

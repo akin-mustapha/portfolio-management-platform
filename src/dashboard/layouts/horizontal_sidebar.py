@@ -1,5 +1,4 @@
-import dash
-from dash import Input, Output, dcc, html, callback, State
+from dash import html
 import dash_bootstrap_components as dbc
 
 horizontal_sidebar = html.Div(

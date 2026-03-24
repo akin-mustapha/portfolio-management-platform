@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 
 from shared.utils.custom_logger import customer_logger

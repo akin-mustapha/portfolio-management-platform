@@ -4,11 +4,9 @@ Portfolio Service Module
 
 from .infrastructure.repositories.repository_factory import RepositoryFactory
 from .domain.entities import Asset, AssetTag, Tag, Category, Industry, Sector
-from .application.interfaces import AssetQueryRepository
 
 from shared.utils.custom_logger import customer_logger
 
-from datetime import datetime, UTC
 
 logging = customer_logger("portfolio_service")
 
@@ -72,7 +70,7 @@ class PortfolioService:
         try:
             logging.info(f"Creating tag: {tag.name}")
             repo_tag.upsert([data_dict], ["name", "tag_type_id"])
-            logging.info(f"Created tag")
+            logging.info("Created tag")
             return tag
         except Exception as e:
             logging.error(f"Error creating tag: {e}")

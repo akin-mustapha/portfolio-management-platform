@@ -8,11 +8,8 @@ from dash import html
 
 from .chart_theme import (
     NEGATIVE_COLOR,
-    TEAL_COLOR,
     POSITIVE_FILL,
     NEGATIVE_FILL,
-    TEAL_FILL,
-    NEGATIVE_SPARKLINE_FILL,
     ANNOTATION_COLOR,
     MEDIAN_ANNOTATION_COLOR,
     PIE_TEXT_COLOR,
