@@ -7,7 +7,6 @@ from .domain.entities import Asset, AssetTag, Tag, Category, Industry, Sector
 
 from shared.utils.custom_logger import customer_logger
 
-
 logging = customer_logger("portfolio_service")
 
 
