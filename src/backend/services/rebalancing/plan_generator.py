@@ -29,6 +29,8 @@ def generate_plan(
             continue
 
         action = "reduce" if drift > 0 else "increase"
+        if config.correction_days <= 0:
+            continue
         daily_correction = drift / config.correction_days
 
         daily_steps = []

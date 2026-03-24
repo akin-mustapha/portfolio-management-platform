@@ -14,7 +14,7 @@ from ..components.organisms.rebalance_panel import build_asset_sliders, render_p
     Output("rebalance-asset-select", "options"),
     Input("portfolio_page_asset_store", "data"),
 )
-def populate_asset_dropdown(store_data):
+def on_asset_store_change(store_data):
     rows = (store_data or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
     return [{"label": r["ticker"], "value": r["ticker"]} for r in rows if r.get("ticker")]
 
@@ -26,12 +26,12 @@ def populate_asset_dropdown(store_data):
     Input("rebalance-asset-select", "value"),
     State("rebalance-config-store", "data"),
 )
-def render_sliders_for_asset(ticker, store_data):
+def on_asset_select(ticker, store_data):
     if not ticker:
         return html.P("Select an asset above.", className="text-muted", style={"fontSize": "12px", "padding": "8px"})
     configs = (store_data or {}).get("configs", [])
-    cfg = next((c for c in configs if c["ticker"] == ticker), {"ticker": ticker})
-    return build_asset_sliders([cfg])
+    asset_config = next((c for c in configs if c["ticker"] == ticker), {"ticker": ticker})
+    return build_asset_sliders([asset_config])
 
 
 # ── 1. Toggle panel visibility ────────────────────────────────────────────────
@@ -42,7 +42,7 @@ def render_sliders_for_asset(ticker, store_data):
     State("rebalance-panel-wrapper", "style"),
     prevent_initial_call=True,
 )
-def toggle_rebalance_panel(n_clicks, current_style):
+def on_toggle_rebalance(n_clicks, current_style):
     is_visible = (current_style or {}).get("display") != "none"
     return {"display": "none"} if is_visible else {"display": "flex"}
 
@@ -54,7 +54,7 @@ def toggle_rebalance_panel(n_clicks, current_style):
     Output("rebalance-panel-plan-summary", "children"),
     Input("portfolio_page_location", "pathname"),
 )
-def load_rebalance_data(_pathname):
+def on_page_load(_pathname):
     try:
         service = build_rebalancing_service()
         configs = service.load_configs()
@@ -70,56 +70,71 @@ def load_rebalance_data(_pathname):
 @callback(
     Output("rebalance-panel-status", "children"),
     Output("rebalance-config-store", "data", allow_duplicate=True),
+    Output("rebalance-panel-body", "children", allow_duplicate=True),
     Input("rebalance-panel-save-btn", "n_clicks"),
     State({"type": "rebalance-slider", "index": ALL}, "value"),
     State({"type": "rebalance-slider", "index": ALL}, "id"),
     State("rebalance-config-store", "data"),
+    State("rebalance-asset-select", "value"),
     prevent_initial_call=True,
 )
-def save_configs(n_clicks, values, ids, store_data):
+def on_save_configs(n_clicks, values, ids, store_data, current_ticker):
     if not n_clicks or not store_data:
         raise PreventUpdate
 
-    # Build {ticker: {field: value}} from the pattern-matched sliders
     asset_fields: dict[str, dict] = {}
     for slider_id, value in zip(ids, values):
         index = slider_id["index"]          # e.g. "NVDA|target_weight_pct"
         ticker, field = index.split("|", 1)
         asset_fields.setdefault(ticker, {})[field] = value
 
-    asset_id_by_ticker = {c["ticker"]: c["asset_id"] for c in store_data.get("configs", [])}
     existing_by_ticker = {c["ticker"]: c for c in store_data.get("configs", [])}
 
-    service = build_rebalancing_service()
     try:
+        service = build_rebalancing_service()
         for ticker, fields in asset_fields.items():
-            asset_id = asset_id_by_ticker.get(ticker)
-            if not asset_id:
-                continue
             existing = existing_by_ticker.get(ticker, {})
+            asset_id = existing.get("asset_id") or service.get_asset_id_by_ticker(ticker)
+            if not asset_id:
+                return f"Error: asset ID not found for {ticker} — try reloading the page.", no_update, no_update
+
+            target = fields.get("target_weight_pct", existing.get("target_weight_pct", 5))
+            band = fields.get("tolerance_band_pct", existing.get("tolerance_band_pct", 5))
             config = RebalanceConfig(
                 id=existing.get("id"),
                 asset_id=asset_id,
                 ticker=ticker,
-                target_weight_pct=fields.get("target_weight_pct", existing.get("target_weight_pct", 0)),
-                min_weight_pct=fields.get("min_weight_pct", existing.get("min_weight_pct", 0)),
-                max_weight_pct=fields.get("max_weight_pct", existing.get("max_weight_pct", 100)),
-                risk_tolerance=int(fields.get("risk_tolerance", existing.get("risk_tolerance", 50))),
+                target_weight_pct=target,
+                min_weight_pct=max(0.0, target - band),
+                max_weight_pct=min(50.0, target + band),
                 rebalance_threshold_pct=float(fields.get("rebalance_threshold_pct", existing.get("rebalance_threshold_pct", 2.0))),
-                correction_days=int(fields.get("correction_days", existing.get("correction_days", 3))),
-                momentum_bias=int(fields.get("momentum_bias", existing.get("momentum_bias", 0))),
+                correction_days=int(fields.get("correction_days", existing.get("correction_days", 7))),
                 is_active=existing.get("is_active", True),
             )
+            
             service.upsert_config(config)
 
-        # Merge written values back into the store in-memory (upsert_config is a pure write)
-        updated_configs = [
-            {**c, **asset_fields.get(c["ticker"], {})}
-            for c in store_data.get("configs", [])
-        ]
-        return "Saved ✓", {**store_data, "configs": updated_configs}
+        # Reload from DB — source of truth after upsert
+        refreshed_configs = service.load_configs()
+        refreshed_store = _build_store(refreshed_configs, store_data.get("plan"))
+
+        # Re-render sliders from saved DB values so user gets visual confirmation
+        refreshed_sliders = no_update
+        if current_ticker:
+            saved_cfg = next((c for c in refreshed_configs if c.ticker == current_ticker), None)
+            if saved_cfg:
+                refreshed_sliders = build_asset_sliders([{
+                    "ticker": saved_cfg.ticker,
+                    "target_weight_pct": saved_cfg.target_weight_pct,
+                    "tolerance_band_pct": round((saved_cfg.max_weight_pct - saved_cfg.min_weight_pct) / 2, 1),
+                    "rebalance_threshold_pct": saved_cfg.rebalance_threshold_pct,
+                    "correction_days": saved_cfg.correction_days,
+                    "is_active": saved_cfg.is_active,
+                }])
+
+        return "Saved", refreshed_store, refreshed_sliders
     except Exception as e:
-        return f"Error: {e}", no_update
+        return f"Error: {e}", no_update, no_update
 
 
 # ── 5. Generate plan on demand ────────────────────────────────────────────────
@@ -130,7 +145,7 @@ def save_configs(n_clicks, values, ids, store_data):
     Input("rebalance-panel-generate-btn", "n_clicks"),
     prevent_initial_call=True,
 )
-def generate_plan_on_demand(n_clicks):
+def on_generate_plan(n_clicks):
     if not n_clicks:
         raise PreventUpdate
     service = build_rebalancing_service()
@@ -139,7 +154,8 @@ def generate_plan_on_demand(n_clicks):
         if plan is None:
             return render_plan_summary(None), "All assets within threshold — no plan needed"
         latest = service.get_latest_plan()
-        return render_plan_summary(latest), "Plan generated ✓"
+        status = "Plan generated ✓" if latest else "Plan generated but could not be retrieved"
+        return render_plan_summary(latest), status
     except Exception as e:
         return no_update, f"Error: {e}"
 
@@ -156,10 +172,9 @@ def _build_store(configs, plan) -> dict:
                 "target_weight_pct": c.target_weight_pct,
                 "min_weight_pct": c.min_weight_pct,
                 "max_weight_pct": c.max_weight_pct,
-                "risk_tolerance": c.risk_tolerance,
+                "tolerance_band_pct": round((c.max_weight_pct - c.min_weight_pct) / 2, 1),
                 "rebalance_threshold_pct": c.rebalance_threshold_pct,
                 "correction_days": c.correction_days,
-                "momentum_bias": c.momentum_bias,
                 "is_active": c.is_active,
             }
             for c in configs

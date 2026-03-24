@@ -78,45 +78,17 @@ def build_asset_sliders(configs: list[dict]) -> list:
                 html.Div(ticker, className="rebalance-asset-name"),
 
                 _slider_row("Target Weight %", {"type": "rebalance-slider", "index": f"{ticker}|target_weight_pct"},
-                            0, 100, 0.5, cfg.get("target_weight_pct", 0)),
+                            0, 50, 1, cfg.get("target_weight_pct", 5)),
 
                 _slider_row("Drift Threshold %", {"type": "rebalance-slider", "index": f"{ticker}|rebalance_threshold_pct"},
-                            0, 20, 0.5, cfg.get("rebalance_threshold_pct", 2.0)),
+                            0, 20, 1, cfg.get("rebalance_threshold_pct", 2.0)),
 
-                html.Div([
-                    html.Div([
-                        html.Span("Min %", className="rebalance-slider-label"),
-                        dcc.Slider(
-                            id={"type": "rebalance-slider", "index": f"{ticker}|min_weight_pct"},
-                            min=0, max=100, step=0.5,
-                            value=cfg.get("min_weight_pct", 0),
-                            marks=None,
-                            tooltip={"placement": "bottom", "always_visible": False},
-                            className="rebalance-slider",
-                        ),
-                    ], style={"flex": "1", "marginRight": "8px"}),
-                    html.Div([
-                        html.Span("Max %", className="rebalance-slider-label"),
-                        dcc.Slider(
-                            id={"type": "rebalance-slider", "index": f"{ticker}|max_weight_pct"},
-                            min=0, max=100, step=0.5,
-                            value=cfg.get("max_weight_pct", 100),
-                            marks=None,
-                            tooltip={"placement": "bottom", "always_visible": False},
-                            className="rebalance-slider",
-                        ),
-                    ], style={"flex": "1"}),
-                ], style={"display": "flex"}),
-
-                _slider_row("Risk Tolerance", {"type": "rebalance-slider", "index": f"{ticker}|risk_tolerance"},
-                            0, 100, 1, cfg.get("risk_tolerance", 50)),
+                _slider_row("Tolerance Band %", {"type": "rebalance-slider", "index": f"{ticker}|tolerance_band_pct"},
+                            0, 25, 1, cfg.get("tolerance_band_pct", 5)),
 
                 _slider_row("Correction Days", {"type": "rebalance-slider", "index": f"{ticker}|correction_days"},
-                            1, 7, 1, cfg.get("correction_days", 3),
-                            marks={i: str(i) for i in range(1, 8)}),
-
-                _slider_row("Momentum Bias", {"type": "rebalance-slider", "index": f"{ticker}|momentum_bias"},
-                            -100, 100, 1, cfg.get("momentum_bias", 0)),
+                            1, 30, 1, cfg.get("correction_days", 7),
+                            marks={1: "1", 7: "7", 14: "14", 21: "21", 30: "30"}),
 
             ], className="rebalance-asset-card")
         )
@@ -129,30 +101,60 @@ def render_plan_summary(plan: dict | None) -> list:
         return [html.P("No plan generated yet.", className="text-muted", style={"fontSize": "12px"})]
 
     pj = plan["plan_json"]
+    actions = pj.get("actions", [])
+
+    reduces = [a for a in actions if a["action"] == "reduce"]
+    increases = [a for a in actions if a["action"] == "increase"]
+
     rows = [
         html.Div("Latest Plan", className="tv-section-header"),
-        html.Small(
-            f"{plan.get('created_date', '')} · {pj.get('summary', '')}",
-            className="text-muted d-block mb-2",
-            style={"fontSize": "11px"},
-        ),
+        html.Small(plan.get("created_date", ""), className="text-muted d-block", style={"fontSize": "11px"}),
+        html.Small(pj.get("summary", ""), className="d-block mb-1", style={"fontSize": "11px", "color": "var(--text-secondary)"}),
+        # Stats bar
+        html.Div([
+            html.Span(
+                f"↓ {len(reduces)} reduce",
+                className="rebalance-action-reduce rebalance-plan-action",
+            ) if reduces else None,
+            html.Span(
+                f"↑ {len(increases)} increase",
+                className="rebalance-action-increase rebalance-plan-action",
+            ) if increases else None,
+        ], className="rebalance-plan-stats"),
     ]
-    for action in pj.get("actions", []):
-        drift = action.get("drift_pct", 0)
-        sign = "+" if drift > 0 else ""
-        rows.append(
-            html.Div([
-                html.Span(action["ticker"], className="rebalance-plan-ticker"),
-                html.Span(
-                    action["action"].upper(),
-                    className=f"rebalance-plan-action {'rebalance-action-reduce' if action['action'] == 'reduce' else 'rebalance-action-increase'}",
-                ),
-                html.Span(
-                    f"{action['current_weight_pct']:.1f}% → {action['target_weight_pct']:.1f}%  ({sign}{drift:.1f}%)",
-                    className="rebalance-plan-detail",
-                ),
-            ], className="rebalance-plan-row")
-        )
+
+    def _action_rows(group):
+        out = []
+        for action in group:
+            drift = action.get("drift_pct", 0)
+            sign = "+" if drift > 0 else ""
+            is_reduce = action["action"] == "reduce"
+            out.append(
+                html.Div([
+                    html.Span(action["ticker"], className="rebalance-plan-ticker"),
+                    html.Span(
+                        action["action"].upper(),
+                        className=f"rebalance-plan-action {'rebalance-action-reduce' if is_reduce else 'rebalance-action-increase'}",
+                    ),
+                    html.Span(
+                        f"{action['current_weight_pct']:.1f}% → {action['target_weight_pct']:.1f}%",
+                        className="rebalance-plan-weight",
+                    ),
+                    html.Span(
+                        f"{sign}{drift:.1f}%",
+                        className=f"rebalance-plan-delta {'negative' if is_reduce else 'positive'}",
+                    ),
+                ], className="rebalance-plan-row")
+            )
+        return out
+
+    if reduces:
+        rows.append(html.Div("Reduce", className="rebalance-plan-group-label"))
+        rows.extend(_action_rows(reduces))
+    if increases:
+        rows.append(html.Div("Increase", className="rebalance-plan-group-label"))
+        rows.extend(_action_rows(increases))
+
     return rows
 
 
