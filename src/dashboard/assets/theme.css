@@ -158,33 +158,54 @@ html[data-theme="dark"] .tab-content {
 }
 
 /* ── Dash dcc.Dropdown dark mode ────────────────────────────── */
-html[data-theme="dark"] .dash-dropdown .Select-control {
+/* .dash-dropdown is the class on the trigger <button> rendered by dcc.Dropdown */
+
+/* Trigger button */
+html[data-theme="dark"] .dash-dropdown {
+  background-color: var(--bg-kpi-card) !important;
+  border-color: var(--border-main) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Value / placeholder text inside trigger */
+html[data-theme="dark"] .dash-dropdown .dash-dropdown-value,
+html[data-theme="dark"] .dash-dropdown .dash-dropdown-placeholder {
+  color: var(--text-primary) !important;
+}
+
+/* Chevron icon */
+html[data-theme="dark"] .dash-dropdown .dash-dropdown-trigger-icon {
+  color: var(--text-muted) !important;
+  fill: var(--text-muted) !important;
+}
+
+/* Content panel — sibling of trigger button, inside .dash-dropdown-wrapper */
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-content {
   background-color: var(--bg-kpi-card) !important;
   border-color: var(--border-main) !important;
 }
 
-html[data-theme="dark"] .dash-dropdown .Select-value-label,
-html[data-theme="dark"] .dash-dropdown .Select-placeholder,
-html[data-theme="dark"] .dash-dropdown .Select-input input {
-  color: var(--text-primary) !important;
-}
-
-html[data-theme="dark"] .dash-dropdown .Select-arrow {
-  border-top-color: var(--text-muted) !important;
-}
-
-html[data-theme="dark"] .dash-dropdown .Select-menu-outer {
+/* Search input inside content panel */
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search {
   background-color: var(--bg-kpi-card) !important;
+  color: var(--text-primary) !important;
   border-color: var(--border-main) !important;
 }
 
-html[data-theme="dark"] .dash-dropdown .Select-option {
+/* Options */
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option {
   background-color: var(--bg-kpi-card) !important;
   color: var(--text-primary) !important;
 }
 
-html[data-theme="dark"] .dash-dropdown .Select-option.is-focused {
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option:hover,
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option:focus {
   background-color: var(--bg-row-hover) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-option[aria-selected='true'] {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+  color: var(--asset-1-color-dark) !important;
 }
 
 /* ── Privacy mode — blur sensitive KPI values ───────────────── */

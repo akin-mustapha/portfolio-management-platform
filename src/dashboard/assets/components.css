@@ -904,8 +904,10 @@ html[data-theme="dark"] .settings-sidebar {
     border-top: 1px solid var(--border-tv);
 }
 
-/* ws-modal dcc.Dropdown — Dash 4 class names */
-.ws-modal-dropdown .dash-dropdown-wrapper {
+/* ws-modal dcc.Dropdown — className lands on the trigger <button>, not a parent div */
+/* Selectors that target button children are valid; content panel uses :has() */
+
+.ws-modal-dropdown {
     background: var(--bg-app) !important;
     border: 1px solid var(--border-main) !important;
     border-radius: 4px !important;
@@ -916,13 +918,10 @@ html[data-theme="dark"] .settings-sidebar {
     outline: none !important;
 }
 
-.ws-modal-dropdown[data-state='open'] .dash-dropdown-wrapper,
-.ws-modal-dropdown .dash-dropdown-wrapper:focus-within {
+.ws-modal-dropdown[data-state='open'],
+.ws-modal-dropdown:focus {
     border-color: #0d6efd !important;
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15) !important;
-}
-
-.ws-modal-dropdown .dash-dropdown-wrapper:focus {
     outline: none !important;
 }
 
@@ -941,39 +940,56 @@ html[data-theme="dark"] .settings-sidebar {
     fill: var(--text-muted) !important;
 }
 
-.ws-modal-dropdown .dash-dropdown-content {
-    background: var(--bg-panel) !important;
-    border: 1px solid var(--border-main) !important;
-    border-radius: 4px !important;
-    font-size: 13px !important;
+/* Content panel and options — use :has() since ws-modal-dropdown is a sibling, not ancestor */
+.dash-dropdown-wrapper:has(.ws-modal-dropdown) .dash-dropdown-content {
     z-index: 9999 !important;
     margin-top: 2px !important;
-}
-
-.ws-modal-dropdown .dash-dropdown-option {
-    background: transparent !important;
-    color: var(--text-primary) !important;
     font-size: 13px !important;
-    padding: 6px 10px !important;
 }
 
-.ws-modal-dropdown .dash-dropdown-option:hover,
-.ws-modal-dropdown .dash-dropdown-option:focus {
-    background: var(--bg-strip-hover) !important;
+.dash-dropdown-wrapper:has(.ws-modal-dropdown) .dash-dropdown-option {
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+}
+
+/* ── Global dcc.Dropdown light mode: fix purple hover + selected state ── */
+.dash-dropdown-wrapper .dash-dropdown-option:hover,
+.dash-dropdown-wrapper .dash-dropdown-option:focus {
+    background-color: var(--bg-strip-hover) !important;
     outline: none !important;
 }
 
-.ws-modal-dropdown .dash-dropdown-option[aria-selected='true'] {
-    background: rgba(13, 110, 253, 0.10) !important;
+.dash-dropdown-wrapper .dash-dropdown-option[aria-selected='true'] {
+    background-color: rgba(13, 110, 253, 0.10) !important;
     color: #0d6efd !important;
 }
 
-.ws-modal-dropdown .dash-dropdown-search {
-    background: var(--bg-app) !important;
-    color: var(--text-primary) !important;
-    border: none !important;
-    font-size: 13px !important;
-    outline: none !important;
+/* ── Search container: replace Dash purple with project blue ── */
+.dash-dropdown-wrapper .dash-dropdown-search-container {
+    border-color: var(--border-tv) !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-search-container:focus-within {
+    border-color: #0d6efd !important;
+    outline: 1px solid #0d6efd !important;
+}
+
+.dash-dropdown-wrapper .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
+    color: #0d6efd !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container {
+    background-color: var(--bg-kpi-card) !important;
+    border-color: var(--border-main) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container:focus-within {
+    border-color: var(--asset-1-color-dark) !important;
+    outline-color: var(--asset-1-color-dark) !important;
+}
+
+html[data-theme="dark"] .dash-dropdown-wrapper .dash-dropdown-search-container:focus-within .dash-dropdown-search-icon {
+    color: var(--asset-1-color-dark) !important;
 }
 
 html[data-theme="dark"] .ws-modal-overlay {

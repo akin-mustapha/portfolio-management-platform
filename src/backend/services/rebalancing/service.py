@@ -28,7 +28,7 @@ class RebalancingService:
         rows = repo.select_all_active_with_ticker()
         return [
             RebalanceConfig(
-                id=str(r["id"]),
+                id=str(r["id"]) if r["id"] is not None else None,
                 asset_id=str(r["asset_id"]),
                 ticker=r["ticker"],
                 target_weight_pct=float(r["target_weight_pct"]),

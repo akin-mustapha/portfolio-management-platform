@@ -1,6 +1,8 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 
+from .components.atoms.dropdown import tv_dropdown
+
 from .callbacks import load_portfolio_page  # noqa: F401 — registers callback
 from .components.organisms.kpi_row import kpi_row
 from .components.organisms.asset_table import asset_table
@@ -14,6 +16,7 @@ from .components.organisms.rebalance_panel import rebalance_drawer_content
 # ─────────────────────────────────────────────
 
 def portfolio_layout():
+    configs = []
     return html.Div([
         dcc.Location(id="portfolio_page_location"),
         dcc.Store(id="portfolio_page_asset_store"),
@@ -87,11 +90,11 @@ def portfolio_layout():
                                 html.Div([
                                     html.Div([
                                         html.Label("Tag", className="ws-modal-label"),
-                                        dcc.Dropdown(id="assign-tag-modal-tag-select", placeholder="Select tag…", className="ws-modal-dropdown"),
+                                        tv_dropdown(id="assign-tag-modal-tag-select", placeholder="Select tag…", className="ws-modal-dropdown"),
                                     ], className="mb-3"),
                                     html.Div([
                                         html.Label("Category", className="ws-modal-label"),
-                                        dcc.Dropdown(id="assign-tag-modal-category-select", placeholder="Select category…", className="ws-modal-dropdown"),
+                                        tv_dropdown(id="assign-tag-modal-category-select", placeholder="Select category…", className="ws-modal-dropdown"),
                                     ], className="mb-3"),
                                 ], className="ws-modal-body"),
                                 html.Div([
@@ -110,7 +113,7 @@ def portfolio_layout():
                 id="rebalance-panel-wrapper",
                 className="rebalance-drawer",
                 style={"display": "none"},
-                children=rebalance_drawer_content(),
+                children=rebalance_drawer_content(configs),
             ),
 
         ], className="workspace-with-rebalance"),
