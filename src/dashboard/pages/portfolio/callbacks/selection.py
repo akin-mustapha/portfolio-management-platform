@@ -7,7 +7,7 @@ from dash.exceptions import PreventUpdate
 
 from ..components.atoms.badges import _kpi_badge
 from ..components.organisms.secondary_kpi import secondary_asset_kpi_row, secondary_asset_tag_row
-from ..charts.portfolio_charts import _ranked_panel
+from ..charts.portfolio_charts import _ranked_panel, PortfolioPerformanceScatterPlot
 from ..charts.asset_charts import PriceWithMAPlotlyLineChart
 from ....controllers.asset_profile_controller import AssetProfileController
 from ....controllers.portfolio_controller import PortfolioController
@@ -221,3 +221,28 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
 
     figure = PriceWithMAPlotlyLineChart().render(snapshot, theme=current_theme)
     return strip, figure
+
+
+# ── 8. Scatter plot bubble highlight on row selection ─────────────
+
+@callback(
+    Output("portfolio_performance_map", "figure", allow_duplicate=True),
+    Input("portfolio-asset-table", "selectedRows"),
+    State("portfolio_page_asset_store", "data"),
+    State("theme-store", "data"),
+    prevent_initial_call=True,
+)
+def on_scatter_selection_highlight(selected_rows, cached_data, theme):
+    if not cached_data:
+        raise PreventUpdate
+
+    distribution = (
+        cached_data.get("view_model", {}).get("position_distribution", [])
+    )
+    tickers = [r["ticker"] for r in (selected_rows or []) if r.get("ticker")]
+
+    return PortfolioPerformanceScatterPlot().render(
+        distribution,
+        theme=theme or "light",
+        selected_tickers=tickers or None,
+    )

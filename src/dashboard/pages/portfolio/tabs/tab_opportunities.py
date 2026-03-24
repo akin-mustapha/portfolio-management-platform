@@ -40,24 +40,22 @@ def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
                     html.Hr(className="tv-divider"),
 
                     # Row 1: Performance scatter + Winners P&L
-                    dbc.Row([
-                        dbc.Col(_chart_section(
-                            "Position Performance Map",
-                            dcc.Graph(
-                                id="portfolio_performance_map",
-                                figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme, currency=currency_symbol),
-                                config=_GRAPH_CONFIG,
-                            ),
-                        )),
-                        dbc.Col(_chart_section(
-                            "Profitable Positions P&L",
-                            dcc.Graph(
-                                id="winners_pnl_chart",
-                                figure=WinnersPnLPlotlyLineChart().render(winners_pnl, theme=theme),
-                                config=_GRAPH_CONFIG,
-                            ),
-                        )),
-                    ], className="mb-6 workspace-chart-grid", style={"gridTemplateColumns": "3fr 2fr"}),
+                    html.Div(_chart_section(
+                        "Position Performance Map",
+                        dcc.Graph(
+                            id="portfolio_performance_map",
+                            figure=PortfolioPerformanceScatterPlot().render(position_distribution, theme=theme, currency=currency_symbol),
+                            config=_GRAPH_CONFIG,
+                        ),
+                    )),
+                    html.Div(_chart_section(
+                        "Profitable Positions P&L",
+                        dcc.Graph(
+                            id="winners_pnl_chart",
+                            figure=WinnersPnLPlotlyLineChart().render(winners_pnl, theme=theme),
+                            config=_GRAPH_CONFIG,
+                        ),
+                    )),
 
                 ],
             ),

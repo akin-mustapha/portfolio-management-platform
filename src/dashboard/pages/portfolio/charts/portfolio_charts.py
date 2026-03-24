@@ -89,7 +89,7 @@ class LosersPnLPlotlyLineChart(_PnLPlotlyLineChart):
     fill = "tozerox"
 
 class PortfolioPerformanceScatterPlot:
-    def render(self, data, theme="light", currency=""):
+    def render(self, data, theme="light", currency="", selected_tickers=None):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
         if not data:
             return go.Figure()
@@ -215,6 +215,41 @@ class PortfolioPerformanceScatterPlot:
         )
 
         _apply_spike_config(fig)
+
+        if selected_tickers:
+            sel_df = df[df["ticker"].isin(selected_tickers)]
+            if not sel_df.empty:
+                fig.update_traces(opacity=0.15)
+
+                max_weight = df["weight_pct"].max()
+                sizeref = 2.0 * max_weight / (20.0 ** 2)
+
+                fig.add_trace(go.Scatter(
+                    x=sel_df["roi_pct"],
+                    y=sel_df["weight_pct"],
+                    mode="markers",
+                    marker=dict(
+                        size=sel_df["weight_pct"].values,
+                        sizemode="area",
+                        sizeref=sizeref,
+                        color=sel_df["value"].values,
+                        colorscale=px.colors.sequential.Agsunset,
+                        showscale=False,
+                        line=dict(color="white", width=2),
+                        opacity=1.0,
+                    ),
+                    customdata=sel_df[["ticker", "name", "profit"]].values,
+                    hovertemplate=(
+                        "<b>%{customdata[0]}</b><br>"
+                        "%{customdata[1]}<br>"
+                        "ROI: %{x:.1f}%<br>"
+                        f"Total Return: {currency}%{{customdata[2]:,.0f}}<br>"
+                        "Weight: %{y:.1f}%<br>"
+                        "<extra></extra>"
+                    ),
+                    showlegend=False,
+                ))
+
         return fig
 
 class _BaseRankedBarChart:
