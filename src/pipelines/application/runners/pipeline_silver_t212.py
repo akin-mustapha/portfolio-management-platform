@@ -74,26 +74,36 @@ class Trading212AssetTransformationSilver(Transformation):
                 try:
                     positions = json.loads(positions)
                 except json.JSONDecodeError as e:
-                    self._parse_errors.append(RejectedRecord(
-                        pipeline_name=None,
-                        layer="silver",
-                        business_key=snapshot_id,
-                        raw_payload={"snapshot_id": snapshot_id, "raw": positions[:500]},
-                        error_type="JSONDecodeError",
-                        error_message=str(e),
-                    ))
+                    self._parse_errors.append(
+                        RejectedRecord(
+                            pipeline_name=None,
+                            layer="silver",
+                            business_key=snapshot_id,
+                            raw_payload={
+                                "snapshot_id": snapshot_id,
+                                "raw": positions[:500],
+                            },
+                            error_type="JSONDecodeError",
+                            error_message=str(e),
+                        )
+                    )
                     continue
 
             for pos in positions:
                 if not isinstance(pos, dict):
-                    self._parse_errors.append(RejectedRecord(
-                        pipeline_name=None,
-                        layer="silver",
-                        business_key=snapshot_id,
-                        raw_payload={"snapshot_id": snapshot_id, "raw": str(pos)[:500]},
-                        error_type="InvalidPositionEntry",
-                        error_message=f"Expected dict, got {type(pos).__name__}: {str(pos)[:100]}",
-                    ))
+                    self._parse_errors.append(
+                        RejectedRecord(
+                            pipeline_name=None,
+                            layer="silver",
+                            business_key=snapshot_id,
+                            raw_payload={
+                                "snapshot_id": snapshot_id,
+                                "raw": str(pos)[:500],
+                            },
+                            error_type="InvalidPositionEntry",
+                            error_message=f"Expected dict, got {type(pos).__name__}: {str(pos)[:100]}",
+                        )
+                    )
                     continue
 
                 if not pos.get("instrument", {}).get("ticker"):
@@ -142,14 +152,19 @@ class Trading212AccountTransformationSilver(Transformation):
                 try:
                     account = json.loads(account)
                 except json.JSONDecodeError as e:
-                    self._parse_errors.append(RejectedRecord(
-                        pipeline_name=None,
-                        layer="silver",
-                        business_key=row.snapshot_id,
-                        raw_payload={"snapshot_id": row.snapshot_id, "raw": account[:500]},
-                        error_type="JSONDecodeError",
-                        error_message=str(e),
-                    ))
+                    self._parse_errors.append(
+                        RejectedRecord(
+                            pipeline_name=None,
+                            layer="silver",
+                            business_key=row.snapshot_id,
+                            raw_payload={
+                                "snapshot_id": row.snapshot_id,
+                                "raw": account[:500],
+                            },
+                            error_type="JSONDecodeError",
+                            error_message=str(e),
+                        )
+                    )
                     continue
             if not account:
                 continue
@@ -241,7 +256,9 @@ class PipelineT212Silver(Pipeline):
             for r in parse_errors:
                 r.pipeline_name = self._pipeline_name
             self._dead_letter.load(parse_errors)
-            logging.warning(f"[{self._pipeline_name}] {len(parse_errors)} snapshots rejected — invalid JSON in JSONB column")
+            logging.warning(
+                f"[{self._pipeline_name}] {len(parse_errors)} snapshots rejected — invalid JSON in JSONB column"
+            )
 
         asset_result = self._asset_validator.validate(asset_data)
         account_result = self._account_validator.validate(account_data)

@@ -414,13 +414,19 @@ def daily_movers_table(data, n=5):
         return html.Div()
 
     df = pd.DataFrame(data)
-    df["daily_value_return"] = pd.to_numeric(df["daily_value_return"], errors="coerce").fillna(0)
+    df["daily_value_return"] = pd.to_numeric(
+        df["daily_value_return"], errors="coerce"
+    ).fillna(0)
 
     gainers = (
-        df[df["daily_value_return"] > 0].sort_values("daily_value_return", ascending=False).head(n)
+        df[df["daily_value_return"] > 0]
+        .sort_values("daily_value_return", ascending=False)
+        .head(n)
     )
     losers = (
-        df[df["daily_value_return"] < 0].sort_values("daily_value_return", ascending=True).head(n)
+        df[df["daily_value_return"] < 0]
+        .sort_values("daily_value_return", ascending=True)
+        .head(n)
     )
 
     gain_max = gainers["daily_value_return"].max() if not gainers.empty else 1
