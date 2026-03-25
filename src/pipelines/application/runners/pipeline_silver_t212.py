@@ -7,6 +7,7 @@ and writes to staging.asset and staging.account in a single run.
 
 import os
 import logging
+from pathlib import Path
 from dotenv import load_dotenv
 from datetime import datetime, UTC
 from typing import List, Dict, Any
@@ -16,10 +17,13 @@ from ...application.protocols import Source, Destination, Transformation
 from ...application.validators.schema_validator import SchemaValidator
 
 from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
 from ...infrastructure.repositories.repository_factory import RepositoryFactory
 from ...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
 from ...domain.schemas.silver.asset import AssetRecord
 from ...domain.schemas.silver.account import AccountRecord
+
+_QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,25 +45,11 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 class Trading212SilverSource(Source):
     def __init__(self):
         self._client = SQLModelClient(DATABASE_URL)
+        self._sql = load_query(_QUERIES_DIR / "silver" / "t212_silver_source.sql")
 
     def extract(self) -> List[Any]:
-        sql = """
-          SELECT
-              id                AS snapshot_id,
-              ingested_timestamp,
-              ingested_date,
-              account_data,
-              position_data
-          FROM raw.t212_snapshot
-          WHERE processed_at IS NOT NULL
-            AND ingested_date > (
-                SELECT COALESCE(MAX(data_timestamp::DATE), '1900-01-01')
-                FROM staging.asset
-            )
-          ORDER BY ingested_timestamp ASC
-        """
         with self._client as db:
-            result = db.execute(sql)
+            result = db.execute(self._sql)
         return result.fetchall()
 
 
@@ -129,7 +119,7 @@ class Trading212AccountTransformationSilver(Transformation):
                     "cash_in_pies": cash.get("inPies", 0.0),
                     "cash_available_to_trade": cash.get("availableToTrade", 0.0),
                     "cash_reserved_for_orders": cash.get("reservedForOrders", 0.0),
-                    "broker": "Trading 212",
+                    "broker": "Trading 212",  # Todo: Hardcoded broker Name
                     "currency": currency,
                     "total_value": account.get("totalValue", 0.0),
                     "investments_total_cost": investments.get("totalCost", 0.0),

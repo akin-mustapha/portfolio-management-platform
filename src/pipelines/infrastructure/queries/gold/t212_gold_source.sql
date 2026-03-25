@@ -29,9 +29,9 @@ asset_base AS (
         price,
         avg_price,
         fx_impact,
-        (value - LAG(value) OVER (PARTITION BY ticker ORDER BY data_timestamp))
+        (price - LAG(price) OVER (PARTITION BY ticker ORDER BY data_timestamp))
         / NULLIF(
-            LAG(value) OVER (PARTITION BY ticker ORDER BY data_timestamp),
+            LAG(price) OVER (PARTITION BY ticker ORDER BY data_timestamp),
             0
         )                                                       AS daily_return
     FROM asset_daily
@@ -112,13 +112,27 @@ asset_latest AS (
     FROM asset_stats
 ),
 
+account_deduped AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY data_timestamp::DATE
+            ORDER BY data_timestamp DESC
+        )                                                       AS rn
+    FROM staging.account
+),
+
 account_ranked AS (
     SELECT
         *,
         LAG(total_value) OVER (
             ORDER BY data_timestamp
-        )                                                       AS prev_total_value
-    FROM staging.account
+        )                                                       AS prev_total_value,
+        LAG(investments_total_cost + investments_unrealized_pnl) OVER (
+            ORDER BY data_timestamp
+        )                                                       AS prev_invested_value
+    FROM account_deduped
+    WHERE rn = 1
 ),
 
 portfolio_agg AS (
@@ -126,7 +140,7 @@ portfolio_agg AS (
         al.snapshot_id,
         SUM(al.fx_impact)                                       AS fx_impact_total,
         SUM(
-            al.value / NULLIF(acc.total_value, 0)
+            al.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0)
             * COALESCE(al.volatility_30d, 0)
         )                                                       AS portfolio_volatility_weighted
     FROM asset_latest al
@@ -150,7 +164,8 @@ SELECT
     a.profit                                                     AS unrealized_pnl,
     a.profit / NULLIF(a.cost, 0) * 100                          AS unrealized_pnl_pct,
     NULL::FLOAT                                                  AS realized_pnl,
-    a.value / NULLIF(acc.total_value, 0) * 100                  AS position_weight_pct,
+    a.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0) * 100
+                                                                AS position_weight_pct,
     a.fx_impact,
 
     -- fact_return
@@ -191,10 +206,17 @@ SELECT
     acc.investments_unrealized_pnl
         / NULLIF(acc.investments_total_cost, 0) * 100           AS acct_unrealized_pnl_pct,
     acc.investments_realized_pnl                                 AS acct_realized_pnl,
-    acc.total_value
-        - COALESCE(acc.prev_total_value, acc.total_value)       AS daily_value_change_abs,
-    (acc.total_value - COALESCE(acc.prev_total_value, acc.total_value))
-        / NULLIF(acc.prev_total_value, 0) * 100                 AS daily_value_change_pct,
+    (acc.investments_total_cost + acc.investments_unrealized_pnl)
+        - COALESCE(
+            acc.prev_invested_value,
+            acc.investments_total_cost + acc.investments_unrealized_pnl
+        )                                                       AS daily_value_change_abs,
+    ((acc.investments_total_cost + acc.investments_unrealized_pnl)
+        - COALESCE(
+            acc.prev_invested_value,
+            acc.investments_total_cost + acc.investments_unrealized_pnl
+        ))
+        / NULLIF(acc.prev_invested_value, 0) * 100              AS daily_value_change_pct,
     acc.cash_available_to_trade                                  AS cash_available,
     acc.cash_reserved_for_orders                                 AS cash_reserved,
     acc.cash_in_pies,
