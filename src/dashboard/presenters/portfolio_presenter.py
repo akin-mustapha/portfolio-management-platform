@@ -117,7 +117,9 @@ class PortfolioPresenter:
             if len(series) >= 2 and series[-2] not in (None, 0):
                 daily_value_return = (series[-1] - series[-2]) / series[-2] * 100
             elif a.get("daily_value_return") is not None:
-                daily_value_return = a["daily_value_return"] * 100  # stored as decimal fraction
+                daily_value_return = (
+                    a["daily_value_return"] * 100
+                )  # stored as decimal fraction
             else:
                 continue
             items.append(
@@ -128,7 +130,9 @@ class PortfolioPresenter:
                 }
             )
 
-        return sorted(items, key=lambda x: abs(x["daily_value_return"]), reverse=True)[:15]
+        return sorted(items, key=lambda x: abs(x["daily_value_return"]), reverse=True)[
+            :15
+        ]
 
     # ---------- Line Chart ----------
 

@@ -58,6 +58,8 @@ class AssetGoldRecord(BaseModel):
 
     # Signals / Opportunities (fact_signal)
     dca_bias: Optional[float] = None
-    value_ma_crossover_signal: Optional[float] = None  # value_ma_20d - value_ma_50d; positive = bullish
+    value_ma_crossover_signal: Optional[float] = (
+        None  # value_ma_20d - value_ma_50d; positive = bullish
+    )
     price_above_ma_20d: Optional[bool] = None
     price_above_ma_50d: Optional[bool] = None
