@@ -6,14 +6,14 @@ from dash import dcc, html
 from ..atoms.dropdown import tv_dropdown
 
 OPTIONAL_COLUMNS = [
-    {"label": "Cumul. Return", "value": "cumulative_return"},
-    {"label": "Daily Return", "value": "daily_return"},
-    {"label": "MA Signal", "value": "ma_crossover_signal"},
+    {"label": "Cumul. Return", "value": "cumulative_value_return"},
+    {"label": "Daily Return", "value": "daily_value_return"},
+    {"label": "MA Signal", "value": "value_ma_crossover_signal"},
     {"label": "Price", "value": "price"},
     {"label": "Avg Cost", "value": "avg_price"},
     {"label": "Weight %", "value": "weight_pct"},
     {"label": "30D High", "value": "recent_profit_high_30d"},
-    {"label": "% Drawdown", "value": "pct_drawdown"},
+    {"label": "% Drawdown", "value": "value_drawdown_pct_30d"},
     {"label": "Vol 30D", "value": "volatility_30d"},
     {"label": "VaR 95%", "value": "var_95_1d"},
     {"label": "DCA Bias", "value": "dca_bias"},
