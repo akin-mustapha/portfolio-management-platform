@@ -136,39 +136,49 @@ def _build_compare_rows(
     names_map  : optional dict mapping ticker -> display name
     """
     n = len(snapshots)
+    
     col_width = 12 // n
     color_map = _ASSET_COLORS_DARK if theme == "dark" else _ASSET_COLORS_LIGHT
     cols = []
+    
     for asset_idx, (ticker, history) in enumerate(snapshots):
         modifier = (
             _ASSET_MODIFIERS[asset_idx]
             if asset_idx < len(_ASSET_MODIFIERS)
             else "asset-1"
         )
+        
         accent = color_map[modifier]
         idx = f"{ns}-{ticker}" if ns else ticker
         name = (names_map or {}).get(ticker, "")
-        charts = []
-        for i, (title, ChartClass) in enumerate(metrics):
-            if i > 0:
-                charts.append(html.Hr(className="tv-divider"))
-            charts.append(
-                html.Div(
-                    [
-                        html.Div(title, className="tv-section-header"),
-                        dcc.Graph(
-                            figure=ChartClass().render(
-                                history, theme, accent_color=accent
-                            ),
-                            config=_GRAPH_CONFIG,
-                        ),
-                    ]
-                )
-            )
+        
+        charts = [
+            html.Div(
+                id={"type": "asset-drop-label", "index": ticker},
+                className="tv-section-header",
+            ),
+            html.Div(
+                [
+                    html.Span(
+                        "Drag a metric badge here to plot",
+                        id={"type": "asset-drop-hint", "index": ticker},
+                        className="chart-drop-zone__hint",
+                    ),
+                    dcc.Graph(
+                        id={"type": "asset-drop-chart", "index": ticker},
+                        config={"displayModeBar": False},
+                        style={"display": "none"},
+                    ),
+                ],
+                className="chart-drop-zone",
+            ),
+        ]
         header_children = [ticker.upper(), html.Span("›", className="tv-chevron")]
+
         if name:
             header_children.append(html.Span(name, className="asset-header-name"))
         metadata = (metadata_map or {}).get(ticker, {})
+
         cols.append(
             dbc.Col(
                 html.Div(

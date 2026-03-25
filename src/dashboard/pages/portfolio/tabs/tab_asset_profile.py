@@ -14,12 +14,30 @@ def _summary_prop(label, value_id):
     )
 
 
+def _summary_badge(label, value_id):
+    """Like _summary_prop but renders as a kpi-badge pill."""
+    return html.Div(
+        [
+            html.Span(label, className="kpi-badge__label"),
+            html.Span("—", id=value_id, className="kpi-badge__value"),
+        ],
+        className="kpi-badge",
+    )
+
+
+def _empty_state():
+    return html.Div(
+        "Select an asset from the table to begin.",
+        className="tv-placeholder-text",
+        style={"padding": "24px 0", "color": "var(--text-muted)", "fontSize": "0.85rem"},
+    )
+
+
 def asset_profile_tab_content():
     return html.Div(
         [
             # ── Position snapshot strip (badges are draggable) ─────────
             html.Div(id="profile-snapshot-strip", className="mb-3"),
-
             # ── Asset metadata card ────────────────────────────────────
             html.Div(
                 [
@@ -46,7 +64,7 @@ def asset_profile_tab_content():
                         className="g-3 mb-3",
                     ),
                     html.Hr(className="tv-divider"),
-                    # Row 2: classification
+                    # Row 2: classification — sector/industry as badges
                     dbc.Row(
                         [
                             dbc.Col(
@@ -57,11 +75,17 @@ def asset_profile_tab_content():
                                 width=3,
                             ),
                             dbc.Col(
-                                _summary_prop("Industry", "profile-summary-industry"),
+                                html.Div(
+                                    [_summary_badge("Industry", "profile-summary-industry")],
+                                    className="kpi-badge-row",
+                                ),
                                 width=3,
                             ),
                             dbc.Col(
-                                _summary_prop("Sector", "profile-summary-sector"),
+                                html.Div(
+                                    [_summary_badge("Sector", "profile-summary-sector")],
+                                    className="kpi-badge-row",
+                                ),
                                 width=3,
                             ),
                         ],
@@ -70,38 +94,11 @@ def asset_profile_tab_content():
                 ],
                 className="tv-section-container mb-3",
             ),
-
-            # ── Drag-to-plot chart zone ────────────────────────────────
-            html.Div(
-                [
-                    html.Div(id="chart-drop-zone-label", className="tv-section-header"),
-                    # Hidden bridge — JS sets window._droppedMetric then clicks
-                    # this button; a clientside callback forwards it to the store.
-                    html.Button(
-                        id="_drop-btn",
-                        n_clicks=0,
-                        style={"display": "none"},
-                    ),
-                    dcc.Store(id="drop-metric-store", data=""),
-                    html.Div(
-                        [
-                            html.Span(
-                                "Drag a metric card here to plot it",
-                                id="chart-drop-zone-hint",
-                                className="chart-drop-zone__hint",
-                            ),
-                            dcc.Graph(
-                                id="chart-drop-zone-graph",
-                                config={"displayModeBar": False},
-                                style={"height": "240px", "display": "none"},
-                            ),
-                        ],
-                        id="chart-drop-zone",
-                        className="chart-drop-zone",
-                    ),
-                ],
-                className="tv-section-container",
-            ),
+            # ── Hidden drag-drop bridge (no visible card) ──────────────
+            html.Button(id="_drop-btn", n_clicks=0, style={"display": "none"}),
+            dcc.Store(id="drop-metric-store", data=""),
+            # ── Asset detail cards — populated on row selection ────────
+            html.Div(id="asset-detail-sections", children=_empty_state()),
         ],
         className="workspace-wrapper",
         id="tab-tags-content",

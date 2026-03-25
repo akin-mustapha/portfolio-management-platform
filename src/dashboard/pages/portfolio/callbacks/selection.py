@@ -2,8 +2,21 @@
 Selection callbacks — asset row selection, compare mode, winners/losers sort.
 """
 
-from dash import ALL, MATCH, Output, Input, State, callback, clientside_callback, ctx, no_update, html
+from dash import (
+    ALL,
+    MATCH,
+    Output,
+    Input,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    no_update,
+    html,
+)
 from dash.exceptions import PreventUpdate
+
+from ..tabs.tab_asset_profile import _empty_state
 
 from ..components.atoms.badges import _kpi_badge
 from ..charts.portfolio_charts import _ranked_panel, PortfolioPerformanceScatterPlot
@@ -23,6 +36,9 @@ from ._helpers import (
     _VALUATION_METRICS,
     _RISK_METRICS,
     _OPPS_METRICS,
+    _ASSET_MODIFIERS,
+    _ASSET_COLORS_DARK,
+    _ASSET_COLORS_LIGHT,
 )
 
 # ── 2. Asset row selection → populate asset detail sections ───────
@@ -31,8 +47,8 @@ from ._helpers import (
 @callback(
     Output("workspace-selected-asset", "data"),
     Output("asset-detail-sections", "children"),
-    Output("risk-asset-detail-sections", "children"),
-    Output("opportunities-asset-detail-sections", "children"),
+    # Output("risk-asset-detail-sections", "children"),
+    # Output("opportunities-asset-detail-sections", "children"),
     Input("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
     State("theme-store", "data"),
@@ -40,7 +56,7 @@ from ._helpers import (
 )
 def on_asset_row_selected(selected_rows, timeframe, theme):
     if not selected_rows:
-        return [], None, None, None
+        return [], _empty_state()
 
     tickers = [r.get("ticker") for r in selected_rows if r.get("ticker")][:3]
     if not tickers:
@@ -58,28 +74,29 @@ def on_asset_row_selected(selected_rows, timeframe, theme):
         tickers,
         _build_compare_rows(
             snapshots,
-            _VALUATION_METRICS,
+            [],
             current_theme,
             ns="val",
             names_map=names_map,
             metadata_map=metadata_map,
         ),
-        _build_compare_rows(
-            snapshots,
-            _RISK_METRICS,
-            current_theme,
-            ns="risk",
-            names_map=names_map,
-            metadata_map=metadata_map,
-        ),
-        _build_compare_rows(
-            snapshots,
-            _OPPS_METRICS,
-            current_theme,
-            ns="opps",
-            names_map=names_map,
-            metadata_map=metadata_map,
-        ),
+        # DISABLED ASSET COMPARE CARD RISK AND OPPORTUNITY TAB
+        # _build_compare_rows(
+        #     snapshots,
+        #     _RISK_METRICS,
+        #     current_theme,
+        #     ns="risk",
+        #     names_map=names_map,
+        #     metadata_map=metadata_map,
+        # ),
+        # _build_compare_rows(
+        #     snapshots,
+        #     _OPPS_METRICS,
+        #     current_theme,
+        #     ns="opps",
+        #     names_map=names_map,
+        #     metadata_map=metadata_map,
+        # ),
     )
 
 
@@ -216,10 +233,10 @@ def _draggable(badge, metric_key):
 
 
 _DRAG_CHART_MAP = {
-    "asset_value":    ("Asset Value",        AssetValuePlotlyLineChart),
-    "asset_profit":   ("Profit Range (30D)", ProfitRangePlotlyLineChart),
-    "asset_return":   ("Return vs Portfolio",AssetVsPortfolioReturnChart),
-    "asset_dca_bias": ("DCA Bias",           DCABiasPlotlyLineChart),
+    "asset_value": ("Asset Value", AssetValuePlotlyLineChart),
+    "asset_profit": ("Profit Range (30D)", ProfitRangePlotlyLineChart),
+    "asset_return": ("Return vs Portfolio", AssetVsPortfolioReturnChart),
+    "asset_dca_bias": ("DCA Bias", DCABiasPlotlyLineChart),
 }
 
 
@@ -234,17 +251,17 @@ def on_asset_profile_deep_dive(selected_rows):
 
     row = selected_rows[0]
 
-    value   = row.get("value")
-    profit  = row.get("profit")
+    value = row.get("value")
+    profit = row.get("profit")
     pnl_pct = row.get("pnl_pct")
     cum_ret = row.get("cumulative_value_return")
-    weight  = row.get("weight_pct")
-    dca     = row.get("dca_bias")
+    weight = row.get("weight_pct")
+    dca = row.get("dca_bias")
 
     profit_str, profit_sign = _fmt_signed(profit, ",.2f")
-    pnl_str,    pnl_sign    = _fmt_signed(pnl_pct, ".2f")
-    ret_str,    ret_sign    = _fmt_signed(cum_ret, ".2f")
-    dca_str,    dca_sign    = _fmt_signed(dca, ".3f")
+    pnl_str, pnl_sign = _fmt_signed(pnl_pct, ".2f")
+    ret_str, ret_sign = _fmt_signed(cum_ret, ".2f")
+    dca_str, dca_sign = _fmt_signed(dca, ".3f")
 
     return html.Div(
         [
@@ -283,10 +300,10 @@ clientside_callback(
 
 
 @callback(
-    Output("chart-drop-zone-graph", "figure"),
-    Output("chart-drop-zone-graph", "style"),
-    Output("chart-drop-zone-hint", "style"),
-    Output("chart-drop-zone-label", "children"),
+    Output({"type": "asset-drop-chart", "index": ALL}, "figure"),
+    Output({"type": "asset-drop-chart", "index": ALL}, "style"),
+    Output({"type": "asset-drop-hint", "index": ALL}, "style"),
+    Output({"type": "asset-drop-label", "index": ALL}, "children"),
     Input("drop-metric-store", "data"),
     State("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
@@ -302,17 +319,19 @@ def on_metric_drop(metric, selected_rows, timeframe, theme, cached_data):
     if not chart_info:
         raise PreventUpdate
 
-    row = selected_rows[0]
-    ticker = row.get("ticker")
-    if not ticker:
+    tickers = [r.get("ticker") for r in selected_rows if r.get("ticker")][:3]
+    if not tickers:
         raise PreventUpdate
 
     label, ChartClass = chart_info
     current_theme = theme or "light"
+    color_map = (
+        _ASSET_COLORS_DARK if current_theme == "dark" else _ASSET_COLORS_LIGHT
+    )
     start_date, end_date = _date_window(timeframe or "1Y")
-    snapshots = _fetch_snapshots([ticker], start_date, end_date)
-    snapshot = dict(snapshots).get(ticker, {})
+    snapshots = dict(_fetch_snapshots(tickers, start_date, end_date))
 
+    portfolio_return = None
     if metric == "asset_return":
         portfolio_return = {"dates": [], "values": []}
         pv = (cached_data or {}).get("view_model", {}).get("portfolio_value_series", {})
@@ -321,14 +340,24 @@ def on_metric_drop(metric, selected_rows, timeframe, theme, cached_data):
                 if start_date <= str(d) <= end_date and c and c > 0:
                     portfolio_return["dates"].append(d)
                     portfolio_return["values"].append((v - c) / c * 100)
-        data = {**snapshot, "portfolio_return": portfolio_return}
-    else:
-        data = snapshot
 
-    fig = ChartClass().render(data, theme=current_theme)
-    graph_style = {"height": "240px", "display": "block"}
-    hint_style  = {"display": "none"}
-    return fig, graph_style, hint_style, label
+    figures = []
+    graph_styles = []
+    for i, ticker in enumerate(tickers):
+        modifier = _ASSET_MODIFIERS[i] if i < len(_ASSET_MODIFIERS) else "asset-1"
+        accent = color_map[modifier]
+        snapshot = snapshots.get(ticker, {})
+        if metric == "asset_return":
+            data = {**snapshot, "portfolio_return": portfolio_return}
+        else:
+            data = snapshot
+        fig = ChartClass().render(data, theme=current_theme, accent_color=accent)
+        figures.append(fig)
+        graph_styles.append({"height": "240px", "display": "block"})
+
+    hint_styles = [{"display": "none"}] * len(tickers)
+    labels = [label] * len(tickers)
+    return figures, graph_styles, hint_styles, labels
 
 
 # ── 8. Scatter plot bubble highlight on row selection ─────────────

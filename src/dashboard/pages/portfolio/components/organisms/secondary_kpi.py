@@ -46,8 +46,6 @@ def secondary_asset_kpi_row(ticker: str, metadata: dict):
         [
             html.Div(
                 [
-                    _kpi_badge("Industry", industry),
-                    _kpi_badge("Sector", sector),
                     _kpi_badge("Price", price_str),
                     _kpi_badge("AVG Price", avg_price_str),
                 ],
