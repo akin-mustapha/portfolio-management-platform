@@ -27,8 +27,8 @@ class AccountGoldRecord(BaseModel):
     realized_pnl: Optional[float] = None
 
     # Daily movement (staging.account_computed)
-    daily_change_abs: Optional[float] = None
-    daily_change_pct: Optional[float] = None
+    daily_value_change_abs: Optional[float] = None
+    daily_value_change_pct: Optional[float] = None
 
     # Cash positions (staging.account)
     cash_available: Optional[float] = None

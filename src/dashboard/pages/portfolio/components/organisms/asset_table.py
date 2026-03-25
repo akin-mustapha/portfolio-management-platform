@@ -18,12 +18,26 @@ def asset_table(data=None):
     # Convert all numeric columns to float before any arithmetic to avoid
     # "Expected numeric dtype, got object instead" in pandas 2.0+.
     numeric_cols = [
-        "value", "profit", "price", "avg_price", "cost",
-        "weight_pct", "pnl_pct", "pct_drawdown", "volatility_30d",
-        "volatility_50d", "ma_30d", "ma_50d", "dca_bias",
-        "recent_profit_high_30d", "recent_profit_low_30d",
-        "var_95_1d", "cumulative_return", "daily_return",
-        "fx_impact", "ma_crossover_signal",
+        "value",
+        "profit",
+        "price",
+        "avg_price",
+        "cost",
+        "weight_pct",
+        "pnl_pct",
+        "value_drawdown_pct_30d",
+        "volatility_30d",
+        "volatility_50d",
+        "value_ma_30d",
+        "value_ma_50d",
+        "dca_bias",
+        "recent_profit_high_30d",
+        "recent_profit_low_30d",
+        "var_95_1d",
+        "cumulative_value_return",
+        "daily_value_return",
+        "fx_impact",
+        "value_ma_crossover_signal",
     ]
     for col in numeric_cols:
         if col in df.columns:
@@ -32,7 +46,7 @@ def asset_table(data=None):
     # precision control
     decimals = 6
     df["weight_pct"] = df["weight_pct"].round(decimals)
-    df["pct_drawdown"] = df["pct_drawdown"].round(decimals)
+    df["value_drawdown_pct_30d"] = df["value_drawdown_pct_30d"].round(decimals)
     df["volatility_30d"] = df["volatility_30d"].round(decimals)
     df["recent_profit_high_30d"] = df["recent_profit_high_30d"].round(decimals)
     df["dca_bias"] = df["dca_bias"].round(decimals)
@@ -40,10 +54,10 @@ def asset_table(data=None):
     df["avg_price"] = df["avg_price"].round(decimals)
     if "var_95_1d" in df.columns:
         df["var_95_1d"] = df["var_95_1d"].round(decimals)
-    if "cumulative_return" in df.columns:
-        df["cumulative_return"] = df["cumulative_return"].round(decimals)
-    if "daily_return" in df.columns:
-        df["daily_return"] = df["daily_return"].round(decimals)
+    if "cumulative_value_return" in df.columns:
+        df["cumulative_value_return"] = df["cumulative_value_return"].round(decimals)
+    if "daily_value_return" in df.columns:
+        df["daily_value_return"] = df["daily_value_return"].round(decimals)
 
     def pnl_style(positive_color=POSITIVE_COLOR, negative_color=NEGATIVE_COLOR):
         return {
@@ -123,7 +137,7 @@ def asset_table(data=None):
                 "cellStyle": pnl_style(),
             },
             {
-                "field": "cumulative_return",
+                "field": "cumulative_value_return",
                 "headerName": "Cumul. Return",
                 "minWidth": 108,
                 "width": 108,
@@ -133,7 +147,7 @@ def asset_table(data=None):
                 "cellStyle": pnl_style(),
             },
             {
-                "field": "daily_return",
+                "field": "daily_value_return",
                 "headerName": "Daily Return",
                 "minWidth": 96,
                 "width": 96,
@@ -143,7 +157,7 @@ def asset_table(data=None):
                 "cellStyle": pnl_style(),
             },
             {
-                "field": "ma_crossover_signal",
+                "field": "value_ma_crossover_signal",
                 "headerName": "MA Signal",
                 "minWidth": 94,
                 "width": 94,
@@ -191,7 +205,7 @@ def asset_table(data=None):
                 ),
             },
             {
-                "field": "pct_drawdown",
+                "field": "value_drawdown_pct_30d",
                 "headerName": "% DD",
                 "minWidth": 72,
                 "width": 72,

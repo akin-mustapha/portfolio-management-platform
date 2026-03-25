@@ -32,15 +32,15 @@ class PostgresAssetQueryRepository:
           COALESCE(fv.unrealized_pnl_pct, 0)            AS pnl_pct,
           ft.recent_profit_high_30d,
           ft.recent_profit_low_30d,
-          ft.pct_drawdown,
+          ft.value_drawdown_pct_30d,
           ft.volatility_30d,
           ft.volatility_50d,
-          ft.ma_30d,
-          ft.ma_50d,
+          ft.value_ma_30d,
+          ft.value_ma_50d,
           fs.dca_bias,
-          fr.cumulative_return,
-          fr.daily_return,
-          fs.ma_crossover_signal,
+          fr.cumulative_value_return,
+          fr.daily_value_return,
+          fs.value_ma_crossover_signal,
           ft.var_95_1d,
           COALESCE(fv.fx_impact, 0)                     AS fx_impact,
           TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
@@ -153,8 +153,8 @@ class PostgresSnapshotQueryRepository:
         COALESCE(fpd.cash_reserved, 0)               AS cash_reserved_for_orders,
         COALESCE(fpd.cash_in_pies, 0)                AS cash_in_pies,
         COALESCE(fpd.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
-        COALESCE(fpd.daily_change_pct, 0)             AS daily_change_pct,
-        COALESCE(fpd.daily_change_abs, 0)             AS daily_change_abs,
+        COALESCE(fpd.daily_value_change_pct, 0)        AS daily_value_change_pct,
+        COALESCE(fpd.daily_value_change_abs, 0)        AS daily_value_change_abs,
         COALESCE(fpd.fx_impact_total, 0)              AS fx_impact_total
     FROM analytics.fact_portfolio_daily fpd
     JOIN analytics.dim_portfolio dp ON dp.id = fpd.portfolio_id
@@ -172,8 +172,8 @@ class PostgresSnapshotQueryRepository:
             da.name                                       AS asset_description,
             ft.recent_value_high_30d,
             ft.recent_value_low_30d,
-            ft.ma_30d,
-            ft.ma_50d,
+            ft.value_ma_30d,
+            ft.value_ma_50d,
             fs.dca_bias,
             fv.value,
             fp.avg_price,
@@ -181,7 +181,7 @@ class PostgresSnapshotQueryRepository:
             fv.unrealized_pnl                             AS profit,
             COALESCE(fv.fx_impact, 0)                     AS fx_impact,
             ft.volatility_30d,
-            ft.pct_drawdown,
+            ft.value_drawdown_pct_30d,
             TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
         FROM analytics.fact_valuation fv
         JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id

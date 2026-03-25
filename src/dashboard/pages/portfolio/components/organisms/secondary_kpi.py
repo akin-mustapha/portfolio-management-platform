@@ -9,7 +9,7 @@ from ..molecules.kpi_card import _daily_change_card
 
 def secondary_kpi_row(data=None, theme="light"):
     data = data or {}
-    daily_change_pct = data.get("daily_change_pct")
+    daily_change_pct = data.get("daily_value_change_pct")
     daily_change_series = data.get("daily_change_series")
     portfolio_vol = data.get("portfolio_vol")
 

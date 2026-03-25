@@ -190,8 +190,8 @@ fact_return:
     - sector_id::uuid null
     - tag_id::uuid null
     - asset_type_id::uuid null
-    - daily_return::numeric          # day-over-day % price change (renamed from `return`)
-    - cumulative_return::numeric     # total % return since position opened
+    - daily_value_return::numeric    # day-over-day % change of position value (value_t - value_t-1) / value_t-1
+    - cumulative_value_return::numeric  # cumulative product of daily_value_return since position opened
     - created_timestamp::timestamptz
     - updated_timestamp::timestamptz
 ```
@@ -208,12 +208,14 @@ fact_technical:
     - sector_id::uuid null
     - tag_id::uuid null
     - asset_type_id::uuid null
-    - pct_drawdown::numeric          # (value - value_high) / value_high
-    - value_high::numeric            # all-time high position value
-    - value_low::numeric             # all-time low position value
-    - ma_20d::numeric
-    - ma_30d::numeric
-    - ma_50d::numeric
+    - value_drawdown_pct_30d::numeric   # (value - recent_value_high_30d) / recent_value_high_30d
+    - value_high_alltime::numeric       # all-time high position value (MAX over all rows)
+    - value_low_alltime::numeric        # all-time low position value (MIN over all rows)
+    - value_ma_20d::numeric             # 20-day moving average of position value (AVG(value))
+    - value_ma_30d::numeric             # 30-day moving average of position value (AVG(value))
+    - value_ma_50d::numeric             # 50-day moving average of position value (AVG(value))
+    - price_ma_20d::numeric             # 20-day moving average of asset price (AVG(price))
+    - price_ma_50d::numeric             # 50-day moving average of asset price (AVG(price))
     - volatility_20d::numeric
     - volatility_30d::numeric
     - volatility_50d::numeric
@@ -239,10 +241,10 @@ fact_signal:
     - sector_id::uuid null
     - tag_id::uuid null
     - asset_type_id::uuid null
-    - dca_bias::numeric              # price / avg_price; <1.0 = below average cost (DCA signal)
-    - ma_crossover_signal::numeric   # ma_20d - ma_50d; positive = short-term uptrend (bullish)
-    - price_above_ma_20d::boolean    # price > ma_20d
-    - price_above_ma_50d::boolean    # price > ma_50d
+    - dca_bias::numeric                  # price / avg_price; <1.0 = below average cost (DCA signal)
+    - value_ma_crossover_signal::numeric # value_ma_20d - value_ma_50d; positive = short-term uptrend in position value
+    - price_above_ma_20d::boolean        # price > price_ma_20d
+    - price_above_ma_50d::boolean        # price > price_ma_50d
     - created_timestamp::timestamptz
     - updated_timestamp::timestamptz
 ```
@@ -260,8 +262,8 @@ fact_portfolio_daily:
     - unrealized_pnl::numeric
     - unrealized_pnl_pct::numeric null
     - realized_pnl::numeric null
-    - daily_change_abs::numeric null # total_value(T) - total_value(T-1)
-    - daily_change_pct::numeric null # daily_change_abs / total_value(T-1)
+    - daily_value_change_abs::numeric null  # total_value(T) - total_value(T-1)
+    - daily_value_change_pct::numeric null  # daily_value_change_abs / total_value(T-1) × 100
     - cash_available::numeric null
     - cash_reserved::numeric null
     - cash_in_pies::numeric null

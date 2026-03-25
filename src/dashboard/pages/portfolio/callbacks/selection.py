@@ -218,7 +218,7 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
     value = row.get("value")
     profit = row.get("profit")
     pnl_pct = row.get("pnl_pct")
-    cum_ret = row.get("cumulative_return")
+    cum_ret = row.get("cumulative_value_return")
     weight = row.get("weight_pct")
     dca = row.get("dca_bias")
 

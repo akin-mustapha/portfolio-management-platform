@@ -128,8 +128,8 @@ class PriceWithMAPlotlyLineChart:
             {
                 "dates": asset_data.get("dates", []),
                 "values": asset_data.get("values", []),
-                "ma_30d": asset_data.get("ma_30d", []),
-                "ma_50d": asset_data.get("ma_50d", []),
+                "value_ma_30d": asset_data.get("value_ma_30d", []),
+                "value_ma_50d": asset_data.get("value_ma_50d", []),
             }
         ).sort_values("dates")
 
@@ -177,7 +177,7 @@ class PriceWithMAPlotlyLineChart:
         fig.add_trace(
             go.Scatter(
                 x=df["dates"],
-                y=df["ma_30d"],
+                y=df["value_ma_30d"],
                 mode="lines",
                 name="MA 30",
                 line=dict(width=1, color=self.MA30_COLOR, dash="dot"),
@@ -189,7 +189,7 @@ class PriceWithMAPlotlyLineChart:
         fig.add_trace(
             go.Scatter(
                 x=df["dates"],
-                y=df["ma_50d"],
+                y=df["value_ma_50d"],
                 mode="lines",
                 name="MA 50",
                 line=dict(width=1, color=self.MA50_COLOR, dash="dot"),
