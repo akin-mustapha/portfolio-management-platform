@@ -132,7 +132,7 @@ def asset_table(data=None):
                 "minWidth": 80,
                 "width": 80,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2f')(params.value) + '%'"},
                 "headerTooltip": "Unrealised P&L as a percentage of cost basis. Comparable across positions.",
                 "cellStyle": pnl_style(),
             },
@@ -189,7 +189,7 @@ def asset_table(data=None):
                 "minWidth": 84,
                 "width": 84,
                 "type": "numericColumn",
-                "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
+                "valueFormatter": {"function": "d3.format('.2f')(params.value) + '%'"},
                 "headerTooltip": "Weight in relation to portfolio value",
             },
             {

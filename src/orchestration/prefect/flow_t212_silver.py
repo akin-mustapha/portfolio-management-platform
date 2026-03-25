@@ -49,8 +49,8 @@ def flow_t212_silver():
 
     task_silver()
 
-    task_asset_computed_silver()
-    task_account_computed_silver()
+    # task_asset_computed_silver()
+    # task_account_computed_silver()
 
     task_mark_snapshot_processed()
 
