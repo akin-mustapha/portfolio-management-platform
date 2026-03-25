@@ -53,7 +53,7 @@ class Pipeline(ABC):
 
 ## Data Model
 
-Each pipeline declares a Pydantic schema in `src/backend/ingestion/domain/schemas/` representing the data contract for that pipeline. Schemas are independent of the database schema — they enforce types, coerce values, and reject invalid records before anything is written.
+Each pipeline declares a Pydantic schema in `src/pipelines/domain/schemas/` representing the data contract for that pipeline. Schemas are independent of the database schema — they enforce types, coerce values, and reject invalid records before anything is written.
 
 ```python
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -84,7 +84,7 @@ Rather than directly subclassing `Pipeline`, most concrete pipelines extend one 
 
 **`FullLoader`** — implements `run()` for bronze-tier bulk loads with date partitioning. Override `_create_partition()`, `_loader()`, and `_exposition_abstraction()`. Use for raw/bronze ingestion.
 
-Both are defined in `src/backend/ingestion/application/policies.py`.
+Both are defined in `src/pipelines/application/policies.py`.
 
 ## Computed Silver Pattern
 
@@ -103,9 +103,11 @@ Use this pattern when metrics require window functions over the full history of 
 
 ## Gold Pattern
 
-Gold pipelines (`PipelineAssetGold`, `PipelineAccountGold`) use `BaseGoldPipeline` and write to multiple fact tables in a single run.
+The canonical gold pipeline is `PipelineT212Gold` (`src/pipelines/application/runners/pipeline_gold_t212.py`). It is a unified pipeline that handles both asset-level and account-level facts in a single run.
 
-**`BaseGoldPipeline`** — implements `run()` for the gold layer. Subclasses must declare:
+**Key design decision:** All computation (window functions, rolling averages, LAG-based returns, volatility) is done in the SQL source query inside `PipelineT212Gold`. The pipeline reads directly from `staging.asset` and `staging.account` — it does **not** depend on `staging.asset_computed` or `staging.account_computed`.
+
+**`BaseGoldPipeline`** — implements `run()` for gold pipelines that follow the standard fan-out pattern. Subclasses must declare:
 - `_pipeline_name: str` — used in log messages and dead letter records
 - `_fact_destinations: list[Destination]` — one destination per fact table
 
@@ -113,44 +115,25 @@ And wire `_source`, `_transformation`, `_validator`, `_dead_letter` in `__init__
 
 The `run()` flow is:
 1. `_ensure_dimensions()` — upsert dimension rows the source query FK-joins against
-2. `extract()` — single source query joining staging and dim tables
+2. `extract()` — single source query joining staging and dim tables (with all window functions)
 3. `transform()` — convert SQLAlchemy rows to plain dicts (no computation)
 4. `validate()` — `SchemaValidator` separates valid records from rejected ones
 5. Invalid records → `DeadLetterDestination` (written to `monitoring` schema)
 6. Valid records → fan-out to all `_fact_destinations` (each projects only its columns)
 
-```python
-class PipelineAssetGold(BaseGoldPipeline):
-    _pipeline_name = "pipeline_asset_gold"
-
-    def __init__(self):
-        self._source = AssetGoldSource()
-        self._transformation = AssetGoldTransformation()
-        self._validator = SchemaValidator(AssetGoldRecord, layer="gold")
-        self._dead_letter = DeadLetterDestination()
-        self._fact_destinations = [
-            FactPriceDestination(),
-            FactValuationDestination(),
-            # ... one per fact table
-        ]
-
-    def _ensure_dimensions(self):
-        # upsert dim_portfolio and dim_asset before source query runs
-        ...
-```
-
 **`SchemaValidator`** — generic validator used by gold (and can be used by silver) pipelines. Takes a Pydantic model and a `layer` string. Returns a `ValidationResult` with `valid` (model instances) and `invalid` (`RejectedRecord` objects). The pipeline sets `pipeline_name` on rejected records before passing them to `DeadLetterDestination`.
 
-**`DeadLetterDestination`** — writes `RejectedRecord` objects to the `monitoring` schema. Used to capture records that fail schema validation without halting the pipeline. Defined in `src/backend/ingestion/infrastructure/repositories/dead_letter_destination.py`.
+**`DeadLetterDestination`** — writes `RejectedRecord` objects to the `monitoring` schema. Used to capture records that fail schema validation without halting the pipeline. Defined in `src/pipelines/infrastructure/repositories/dead_letter_destination.py`.
 
 Place gold schemas under:
 - `domain/schemas/gold/` — for analytics fact table contracts
 
 ## How to Create a New Pipeline
 
-All pipelines live under `src/backend/ingestion/application/pipelines/`. Sub-folders by type:
-- `pipelines/loaders/` — bronze-tier full loaders
-- `pipelines/events/` — event producers and consumers
+All pipelines live under `src/pipelines/application/`. Sub-folders by type:
+- `runners/` — all pipeline implementations (bronze, silver, gold)
+- `loaders/` — bronze-tier full loaders
+- `events/` — event producers and consumers
 
 Follow these steps to implement a new pipeline:
 

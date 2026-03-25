@@ -45,12 +45,12 @@ infrastructure/  — SQL queries against analytics schema
 Prefect. Defines when and in what order pipelines run.
 Sits above the backend — coordinates it, doesn't contain business logic.
 
-## Backend (`src/backend/`)
+## Backend (`src/backend/` and `src/pipelines/`)
 
-**Ingestion** (`src/backend/ingestion/`) — Pulls data from Trading212 via events and pipelines. Loads into raw, transforms through to staging.
+**Pipelines** (`src/pipelines/`) — Pulls data from Trading212. Loads into raw, transforms through staging, computes and writes to analytics (gold). Replaced `src/backend/ingestion/` after the pipeline restructure (PR #172).
 
-- `domain/` — core models: Data and Event
-- `application/` — protocols, policies, all pipeline logic (bronze, silver, loaders, events)
+- `domain/` — core models: Data and Event; Pydantic schemas per layer (bronze/, silver/, gold/)
+- `application/` — protocols, policies, all pipeline logic (bronze, silver, gold, loaders, events)
 - `infrastructure/` — external integrations: Trading212 API client, Kafka producer/consumer, database repositories
 - `factories/` — PipelineFactory and EventProducerFactory registries
 
