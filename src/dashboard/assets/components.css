@@ -13,7 +13,7 @@
      8. KPI Cards                     (.kpi-card, .kpi-badge, .kpi-badge-row)
      9. Settings Modal                (.settings-modal, .settings-*)
     10. Edit Tags Modal               (.ws-modal-*)
-    11. Asset Profile                 (.profile-summary-prop)
+    11. Asset Profile                 (.profile-summary-prop, .draggable-kpi, .chart-drop-zone)
    ══════════════════════════════════════════════════════════════ */
 
 
@@ -493,9 +493,10 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
 
 #workspace-tabs,
 .workspace-tab-bar {
-    border-bottom: 1px solid var(--border-split, #dee2e6) !important;
+    border: 1px solid var(--border-tv) !important;
+    border-radius: 8px !important;
     padding: 0 8px !important;
-    margin: 0 !important;
+    margin: var(--ws-tab-pad) var(--ws-tab-pad) var(--ws-section-gap) !important;
     gap: 2px;
 }
 
@@ -562,7 +563,7 @@ html[data-theme="dark"] .tv-single-picker input::placeholder {
 /* Tab bar dark theme */
 html[data-theme="dark"] #workspace-tabs,
 html[data-theme="dark"] .workspace-tab-bar {
-    border-bottom-color: var(--border-main) !important;
+    border-color: var(--border-main) !important;
 }
 
 html[data-theme="dark"] .workspace-tab .nav-link {
@@ -1028,6 +1029,42 @@ html[data-theme="dark"] .ws-modal-overlay {
    11. Asset Profile
    Summary card (AWS Console style) + outline accordion
    ══════════════════════════════════════════════════════════════ */
+
+/* Draggable KPI badges */
+.draggable-kpi {
+    cursor: grab;
+    user-select: none;
+}
+.draggable-kpi:active {
+    cursor: grabbing;
+}
+.draggable-kpi:hover .kpi-badge {
+    border-color: var(--color-primary);
+}
+
+/* Drop zone */
+.chart-drop-zone {
+    min-height: 80px;
+    border: 2px dashed var(--border-tv);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+}
+.chart-drop-zone--active {
+    border-color: var(--color-primary);
+    background: rgba(13, 110, 253, 0.04);
+}
+.chart-drop-zone__hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+html[data-theme="dark"] .chart-drop-zone--active {
+    background: rgba(99, 154, 255, 0.06);
+}
 
 .profile-summary-prop {
     display: flex;

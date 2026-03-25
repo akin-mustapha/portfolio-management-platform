@@ -53,6 +53,7 @@ class PortfolioController:
         for row in assets:
             row["price_series"] = price_map.get(row["ticker"], [])
             row["tags"] = tag_map.get(row["ticker"].upper(), [])
+            row["trend"] = "Bullish" if (row.get("value_ma_crossover_signal") or 0) > 0 else "Bearish"
 
         available_tags = sorted({tag for tags in tag_map.values() for tag in tags})
         data = {

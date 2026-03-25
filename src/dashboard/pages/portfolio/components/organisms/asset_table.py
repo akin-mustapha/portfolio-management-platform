@@ -268,6 +268,8 @@ def asset_table(data=None):
             "resizable": True,
             "sortable": True,
             "cellStyle": {"display": "flex", "alignItems": "center"},
+            "unSortIcon": True,
+            
         },
         columnSize="autoSize",
         dashGridOptions={
@@ -282,7 +284,6 @@ def asset_table(data=None):
             "rowBuffer": 10,
             "rowHeight": 32,
             "headerHeight": 36,
-            "unSortIcon": True,
         },
         style={"height": "100%"},
     )

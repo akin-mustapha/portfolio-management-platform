@@ -1,4 +1,4 @@
-"""Asset Profile tab — position snapshot, price/MA chart, and metadata card."""
+"""Asset Profile tab — KPI strip, asset summary, and drag-to-plot chart zone."""
 
 import dash_bootstrap_components as dbc
 from dash import dcc, html
@@ -17,15 +17,9 @@ def _summary_prop(label, value_id):
 def asset_profile_tab_content():
     return html.Div(
         [
-            # ── Position snapshot strip ────────────────────────────────
+            # ── Position snapshot strip (badges are draggable) ─────────
             html.Div(id="profile-snapshot-strip", className="mb-3"),
-            # ── Price + MA chart ───────────────────────────────────────
-            dcc.Graph(
-                id="profile-price-ma-chart",
-                config={"displayModeBar": False},
-                style={"height": "220px"},
-                className="mb-4",
-            ),
+
             # ── Asset metadata card ────────────────────────────────────
             html.Div(
                 [
@@ -72,6 +66,38 @@ def asset_profile_tab_content():
                             ),
                         ],
                         className="g-3",
+                    ),
+                ],
+                className="tv-section-container mb-3",
+            ),
+
+            # ── Drag-to-plot chart zone ────────────────────────────────
+            html.Div(
+                [
+                    html.Div(id="chart-drop-zone-label", className="tv-section-header"),
+                    # Hidden bridge — JS sets window._droppedMetric then clicks
+                    # this button; a clientside callback forwards it to the store.
+                    html.Button(
+                        id="_drop-btn",
+                        n_clicks=0,
+                        style={"display": "none"},
+                    ),
+                    dcc.Store(id="drop-metric-store", data=""),
+                    html.Div(
+                        [
+                            html.Span(
+                                "Drag a metric card here to plot it",
+                                id="chart-drop-zone-hint",
+                                className="chart-drop-zone__hint",
+                            ),
+                            dcc.Graph(
+                                id="chart-drop-zone-graph",
+                                config={"displayModeBar": False},
+                                style={"height": "240px", "display": "none"},
+                            ),
+                        ],
+                        id="chart-drop-zone",
+                        className="chart-drop-zone",
                     ),
                 ],
                 className="tv-section-container",

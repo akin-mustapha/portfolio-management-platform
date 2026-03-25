@@ -26,6 +26,25 @@ from ...domain.schemas.silver.account import AccountRecord
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
+
+def _reject(
+    errors: List[RejectedRecord],
+    snapshot_id: str,
+    raw: Any,
+    error_type: str,
+    error_message: str,
+) -> None:
+    errors.append(
+        RejectedRecord(
+            pipeline_name=None,
+            layer="silver",
+            business_key=snapshot_id,
+            raw_payload={"snapshot_id": snapshot_id, "raw": str(raw)[:500]},
+            error_type=error_type,
+            error_message=error_message,
+        )
+    )
+
 logging.basicConfig(
     level=logging.INFO,
     filename="logs/info.log",
@@ -60,11 +79,12 @@ class Trading212SilverSource(Source):
 
 
 class Trading212AssetTransformationSilver(Transformation):
-    def __init__(self):
-        self._parse_errors: List[RejectedRecord] = []
+    @property
+    def parse_errors(self) -> List[RejectedRecord]:
+        return self._parse_errors
 
     def transform(self, snapshots: List[Any]) -> List[Dict]:
-        self._parse_errors = []
+        self._parse_errors: List[RejectedRecord] = []
         records = []
         for row in snapshots:
             snapshot_id = row.snapshot_id
@@ -74,35 +94,16 @@ class Trading212AssetTransformationSilver(Transformation):
                 try:
                     positions = json.loads(positions)
                 except json.JSONDecodeError as e:
-                    self._parse_errors.append(
-                        RejectedRecord(
-                            pipeline_name=None,
-                            layer="silver",
-                            business_key=snapshot_id,
-                            raw_payload={
-                                "snapshot_id": snapshot_id,
-                                "raw": positions[:500],
-                            },
-                            error_type="JSONDecodeError",
-                            error_message=str(e),
-                        )
-                    )
+                    _reject(self._parse_errors, snapshot_id, positions, "JSONDecodeError", str(e))
                     continue
 
             for pos in positions:
                 if not isinstance(pos, dict):
-                    self._parse_errors.append(
-                        RejectedRecord(
-                            pipeline_name=None,
-                            layer="silver",
-                            business_key=snapshot_id,
-                            raw_payload={
-                                "snapshot_id": snapshot_id,
-                                "raw": str(pos)[:500],
-                            },
-                            error_type="InvalidPositionEntry",
-                            error_message=f"Expected dict, got {type(pos).__name__}: {str(pos)[:100]}",
-                        )
+                    pos_str = str(pos)
+                    _reject(
+                        self._parse_errors, snapshot_id, pos_str,
+                        "InvalidPositionEntry",
+                        f"Expected dict, got {type(pos).__name__}: {pos_str[:100]}",
                     )
                     continue
 
@@ -140,11 +141,12 @@ class Trading212AssetTransformationSilver(Transformation):
 
 
 class Trading212AccountTransformationSilver(Transformation):
-    def __init__(self):
-        self._parse_errors: List[RejectedRecord] = []
+    @property
+    def parse_errors(self) -> List[RejectedRecord]:
+        return self._parse_errors
 
     def transform(self, snapshots: List[Any]) -> List[Dict]:
-        self._parse_errors = []
+        self._parse_errors: List[RejectedRecord] = []
         records = []
         for row in snapshots:
             account = row.account_data
@@ -152,19 +154,7 @@ class Trading212AccountTransformationSilver(Transformation):
                 try:
                     account = json.loads(account)
                 except json.JSONDecodeError as e:
-                    self._parse_errors.append(
-                        RejectedRecord(
-                            pipeline_name=None,
-                            layer="silver",
-                            business_key=row.snapshot_id,
-                            raw_payload={
-                                "snapshot_id": row.snapshot_id,
-                                "raw": account[:500],
-                            },
-                            error_type="JSONDecodeError",
-                            error_message=str(e),
-                        )
-                    )
+                    _reject(self._parse_errors, row.snapshot_id, account, "JSONDecodeError", str(e))
                     continue
             if not account:
                 continue
@@ -249,8 +239,8 @@ class PipelineT212Silver(Pipeline):
         account_data = self._account_transformation.transform(snapshots)
 
         parse_errors = (
-            self._asset_transformation._parse_errors
-            + self._account_transformation._parse_errors
+            self._asset_transformation.parse_errors
+            + self._account_transformation.parse_errors
         )
         if parse_errors:
             for r in parse_errors:

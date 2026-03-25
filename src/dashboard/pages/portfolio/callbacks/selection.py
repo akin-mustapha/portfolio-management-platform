@@ -2,12 +2,17 @@
 Selection callbacks — asset row selection, compare mode, winners/losers sort.
 """
 
-from dash import ALL, MATCH, Output, Input, State, callback, ctx, no_update, html
+from dash import ALL, MATCH, Output, Input, State, callback, clientside_callback, ctx, no_update, html
 from dash.exceptions import PreventUpdate
 
 from ..components.atoms.badges import _kpi_badge
 from ..charts.portfolio_charts import _ranked_panel, PortfolioPerformanceScatterPlot
-from ..charts.asset_charts import PriceWithMAPlotlyLineChart
+from ..charts.asset_charts import (
+    AssetValuePlotlyLineChart,
+    ProfitRangePlotlyLineChart,
+    DCABiasPlotlyLineChart,
+    AssetVsPortfolioReturnChart,
+)
 from ....controllers.asset_profile_controller import AssetProfileController
 from ....controllers.portfolio_controller import PortfolioController
 from ._helpers import (
@@ -200,55 +205,130 @@ def _fmt_signed(v, fmt=".2f"):
     return f"{v:{fmt}}", sign
 
 
+def _draggable(badge, metric_key):
+    """Wrap a KPI badge in a draggable div so JS can pick up the metric key."""
+    return html.Div(
+        badge,
+        draggable="true",
+        **{"data-metric": metric_key},
+        className="draggable-kpi",
+    )
+
+
+_DRAG_CHART_MAP = {
+    "asset_value":    ("Asset Value",        AssetValuePlotlyLineChart),
+    "asset_profit":   ("Profit Range (30D)", ProfitRangePlotlyLineChart),
+    "asset_return":   ("Return vs Portfolio",AssetVsPortfolioReturnChart),
+    "asset_dca_bias": ("DCA Bias",           DCABiasPlotlyLineChart),
+}
+
+
 @callback(
     Output("profile-snapshot-strip", "children"),
-    Output("profile-price-ma-chart", "figure"),
     Input("portfolio-asset-table", "selectedRows"),
-    State("workspace-timeframe", "data"),
-    State("theme-store", "data"),
     prevent_initial_call=True,
 )
-def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
+def on_asset_profile_deep_dive(selected_rows):
     if not selected_rows:
         raise PreventUpdate
 
     row = selected_rows[0]
-    current_theme = theme or "light"
 
-    value = row.get("value")
-    profit = row.get("profit")
+    value   = row.get("value")
+    profit  = row.get("profit")
     pnl_pct = row.get("pnl_pct")
     cum_ret = row.get("cumulative_value_return")
-    weight = row.get("weight_pct")
-    dca = row.get("dca_bias")
+    weight  = row.get("weight_pct")
+    dca     = row.get("dca_bias")
 
     profit_str, profit_sign = _fmt_signed(profit, ",.2f")
-    pnl_str, pnl_sign = _fmt_signed(pnl_pct, ".2f")
-    ret_str, ret_sign = _fmt_signed(cum_ret, ".2f")
-    dca_str, dca_sign = _fmt_signed(dca, ".3f")
+    pnl_str,    pnl_sign    = _fmt_signed(pnl_pct, ".2f")
+    ret_str,    ret_sign    = _fmt_signed(cum_ret, ".2f")
+    dca_str,    dca_sign    = _fmt_signed(dca, ".3f")
 
-    strip = html.Div(
+    return html.Div(
         [
-            _kpi_badge("Value", f"£{value:,.2f}" if value is not None else "—"),
-            _kpi_badge("P&L", f"£{profit_str}", change_sign=profit_sign),
+            _draggable(
+                _kpi_badge("Value", f"£{value:,.2f}" if value is not None else "—"),
+                "asset_value",
+            ),
+            _draggable(
+                _kpi_badge("P&L", f"£{profit_str}", change_sign=profit_sign),
+                "asset_profit",
+            ),
             _kpi_badge("P&L %", f"{pnl_str}%", change_sign=pnl_sign),
-            _kpi_badge("Return", f"{ret_str}%", change_sign=ret_sign),
+            _draggable(
+                _kpi_badge("Return", f"{ret_str}%", change_sign=ret_sign),
+                "asset_return",
+            ),
             _kpi_badge("Weight", f"{weight:.2f}%" if weight is not None else "—"),
-            _kpi_badge("DCA Bias", dca_str, change_sign=dca_sign),
+            _draggable(
+                _kpi_badge("DCA Bias", dca_str, change_sign=dca_sign),
+                "asset_dca_bias",
+            ),
         ],
         className="kpi-badge-row",
     )
 
+
+# ── 8. Drag-to-plot: render chart for dropped metric ──────────────
+
+# Bridge: hidden button click → store the metric key from JS global.
+clientside_callback(
+    "function(n) { return window._droppedMetric || ''; }",
+    Output("drop-metric-store", "data"),
+    Input("_drop-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+
+
+@callback(
+    Output("chart-drop-zone-graph", "figure"),
+    Output("chart-drop-zone-graph", "style"),
+    Output("chart-drop-zone-hint", "style"),
+    Output("chart-drop-zone-label", "children"),
+    Input("drop-metric-store", "data"),
+    State("portfolio-asset-table", "selectedRows"),
+    State("workspace-timeframe", "data"),
+    State("theme-store", "data"),
+    State("portfolio_page_asset_store", "data"),
+    prevent_initial_call=True,
+)
+def on_metric_drop(metric, selected_rows, timeframe, theme, cached_data):
+    if not metric or not selected_rows:
+        raise PreventUpdate
+
+    chart_info = _DRAG_CHART_MAP.get(metric)
+    if not chart_info:
+        raise PreventUpdate
+
+    row = selected_rows[0]
     ticker = row.get("ticker")
     if not ticker:
-        return strip, {}
+        raise PreventUpdate
 
+    label, ChartClass = chart_info
+    current_theme = theme or "light"
     start_date, end_date = _date_window(timeframe or "1Y")
     snapshots = _fetch_snapshots([ticker], start_date, end_date)
     snapshot = dict(snapshots).get(ticker, {})
 
-    figure = PriceWithMAPlotlyLineChart().render(snapshot, theme=current_theme)
-    return strip, figure
+    if metric == "asset_return":
+        portfolio_return = {"dates": [], "values": []}
+        pv = (cached_data or {}).get("view_model", {}).get("portfolio_value_series", {})
+        if pv.get("dates"):
+            for d, v, c in zip(pv["dates"], pv["values"], pv.get("costs", [])):
+                if start_date <= str(d) <= end_date and c and c > 0:
+                    portfolio_return["dates"].append(d)
+                    portfolio_return["values"].append((v - c) / c * 100)
+        data = {**snapshot, "portfolio_return": portfolio_return}
+    else:
+        data = snapshot
+
+    fig = ChartClass().render(data, theme=current_theme)
+    graph_style = {"height": "240px", "display": "block"}
+    hint_style  = {"display": "none"}
+    return fig, graph_style, hint_style, label
 
 
 # ── 8. Scatter plot bubble highlight on row selection ─────────────

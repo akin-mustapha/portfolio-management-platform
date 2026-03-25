@@ -491,3 +491,66 @@ class ProfitRangePlotlyLineChart:
         fig.update_layout(**_base_layout(t))
         _apply_spike_config(fig)
         return fig
+
+
+class AssetVsPortfolioReturnChart:
+    @staticmethod
+    def _index_to_100(vals):
+        """Shift a return % series so the first value = 100."""
+        clean = [v for v in vals if v is not None]
+        if not clean:
+            return [None] * len(vals)
+        base = clean[0]
+        return [100 + (v - base) if v is not None else None for v in vals]
+
+    def render(self, data, theme="light", accent_color=None):
+        t = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        accent = accent_color or FALLBACK_ACCENT
+
+        asset_series = data.get("asset_return", {})
+        portfolio_series = data.get("portfolio_return", {})
+
+        asset_dates = asset_series.get("dates", [])
+        asset_vals = self._index_to_100(asset_series.get("values", []))
+        port_dates = portfolio_series.get("dates", [])
+        port_vals = self._index_to_100(portfolio_series.get("values", []))
+
+        fig = go.Figure()
+        fig.add_trace(
+            go.Scatter(
+                x=asset_dates,
+                y=asset_vals,
+                name="Asset",
+                mode="lines",
+                line=dict(color=accent, width=1.5),
+                fill="tonexty",
+                fillcolor=_hex_to_rgba(accent, 0.06),
+                hovertemplate="<b>%{y:.2f}</b><extra>Asset</extra>",
+            )
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=port_dates,
+                y=port_vals,
+                name="Portfolio",
+                mode="lines",
+                line=dict(color=MUTED_FILL, width=1.2, dash="dot"),
+                hovertemplate="<b>%{y:.2f}</b><extra>Portfolio</extra>",
+            )
+        )
+        fig.add_hline(y=100, line_dash="dot", line_color="rgba(0,0,0,0.15)", line_width=1)
+        layout = _base_layout(t)
+        layout["yaxis"]["tickformat"] = ".1f"
+        layout["yaxis"].pop("ticksuffix", None)
+        layout["showlegend"] = True
+        layout["legend"] = dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font=dict(size=10),
+        )
+        fig.update_layout(**layout)
+        _apply_spike_config(fig)
+        return fig
