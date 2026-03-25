@@ -207,46 +207,34 @@ class TestBug2AssetComputedWhereClausePreventsUpdates:
 
 class TestBug3AccountGoldLeadingSemicolon:
     """
-    Bug: AccountGoldSource.extract() contains:
+    Bug: AccountGoldSource.extract() contained a leading semicolon before WITH.
 
-        sql = \"\"\"
-            ;WITH cte_fx AS (
-            ...
-
-    The leading semicolon before WITH is invalid SQL syntax. When executed via
-    psycopg2 (the PostgreSQL driver used here) it raises:
-        psycopg2.errors.SyntaxError: syntax error at or near ";"
-
-    Fix: remove the leading semicolon so the query starts with 'WITH'.
+    The canonical gold pipeline is now PipelineT212Gold (pipeline_gold_t212.py)
+    which uses T212GoldSource — a single unified source for both asset and account
+    facts. These tests verify the SQL in T212GoldSource has no leading semicolon.
     """
 
     def test_account_gold_sql_has_no_leading_semicolon(self):
         """
         The SQL must not contain the ';WITH' pattern.
-        FAILS before fix, PASSES after fix.
         """
-        from pipelines.application.runners.pipeline_account_gold import (
-            AccountGoldSource,
+        from pipelines.application.runners.pipeline_gold_t212 import (
+            T212GoldSource,
         )
-        src = inspect.getsource(AccountGoldSource.extract)
+        src = inspect.getsource(T212GoldSource.extract)
         assert ";WITH" not in src, (
-            "SQL starts with ';WITH' which is a syntax error in PostgreSQL. "
-            "Remove the leading semicolon — the query should begin with 'WITH'."
+            "SQL contains ';WITH' which is a syntax error in PostgreSQL. "
+            "The query should begin with 'WITH'."
         )
 
     def test_account_gold_sql_starts_with_valid_cte(self):
         """
-        Complementary check: the SQL string (after stripping whitespace) must
-        start with 'WITH' to be a valid Common Table Expression.
-        FAILS before fix, PASSES after fix.
+        Complementary check: the SQL must not have a leading semicolon before WITH.
         """
-        from pipelines.application.runners.pipeline_account_gold import (
-            AccountGoldSource,
+        from pipelines.application.runners.pipeline_gold_t212 import (
+            T212GoldSource,
         )
-        # Grab the raw SQL by instantiating a source and inspecting the method body
-        # We test the source text rather than executing against a real DB
-        src = inspect.getsource(AccountGoldSource.extract)
-        # Find the sql assignment — the trimmed string content should not begin with ";"
+        src = inspect.getsource(T212GoldSource.extract)
         assert '";WITH' not in src and "';WITH" not in src and "\n            ;WITH" not in src, (
             "SQL has a leading ';' before WITH — this is a syntax error. "
             "Remove the semicolon."
