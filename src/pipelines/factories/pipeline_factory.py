@@ -14,6 +14,9 @@ from ..application.runners.pipeline_account_computed_silver import (
 from ..application.runners.portfolio_enrichment_synchronizer import (
     enrichment_sychronization,
 )
+from ..application.runners.pipeline_bronze_t212 import PipelineT212Bronze
+from ..application.runners.pipeline_silver_t212 import PipelineT212Silver
+from ..application.runners.pipeline_gold_t212 import PipelineT212Gold
 
 
 class PipelineFactory:
@@ -26,6 +29,9 @@ class PipelineFactory:
         "account_silver": PipelineAccountSilver,
         "account_computed_silver": PipelineAccountComputedSilver,
         "enrichment_sychronization": enrichment_sychronization,
+        "t212_bronze": PipelineT212Bronze,
+        "t212_silver": PipelineT212Silver,
+        "t212_gold": PipelineT212Gold,
     }
 
     @classmethod

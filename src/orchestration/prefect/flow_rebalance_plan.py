@@ -9,7 +9,7 @@ from backend.services.rebalancing.rebalancing_service_builder import (
 logger = loggers.get_logger(__name__)
 
 
-@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE)
+@task(retry_delay_seconds=60, retries=2, cache_policy=NO_CACHE, log_prints=True)
 def task_generate_rebalance_plan():
     service = build_rebalancing_service()
     logger.info("Generating rebalance plan")
@@ -21,7 +21,7 @@ def task_generate_rebalance_plan():
 
 
 @flow
-def flow_rebalance_plan():
+def flow_rebalance_plan(log_prints=True):
     logger.info("Starting rebalance plan flow")
     task_generate_rebalance_plan()
     logger.info("Rebalance plan flow complete")

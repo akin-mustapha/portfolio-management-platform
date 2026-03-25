@@ -34,16 +34,18 @@ class AssetGoldRecord(BaseModel):
     fx_impact: Optional[float] = None
 
     # Returns (fact_return)
-    daily_return: Optional[float] = None
-    cumulative_return: Optional[float] = None
+    daily_value_return: Optional[float] = None
+    cumulative_value_return: Optional[float] = None
 
     # Technical / Risk (fact_technical)
-    pct_drawdown: Optional[float] = None
-    value_high: Optional[float] = None
-    value_low: Optional[float] = None
-    ma_20d: Optional[float] = None
-    ma_30d: Optional[float] = None
-    ma_50d: Optional[float] = None
+    value_drawdown_pct_30d: Optional[float] = None
+    value_high_alltime: Optional[float] = None
+    value_low_alltime: Optional[float] = None
+    value_ma_20d: Optional[float] = None
+    value_ma_30d: Optional[float] = None
+    value_ma_50d: Optional[float] = None
+    price_ma_20d: Optional[float] = None
+    price_ma_50d: Optional[float] = None
     volatility_20d: Optional[float] = None
     volatility_30d: Optional[float] = None
     volatility_50d: Optional[float] = None
@@ -56,6 +58,6 @@ class AssetGoldRecord(BaseModel):
 
     # Signals / Opportunities (fact_signal)
     dca_bias: Optional[float] = None
-    ma_crossover_signal: Optional[float] = None  # ma_20d - ma_50d; positive = bullish
+    value_ma_crossover_signal: Optional[float] = None  # value_ma_20d - value_ma_50d; positive = bullish
     price_above_ma_20d: Optional[bool] = None
     price_above_ma_50d: Optional[bool] = None

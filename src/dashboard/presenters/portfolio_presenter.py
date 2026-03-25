@@ -48,11 +48,11 @@ class PortfolioPresenter:
         }
 
     def _daily_change_series(self, history: list[dict]) -> dict:
-        rows = [r for r in history if r.get("daily_change_pct") is not None]
+        rows = [r for r in history if r.get("daily_value_change_pct") is not None]
         rows = rows[-30:]
         return {
             "dates": [r["data_date"] for r in rows],
-            "values": [r["daily_change_pct"] for r in rows],
+            "values": [r["daily_value_change_pct"] for r in rows],
         }
 
     def _kpi(self, snapshot: dict, history: list[dict] | None = None) -> dict:
@@ -67,9 +67,9 @@ class PortfolioPresenter:
             "cash": snapshot.get("cash_available_to_trade", 0),
             "cash_reserved": snapshot.get("cash_reserved_for_orders", 0),
             "cash_in_pies": snapshot.get("cash_in_pies", 0),
-            "daily_change_pct": (
-                round(snapshot["daily_change_pct"], 2)
-                if snapshot.get("daily_change_pct") is not None
+            "daily_value_change_pct": (
+                round(snapshot["daily_value_change_pct"], 2)
+                if snapshot.get("daily_value_change_pct") is not None
                 else None
             ),
             "portfolio_vol": (
@@ -102,7 +102,7 @@ class PortfolioPresenter:
         items = [
             {
                 "ticker": a["ticker"],
-                "var_95_1d": a.get("var_95_1d"),
+                "var_95_1d": float(a["var_95_1d"]),
                 "label": a["ticker"],
             }
             for a in assets
@@ -115,20 +115,20 @@ class PortfolioPresenter:
         for a in assets:
             series = a.get("price_series") or []
             if len(series) >= 2 and series[-2] not in (None, 0):
-                daily_return = (series[-1] - series[-2]) / series[-2] * 100
-            elif a.get("daily_return") is not None:
-                daily_return = a["daily_return"] * 100  # stored as decimal fraction
+                daily_value_return = (series[-1] - series[-2]) / series[-2] * 100
+            elif a.get("daily_value_return") is not None:
+                daily_value_return = a["daily_value_return"] * 100  # stored as decimal fraction
             else:
                 continue
             items.append(
                 {
                     "ticker": a["ticker"],
-                    "daily_return": daily_return,
+                    "daily_value_return": daily_value_return,
                     "label": a["ticker"],
                 }
             )
 
-        return sorted(items, key=lambda x: abs(x["daily_return"]), reverse=True)[:15]
+        return sorted(items, key=lambda x: abs(x["daily_value_return"]), reverse=True)[:15]
 
     # ---------- Line Chart ----------
 
@@ -136,19 +136,21 @@ class PortfolioPresenter:
         return {
             "dates": [r["data_date"] for r in rows],
             "values": [
-                r["investments_total_cost"] + r["investments_unrealized_pnl"]
+                float(r["investments_total_cost"])
+                + float(r["investments_unrealized_pnl"])
                 for r in rows
             ],
-            "costs": [r["investments_total_cost"] for r in rows],
+            "costs": [float(r["investments_total_cost"]) for r in rows],
         }
 
     def _portfolio_pnl_series_vm(self, rows: list[dict]) -> dict:
         return {
             "dates": [r["data_date"] for r in rows],
-            "values": [r["investments_unrealized_pnl"] for r in rows],
-            "realized": [r["investments_realized_pnl"] for r in rows],
+            "values": [float(r["investments_unrealized_pnl"]) for r in rows],
+            "realized": [float(r["investments_realized_pnl"]) for r in rows],
             "total_pnl": [
-                r["investments_unrealized_pnl"] + r["investments_realized_pnl"]
+                float(r["investments_unrealized_pnl"])
+                + float(r["investments_realized_pnl"])
                 for r in rows
             ],
         }
@@ -158,19 +160,19 @@ class PortfolioPresenter:
             return {"fx_impact_total": 0, "unrealized_pnl": 0}
         latest = rows[-1]
         return {
-            "fx_impact_total": latest.get("fx_impact_total") or 0,
-            "unrealized_pnl": latest.get("investments_unrealized_pnl") or 0,
+            "fx_impact_total": float(latest.get("fx_impact_total") or 0),
+            "unrealized_pnl": float(latest.get("investments_unrealized_pnl") or 0),
         }
 
     def _portfolio_drawdown_vm(self, rows: list[dict]) -> dict:
         dates = [r["data_date"] for r in rows]
-        values = [r["total_value"] for r in rows]
-        peak = 0
+        values = [float(r["total_value"]) for r in rows]
+        peak = 0.0
         drawdown = []
         for v in values:
             if v > peak:
                 peak = v
-            dd = ((v - peak) / peak * 100) if peak > 0 else 0
+            dd = ((v - peak) / peak * 100) if peak > 0 else 0.0
             drawdown.append(round(dd, 4))
         return {"dates": dates, "drawdown_pct": drawdown}
 
@@ -178,7 +180,10 @@ class PortfolioPresenter:
 
     def _position_weight_series_vm(self, assets: list[dict]) -> dict:
         items = sorted(
-            [{"ticker": a["ticker"], "weight_pct": a["weight_pct"]} for a in assets],
+            [
+                {"ticker": a["ticker"], "weight_pct": float(a["weight_pct"] or 0)}
+                for a in assets
+            ],
             key=lambda x: x["weight_pct"],
             reverse=True,
         )
@@ -205,10 +210,10 @@ class PortfolioPresenter:
             [
                 {
                     "ticker": a["ticker"],
-                    "weight_pct": a["weight_pct"],
-                    "roi_pct": round(a.get("pnl_pct") or 0, 2),
-                    "profit": a["profit"],
-                    "value": a["value"],
+                    "weight_pct": float(a["weight_pct"] or 0),
+                    "roi_pct": round(float(a.get("pnl_pct") or 0), 2),
+                    "profit": float(a["profit"] or 0),
+                    "value": float(a["value"] or 0),
                     "name": a["name"],
                 }
                 for a in assets
@@ -232,7 +237,7 @@ class PortfolioPresenter:
         try:
 
             def _label(a):
-                roi = round(a.get("pnl_pct") or 0, 2)
+                roi = round(float(a.get("pnl_pct") or 0), 2)
                 roi_str = ("+" if roi >= 0 else "") + str(roi) + "%"
                 return f"{a['ticker']} {roi_str}"
 
@@ -240,9 +245,9 @@ class PortfolioPresenter:
                 [
                     {
                         "ticker": a["ticker"],
-                        "weight_pct": a["weight_pct"],
-                        "profit": a["profit"],
-                        "value": a["value"],
+                        "weight_pct": float(a["weight_pct"] or 0),
+                        "profit": float(a["profit"] or 0),
+                        "value": float(a["value"] or 0),
                         "name": a["name"],
                         "label": _label(a),
                     }
@@ -264,7 +269,7 @@ class PortfolioPresenter:
         try:
 
             def _label(a):
-                roi = round(a.get("pnl_pct") or 0, 2)
+                roi = round(float(a.get("pnl_pct") or 0), 2)
                 roi_str = ("+" if roi >= 0 else "") + str(roi) + "%"
                 return f"{a['ticker']} {roi_str}"
 
@@ -272,9 +277,9 @@ class PortfolioPresenter:
                 [
                     {
                         "ticker": a["ticker"],
-                        "weight_pct": a["weight_pct"],
-                        "profit": a["profit"],
-                        "value": a["value"],
+                        "weight_pct": float(a["weight_pct"] or 0),
+                        "profit": float(a["profit"] or 0),
+                        "value": float(a["value"] or 0),
                         "name": a["name"],
                         "label": _label(a),
                     }
@@ -294,25 +299,29 @@ class PortfolioPresenter:
             import pandas as pd
 
             df = pd.DataFrame(assets)
+            if df.empty or "is_profitable" not in df.columns:
+                return {}
             return (
                 df[df["is_profitable"] == 1]
                 .groupby("data_date")["profit"]
                 .sum()
                 .to_dict()
             )
-        except Exception as e:
-            raise e
+        except Exception:
+            return {}
 
     def _losers_pnl_vm(self, assets: list[dict]) -> dict:
         try:
             import pandas as pd
 
             df = pd.DataFrame(assets)
+            if df.empty or "is_profitable" not in df.columns:
+                return {}
             return (
                 df[df["is_profitable"] == 0]
                 .groupby("data_date")["profit"]
                 .sum()
                 .to_dict()
             )
-        except Exception as e:
-            raise e
+        except Exception:
+            return {}

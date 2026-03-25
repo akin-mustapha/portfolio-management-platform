@@ -54,8 +54,8 @@ class AssetPresenter:
         return {
             "dates": [r["data_date"] for r in rows],
             "values": [r["price"] for r in rows],
-            "ma_30d": [r.get("ma_30d") for r in rows],
-            "ma_50d": [r.get("ma_50d") for r in rows],
+            "value_ma_30d": [r.get("value_ma_30d") for r in rows],
+            "value_ma_50d": [r.get("value_ma_50d") for r in rows],
             "title": "Price",
         }
 
@@ -69,7 +69,7 @@ class AssetPresenter:
     def _asset_risk_series_vm(self, rows: list[dict]) -> dict:
         return {
             "dates": [r["data_date"] for r in rows],
-            "values": [r["pct_drawdown"] for r in rows],
+            "values": [r["value_drawdown_pct_30d"] for r in rows],
         }
 
     def _asset_dca_bias_series_vm(self, rows: list[dict]) -> dict:

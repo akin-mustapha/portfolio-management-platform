@@ -1,7 +1,7 @@
 from prefect import flow, task
 from prefect.logging import loggers
 from prefect.cache_policies import NO_CACHE
-from backend.ingestion.factories.pipeline_factory import PipelineFactory
+from pipelines.factories.pipeline_factory import PipelineFactory
 
 logger = loggers.get_logger(__name__)
 

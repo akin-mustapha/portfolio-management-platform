@@ -358,7 +358,7 @@ class LosersPlotlyBarChart(_BaseRankedBarChart):
     y_axis_side = "right"
 
 
-_PCT_COLS = {"daily_return", "cumulative_return", "weight_pct", "pnl_pct"}
+_PCT_COLS = {"daily_value_return", "cumulative_value_return", "weight_pct", "pnl_pct"}
 
 
 def _ranked_panel(data, sort_by="profit", is_gain=True):
@@ -414,17 +414,17 @@ def daily_movers_table(data, n=5):
         return html.Div()
 
     df = pd.DataFrame(data)
-    df["daily_return"] = pd.to_numeric(df["daily_return"], errors="coerce").fillna(0)
+    df["daily_value_return"] = pd.to_numeric(df["daily_value_return"], errors="coerce").fillna(0)
 
     gainers = (
-        df[df["daily_return"] > 0].sort_values("daily_return", ascending=False).head(n)
+        df[df["daily_value_return"] > 0].sort_values("daily_value_return", ascending=False).head(n)
     )
     losers = (
-        df[df["daily_return"] < 0].sort_values("daily_return", ascending=True).head(n)
+        df[df["daily_value_return"] < 0].sort_values("daily_value_return", ascending=True).head(n)
     )
 
-    gain_max = gainers["daily_return"].max() if not gainers.empty else 1
-    loss_max = losers["daily_return"].abs().max() if not losers.empty else 1
+    gain_max = gainers["daily_value_return"].max() if not gainers.empty else 1
+    loss_max = losers["daily_value_return"].abs().max() if not losers.empty else 1
 
     def _row(ticker, value, is_gain):
         fill = abs(value) / (gain_max if is_gain else loss_max) * 100
@@ -447,7 +447,7 @@ def daily_movers_table(data, n=5):
     def _panel(label, rows_df, is_gain):
         rows = (
             [
-                _row(r["ticker"], r["daily_return"], is_gain)
+                _row(r["ticker"], r["daily_value_return"], is_gain)
                 for _, r in rows_df.iterrows()
             ]
             if not rows_df.empty
@@ -650,8 +650,17 @@ class PortfolioDrawdownPlotlyLineChart:
 class PortfolioPerformancePlotlyLineChart:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
-        df = pd.DataFrame(data).sort_values("dates")
-
+        df = pd.DataFrame(data)
+        if df.empty or "dates" not in df.columns:
+            fig = go.Figure()
+            fig.update_layout(
+                paper_bgcolor=ct["paper_bgcolor"],
+                plot_bgcolor=ct["plot_bgcolor"],
+                font=dict(color=ct["font_color"]),
+                margin=dict(l=2, r=2, t=2, b=2),
+            )
+            return fig
+        df = df.sort_values("dates")
         ref_value = df["costs"].iloc[0]
 
         fig = go.Figure()

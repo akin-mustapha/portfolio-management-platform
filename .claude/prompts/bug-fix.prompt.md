@@ -1,4 +1,4 @@
-Find all bugs in the data pipeline layer (silver and gold pipelines). For each bug:
+Find all bugs in the dashboard. For each bug:
 
 1) Write a failing test that reproduces it,
 2) Fix the code,
