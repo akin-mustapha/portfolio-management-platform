@@ -6,6 +6,7 @@ and writes to staging.asset and staging.account in a single run.
 """
 
 import os
+import json
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ from datetime import datetime, UTC
 from typing import List, Dict, Any
 
 from ...application.policies import Pipeline
-from ...application.protocols import Source, Destination, Transformation
+from ...application.protocols import Source, Destination, Transformation, RejectedRecord
 from ...application.validators.schema_validator import SchemaValidator
 
 from shared.database.client import SQLModelClient
@@ -59,14 +60,42 @@ class Trading212SilverSource(Source):
 
 
 class Trading212AssetTransformationSilver(Transformation):
+    def __init__(self):
+        self._parse_errors: List[RejectedRecord] = []
+
     def transform(self, snapshots: List[Any]) -> List[Dict]:
+        self._parse_errors = []
         records = []
         for row in snapshots:
             snapshot_id = row.snapshot_id
             ingested_timestamp = row.ingested_timestamp
-            positions = row.position_data  # psycopg2 deserialises JSONB → Python list
+            positions = row.position_data
+            if isinstance(positions, str):
+                try:
+                    positions = json.loads(positions)
+                except json.JSONDecodeError as e:
+                    self._parse_errors.append(RejectedRecord(
+                        pipeline_name=None,
+                        layer="silver",
+                        business_key=snapshot_id,
+                        raw_payload={"snapshot_id": snapshot_id, "raw": positions[:500]},
+                        error_type="JSONDecodeError",
+                        error_message=str(e),
+                    ))
+                    continue
 
             for pos in positions:
+                if not isinstance(pos, dict):
+                    self._parse_errors.append(RejectedRecord(
+                        pipeline_name=None,
+                        layer="silver",
+                        business_key=snapshot_id,
+                        raw_payload={"snapshot_id": snapshot_id, "raw": str(pos)[:500]},
+                        error_type="InvalidPositionEntry",
+                        error_message=f"Expected dict, got {type(pos).__name__}: {str(pos)[:100]}",
+                    ))
+                    continue
+
                 if not pos.get("instrument", {}).get("ticker"):
                     continue
 
@@ -101,10 +130,27 @@ class Trading212AssetTransformationSilver(Transformation):
 
 
 class Trading212AccountTransformationSilver(Transformation):
+    def __init__(self):
+        self._parse_errors: List[RejectedRecord] = []
+
     def transform(self, snapshots: List[Any]) -> List[Dict]:
+        self._parse_errors = []
         records = []
         for row in snapshots:
-            account = row.account_data  # psycopg2 deserialises JSONB → Python dict
+            account = row.account_data
+            if isinstance(account, str):
+                try:
+                    account = json.loads(account)
+                except json.JSONDecodeError as e:
+                    self._parse_errors.append(RejectedRecord(
+                        pipeline_name=None,
+                        layer="silver",
+                        business_key=row.snapshot_id,
+                        raw_payload={"snapshot_id": row.snapshot_id, "raw": account[:500]},
+                        error_type="JSONDecodeError",
+                        error_message=str(e),
+                    ))
+                    continue
             if not account:
                 continue
 
@@ -186,6 +232,16 @@ class PipelineT212Silver(Pipeline):
 
         asset_data = self._asset_transformation.transform(snapshots)
         account_data = self._account_transformation.transform(snapshots)
+
+        parse_errors = (
+            self._asset_transformation._parse_errors
+            + self._account_transformation._parse_errors
+        )
+        if parse_errors:
+            for r in parse_errors:
+                r.pipeline_name = self._pipeline_name
+            self._dead_letter.load(parse_errors)
+            logging.warning(f"[{self._pipeline_name}] {len(parse_errors)} snapshots rejected — invalid JSON in JSONB column")
 
         asset_result = self._asset_validator.validate(asset_data)
         account_result = self._account_validator.validate(account_data)
