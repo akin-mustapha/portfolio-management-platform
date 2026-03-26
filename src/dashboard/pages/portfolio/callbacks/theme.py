@@ -8,10 +8,8 @@ from dash import Output, Input, State, callback, clientside_callback, no_update,
 from ._helpers import (
     _build_compare_rows,
     _date_window,
+    _fetch_asset_metadata,
     _fetch_snapshots,
-    _VALUATION_METRICS,
-    _RISK_METRICS,
-    _OPPS_METRICS,
 )
 
 # ── Privacy toggle ───────────────────────────────────────────────────────────
@@ -78,7 +76,7 @@ clientside_callback(
     Output("winners_pnl_chart", "figure"),
     Output("position_weight_donut_chart", "figure"),
     Output("profitability_donut_chart", "figure"),
-    Output("portfolio_performance_map", "figure"),
+    Output("portfolio_performance_map", "figure", allow_duplicate=True),
     Output("portfolio_drawdown_chart", "figure"),
     Output("var_by_position_chart", "figure"),
     Input("theme-store", "data"),
@@ -115,7 +113,6 @@ def update_chart_theme(theme):
 @callback(
     Output("asset-detail-sections", "children", allow_duplicate=True),
     Output("risk-asset-detail-sections", "children", allow_duplicate=True),
-    Output("opportunities-asset-detail-sections", "children", allow_duplicate=True),
     Input("theme-store", "data"),
     State("workspace-selected-asset", "data"),
     State("workspace-timeframe", "data"),
@@ -125,7 +122,7 @@ def update_chart_theme(theme):
 def update_workspace_chart_theme(theme, selected_assets, timeframe, asset_store):
     tickers = selected_assets if isinstance(selected_assets, list) else []
     if not tickers:
-        return no_update, no_update, no_update
+        return no_update, no_update
 
     current_theme = theme or "light"
     start_date, end_date = _date_window(timeframe or "1Y")
@@ -135,17 +132,12 @@ def update_workspace_chart_theme(theme, selected_assets, timeframe, asset_store)
         (asset_store or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
     )
     names_map = {r["ticker"]: r.get("name", "") for r in asset_rows if r.get("ticker")}
+    selected_row_objs = [r for r in asset_rows if r.get("ticker") in tickers]
+    metadata_map = _fetch_asset_metadata(selected_row_objs)
 
     return (
-        _build_compare_rows(
-            snapshots, _VALUATION_METRICS, current_theme, ns="val", names_map=names_map
-        ),
-        _build_compare_rows(
-            snapshots, _RISK_METRICS, current_theme, ns="risk", names_map=names_map
-        ),
-        _build_compare_rows(
-            snapshots, _OPPS_METRICS, current_theme, ns="opps", names_map=names_map
-        ),
+        _build_compare_rows(snapshots, current_theme, ns="val", names_map=names_map, metadata_map=metadata_map),
+        _build_compare_rows(snapshots, current_theme, ns="risk", names_map=names_map, metadata_map=metadata_map),
     )
 
 

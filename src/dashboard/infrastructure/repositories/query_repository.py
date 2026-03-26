@@ -183,6 +183,7 @@ class PostgresSnapshotQueryRepository:
             ft.volatility_30d,
             ft.value_drawdown_pct_30d,
             fr.cumulative_value_return,
+            fr.daily_value_return,
             TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
         FROM analytics.fact_valuation fv
         JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id

@@ -17,7 +17,6 @@ from ._helpers import (
     _build_compare_rows,
     _VALUATION_METRICS,
     _RISK_METRICS,
-    _OPPS_METRICS,
 )
 
 # ── 3. Timeframe change → update KPIs + all tabs ──────────────────
@@ -31,7 +30,6 @@ from ._helpers import (
     Output("tab-opportunities-content", "children", allow_duplicate=True),
     Output("asset-detail-sections", "children", allow_duplicate=True),
     Output("risk-asset-detail-sections", "children", allow_duplicate=True),
-    Output("opportunities-asset-detail-sections", "children", allow_duplicate=True),
     Input("workspace-timeframe-selector", "value"),
     State("portfolio_page_asset_store", "data"),
     State("workspace-selected-asset", "data"),
@@ -73,7 +71,6 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
             opportunities_tab,
             no_update,
             no_update,
-            no_update,
         )
 
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
@@ -92,7 +89,6 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
         opportunities_tab,
         _build_compare_rows(
             snapshots,
-            _VALUATION_METRICS,
             current_theme,
             ns="val",
             names_map=names_map,
@@ -100,17 +96,8 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
         ),
         _build_compare_rows(
             snapshots,
-            _RISK_METRICS,
             current_theme,
             ns="risk",
-            names_map=names_map,
-            metadata_map=metadata_map,
-        ),
-        _build_compare_rows(
-            snapshots,
-            _OPPS_METRICS,
-            current_theme,
-            ns="opps",
             names_map=names_map,
             metadata_map=metadata_map,
         ),
@@ -128,7 +115,6 @@ def on_timeframe_change(timeframe, cached_data, selected_assets, theme):
     Output("tab-opportunities-content", "children", allow_duplicate=True),
     Output("asset-detail-sections", "children", allow_duplicate=True),
     Output("risk-asset-detail-sections", "children", allow_duplicate=True),
-    Output("opportunities-asset-detail-sections", "children", allow_duplicate=True),
     Output("workspace-timeframe-selector", "value", allow_duplicate=True),
     Input("workspace-apply-filter-btn", "n_clicks"),
     State("workspace-start-date", "date"),
@@ -178,7 +164,6 @@ def on_date_filter_apply(
             opportunities_tab,
             no_update,
             no_update,
-            no_update,
             None,
         )
 
@@ -198,7 +183,6 @@ def on_date_filter_apply(
         opportunities_tab,
         _build_compare_rows(
             snapshots,
-            _VALUATION_METRICS,
             current_theme,
             ns="val",
             names_map=names_map,
@@ -206,17 +190,8 @@ def on_date_filter_apply(
         ),
         _build_compare_rows(
             snapshots,
-            _RISK_METRICS,
             current_theme,
             ns="risk",
-            names_map=names_map,
-            metadata_map=metadata_map,
-        ),
-        _build_compare_rows(
-            snapshots,
-            _OPPS_METRICS,
-            current_theme,
-            ns="opps",
             names_map=names_map,
             metadata_map=metadata_map,
         ),

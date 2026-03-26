@@ -85,7 +85,15 @@ def asset_table(data=None):
                 "minWidth": 116,
                 "width": 116,
                 "cellRenderer": "TrendSparkline",
-                "cellStyle": {"padding": "0", "overflow": "hidden"},
+                "cellStyle": {
+                    "function": (
+                        f"(function(params) {{"
+                        f"  var s = params.data.value_ma_crossover_signal;"
+                        f"  var c = s > 0 ? '{POSITIVE_COLOR}' : '{NEGATIVE_COLOR}';"
+                        f"  return {{padding: '0', overflow: 'hidden', borderLeft: '3px solid ' + c}};"
+                        f"}})(params)"
+                    )
+                },
                 "headerTooltip": "30-day price trend. Green = Bullish (MA30 > MA50), Red = Bearish.",
             },
             {
@@ -101,6 +109,7 @@ def asset_table(data=None):
                 "field": "name",
                 "minWidth": 100,
                 "width": 130,
+                "hide": True,
                 "tooltipField": "name",
                 "headerTooltip": "Brief description of the asset. Context only — not a trading signal.",
             },
@@ -161,6 +170,7 @@ def asset_table(data=None):
                 "headerName": "MA Signal",
                 "minWidth": 94,
                 "width": 94,
+                "hide": True,
                 "valueFormatter": {
                     "function": "params.value == null ? '—' : params.value > 0 ? '↑ Bullish' : '↓ Bearish'"
                 },
@@ -188,6 +198,7 @@ def asset_table(data=None):
                 "headerName": "Weight %",
                 "minWidth": 84,
                 "width": 84,
+                "hide": True,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2f')(params.value) + '%'"},
                 "headerTooltip": "Weight in relation to portfolio value",
@@ -197,6 +208,7 @@ def asset_table(data=None):
                 "headerName": "30D High",
                 "minWidth": 88,
                 "width": 88,
+                "hide": True,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format(',.2f')(params.value)"},
                 "headerTooltip": (
@@ -258,6 +270,7 @@ def asset_table(data=None):
                 "headerName": "Date",
                 "minWidth": 100,
                 "width": 100,
+                "hide": True,
                 "valueFormatter": {
                     "function": "params.value ? new Date(params.value).toLocaleDateString('en-GB', {year: 'numeric', month: 'short', day: 'numeric'}) : ''"
                 },
@@ -269,7 +282,6 @@ def asset_table(data=None):
             "sortable": True,
             "cellStyle": {"display": "flex", "alignItems": "center"},
             "unSortIcon": True,
-            
         },
         columnSize="autoSize",
         dashGridOptions={

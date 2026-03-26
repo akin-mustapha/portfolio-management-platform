@@ -493,6 +493,36 @@ class ProfitRangePlotlyLineChart:
         return fig
 
 
+class DailyReturnBarChart:
+    def render(self, data, theme="light", accent_color=None):
+        asset_data = data.get("asset_daily_return")
+        if not asset_data or not asset_data.get("dates"):
+            return go.Figure()
+
+        df = pd.DataFrame(asset_data).sort_values("dates")
+        df["values"] = df["values"].fillna(0) * 100
+
+        t = CHART_THEMES.get(theme or "light", CHART_THEMES["light"])
+        accent = accent_color or FALLBACK_ACCENT
+        colors = [accent if v >= 0 else "#ef5350" for v in df["values"]]
+
+        fig = go.Figure()
+        fig.add_trace(
+            go.Bar(
+                x=df["dates"],
+                y=df["values"],
+                marker_color=colors,
+                hovertemplate="%{y:+.2f}%<extra></extra>",
+                showlegend=False,
+            )
+        )
+        layout = _base_layout(t)
+        layout["yaxis"]["tickformat"] = ".2f"
+        layout["bargap"] = 0.1
+        fig.update_layout(**layout)
+        return fig
+
+
 class AssetVsPortfolioReturnChart:
     @staticmethod
     def _index_to_100(vals):
@@ -538,7 +568,9 @@ class AssetVsPortfolioReturnChart:
                 hovertemplate="<b>%{y:.2f}</b><extra>Portfolio</extra>",
             )
         )
-        fig.add_hline(y=100, line_dash="dot", line_color="rgba(0,0,0,0.15)", line_width=1)
+        fig.add_hline(
+            y=100, line_dash="dot", line_color="rgba(0,0,0,0.15)", line_width=1
+        )
         layout = _base_layout(t)
         layout["yaxis"]["tickformat"] = ".1f"
         layout["yaxis"].pop("ticksuffix", None)
