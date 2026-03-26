@@ -1044,12 +1044,11 @@ html[data-theme="dark"] .ws-modal-overlay {
 
 /* Drop zone */
 .chart-drop-zone {
+    width: 100%;
     min-height: 80px;
     border: 2px dashed var(--border-tv);
     border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 5px 5px;
     transition: border-color 0.15s, background 0.15s;
 }
 .chart-drop-zone--active {
@@ -1060,10 +1059,91 @@ html[data-theme="dark"] .ws-modal-overlay {
     font-size: 0.78rem;
     color: var(--text-muted);
     pointer-events: none;
+    padding: 6px 4px;
+    display: block;
+}
+/* Hide hint and remove min-height once chart cards are present */
+.chart-drop-zone:has(.chart-card) {
+    min-height: unset;
+}
+.chart-drop-zone:has(.chart-card) .chart-drop-zone__hint {
+    display: none;
 }
 
 html[data-theme="dark"] .chart-drop-zone--active {
     background: rgba(99, 154, 255, 0.06);
+}
+
+/* ── Chart cards grid ─────────────────────────────────────────── */
+
+.asset-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+/* Single card fills full width */
+.asset-charts-grid .chart-card:only-child {
+    grid-column: 1 / -1;
+}
+
+/* Compare mode (col-6 = 2 assets, col-4 = 3 assets) → single column */
+.col-6 .asset-charts-grid,
+.col-4 .asset-charts-grid {
+    grid-template-columns: 1fr;
+}
+
+@media (max-width: 768px) {
+    .asset-charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card {
+    border: 1px solid var(--border-tv);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.chart-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--border-tv);
+}
+
+.chart-card-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Round close button — matches the top utility button style */
+.chart-card-close-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border-tv);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.chart-card-close-btn:hover {
+    background: var(--bg-strip-hover);
+    color: var(--color-negative);
+    border-color: var(--color-negative);
 }
 
 .profile-summary-prop {
@@ -1087,6 +1167,34 @@ html[data-theme="dark"] .chart-drop-zone--active {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* ── KPI group rows inside Asset Details card ─────────────────── */
+
+.profile-kpi-group-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.profile-kpi-group {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.profile-kpi-group::-webkit-scrollbar {
+    display: none;
+}
+
+/* Prevent badges from shrinking — force scroll instead of compress */
+.profile-kpi-group .kpi-badge,
+.profile-kpi-group .draggable-kpi {
+    flex-shrink: 0;
 }
 
 #profile-accordion .accordion-item {

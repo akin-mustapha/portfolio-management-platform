@@ -72,7 +72,8 @@ def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
                 className="tv-section-container",
             ),
             # ── Asset detail — populated on row selection ──────────────
-            html.Div(id="opportunities-asset-detail-sections"),
+            # DISABLE
+            # html.Div(id="opportunities-asset-detail-sections"),
         ],
         className="workspace-wrapper",
     )

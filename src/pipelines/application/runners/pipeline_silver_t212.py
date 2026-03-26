@@ -10,7 +10,6 @@ import json
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
-from datetime import datetime, UTC
 from typing import List, Dict, Any
 
 from ...application.policies import Pipeline
@@ -44,6 +43,7 @@ def _reject(
             error_message=error_message,
         )
     )
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -94,14 +94,22 @@ class Trading212AssetTransformationSilver(Transformation):
                 try:
                     positions = json.loads(positions)
                 except json.JSONDecodeError as e:
-                    _reject(self._parse_errors, snapshot_id, positions, "JSONDecodeError", str(e))
+                    _reject(
+                        self._parse_errors,
+                        snapshot_id,
+                        positions,
+                        "JSONDecodeError",
+                        str(e),
+                    )
                     continue
 
             for pos in positions:
                 if not isinstance(pos, dict):
                     pos_str = str(pos)
                     _reject(
-                        self._parse_errors, snapshot_id, pos_str,
+                        self._parse_errors,
+                        snapshot_id,
+                        pos_str,
                         "InvalidPositionEntry",
                         f"Expected dict, got {type(pos).__name__}: {pos_str[:100]}",
                     )
@@ -134,7 +142,6 @@ class Trading212AssetTransformationSilver(Transformation):
                         "snapshot_id": snapshot_id,
                         "business_key": f"{snapshot_id}_{full_ticker}_{ingested_timestamp}",
                         "data_timestamp": ingested_timestamp,
-                        "updated_timestamp": datetime.now(UTC),
                     }
                 )
         return records
@@ -154,7 +161,13 @@ class Trading212AccountTransformationSilver(Transformation):
                 try:
                     account = json.loads(account)
                 except json.JSONDecodeError as e:
-                    _reject(self._parse_errors, row.snapshot_id, account, "JSONDecodeError", str(e))
+                    _reject(
+                        self._parse_errors,
+                        row.snapshot_id,
+                        account,
+                        "JSONDecodeError",
+                        str(e),
+                    )
                     continue
             if not account:
                 continue
@@ -183,7 +196,6 @@ class Trading212AccountTransformationSilver(Transformation):
                     "snapshot_id": row.snapshot_id,
                     "business_key": f"{external_id}_{currency}_{row.ingested_timestamp}",
                     "data_timestamp": row.ingested_timestamp,
-                    "updated_timestamp": datetime.now(UTC),
                 }
             )
         return records
