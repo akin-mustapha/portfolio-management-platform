@@ -6,12 +6,13 @@ class PostgresAssetRepository(BaseTableRepository):
         # Domain field -> DB column mapping
         field_map = {
             "id": "id",
-            "external_id": "external_id",  # TODO: verify DB column name against portfolio schema
+            "ticker": "ticker",
             "name": "name",
-            "description": "description",
-            "source_name": "source_name",  # TODO: verify DB column name against portfolio schema
+            "broker": "broker",
+            "currency": "currency",
             "is_active": "is_active",
-            "created_timestamp": "from_timestamp",  # TODO: verify DB column name against portfolio schema
+            "from_timestamp": "from_timestamp",
+            "to_timestamp": "to_timestamp",
             "updated_timestamp": "updated_timestamp",
         }
 

@@ -3,21 +3,27 @@ from dataclasses import dataclass
 
 @dataclass
 class Asset:
-    # NOTE: domain rule — external_id and source_name are required; id is None until persisted
-    id: int | None
-    external_id: str
+    # NOTE: domain rule — ticker and name are required; id is None until persisted
+    id: str | None
+    ticker: str
     name: str
-    description: str
-    source_name: str
-    created_timestamp: str
+    broker: str | None
+    currency: str | None
+    is_active: bool = True
+    from_timestamp: str | None = None
+    to_timestamp: str | None = None
+    updated_timestamp: str | None = None
 
     def to_record(self):
         return {
-            "external_id": self.external_id,
+            "ticker": self.ticker,
             "name": self.name,
-            "description": self.description,
-            "source_name": self.source_name,
-            "created_timestamp": self.created_timestamp,
+            "broker": self.broker,
+            "currency": self.currency,
+            "is_active": self.is_active,
+            "from_timestamp": self.from_timestamp,
+            "to_timestamp": self.to_timestamp,
+            "updated_timestamp": self.updated_timestamp,
         }
 
 

@@ -154,6 +154,18 @@ class PortfolioService:
             logging.error(f"Error searching tags by asset: {e}")
             raise
 
+    def search_tag_by_asset_id(self, asset_id: str):
+        asset_tag_repo = self._repo_factory.get("asset_tag")
+
+        if not asset_id:
+            raise ValueError("asset_id is required to search tags.")
+
+        try:
+            return asset_tag_repo.select_all_by({"asset_id": asset_id})
+        except Exception as e:
+            logging.error(f"Error searching tags by asset_id: {e}")
+            raise
+
     def get_all_tags(self):
         tag_repo = self._repo_factory.get("tag")
         result = tag_repo.select_all()
@@ -174,3 +186,20 @@ class PortfolioService:
     def get_asset_by_name(self, name: str):
         asset_repo = self._repo_factory.get("asset")
         return asset_repo.select({"name": name})
+
+    def get_asset_by_ticker(
+        self,
+        ticker: str,
+        broker: str | None = None,
+        currency: str | None = None,
+    ):
+        if not ticker:
+            return None
+
+        asset_repo = self._repo_factory.get("asset")
+        params = {"ticker": ticker}
+        if broker:
+            params["broker"] = broker
+        if currency:
+            params["currency"] = currency
+        return asset_repo.select(params)

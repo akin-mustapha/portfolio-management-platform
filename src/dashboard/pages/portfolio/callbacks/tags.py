@@ -63,9 +63,13 @@ def save_modal_tag(n_clicks, tag_id, ticker, cached_data):
         (cached_data or {}).get("view_model", {}).get("asset_table", {}).get("rows", [])
     )
     asset_row = next((r for r in asset_rows if r.get("ticker") == ticker), {})
-    asset_name = asset_row.get("name", "")
-    if tag_id and asset_name:
-        AssetProfileController().assign_tag(asset_name, tag_id)
+    if tag_id and ticker:
+        AssetProfileController().assign_tag(
+            ticker=ticker,
+            tag_id=tag_id,
+            broker=asset_row.get("broker"),
+            currency=asset_row.get("currency"),
+        )
         return "Saved ✓", _MODAL_HIDE
     return "Nothing to save.", no_update
 
