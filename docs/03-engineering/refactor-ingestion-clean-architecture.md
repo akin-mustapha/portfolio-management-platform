@@ -1,6 +1,7 @@
 # Refactor: Ingestion Clean Architecture
 
 > **Status: Completed** — Implemented on branch `ingestion-cleanup-dead-code`. Retained as an ADR.
+> **Historical note:** This document captures the migration from legacy `src/backend/ingestion` paths. Current runtime pipeline code lives in `src/pipelines`.
 
 Restructure `src/backend/ingestion/` to comply with clean architecture — single `application/` and `infrastructure/` layer, flatten event modules.
 

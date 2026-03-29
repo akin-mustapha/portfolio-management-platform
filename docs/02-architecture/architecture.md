@@ -47,7 +47,7 @@ Sits above the backend — coordinates it, doesn't contain business logic.
 
 ## Backend (`src/backend/` and `src/pipelines/`)
 
-**Pipelines** (`src/pipelines/`) — Pulls data from Trading212. Loads into raw, transforms through staging, computes and writes to analytics (gold). Replaced `src/backend/ingestion/` after the pipeline restructure (PR #172).
+**Pipelines** (`src/pipelines/`) — Pulls data from Trading212. Loads into raw, transforms through staging, computes and writes to analytics (gold).
 
 - `domain/` — core models: Data and Event; Pydantic schemas per layer (bronze/, silver/, gold/)
 - `application/` — protocols, policies, all pipeline logic (bronze, silver, gold, loaders, events)
@@ -55,7 +55,7 @@ Sits above the backend — coordinates it, doesn't contain business logic.
 - `factories/` — PipelineFactory and EventProducerFactory registries
 
 **Services** (`src/backend/services/`) — Business logic layer between storage and frontend.
-Currently: `portfolio/` service.
+Current domains: `portfolio/`, `credentials/`, and `rebalancing/`.
 
 - `domain/` — entities: Asset, Tag, Category, AssetTag, Industry, Sector
 - `application/` — use case interfaces and repository contracts (protocols)

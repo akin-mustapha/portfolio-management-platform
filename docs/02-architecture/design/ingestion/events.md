@@ -7,13 +7,13 @@ name: Event
 ## Event Consumer
 
 ```sh
-  python3 -m backend.ingestion.infrastructure.kafka.consumer_main
+  python3 -m pipelines.infrastructure.kafka.consumer_main
 ```
 
 ## Event Producer
 
 ```python
-from backend.ingestion.factories.event_producer_factory import EventProducerFactory
+from pipelines.factories.event_producer_factory import EventProducerFactory
 
 if __name__ == "__main__":
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 ## Ingestion
 
 ```python
-from backend.ingestion.factories.pipeline_factory import PipelineFactory
+from pipelines.factories.pipeline_factory import PipelineFactory
 
 if __name__ == "__main__":
 
