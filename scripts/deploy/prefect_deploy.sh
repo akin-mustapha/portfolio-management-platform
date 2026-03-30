@@ -4,10 +4,18 @@ set -e
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+cd "$ROOT"
+
 echo -e "${GREEN}Activating virtual environment...${NC}"
 source venv/bin/activate
 
 mkdir -p logs
+
+# Workers require PREFECT_API_URL (see Prefect worker base.py setup).
+export PREFECT_API_URL="${PREFECT_API_URL:-http://127.0.0.1:4200/api}"
+# Flow modules use `from pipelines...` etc.; match tests (PYTHONPATH=src).
+export PYTHONPATH="${ROOT}/src${PYTHONPATH:+:$PYTHONPATH}"
 
 echo -e "${GREEN}Starting Prefect server...${NC}"
 prefect server start > logs/prefect_server.log 2>&1 & SERVER_PID=$!
