@@ -69,7 +69,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                         style={"cursor": "pointer"},
                     ),
                     secondary_kpi_row(kpi_data, theme=theme),
-                    _cash_bar(kpi_data),
+                    # _cash_bar(kpi_data),
                     dbc.Collapse(
                         id="portfolio-charts-collapse",
                         is_open=False,

@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 from shared.utils.custom_logger import customer_logger
 from shared.notifications.email import EmailClient
 
-from .domain.entities import RebalanceConfig, RebalancePlan
-from .infrastructure.repositories.repository_factory import RebalancingRepositoryFactory
-from .plan_generator import generate_plan
+from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
+from backend.infrastructure.rebalancing.repository_factory import RebalancingRepositoryFactory
+from backend.application.rebalancing.plan_generator import generate_plan
 
 load_dotenv()
 
@@ -27,10 +28,14 @@ class RebalancingService:
                 id=str(r["id"]) if r["id"] is not None else None,
                 asset_id=str(r["asset_id"]),
                 ticker=r["ticker"],
-                target_weight_pct=float(r["target_weight_pct"]),
-                min_weight_pct=float(r["min_weight_pct"]),
-                max_weight_pct=float(r["max_weight_pct"]),
-                rebalance_threshold_pct=float(r["rebalance_threshold_pct"]),
+                weight_band=WeightBand(
+                    target=float(r["target_weight_pct"]),
+                    min=float(r["min_weight_pct"]),
+                    max=float(r["max_weight_pct"]),
+                ),
+                rebalance_threshold=RebalanceThreshold(
+                    float(r["rebalance_threshold_pct"])
+                ),
                 correction_days=int(r["correction_days"]),
                 is_active=bool(r["is_active"]),
             )

@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
-from .domain.entities import RebalanceConfig, RebalancePlan
+from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from backend.domain.rebalancing.value_objects import PlanStatus
 
 
 def generate_plan(
@@ -73,7 +74,7 @@ def generate_plan(
         id=None,
         created_date=date.today().isoformat(),
         target_completion_date=completion_date,
-        status="draft",
+        status=PlanStatus("draft"),
         plan_json=plan_json,
         email_sent=False,
     )
