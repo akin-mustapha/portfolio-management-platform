@@ -3,7 +3,14 @@ Portfolio Service Module
 """
 
 from backend.infrastructure.portfolio.repository_factory import RepositoryFactory
-from backend.domain.portfolio.entities import Asset, AssetTag, Tag, Category, Industry, Sector
+from backend.domain.portfolio.entities import (
+    Asset,
+    AssetTag,
+    Tag,
+    Category,
+    Industry,
+    Sector,
+)
 
 from shared.utils.custom_logger import customer_logger
 

@@ -2,7 +2,7 @@
 Tests for generate_plan — a pure function with no DB access.
 All cases can be driven by constructing domain objects directly.
 """
-import pytest
+
 from datetime import date, timedelta
 
 from backend.domain.rebalancing.entities import RebalanceConfig
@@ -10,12 +10,20 @@ from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThresh
 from backend.application.rebalancing.plan_generator import generate_plan
 
 
-def _config(ticker: str, target: float, threshold: float, correction_days: int = 5, is_active: bool = True) -> RebalanceConfig:
+def _config(
+    ticker: str,
+    target: float,
+    threshold: float,
+    correction_days: int = 5,
+    is_active: bool = True,
+) -> RebalanceConfig:
     return RebalanceConfig(
         id=None,
         asset_id="asset-1",
         ticker=ticker,
-        weight_band=WeightBand(target=target, min=max(0.0, target - 10), max=min(100.0, target + 10)),
+        weight_band=WeightBand(
+            target=target, min=max(0.0, target - 10), max=min(100.0, target + 10)
+        ),
         rebalance_threshold=RebalanceThreshold(threshold),
         correction_days=correction_days,
         is_active=is_active,

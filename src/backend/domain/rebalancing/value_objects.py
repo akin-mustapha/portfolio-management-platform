@@ -25,9 +25,7 @@ class RebalanceThreshold:
 
     def __post_init__(self):
         if self.value <= 0.0:
-            raise ValueError(
-                f"RebalanceThreshold must be > 0.0, got {self.value}"
-            )
+            raise ValueError(f"RebalanceThreshold must be > 0.0, got {self.value}")
 
 
 @dataclass(frozen=True)
