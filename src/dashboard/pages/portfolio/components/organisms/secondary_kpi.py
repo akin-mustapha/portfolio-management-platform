@@ -35,8 +35,6 @@ def secondary_kpi_row(data=None, theme="light"):
 
 
 def secondary_asset_kpi_row(ticker: str, metadata: dict):
-    industry = metadata.get("industry") or "—"
-    sector = metadata.get("sector") or "—"
     price = metadata.get("price")
     avg_price = metadata.get("avg_price")
     price_str = f"{price:.2f}" if price is not None else "—"

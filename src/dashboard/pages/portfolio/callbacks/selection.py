@@ -17,7 +17,6 @@ from dash.exceptions import PreventUpdate
 
 from ..tabs.tab_asset_profile import _empty_state
 
-from ..components.atoms.badges import _kpi_badge
 from ..charts.portfolio_charts import _ranked_panel, PortfolioPerformanceScatterPlot
 from ..charts.asset_charts import (
     AssetValuePlotlyLineChart,
@@ -35,8 +34,6 @@ from ._helpers import (
     _fetch_asset_metadata,
     _build_compare_rows,
     _chart_card,
-    _fmt_signed,
-    _draggable,
     _compute_portfolio_return,
     _KNOWN_NS,
     _ASSET_MODIFIERS,

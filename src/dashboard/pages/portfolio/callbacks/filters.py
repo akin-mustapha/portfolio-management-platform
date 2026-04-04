@@ -15,8 +15,6 @@ from ._helpers import (
     _fetch_snapshots,
     _fetch_asset_metadata,
     _build_compare_rows,
-    _VALUATION_METRICS,
-    _RISK_METRICS,
 )
 
 # ── 3. Timeframe change → update KPIs + all tabs ──────────────────
