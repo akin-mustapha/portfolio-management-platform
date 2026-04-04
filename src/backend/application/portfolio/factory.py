@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 
 from shared.utils.custom_logger import customer_logger
-from backend.services.portfolio.service import PortfolioService
+from backend.application.portfolio.service import PortfolioService
 
 logging = customer_logger("Portfolio Service")
 load_dotenv()

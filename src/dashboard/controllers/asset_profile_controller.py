@@ -1,4 +1,4 @@
-from backend.services.portfolio.portfolio_service_builder import build_portfolio_service
+from backend.application.portfolio.factory import build_portfolio_service
 from ..presenters.asset_profile_presenter import AssetProfilePresenter
 
 

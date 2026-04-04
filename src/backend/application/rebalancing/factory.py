@@ -1,4 +1,4 @@
-from backend.services.rebalancing.service import RebalancingService
+from backend.application.rebalancing.service import RebalancingService
 
 
 def build_rebalancing_service() -> RebalancingService:

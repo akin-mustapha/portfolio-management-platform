@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from backend.services.credentials.repository import CredentialsRepository
+from backend.infrastructure.credentials.repository import CredentialsRepository
 
 credentials_bp = Blueprint("credentials", __name__)
 

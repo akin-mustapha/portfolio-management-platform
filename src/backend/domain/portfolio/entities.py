@@ -1,14 +1,16 @@
 from dataclasses import dataclass
 
+from .value_objects import Ticker, Currency, Broker
+
 
 @dataclass
 class Asset:
     # NOTE: domain rule — ticker and name are required; id is None until persisted
     id: str | None
-    ticker: str
+    ticker: Ticker
     name: str
-    broker: str | None
-    currency: str | None
+    broker: Broker | None
+    currency: Currency | None
     is_active: bool = True
     from_timestamp: str | None = None
     to_timestamp: str | None = None
@@ -16,10 +18,10 @@ class Asset:
 
     def to_record(self):
         return {
-            "ticker": self.ticker,
+            "ticker": str(self.ticker),
             "name": self.name,
-            "broker": self.broker,
-            "currency": self.currency,
+            "broker": str(self.broker) if self.broker is not None else None,
+            "currency": str(self.currency) if self.currency is not None else None,
             "is_active": self.is_active,
             "from_timestamp": self.from_timestamp,
             "to_timestamp": self.to_timestamp,

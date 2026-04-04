@@ -14,7 +14,7 @@ load_dotenv()
 # Fall back to .env so existing pipeline runs keep working if no DB row exists yet.
 def _load_credentials():
     try:
-        from backend.services.credentials.repository import CredentialsRepository
+        from backend.infrastructure.credentials.repository import CredentialsRepository
 
         row = CredentialsRepository().load("trading212")
         if row and row.get("api_key"):
