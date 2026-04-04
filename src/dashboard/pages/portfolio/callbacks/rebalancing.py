@@ -3,10 +3,9 @@
 from dash import callback, html, Input, Output, State, ALL, no_update
 from dash.exceptions import PreventUpdate
 
-from backend.services.rebalancing.rebalancing_service_builder import (
-    build_rebalancing_service,
-)
-from backend.services.rebalancing.domain.entities import RebalanceConfig
+from backend.application.rebalancing.factory import build_rebalancing_service
+from backend.domain.rebalancing.entities import RebalanceConfig
+from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
 
 from ..components.organisms.rebalance_panel import (
     build_asset_sliders,
@@ -133,13 +132,17 @@ def on_save_configs(n_clicks, values, ids, store_data, current_ticker):
                 id=existing.get("id"),
                 asset_id=asset_id,
                 ticker=ticker,
-                target_weight_pct=target,
-                min_weight_pct=max(0.0, target - band),
-                max_weight_pct=min(50.0, target + band),
-                rebalance_threshold_pct=float(
-                    fields.get(
-                        "rebalance_threshold_pct",
-                        existing.get("rebalance_threshold_pct", 2.0),
+                weight_band=WeightBand(
+                    target=target,
+                    min=max(0.0, target - band),
+                    max=min(50.0, target + band),
+                ),
+                rebalance_threshold=RebalanceThreshold(
+                    float(
+                        fields.get(
+                            "rebalance_threshold_pct",
+                            existing.get("rebalance_threshold_pct", 2.0),
+                        )
                     )
                 ),
                 correction_days=int(

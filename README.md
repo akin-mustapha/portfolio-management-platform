@@ -23,7 +23,7 @@ Four layers, each with a single responsibility:
 ```
 Frontend        src/dashboard/            Dash UI — reads from services
 Orchestration   src/orchestration/        Prefect — schedules pipelines
-Backend         src/backend/ingestion/    ETL pipelines and Kafka events
+Backend         src/pipelines/    ETL pipelines and Kafka events
                 src/backend/services/     Portfolio domain logic
 Storage         raw → staging → analytics (Postgres, 3 schemas)
 ```
@@ -128,7 +128,7 @@ docker exec -it kafka kafka-topics \
 
 ```sh
 cd src
-python -m dashboard.app_2
+python -m dashboard.app
 ```
 
 ### Pipelines (via Prefect)
@@ -141,7 +141,7 @@ python -m dashboard.app_2
 
 ```sh
 cd src
-python3 -m backend.ingestion.pipelines.pipeline_account_bronze
+python3 -m pipelines.application.runners.pipeline_account_bronze
 ```
 
 ---
@@ -152,8 +152,8 @@ python3 -m backend.ingestion.pipelines.pipeline_account_bronze
 src/
 ├── dashboard/          # Frontend — Dash UI
 ├── orchestration/      # Orchestration — Prefect flows
+├── pipelines/          # ETL pipelines, Kafka producer/consumer
 ├── backend/
-│   ├── ingestion/      # ETL pipelines, Kafka producer/consumer
 │   └── services/       # Portfolio domain logic
 ├── shared/             # Database client, migrations, utilities
 └── config/             # App and environment configuration

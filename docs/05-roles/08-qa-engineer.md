@@ -18,7 +18,7 @@
 - `tests/` — all test files
 - `.github/workflows/` — CI configuration
 - `src/backend/services/` — highest priority for test coverage
-- `src/backend/ingestion/` — pipeline transformation tests
+- `src/pipelines/` — pipeline transformation tests
 
 **Why** — Currently there are no tests for `rebalancing_service`, `portfolio_service`, silver/gold pipelines, or dashboard callbacks. Bugs in these areas surface only in production.
 

@@ -9,10 +9,33 @@ from ..charts.portfolio_charts import (
     PortfolioPNLPlotlyLineChart,
     PositionWeightPlotlyDonutChart,
     PortfolioFXAttributionDonutChart,
+    PositionConcentrationTreemapChart,
     daily_movers_table,
 )
 from ..components.organisms.secondary_kpi import secondary_kpi_row
 from ._helpers import _GRAPH_CONFIG, _chart_section, _loading_placeholder
+
+
+def _cash_bar(kpi_data):
+    """Thin progress bar showing available cash as % of total portfolio value."""
+    if not kpi_data:
+        return html.Div()
+    value = kpi_data.get("value") or 0
+    cash = kpi_data.get("cash") or 0
+    if value <= 0:
+        return html.Div()
+    pct = min(cash / value * 100, 100)
+    currency = kpi_data.get("currency_symbol", "")
+    label = f"Dry Powder  {pct:.1f}%  ({currency}{cash:,.2f} available)"
+    return html.Div(
+        dbc.Progress(
+            value=pct,
+            label=label,
+            style={"height": "18px", "fontSize": "11px"},
+            color="primary",
+        ),
+        style={"padding": "4px 12px 2px"},
+    )
 
 
 def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
@@ -28,6 +51,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
     position_weight_series = _position_weight_data.get("series", [])
     position_weight_avg = _position_weight_data.get("avg_weight_pct", 0)
     fx_attribution = view_model.get("portfolio_fx_attribution", {})
+    position_distribution = view_model.get("position_distribution", [])
     winners = view_model.get("winners", [])
     losers = view_model.get("losers", [])
     daily_movers = view_model.get("daily_movers", [])
@@ -45,6 +69,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                         style={"cursor": "pointer"},
                     ),
                     secondary_kpi_row(kpi_data, theme=theme),
+                    # _cash_bar(kpi_data),
                     dbc.Collapse(
                         id="portfolio-charts-collapse",
                         is_open=False,
@@ -150,7 +175,19 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                                 style={"gridTemplateColumns": "1fr 1fr 25% 25%"},
                             ),
                             html.Hr(className="tv-divider"),
-                            # Row 3: Daily movers
+                            # Row 3: Concentration treemap
+                            _chart_section(
+                                "Portfolio Concentration (size = weight, colour = ROI)",
+                                dcc.Graph(
+                                    id="position_concentration_treemap",
+                                    figure=PositionConcentrationTreemapChart().render(
+                                        position_distribution, theme=theme
+                                    ),
+                                    config=_GRAPH_CONFIG,
+                                ),
+                            ),
+                            html.Hr(className="tv-divider"),
+                            # Row 4: Daily movers
                             html.Div(
                                 [
                                     html.Div(
@@ -170,7 +207,8 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                 className="tv-section-container",
             ),
             # ── Asset detail — populated on row selection ──────────────
-            html.Div(id="asset-detail-sections"),
+            # DISABLED
+            # html.Div(id="asset-detail-sections"),
         ],
         className="workspace-wrapper",
     )

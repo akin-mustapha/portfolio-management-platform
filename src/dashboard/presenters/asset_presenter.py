@@ -32,6 +32,8 @@ class AssetPresenter:
             "asset_fx_attribution": self._asset_fx_attribution_vm(
                 data.get("asset_history", [])
             ),
+            "asset_return": self._asset_return_series_vm(data.get("asset_history", [])),
+            "asset_daily_return": self._asset_daily_return_series_vm(data.get("asset_history", [])),
         }
 
     # ---------- Table ----------
@@ -93,4 +95,16 @@ class AssetPresenter:
         return {
             "fx_impact": latest.get("fx_impact") or 0,
             "profit": latest.get("profit") or 0,
+        }
+
+    def _asset_return_series_vm(self, rows: list[dict]) -> dict:
+        return {
+            "dates": [r["data_date"] for r in rows],
+            "values": [r.get("cumulative_value_return") for r in rows],
+        }
+
+    def _asset_daily_return_series_vm(self, rows: list[dict]) -> dict:
+        return {
+            "dates": [r["data_date"] for r in rows],
+            "values": [r.get("daily_value_return") for r in rows],
         }

@@ -45,17 +45,17 @@ infrastructure/  — SQL queries against analytics schema
 Prefect. Defines when and in what order pipelines run.
 Sits above the backend — coordinates it, doesn't contain business logic.
 
-## Backend (`src/backend/`)
+## Backend (`src/backend/` and `src/pipelines/`)
 
-**Ingestion** (`src/backend/ingestion/`) — Pulls data from Trading212 via events and pipelines. Loads into raw, transforms through to staging.
+**Pipelines** (`src/pipelines/`) — Pulls data from Trading212. Loads into raw, transforms through staging, computes and writes to analytics (gold).
 
-- `domain/` — core models: Data and Event
-- `application/` — protocols, policies, all pipeline logic (bronze, silver, loaders, events)
+- `domain/` — core models: Data and Event; Pydantic schemas per layer (bronze/, silver/, gold/)
+- `application/` — protocols, policies, all pipeline logic (bronze, silver, gold, loaders, events)
 - `infrastructure/` — external integrations: Trading212 API client, Kafka producer/consumer, database repositories
 - `factories/` — PipelineFactory and EventProducerFactory registries
 
 **Services** (`src/backend/services/`) — Business logic layer between storage and frontend.
-Currently: `portfolio/` service.
+Current domains: `portfolio/`, `credentials/`, and `rebalancing/`.
 
 - `domain/` — entities: Asset, Tag, Category, AssetTag, Industry, Sector
 - `application/` — use case interfaces and repository contracts (protocols)

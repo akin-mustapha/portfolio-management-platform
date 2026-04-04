@@ -21,17 +21,17 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.execute("""
         ALTER TABLE portfolio.industry
-        ADD COLUMN is_active Boolean DEFAULT (true);
+        ADD COLUMN IF NOT EXISTS is_active Boolean DEFAULT (true);
 
         ALTER TABLE portfolio.industry_history
-        ADD COLUMN is_active Boolean DEFAULT (true);
+        ADD COLUMN IF NOT EXISTS is_active Boolean DEFAULT (true);
 
 
         ALTER TABLE portfolio.sector
-        ADD COLUMN is_active Boolean DEFAULT(true);
+        ADD COLUMN IF NOT EXISTS is_active Boolean DEFAULT(true);
 
         ALTER TABLE portfolio.sector_history
-        ADD COLUMN is_active Boolean DEFAULT(true);
+        ADD COLUMN IF NOT EXISTS is_active Boolean DEFAULT(true);
 
         DROP TABLE IF EXISTS portfolio.asset_tag;
         DROP TABLE IF EXISTS portfolio.asset;
@@ -105,16 +105,26 @@ def upgrade() -> None:
         CREATE OR REPLACE TRIGGER industry_versioning BEFORE DELETE OR UPDATE ON portfolio.industry FOR EACH ROW EXECUTE FUNCTION portfolio.industry_history();
 
         ALTER TABLE portfolio.category
-        ADD COLUMN description varchar NULL;
+        ADD COLUMN IF NOT EXISTS description varchar NULL;
 
         ALTER TABLE portfolio.category
-        ADD COLUMN is_active boolean Default true;
+        ADD COLUMN IF NOT EXISTS is_active boolean Default true;
 
         ALTER TABLE portfolio.category_history
-        ADD COLUMN description varchar;
+        ADD COLUMN IF NOT EXISTS description varchar;
 
-        ALTER TABLE portfolio.sector
-        ADD CONSTRAINT unq_sector_name UNIQUE(name);
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM pg_constraint
+                WHERE conname = 'unq_sector_name'
+                  AND conrelid = 'portfolio.sector'::regclass
+            ) THEN
+                ALTER TABLE portfolio.sector
+                ADD CONSTRAINT unq_sector_name UNIQUE(name);
+            END IF;
+        END $$;
 
         ALTER TABLE portfolio.category_history
         ALTER COLUMN is_active DROP NOT NULL;

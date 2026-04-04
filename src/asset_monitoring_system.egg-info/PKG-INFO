@@ -2,6 +2,7 @@ Metadata-Version: 2.4
 Name: asset_monitoring_system
 Version: 0.1.0
 Requires-Python: >=3.11
+License-File: LICENSE
 Requires-Dist: pydantic
 Requires-Dist: python-dotenv
 Requires-Dist: httpx
@@ -21,3 +22,4 @@ Requires-Dist: pandas
 Requires-Dist: dash-bootstrap-components
 Requires-Dist: nbformat>=4.2.0
 Requires-Dist: confluent-kafka
+Dynamic: license-file

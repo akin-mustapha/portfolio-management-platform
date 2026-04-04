@@ -533,6 +533,67 @@ class PositionWeightPlotlyDonutChart:
         return fig
 
 
+class PositionConcentrationTreemapChart:
+    """
+    Treemap of portfolio concentration.
+    Tile size = position weight; colour = ROI % (red → green, midpoint 0).
+    Data: list of {ticker, weight_pct, roi_pct, profit, value, name}
+    """
+
+    def render(self, data, theme="light"):
+        ct = CHART_THEMES.get(theme, CHART_THEMES["light"])
+        if not data:
+            return go.Figure()
+
+        df = pd.DataFrame(data)
+        df = df[df["weight_pct"] > 0].copy()
+        if df.empty:
+            return go.Figure()
+
+        roi = df["roi_pct"].fillna(0)
+        abs_max = max(abs(roi).max(), 0.01)
+
+        fig = go.Figure(
+            go.Treemap(
+                labels=df["ticker"],
+                parents=[""] * len(df),
+                values=df["weight_pct"],
+                customdata=list(
+                    zip(df["name"], df["value"], df["profit"], df["roi_pct"])
+                ),
+                hovertemplate=(
+                    "<b>%{label}</b><br>"
+                    "%{customdata[0]}<br>"
+                    "Weight: %{value:.2f}%<br>"
+                    "Value: £%{customdata[1]:,.2f}<br>"
+                    "P&L: £%{customdata[2]:,.2f}<br>"
+                    "ROI: %{customdata[3]:.2f}%"
+                    "<extra></extra>"
+                ),
+                marker=dict(
+                    colors=roi,
+                    colorscale=[
+                        [0, "#c62828"],
+                        [0.5, ct["plot_bgcolor"]],
+                        [1, "#2e7d32"],
+                    ],
+                    cmin=-abs_max,
+                    cmax=abs_max,
+                    line=dict(width=1, color=ct["paper_bgcolor"]),
+                ),
+                textfont=dict(size=11, color=ct["font_color"]),
+                textposition="middle center",
+            )
+        )
+        fig.update_layout(
+            height=280,
+            margin=dict(l=2, r=2, t=2, b=2),
+            paper_bgcolor=ct["paper_bgcolor"],
+            font=dict(size=10, color=ct["font_color"]),
+        )
+        return fig
+
+
 class PositionProfitabilityPlotlyDonutChart:
     def render(self, data, theme="light"):
         ct = CHART_THEMES.get(theme, CHART_THEMES["light"])

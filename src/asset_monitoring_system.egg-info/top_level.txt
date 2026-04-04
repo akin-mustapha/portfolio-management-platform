@@ -3,4 +3,5 @@ config
 dashboard
 logs
 orchestration
+pipelines
 shared

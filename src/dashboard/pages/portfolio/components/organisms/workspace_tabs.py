@@ -33,6 +33,13 @@ def workspace_tabs(view_model=None, theme="light"):
                 children=portfolio_tab_content(view_model, theme),
             ),
             dbc.Tab(
+                label="Asset Profile",
+                tab_id="tab-tags",
+                tab_class_name="workspace-tab",
+                active_tab_class_name="workspace-tab--active",
+                children=asset_profile_tab_content(),
+            ),
+            dbc.Tab(
                 label="Risk",
                 tab_id="tab-risk",
                 tab_class_name="workspace-tab",
@@ -45,13 +52,6 @@ def workspace_tabs(view_model=None, theme="light"):
                 tab_class_name="workspace-tab",
                 active_tab_class_name="workspace-tab--active",
                 children=opportunities_tab_content(view_model, theme),
-            ),
-            dbc.Tab(
-                label="Asset Profile",
-                tab_id="tab-tags",
-                tab_class_name="workspace-tab",
-                active_tab_class_name="workspace-tab--active",
-                children=asset_profile_tab_content(),
             ),
         ],
     )

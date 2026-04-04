@@ -182,12 +182,15 @@ class PostgresSnapshotQueryRepository:
             COALESCE(fv.fx_impact, 0)                     AS fx_impact,
             ft.volatility_30d,
             ft.value_drawdown_pct_30d,
+            fr.cumulative_value_return,
+            fr.daily_value_return,
             TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
         FROM analytics.fact_valuation fv
         JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id
         JOIN analytics.fact_price fp ON fp.asset_id = fv.asset_id AND fp.date_id = fv.date_id
         LEFT JOIN analytics.fact_technical ft ON ft.asset_id = fv.asset_id AND ft.date_id = fv.date_id
         LEFT JOIN analytics.fact_signal fs ON fs.asset_id = fv.asset_id AND fs.date_id = fv.date_id
+        LEFT JOIN analytics.fact_return fr ON fr.asset_id = fv.asset_id AND fr.date_id = fv.date_id
         WHERE TO_DATE(fv.date_id::TEXT, 'YYYYMMDD') BETWEEN :start_date AND :end_date
           AND LOWER(da.ticker) = :ticker
         ORDER BY fv.date_id ASC

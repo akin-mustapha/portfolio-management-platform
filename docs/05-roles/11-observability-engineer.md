@@ -15,7 +15,7 @@
 - A pipeline ran but produced no output (silent failure)
 
 **Where**
-- `src/backend/ingestion/` — pipeline logging
+- `src/pipelines/` — pipeline logging
 - Prefect UI — flow run monitoring
 - Log files (current) → structured JSON logs (target)
 - `src/orchestration/` — Prefect flow definitions
