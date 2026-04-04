@@ -2,13 +2,13 @@
 RebalancingService unit tests — all repository calls are mocked.
 No database connection is required.
 """
+
 import pytest
 from unittest.mock import MagicMock, patch
 
 from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold, PlanStatus
+from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
 from backend.application.rebalancing.service import RebalancingService
-
 
 _RAW_CONFIG_ROW = {
     "id": "cfg-1",
@@ -79,7 +79,9 @@ class TestGenerateAndSavePlan:
         config_repo.select_all_active_with_ticker.return_value = [_RAW_CONFIG_ROW]
 
         plan_repo = MagicMock()
-        plan_repo.load_current_weights.return_value = {"AAPL": 20.0}  # drift = 10 > threshold 2
+        plan_repo.load_current_weights.return_value = {
+            "AAPL": 20.0
+        }  # drift = 10 > threshold 2
         plan_repo.get_latest.return_value = {"id": "plan-1"}
 
         mock_factory.get_config_repo.return_value = config_repo
@@ -107,7 +109,9 @@ class TestGenerateAndSavePlan:
         config_repo.select_all_active_with_ticker.return_value = [_RAW_CONFIG_ROW]
 
         plan_repo = MagicMock()
-        plan_repo.load_current_weights.return_value = {"AAPL": 10.5}  # drift 0.5 < threshold 2.0
+        plan_repo.load_current_weights.return_value = {
+            "AAPL": 10.5
+        }  # drift 0.5 < threshold 2.0
 
         mock_factory.get_config_repo.return_value = config_repo
         mock_factory.get_plan_repo.return_value = plan_repo
@@ -131,7 +135,9 @@ class TestGenerateAndSavePlan:
         mock_factory.get_plan_repo.return_value = plan_repo
 
         with patch("backend.application.rebalancing.service.EmailClient") as MockEmail:
-            MockEmail.return_value.send.side_effect = smtplib.SMTPException("SMTP error")
+            MockEmail.return_value.send.side_effect = smtplib.SMTPException(
+                "SMTP error"
+            )
             result = service.generate_and_save_plan()
 
         # Plan must be saved even when email fails

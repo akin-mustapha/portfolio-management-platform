@@ -86,7 +86,9 @@ class TestApplicationRebalancingImports:
 
 class TestInfrastructurePortfolioImports:
     def test_repository_factory_importable(self):
-        from backend.infrastructure.portfolio.repository_factory import RepositoryFactory
+        from backend.infrastructure.portfolio.repository_factory import (
+            RepositoryFactory,
+        )
 
         assert RepositoryFactory
 

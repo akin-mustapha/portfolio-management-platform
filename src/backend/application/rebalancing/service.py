@@ -6,7 +6,9 @@ from shared.notifications.email import EmailClient
 
 from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
 from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
-from backend.infrastructure.rebalancing.repository_factory import RebalancingRepositoryFactory
+from backend.infrastructure.rebalancing.repository_factory import (
+    RebalancingRepositoryFactory,
+)
 from backend.application.rebalancing.plan_generator import generate_plan
 
 load_dotenv()
