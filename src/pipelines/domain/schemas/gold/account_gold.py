@@ -43,6 +43,7 @@ class AccountGoldRecord(BaseModel):
     portfolio_volatility_weighted: Optional[float] = (
         None  # Σ(weight_i * volatility_30d_i)
     )
+    portfolio_beta_weighted: Optional[float] = None  # Σ(weight_i * beta_60d_i)
 
     # FRED metrics (fact_portfolio_daily)
     sharpe_ratio_30d: Optional[float] = None  # 30-day annualised portfolio Sharpe

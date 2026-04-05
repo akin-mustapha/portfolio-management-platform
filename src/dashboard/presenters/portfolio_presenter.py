@@ -77,6 +77,11 @@ class PortfolioPresenter:
                 if snapshot.get("portfolio_volatility_weighted") is not None
                 else None
             ),
+            "portfolio_beta": (
+                round(float(snapshot["portfolio_beta_weighted"]), 2)
+                if snapshot.get("portfolio_beta_weighted") is not None
+                else None
+            ),
             "sharpe_ratio_30d": (
                 round(snapshot["sharpe_ratio_30d"], 2)
                 if snapshot.get("sharpe_ratio_30d") is not None

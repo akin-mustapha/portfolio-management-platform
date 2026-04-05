@@ -158,6 +158,7 @@ class PostgresSnapshotQueryRepository:
         COALESCE(fpd.daily_value_change_pct, 0)        AS daily_value_change_pct,
         COALESCE(fpd.daily_value_change_abs, 0)        AS daily_value_change_abs,
         COALESCE(fpd.fx_impact_total, 0)              AS fx_impact_total,
+        fpd.portfolio_beta_weighted,
         fpd.sharpe_ratio_30d,
         fpd.benchmark_return_daily,
         fpd.portfolio_vs_benchmark_30d

@@ -300,7 +300,11 @@ class T212GoldSource(Source):
                     SUM(
                         al.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0)
                         * COALESCE(al.volatility_30d, 0)
-                    )                                                       AS portfolio_volatility_weighted
+                    )                                                       AS portfolio_volatility_weighted,
+                    SUM(
+                        al.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0)
+                        * COALESCE(al.beta_60d, 0)
+                    )                                                       AS portfolio_beta_weighted
                 FROM asset_latest al
                 JOIN account_with_fred acc ON acc.snapshot_id = al.snapshot_id
                 WHERE al.rn = 1
@@ -386,6 +390,7 @@ class T212GoldSource(Source):
                     / NULLIF(acc.total_value, 0) * 100                      AS cash_deployment_ratio,
                 pa.fx_impact_total,
                 pa.portfolio_volatility_weighted,
+                pa.portfolio_beta_weighted,
 
                 -- fact_portfolio_daily (FRED)
                 pm.sharpe_ratio_30d                                      AS acct_sharpe_ratio_30d,
@@ -579,6 +584,7 @@ class FactPortfolioDailyDestination(Destination):
         "cash_deployment_ratio",
         "fx_impact_total",
         "portfolio_volatility_weighted",
+        "portfolio_beta_weighted",
         "sharpe_ratio_30d",
         "benchmark_return_daily",
         "portfolio_vs_benchmark_30d",
