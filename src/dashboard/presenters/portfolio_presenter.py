@@ -77,6 +77,21 @@ class PortfolioPresenter:
                 if snapshot.get("portfolio_volatility_weighted") is not None
                 else None
             ),
+            "sharpe_ratio_30d": (
+                round(snapshot["sharpe_ratio_30d"], 2)
+                if snapshot.get("sharpe_ratio_30d") is not None
+                else None
+            ),
+            "benchmark_return_daily": (
+                round(float(snapshot["benchmark_return_daily"]) * 100, 3)
+                if snapshot.get("benchmark_return_daily") is not None
+                else None
+            ),
+            "portfolio_vs_benchmark_30d": (
+                round(float(snapshot["portfolio_vs_benchmark_30d"]) * 100, 2)
+                if snapshot.get("portfolio_vs_benchmark_30d") is not None
+                else None
+            ),
             "daily_change_series": self._daily_change_series(history or []),
         }
 

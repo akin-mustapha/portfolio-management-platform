@@ -285,6 +285,34 @@ def on_metric_drop(metric, all_grid_children, selected_rows, timeframe, theme, c
         fig = ChartClass().render(data, theme=current_theme, accent_color=accent)
 
         result.append(list(children or []) + [_chart_card(card_id, label, fig)])
+    value = row.get("value")
+    profit = row.get("profit")
+    pnl_pct = row.get("pnl_pct")
+    cum_ret = row.get("cumulative_value_return")
+    weight = row.get("weight_pct")
+    dca = row.get("dca_bias")
+    beta = row.get("beta_60d")
+    asset_sharpe = row.get("asset_sharpe_ratio_30d")
+
+    profit_str, profit_sign = _fmt_signed(profit, ",.2f")
+    pnl_str, pnl_sign = _fmt_signed(pnl_pct, ".2f")
+    ret_str, ret_sign = _fmt_signed(cum_ret, ".2f")
+    dca_str, dca_sign = _fmt_signed(dca, ".3f")
+    sharpe_str, sharpe_sign = _fmt_signed(asset_sharpe, ".2f")
+
+    strip = html.Div(
+        [
+            _kpi_badge("Value", f"£{value:,.2f}" if value is not None else "—"),
+            _kpi_badge("P&L", f"£{profit_str}", change_sign=profit_sign),
+            _kpi_badge("P&L %", f"{pnl_str}%", change_sign=pnl_sign),
+            _kpi_badge("Return", f"{ret_str}%", change_sign=ret_sign),
+            _kpi_badge("Weight", f"{weight:.2f}%" if weight is not None else "—"),
+            _kpi_badge("DCA Bias", dca_str, change_sign=dca_sign),
+            _kpi_badge("Beta 60D", f"{beta:.2f}" if beta is not None else "—"),
+            _kpi_badge("Sharpe 30D", sharpe_str, change_sign=sharpe_sign),
+        ],
+        className="kpi-badge-row",
+    )
 
     return result
 
