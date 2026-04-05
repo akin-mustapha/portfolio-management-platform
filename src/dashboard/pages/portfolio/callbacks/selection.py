@@ -2,22 +2,43 @@
 Selection callbacks — asset row selection, compare mode, winners/losers sort.
 """
 
-from dash import ALL, MATCH, Output, Input, State, callback, ctx, no_update, html
+from dash import (
+    ALL,
+    MATCH,
+    Output,
+    Input,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    no_update,
+)
 from dash.exceptions import PreventUpdate
 
-from ..components.atoms.badges import _kpi_badge
+from ..tabs.tab_asset_profile import _empty_state
+
 from ..charts.portfolio_charts import _ranked_panel, PortfolioPerformanceScatterPlot
-from ..charts.asset_charts import PriceWithMAPlotlyLineChart
-from ....controllers.asset_profile_controller import AssetProfileController
+from ..charts.asset_charts import (
+    AssetValuePlotlyLineChart,
+    ProfitRangePlotlyLineChart,
+    DCABiasPlotlyLineChart,
+    DailyReturnBarChart,
+    AssetVsPortfolioReturnChart,
+    RiskContextPlotlyLineChart,
+    FXReturnAttributionDonutChart,
+)
 from ....controllers.portfolio_controller import PortfolioController
 from ._helpers import (
     _date_window,
     _fetch_snapshots,
     _fetch_asset_metadata,
     _build_compare_rows,
-    _VALUATION_METRICS,
-    _RISK_METRICS,
-    _OPPS_METRICS,
+    _chart_card,
+    _compute_portfolio_return,
+    _KNOWN_NS,
+    _ASSET_MODIFIERS,
+    _ASSET_COLORS_DARK,
+    _ASSET_COLORS_LIGHT,
 )
 
 # ── 2. Asset row selection → populate asset detail sections ───────
@@ -27,53 +48,77 @@ from ._helpers import (
     Output("workspace-selected-asset", "data"),
     Output("asset-detail-sections", "children"),
     Output("risk-asset-detail-sections", "children"),
-    Output("opportunities-asset-detail-sections", "children"),
+    # Output("opportunities-asset-detail-sections", "children"),
     Input("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
     State("theme-store", "data"),
+    State("portfolio_page_asset_store", "data"),
     prevent_initial_call=True,
 )
-def on_asset_row_selected(selected_rows, timeframe, theme):
+def on_asset_row_selected(selected_rows, timeframe, theme, cached_data):
     if not selected_rows:
-        return [], None, None, None
+        return [], _empty_state(), []
 
     tickers = [r.get("ticker") for r in selected_rows if r.get("ticker")][:3]
     if not tickers:
         raise PreventUpdate
 
     current_theme = theme or "light"
+    color_map = _ASSET_COLORS_DARK if current_theme == "dark" else _ASSET_COLORS_LIGHT
     start_date, end_date = _date_window(timeframe or "1Y")
     snapshots = _fetch_snapshots(tickers, start_date, end_date)
     names_map = {
         r["ticker"]: r.get("name", "") for r in selected_rows if r.get("ticker")
     }
     metadata_map = _fetch_asset_metadata(selected_rows)
+    rows_map = {r["ticker"]: r for r in selected_rows if r.get("ticker")}
+
+    # Build portfolio return series for relative performance chart (2+ assets)
+    portfolio_return = None
+    if len(tickers) >= 2:
+        pv = (cached_data or {}).get("view_model", {}).get("portfolio_value_series", {})
+        portfolio_return = _compute_portfolio_return(pv, start_date, end_date)
+
+    # Pre-render default charts per ticker for val and risk sections
+    val_default_charts = {}
+    risk_default_charts = {}
+    for i, (ticker, snapshot) in enumerate(snapshots):
+        modifier = _ASSET_MODIFIERS[i] if i < len(_ASSET_MODIFIERS) else "asset-1"
+        accent = color_map[modifier]
+        if portfolio_return is not None:
+            data = {**snapshot, "portfolio_return": portfolio_return}
+            val_fig = AssetVsPortfolioReturnChart().render(
+                data, theme=current_theme, accent_color=accent
+            )
+            val_default_charts[ticker] = ("asset_return", "Return vs Portfolio", val_fig)
+        else:
+            val_fig = ProfitRangePlotlyLineChart().render(
+                snapshot, theme=current_theme, accent_color=accent
+            )
+            val_default_charts[ticker] = ("asset_profit", "Profit Range (30D)", val_fig)
+        risk_fig = RiskContextPlotlyLineChart().render(
+            snapshot, theme=current_theme, accent_color=accent
+        )
+        risk_default_charts[ticker] = ("asset_risk", "Risk Context", risk_fig)
 
     return (
         tickers,
         _build_compare_rows(
             snapshots,
-            _VALUATION_METRICS,
             current_theme,
             ns="val",
             names_map=names_map,
             metadata_map=metadata_map,
+            default_charts=val_default_charts,
+            rows_map=rows_map,
         ),
         _build_compare_rows(
             snapshots,
-            _RISK_METRICS,
             current_theme,
             ns="risk",
             names_map=names_map,
             metadata_map=metadata_map,
-        ),
-        _build_compare_rows(
-            snapshots,
-            _OPPS_METRICS,
-            current_theme,
-            ns="opps",
-            names_map=names_map,
-            metadata_map=metadata_map,
+            default_charts=risk_default_charts,
         ),
     )
 
@@ -151,70 +196,95 @@ def on_winners_losers_sort_change(sort_by, cached_data):
     )
 
 
-# ── 6. Asset Profile tab — populate metadata on row selection ──────
+# ── 7. Drag-to-plot: render chart for dropped metric ──────────────
 
+_DRAG_CHART_MAP = {
+    "asset_value": ("Asset Value", AssetValuePlotlyLineChart),
+    "asset_profit": ("Profit Range (30D)", ProfitRangePlotlyLineChart),
+    "asset_return": ("Return vs Portfolio", AssetVsPortfolioReturnChart),
+    "asset_daily_return": ("Daily Return", DailyReturnBarChart),
+    "asset_dca_bias": ("DCA Bias", DCABiasPlotlyLineChart),
+    "asset_risk": ("Risk Context", RiskContextPlotlyLineChart),
+    "asset_fx_attribution": ("FX Attribution", FXReturnAttributionDonutChart),
+}
 
-@callback(
-    Output("profile-ticker", "children"),
-    Output("profile-name", "children"),
-    Output("profile-description", "children"),
-    Output("profile-created", "children"),
-    Output("profile-last-ingestion", "children"),
-    Output("profile-summary-tags", "children"),
-    Output("profile-summary-category", "children"),
-    Output("profile-summary-industry", "children"),
-    Output("profile-summary-sector", "children"),
-    Input("portfolio-asset-table", "selectedRows"),
+# Bridge: hidden button click → store the metric key from JS global.
+clientside_callback(
+    "function(n) { return window._droppedMetric || ''; }",
+    Output("drop-metric-store", "data"),
+    Input("_drop-btn", "n_clicks"),
     prevent_initial_call=True,
 )
-def on_asset_profile_selected(selected_rows):
-    if not selected_rows:
-        raise PreventUpdate
-
-    asset_row = selected_rows[0]
-    vm = AssetProfileController().get_profile(asset_row)
-
-    current_tags = vm.get("current_tags", [])
-    tag_display = ", ".join(current_tags) if current_tags else "—"
-
-    return (
-        vm["ticker"],
-        vm["name"],
-        vm["description"],
-        vm["created"],
-        vm["last_ingestion"],
-        tag_display,
-        "—",  # category — assignment not yet implemented
-        "—",  # industry — assignment not yet implemented
-        "—",  # sector   — assignment not yet implemented
-    )
-
-
-# ── 7. Asset Profile — price/MA chart + snapshot strip ────────────
-
-
-def _fmt_signed(v, fmt=".2f"):
-    if v is None:
-        return "—", 0
-    sign = 1 if v > 0 else (-1 if v < 0 else 0)
-    return f"{v:{fmt}}", sign
 
 
 @callback(
-    Output("profile-snapshot-strip", "children"),
-    Output("profile-price-ma-chart", "figure"),
-    Input("portfolio-asset-table", "selectedRows"),
+    Output({"type": "asset-charts-grid", "index": ALL}, "children"),
+    Input("drop-metric-store", "data"),
+    State({"type": "asset-charts-grid", "index": ALL}, "children"),
+    State("portfolio-asset-table", "selectedRows"),
     State("workspace-timeframe", "data"),
     State("theme-store", "data"),
+    State("portfolio_page_asset_store", "data"),
     prevent_initial_call=True,
 )
-def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
-    if not selected_rows:
+def on_metric_drop(metric, all_grid_children, selected_rows, timeframe, theme, cached_data):
+    if not metric or not selected_rows:
         raise PreventUpdate
 
-    row = selected_rows[0]
-    current_theme = theme or "light"
+    chart_info = _DRAG_CHART_MAP.get(metric)
+    if not chart_info:
+        raise PreventUpdate
 
+    tickers = [r.get("ticker") for r in selected_rows if r.get("ticker")][:3]
+    if not tickers:
+        raise PreventUpdate
+
+    # Single ALL output → ctx.outputs_list is the flat list of matched dicts
+    grid_ids = [o["id"]["index"] for o in ctx.outputs_list]
+    if not grid_ids:
+        raise PreventUpdate
+
+    label, ChartClass = chart_info
+    current_theme = theme or "light"
+    color_map = _ASSET_COLORS_DARK if current_theme == "dark" else _ASSET_COLORS_LIGHT
+    start_date, end_date = _date_window(timeframe or "1Y")
+    snapshots = dict(_fetch_snapshots(tickers, start_date, end_date))
+
+    portfolio_return = None
+    if metric == "asset_return":
+        pv = (cached_data or {}).get("view_model", {}).get("portfolio_value_series", {})
+        portfolio_return = _compute_portfolio_return(pv, start_date, end_date)
+
+    result = []
+
+    for grid_idx, children in zip(grid_ids, all_grid_children):
+        # Strip namespace prefix (e.g. "val-AIAIL" → "AIAIL")
+        parts = grid_idx.split("-", 1)
+        ticker = parts[1] if len(parts) == 2 and parts[0] in _KNOWN_NS else grid_idx
+
+        if ticker not in tickers:
+            result.append(no_update)
+            continue
+
+        # Duplicate guard — skip if this metric card already exists in the grid
+        card_id = f"{grid_idx}--{metric}"
+        existing_ids = [
+            c.get("props", {}).get("id", {}).get("index")
+            for c in (children or [])
+            if isinstance(c, dict)
+        ]
+        if card_id in existing_ids:
+            result.append(no_update)
+            continue
+
+        asset_i = tickers.index(ticker)
+        modifier = _ASSET_MODIFIERS[asset_i] if asset_i < len(_ASSET_MODIFIERS) else "asset-1"
+        accent = color_map[modifier]
+        snapshot = snapshots.get(ticker, {})
+        data = {**snapshot, "portfolio_return": portfolio_return} if metric == "asset_return" else snapshot
+        fig = ChartClass().render(data, theme=current_theme, accent_color=accent)
+
+        result.append(list(children or []) + [_chart_card(card_id, label, fig)])
     value = row.get("value")
     profit = row.get("profit")
     pnl_pct = row.get("pnl_pct")
@@ -244,16 +314,42 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
         className="kpi-badge-row",
     )
 
-    ticker = row.get("ticker")
-    if not ticker:
-        return strip, {}
+    return result
 
-    start_date, end_date = _date_window(timeframe or "1Y")
-    snapshots = _fetch_snapshots([ticker], start_date, end_date)
-    snapshot = dict(snapshots).get(ticker, {})
 
-    figure = PriceWithMAPlotlyLineChart().render(snapshot, theme=current_theme)
-    return strip, figure
+@callback(
+    Output({"type": "asset-charts-grid", "index": ALL}, "children", allow_duplicate=True),
+    Input({"type": "close-chart-btn", "index": ALL}, "n_clicks"),
+    State({"type": "asset-charts-grid", "index": ALL}, "children"),
+    prevent_initial_call=True,
+)
+def on_close_chart(n_clicks_list, all_grid_children):
+    if not any(n_clicks_list):
+        raise PreventUpdate
+    triggered = ctx.triggered_id
+    if not isinstance(triggered, dict) or triggered.get("type") != "close-chart-btn":
+        raise PreventUpdate
+
+    btn_index = triggered["index"]           # e.g. "val-AIAIL--asset_profit"
+    grid_idx = btn_index.rsplit("--", 1)[0]  # e.g. "val-AIAIL"
+
+    grid_ids = [o["id"]["index"] for o in ctx.outputs_list]
+    result = []
+
+    for gid, children in zip(grid_ids, all_grid_children):
+        if gid != grid_idx:
+            result.append(no_update)
+            continue
+        new_children = [
+            c for c in (children or [])
+            if not (
+                isinstance(c, dict)
+                and c.get("props", {}).get("id", {}).get("index") == btn_index
+            )
+        ]
+        result.append(new_children)
+
+    return result
 
 
 # ── 8. Scatter plot bubble highlight on row selection ─────────────

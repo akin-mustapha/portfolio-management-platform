@@ -59,7 +59,7 @@ transformations over stored data — no API calls required to re-run them.
 - [ ] Remove `pipeline_asset_bronze.py`, `pipeline_account_bronze.py`
 - [ ] Remove `loaders/asset_full_loader.py`, `loaders/account_full_loader.py`
 - [ ] Remove old factory registrations (`"asset_bronze"`, `"account_bronze"`)
-- [ ] Retire old flows: `flow_t212_asset.py`, `flow_t212_account.py`, `account_flow_silver.py`
+- [ ] Retire old flows: `flow_t212_asset.py`, `flow_t212_account.py` (~~`account_flow_silver.py` — deleted~~)
 - [ ] Keep `raw.asset` and `raw.account` tables — do not drop until new pipeline has run
 
 ---

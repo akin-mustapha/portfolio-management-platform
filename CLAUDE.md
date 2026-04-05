@@ -17,7 +17,7 @@ Four layers. Keep changes within one layer per task.
 ```text
 Frontend        src/dashboard/            Dash UI — reads from services
 Orchestration   src/orchestration/        Prefect — schedules pipelines
-Backend         src/backend/ingestion/    ETL pipelines and Kafka events
+Backend         src/pipelines/            ETL pipelines and Kafka events
                 src/backend/services/     Portfolio domain logic
 Storage         raw → staging → analytics (Postgres, 3 schemas)
 ```
@@ -50,7 +50,7 @@ Reference: `docs/02-architecture/design/ingestion/doc-pipelines.md`
 | Schema | Layer | What It Holds |
 | --- | --- | --- |
 | `raw` | Bronze | Append-only, partitioned by date, data as received |
-| `staging` | Silver | Typed, deduplicated, computed metrics |
+| `staging` | Silver | Typed, deduplicated, normalised |
 | `analytics` | Gold | Kimball star schema — built to answer dashboard questions |
 
 Schema migrations are managed with Alembic.
@@ -60,9 +60,11 @@ Schema detail: `docs/02-architecture/design/schema/`
 
 ## Gold Layer
 
-The gold layer is built. The `analytics` schema, all dimension tables, and all six fact tables (`fact_price`, `fact_valuation`, `fact_return`, `fact_technical`, `fact_signal`, `fact_portfolio_daily`) exist and are fully migrated. Both `pipeline_asset_gold.py` and `pipeline_account_gold.py` are implemented and write to these tables.
+The gold layer is fully implemented and orchestrated. The `analytics` schema, all dimension tables, and all six fact tables (`fact_price`, `fact_valuation`, `fact_return`, `fact_technical`, `fact_signal`, `fact_portfolio_daily`) exist and are fully migrated.
 
-**Current gap — orchestration:** The gold pipelines are not yet called by any Prefect flow. The tables exist but are empty at runtime until a flow is wired up.
+The canonical gold pipeline is `PipelineT212Gold` (`src/pipelines/application/runners/pipeline_gold_t212.py`). It is the single pipeline that writes to all six fact tables. It runs hourly via `flow_t212_gold` (registered in `prefect.yaml`).
+
+**Computation is in the gold layer.** All metrics (moving averages, rolling volatility, LAG-based returns, drawdown) are computed via SQL window functions in `PipelineT212Gold`'s source query. The computed silver tables (`staging.asset_computed`, `staging.account_computed`) exist but are no longer part of the active pipeline.
 
 Dashboard questions are tracked in: `docs/02-architecture/design/ui-design.md`
 Schema reference: `docs/02-architecture/design/schema/schema-analytics.md`
@@ -74,29 +76,23 @@ Do not add gold layer tables or columns speculatively. Only build what a dashboa
 ## Known Gaps — Docs vs. Code
 
 - The docs and code are not fully aligned. Treat docs as design intent.
-- `doc-data-model.md` describes the tagging model but some field names have drifted (e.g. `tag_type` in docs is `Category` in code).
+- **Tagging model:** The domain entity uses `tag_type_id`; the DB column is `category_id`. The repository layer maps between them. Both names are correct in their respective contexts.
 - `schema-staging.md` is the most accurate schema doc.
-- `schema-analytics.md` reflects the current implemented schema (post-migration-007).
+- `schema-analytics.md` reflects the current implemented schema (post-migration-008).
 
 ---
 
 ## Working Rules
 
-**Layer segregation** — One task, one layer. Do not mix ingestion changes with dashboard changes in the same branch.
+Rules are formalized in `.claude/rules/`. Key rules:
 
-**Read before write** — Never suggest changes to code you haven't read.
-
-**No speculation** — Don't add fields, tables, or features not tied to a specific requirement or dashboard question.
-
-**No over-engineering** — Don't add abstractions, error handling, or configurability beyond what the task needs.
-
-**Migrations** — Any new or changed table requires an Alembic migration. See `docs/03-engineering/doc-commands.md`.
-
-**Dashboard callbacks** — Before adding any callback output, search for existing `Output('component-id', 'property')` patterns to avoid duplicates. For layout direction (horizontal vs vertical), confirm with the user before implementing — default to side-by-side for chart pairs.
-
-**Schema changes** — Never reference columns from unapplied migrations in application code. Confirm migrations are applied before writing code that reads those columns.
-
-**Refactoring** — Do not remove variables that appear unused without first searching templates, callbacks, and conditional logic (especially theme variables like `ct`). After any multi-file refactor, run the test suite and verify all imports resolve — Prefect workers and the dashboard app may resolve imports differently.
+- **Layer segregation** — one task, one layer; no cross-layer changes in a single branch
+- **Read before write** — read the file before proposing changes
+- **No speculation** — no fields, tables, or features without a specific requirement
+- **No over-engineering** — no abstractions or configurability beyond what the task needs
+- **Migrations** — every schema change needs an Alembic migration; never reference unapplied columns
+- **Dashboard callbacks** — search for duplicate `Output(...)` before adding; confirm layout direction
+- **Refactoring** — verify imports resolve in both Prefect and dashboard contexts after multi-file changes
 
 ---
 

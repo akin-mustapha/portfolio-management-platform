@@ -15,8 +15,8 @@
 - A new metric requires a new column in silver or gold
 
 **Where**
-- `src/backend/ingestion/` — pipeline implementations
-- `src/shared/models/` — Pydantic schemas
+- `src/pipelines/` — pipeline implementations
+- `src/pipelines/domain/schemas/` — Pydantic schemas
 - `raw`, `staging`, `analytics` schemas in Postgres
 - `docs/02-architecture/design/ingestion/doc-pipelines.md` — pipeline contract
 

@@ -6,12 +6,12 @@ push: null
 
 pull:
   - prefect.deployments.steps.set_working_directory:
-      directory: /Users/kunmi/Projects/workspace/data_engineering/asset_monitoring_system
+      directory: /Users/kunmi/workspace/projects/engineering/projects/portfolio-management-platform
 
 deployments:
 
   - name: t212_bronze
-    entrypoint: src/orchestration/prefect/flow_t212_bronze.py:flow_t212_bronze
+    entrypoint: ./src/orchestration/prefect/flow_t212_bronze.py:flow_t212_bronze
     work_pool:
       name: asset-monitoring-pool
     schedules:
@@ -19,7 +19,7 @@ deployments:
         anchor_date: "2024-01-01T00:00:00Z"
 
   - name: t212_silver
-    entrypoint: src/orchestration/prefect/flow_t212_silver.py:flow_t212_silver
+    entrypoint: ./src/orchestration/prefect/flow_t212_silver.py:flow_t212_silver
     work_pool:
       name: asset-monitoring-pool
     schedules:
@@ -56,6 +56,14 @@ deployments:
     schedules:
       - interval: 86400          # daily
         anchor_date: "2026-01-01T07:00:00Z"
+
+  - name: fred_daily
+    entrypoint: src/orchestration/prefect/flow_fred.py:flow_fred
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 86400          # daily
+        anchor_date: "2026-01-01T07:30:00Z"
 
   # - name: trading_212_asset_event_producer
   #   entrypoint: src/orchestration/prefect/asset_flow_event_producer.py:trading_212_asset_event_producer

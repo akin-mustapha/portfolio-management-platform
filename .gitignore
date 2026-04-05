@@ -5,7 +5,7 @@ venv/
 __pycache__/
 *.pyc
 *.db
-*.ini
+# *.ini
 data/csv/asset_data.csv
 data/csv/asset_snapshot.csv
 data/csv/assets.csv

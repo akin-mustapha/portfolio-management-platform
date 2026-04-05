@@ -84,7 +84,7 @@ Bronze → Silver → Computed Silver
 
 | Field | Computed In | Notes |
 |-------|-------------|-------|
-| `cashflow` | SQL | Aliased from `cost` |
+| `cost_basis` | SQL | Aliased from `cost` (renamed from `cashflow` in migration 011) |
 | `daily_return` | SQL | LAG-based % change in value per ticker |
 | `cumulative_return` | SQL | `EXP(SUM(LN(1 + daily_return)))` over all rows |
 | `dca_bias` | SQL | `(value - cost) / cost` |
@@ -101,7 +101,7 @@ Bronze → Silver → Computed Silver
 | `volatility_20d` | SQL | 20-row rolling STDDEV(daily_return) per ticker |
 | `volatility_30d` | SQL | 30-row rolling STDDEV(daily_return) per ticker |
 | `volatility_50d` | SQL | 50-row rolling STDDEV(daily_return) per ticker |
-| `pnl_pct` | Python | `profit / cashflow * 100` |
+| `pnl_pct` | Python | `profit / cost_basis * 100` |
 | `var_95_1d` | Python | `volatility_30d * value * 1.65` |
 | `profit_range_30d` | Python | `recent_profit_high_30d - recent_profit_low_30d` |
 | `ma_crossover_signal` | Python | `ma_20d - ma_50d` |

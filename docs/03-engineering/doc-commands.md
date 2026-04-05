@@ -126,12 +126,12 @@ Current deployments:
 
 | Deployment name | Command |
 |---|---|
-| Asset pipeline (bronze → silver → computed) | `prefect deployment run 'flow_t212_asset/t212_asset'` |
-| Account pipeline (bronze → silver) | `prefect deployment run 'flow_t212_account/t212_account'` |
+| T212 bronze | `prefect deployment run 'flow_t212_bronze/t212_bronze'` |
+| T212 silver | `prefect deployment run 'flow_t212_silver/t212_silver'` |
+| T212 gold | `prefect deployment run 'flow_t212_gold/t212_gold'` |
 | Portfolio sync | `prefect deployment run 'flow_t212_asset_portfolio_sync/t212_asset_portfolio_sync'` |
 | Enrichment sync | `prefect deployment run 'flow_t212_enrichment_sychronization/t212_enrichment_synchronization'` |
-
-> Gold pipelines (`PipelineAssetGold`, `PipelineAccountGold`) are not yet registered as Prefect deployments. Run them manually — see **Services** section below.
+| Rebalance plan | `prefect deployment run 'flow_rebalance_plan/rebalance_plan'` |
 
 Create the work pool manually (already done by the deploy script):
 
@@ -143,11 +143,10 @@ prefect work-pool create asset-monitoring-pool --type process
 
 ### Gold Pipelines
 
-Run manually from the project root (not yet in Prefect):
+Run manually from the project root:
 
 ```sh
-  python -m src.backend.ingestion.application.pipelines.pipeline_asset_gold
-  python -m src.backend.ingestion.application.pipelines.pipeline_account_gold
+  python -m src.pipelines.application.runners.pipeline_gold_t212
 ```
 
 ### Dash UI

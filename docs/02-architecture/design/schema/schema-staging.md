@@ -40,6 +40,8 @@ asset:
 
 **staging.asset_computed**
 
+> **Note:** This table is no longer the source for gold. `PipelineT212Gold` computes all metrics directly from `staging.asset` using SQL window functions. This table is maintained by the (currently disabled) `PipelineAssetComputedSilver` task and may be removed in a future cleanup.
+
 ```yaml
 asset_computed:
   columns:
@@ -96,6 +98,8 @@ account:
 ---
 
 **staging.account_computed**
+
+> **Note:** Same as `asset_computed` — no longer used by gold. `PipelineT212Gold` computes account metrics directly from `staging.account`.
 
 ```yaml
 account_computed:
