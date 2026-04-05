@@ -221,11 +221,14 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
     cum_ret = row.get("cumulative_value_return")
     weight = row.get("weight_pct")
     dca = row.get("dca_bias")
+    beta = row.get("beta_60d")
+    asset_sharpe = row.get("asset_sharpe_ratio_30d")
 
     profit_str, profit_sign = _fmt_signed(profit, ",.2f")
     pnl_str, pnl_sign = _fmt_signed(pnl_pct, ".2f")
     ret_str, ret_sign = _fmt_signed(cum_ret, ".2f")
     dca_str, dca_sign = _fmt_signed(dca, ".3f")
+    sharpe_str, sharpe_sign = _fmt_signed(asset_sharpe, ".2f")
 
     strip = html.Div(
         [
@@ -235,6 +238,8 @@ def on_asset_profile_deep_dive(selected_rows, timeframe, theme):
             _kpi_badge("Return", f"{ret_str}%", change_sign=ret_sign),
             _kpi_badge("Weight", f"{weight:.2f}%" if weight is not None else "—"),
             _kpi_badge("DCA Bias", dca_str, change_sign=dca_sign),
+            _kpi_badge("Beta 60D", f"{beta:.2f}" if beta is not None else "—"),
+            _kpi_badge("Sharpe 30D", sharpe_str, change_sign=sharpe_sign),
         ],
         className="kpi-badge-row",
     )
