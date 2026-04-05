@@ -25,7 +25,9 @@ Internal structure:
 
 ```
 assets/          — CSS split by concern: theme, base, layout, components, charts, ag-grid
-components/      — shared UI utilities reusable across pages
+api/             — Flask/Dash server-side API routes
+components/      — shared UI primitives (atoms only at this level)
+  atoms/         — pure primitives: value formatters, badge elements
 layouts/         — top-level shell: navbar, page router, settings modal
 pages/portfolio/ — portfolio page: layout, tabs, callbacks, charts
   tabs/          — one file per tab: Valuation, Risk, Opportunities, Asset Profile
@@ -38,6 +40,7 @@ pages/portfolio/ — portfolio page: layout, tabs, callbacks, charts
 controllers/     — orchestrate data fetch and presenter calls
 presenters/      — transform DB data into dashboard-ready view models
 infrastructure/  — SQL queries against analytics schema
+utils/           — dashboard-local utility functions
 ```
 
 ## Orchestration (`src/orchestration/`)
@@ -50,16 +53,16 @@ Sits above the backend — coordinates it, doesn't contain business logic.
 **Pipelines** (`src/pipelines/`) — Pulls data from Trading212. Loads into raw, transforms through staging, computes and writes to analytics (gold).
 
 - `domain/` — core models: Data and Event; Pydantic schemas per layer (bronze/, silver/, gold/)
-- `application/` — protocols, policies, all pipeline logic (bronze, silver, gold, loaders, events)
-- `infrastructure/` — external integrations: Trading212 API client, Kafka producer/consumer, database repositories
+- `application/` — pipeline logic: protocols, policies, runners (bronze, silver, gold, loaders, events), interfaces, validators
+- `infrastructure/` — external integrations: Trading212 API client, Kafka producer/consumer, database repositories, SQL queries (gold/, silver/)
 - `factories/` — PipelineFactory and EventProducerFactory registries
 
-**Services** (`src/backend/services/`) — Business logic layer between storage and frontend.
+**Services** (`src/backend/`) — Business logic layer between storage and frontend.
 Current domains: `portfolio/`, `credentials/`, and `rebalancing/`.
 
-- `domain/` — entities: Asset, Tag, Category, AssetTag, Industry, Sector
-- `application/` — use case interfaces and repository contracts (protocols)
-- `infrastructure/` — repository implementations (Postgres and SQLite) per entity
+- `domain/` — entities per domain: portfolio (Asset, Tag, Category, AssetTag, Industry, Sector), rebalancing
+- `application/` — use case interfaces and repository contracts per domain (portfolio/, rebalancing/)
+- `infrastructure/` — repository implementations (Postgres and SQLite) per domain (portfolio/, credentials/, rebalancing/)
 
 ## Storage (`raw` → `staging` → `analytics`)
 
