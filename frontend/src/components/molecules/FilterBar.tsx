@@ -1,38 +1,63 @@
-import { Box, FormControl, InputLabel, MenuItem, Select, Autocomplete, TextField } from '@mui/material'
+import { Box, ToggleButtonGroup, ToggleButton, Autocomplete, TextField, useTheme } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import { useAppStore } from '../../store/useAppStore'
 
 interface FilterBarProps {
   availableTags?: string[]
 }
 
-const TIMEFRAME_OPTIONS = [
-  { value: '7d', label: '7 Days' },
-  { value: '30d', label: '30 Days' },
-  { value: '90d', label: '90 Days' },
-  { value: '180d', label: '6 Months' },
-  { value: '365d', label: '1 Year' },
-  { value: 'all', label: 'All Time' },
+export const TIMEFRAME_OPTIONS = [
+  { value: '1d', label: '1D' },
+  { value: '1w', label: '1W' },
+  { value: '1m', label: '1M' },
+  { value: '3m', label: '3M' },
+  { value: '6m', label: '6M' },
+  { value: '1y', label: '1Y' },
+  { value: 'all', label: 'All' },
 ]
 
 export default function FilterBar({ availableTags = [] }: FilterBarProps) {
+  const theme = useTheme()
   const { timeframe, setTimeframe, selectedTags, setSelectedTags } = useAppStore()
 
+  const toggleGroupSx = {
+    '& .MuiToggleButton-root': {
+      border: 'none',
+      borderRadius: '6px',
+      px: 1.5,
+      py: 0.5,
+      color: 'text.secondary',
+      fontSize: '0.8125rem',
+      fontWeight: 500,
+      textTransform: 'none',
+      '&.Mui-selected': {
+        color: 'primary.main',
+        bgcolor: alpha(theme.palette.primary.main, 0.12),
+        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.18) },
+      },
+      '&:hover': { bgcolor: 'action.hover' },
+    },
+  }
+
   return (
-    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-      <FormControl size="small" sx={{ minWidth: 120 }}>
-        <InputLabel>Timeframe</InputLabel>
-        <Select
-          value={timeframe}
-          label="Timeframe"
-          onChange={(e) => setTimeframe(e.target.value as Parameters<typeof setTimeframe>[0])}
-        >
-          {TIMEFRAME_OPTIONS.map((o) => (
-            <MenuItem key={o.value} value={o.value}>
-              {o.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+    <Box sx={{
+      display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap',
+      border: '1px solid', borderColor: 'divider',
+      borderRadius: 1, px: 1.5, py: 0.75, mb: 1,
+    }}>
+      <ToggleButtonGroup
+        value={timeframe}
+        exclusive
+        onChange={(_, val) => { if (val) setTimeframe(val) }}
+        size="small"
+        sx={toggleGroupSx}
+      >
+        {TIMEFRAME_OPTIONS.map((o) => (
+          <ToggleButton key={o.value} value={o.value}>
+            {o.label}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
 
       <Autocomplete
         multiple
@@ -40,7 +65,7 @@ export default function FilterBar({ availableTags = [] }: FilterBarProps) {
         options={availableTags}
         value={selectedTags}
         onChange={(_, val) => setSelectedTags(val)}
-        renderInput={(params) => <TextField {...params} label="Tags" placeholder="Filter by tag…" />}
+        renderInput={(params) => <TextField {...params} placeholder="Filter by tag..." />}
         sx={{ minWidth: 220 }}
         disableCloseOnSelect
       />

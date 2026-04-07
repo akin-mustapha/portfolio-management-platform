@@ -39,13 +39,13 @@ export default function KpiCard({
       variant="outlined"
       sx={{
         height: '100%',
-        minWidth: compact ? 120 : 140,
+        minWidth: compact ? 115 : 140,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
       }}
     >
-      <CardContent sx={{ p: compact ? 1 : 1.5, '&:last-child': { pb: compact ? 1 : 1.5 } }}>
+      <CardContent sx={{ p: compact ? 1.25 : 1.5, '&:last-child': { pb: compact ? 1.25 : 1.5 } }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} mb={0.5}>
           <Typography variant="caption" color="text.secondary" noWrap>
             {label}

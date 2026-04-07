@@ -8,7 +8,8 @@ import AssetPnlChart from '../../../components/charts/AssetPnlChart'
 import AssetReturnChart from '../../../components/charts/AssetReturnChart'
 import EditTagsModal from '../../../components/organisms/EditTagsModal'
 import KpiCard from '../../../components/atoms/KpiCard'
-import MetricInfo from '../../../components/atoms/MetricInfo'
+import TickerLogo from '../../../components/atoms/TickerLogo'
+import Section from '../../../components/molecules/Section'
 import { Grid } from '@mui/material'
 
 interface AssetProfileTabProps {
@@ -39,6 +40,7 @@ export default function AssetProfileTab({ assetRow }: AssetProfileTabProps) {
     <Box>
       {/* Header row */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+        <TickerLogo ticker={ticker} />
         <Typography variant="subtitle1" fontWeight={700}>{ticker}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
           {assetRow?.name as string}
@@ -73,36 +75,20 @@ export default function AssetProfileTab({ assetRow }: AssetProfileTabProps) {
 
       {/* Charts */}
       {!isLoading && history && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
-              <Typography variant="caption" color="text.secondary">Price + Moving Averages</Typography>
-              <MetricInfo metricKey="asset_price_chart" size="inherit" />
-            </Box>
+        <div>
+          <Section title="Price + Moving Averages" metricKey="asset_price_chart">
             <AssetPriceChart series={history.asset_price} />
-          </Box>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
-              <Typography variant="caption" color="text.secondary">Asset Value</Typography>
-              <MetricInfo metricKey="asset_value_chart" size="inherit" />
-            </Box>
+          </Section>
+          <Section title="Asset Value" metricKey="asset_value_chart">
             <AssetValueChart series={history.asset_value} title="Value" />
-          </Box>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
-              <Typography variant="caption" color="text.secondary">P&L Range</Typography>
-              <MetricInfo metricKey="asset_profit_range_chart" size="inherit" />
-            </Box>
+          </Section>
+          <Section title="P&L Range" metricKey="asset_profit_range_chart">
             <AssetPnlChart series={history.asset_profit_range} />
-          </Box>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.25 }}>
-              <Typography variant="caption" color="text.secondary">Cumulative Return</Typography>
-              <MetricInfo metricKey="asset_vs_portfolio_return_chart" size="inherit" />
-            </Box>
+          </Section>
+          <Section title="Cumulative Return" metricKey="asset_vs_portfolio_return_chart">
             <AssetReturnChart cumulativeSeries={history.asset_return} />
-          </Box>
-        </Box>
+          </Section>
+        </div>
       )}
 
       <EditTagsModal

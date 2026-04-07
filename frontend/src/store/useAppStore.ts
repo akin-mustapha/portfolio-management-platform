@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PaletteMode } from '@mui/material'
+import { TIMEFRAME_OPTIONS } from '../components/molecules/FilterBar'
 
-type TimeframeOption = '7d' | '30d' | '90d' | '180d' | '365d' | 'all'
+export type TimeframeOption = '1d' | '1w' | '1m' | '3m' | '6m' | '1y' | 'all'
+
+const VALID_TIMEFRAMES = new Set(TIMEFRAME_OPTIONS.map((o) => o.value))
 
 interface AppState {
   // Theme
@@ -44,7 +47,7 @@ export const useAppStore = create<AppState>()(
       selectedTickers: [],
       setSelectedTickers: (tickers) => set({ selectedTickers: tickers }),
 
-      timeframe: '30d',
+      timeframe: '6m',
       setTimeframe: (tf) => set({ timeframe: tf }),
 
       fromDate: null,
@@ -56,6 +59,14 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'portfolio-app-store',
+      version: 1,
+      migrate: (persisted: unknown) => {
+        const s = persisted as Record<string, unknown>
+        return {
+          ...s,
+          timeframe: VALID_TIMEFRAMES.has(s.timeframe as string) ? s.timeframe : '6m',
+        }
+      },
       partialize: (state) => ({
         themeMode: state.themeMode,
         privacyMode: state.privacyMode,

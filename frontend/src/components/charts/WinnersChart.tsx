@@ -13,7 +13,7 @@ export default function WinnersChart({ winners }: WinnersChartProps) {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={winners} layout="vertical" margin={{ top: 4, right: 16, bottom: 0, left: 60 }}>
+      <BarChart data={winners} layout="vertical" margin={{ top: 4, right: 16, bottom: 4, left: 0 }}>
         <XAxis type="number" tick={{ fontSize: 10 }} tickLine={false} />
         <YAxis type="category" dataKey="label" tick={{ fontSize: 10 }} width={60} />
         <Tooltip

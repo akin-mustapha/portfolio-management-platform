@@ -9,8 +9,8 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
   if (!movers?.length) return null
 
   return (
-    <Box sx={{ overflowX: 'auto' }}>
-      <Table size="small">
+    <Box sx={{ height: 300, overflowY: 'auto', overflowX: 'hidden' }}>
+      <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell sx={{ fontSize: 11, fontWeight: 700 }}>Ticker</TableCell>

@@ -1,4 +1,5 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material'
+import type { SxProps, Theme } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { ReactNode } from 'react'
 import MetricInfo from '../atoms/MetricInfo'
@@ -8,15 +9,16 @@ interface SectionProps {
   title: string
   children: ReactNode
   metricKey?: MetricKey
+  sx?: SxProps<Theme>
 }
 
-export default function Section({ title, children, metricKey }: SectionProps) {
+export default function Section({ title, children, metricKey, sx }: SectionProps) {
   return (
     <Accordion
       defaultExpanded
       disableGutters
       elevation={0}
-      sx={{ border: '1px solid', borderColor: 'divider', mb: 1, '&:before': { display: 'none' } }}
+      sx={{ border: '1px solid', borderColor: 'divider', mb: 1, '&:before': { display: 'none' }, ...sx }}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
