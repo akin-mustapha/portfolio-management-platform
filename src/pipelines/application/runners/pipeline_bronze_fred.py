@@ -55,11 +55,13 @@ class FredBronzeSource(Source):
                 observation_start=observation_start,
             )
             self._validate_structure(series_id, response)
-            results.append({
-                "series_id": series_id,
-                "observations": response["observations"],
-                "observation_start": observation_start,
-            })
+            results.append(
+                {
+                    "series_id": series_id,
+                    "observations": response["observations"],
+                    "observation_start": observation_start,
+                }
+            )
         return results
 
     def _get_observation_start(self, series_id: str) -> str:

@@ -39,9 +39,9 @@ def secondary_kpi_row(data=None, theme="light"):
                         "vs SP500 30D",
                         f"{vs_benchmark:+.2f}%" if vs_benchmark is not None else "—",
                         change_sign=(
-                            1 if (vs_benchmark or 0) > 0
-                            else -1 if (vs_benchmark or 0) < 0
-                            else 0
+                            1
+                            if (vs_benchmark or 0) > 0
+                            else -1 if (vs_benchmark or 0) < 0 else 0
                         ),
                     ),
                 ],

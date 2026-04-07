@@ -7,7 +7,11 @@ def _empty_state():
     return html.Div(
         "Select an asset from the table to begin.",
         className="tv-placeholder-text",
-        style={"padding": "24px 0", "color": "var(--text-muted)", "fontSize": "0.85rem"},
+        style={
+            "padding": "24px 0",
+            "color": "var(--text-muted)",
+            "fontSize": "0.85rem",
+        },
     )
 
 

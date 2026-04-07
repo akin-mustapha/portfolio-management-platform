@@ -64,13 +64,15 @@ class FredObservationTransformation(Transformation):
         records = []
         for row in rows:
             observation_date = date.fromisoformat(row.observation_date)
-            records.append({
-                "series_id": row.series_id,
-                "observation_date": observation_date,
-                "value": Decimal(row.observation_value),
-                "business_key": f"{row.series_id}_{observation_date}",
-                "ingested_date": row.ingested_date,
-            })
+            records.append(
+                {
+                    "series_id": row.series_id,
+                    "observation_date": observation_date,
+                    "value": Decimal(row.observation_value),
+                    "business_key": f"{row.series_id}_{observation_date}",
+                    "ingested_date": row.ingested_date,
+                }
+            )
         return records
 
 
@@ -81,7 +83,9 @@ class FredObservationTransformation(Transformation):
 
 class FredObservationDestination(Destination):
     def __init__(self):
-        self._repository = RepositoryFactory.get("fred_observation", schema_name="staging")
+        self._repository = RepositoryFactory.get(
+            "fred_observation", schema_name="staging"
+        )
 
     def load(self, data: list[dict]) -> None:
         self._repository.upsert(records=data, unique_key=["business_key"])

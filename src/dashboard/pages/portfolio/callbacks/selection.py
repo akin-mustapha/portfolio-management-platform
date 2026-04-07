@@ -90,7 +90,11 @@ def on_asset_row_selected(selected_rows, timeframe, theme, cached_data):
             val_fig = AssetVsPortfolioReturnChart().render(
                 data, theme=current_theme, accent_color=accent
             )
-            val_default_charts[ticker] = ("asset_return", "Return vs Portfolio", val_fig)
+            val_default_charts[ticker] = (
+                "asset_return",
+                "Return vs Portfolio",
+                val_fig,
+            )
         else:
             val_fig = ProfitRangePlotlyLineChart().render(
                 snapshot, theme=current_theme, accent_color=accent
@@ -227,7 +231,9 @@ clientside_callback(
     State("portfolio_page_asset_store", "data"),
     prevent_initial_call=True,
 )
-def on_metric_drop(metric, all_grid_children, selected_rows, timeframe, theme, cached_data):
+def on_metric_drop(
+    metric, all_grid_children, selected_rows, timeframe, theme, cached_data
+):
     if not metric or not selected_rows:
         raise PreventUpdate
 
@@ -278,10 +284,16 @@ def on_metric_drop(metric, all_grid_children, selected_rows, timeframe, theme, c
             continue
 
         asset_i = tickers.index(ticker)
-        modifier = _ASSET_MODIFIERS[asset_i] if asset_i < len(_ASSET_MODIFIERS) else "asset-1"
+        modifier = (
+            _ASSET_MODIFIERS[asset_i] if asset_i < len(_ASSET_MODIFIERS) else "asset-1"
+        )
         accent = color_map[modifier]
         snapshot = snapshots.get(ticker, {})
-        data = {**snapshot, "portfolio_return": portfolio_return} if metric == "asset_return" else snapshot
+        data = (
+            {**snapshot, "portfolio_return": portfolio_return}
+            if metric == "asset_return"
+            else snapshot
+        )
         fig = ChartClass().render(data, theme=current_theme, accent_color=accent)
 
         result.append(list(children or []) + [_chart_card(card_id, label, fig)])
@@ -290,7 +302,9 @@ def on_metric_drop(metric, all_grid_children, selected_rows, timeframe, theme, c
 
 
 @callback(
-    Output({"type": "asset-charts-grid", "index": ALL}, "children", allow_duplicate=True),
+    Output(
+        {"type": "asset-charts-grid", "index": ALL}, "children", allow_duplicate=True
+    ),
     Input({"type": "close-chart-btn", "index": ALL}, "n_clicks"),
     State({"type": "asset-charts-grid", "index": ALL}, "children"),
     prevent_initial_call=True,
@@ -302,7 +316,7 @@ def on_close_chart(n_clicks_list, all_grid_children):
     if not isinstance(triggered, dict) or triggered.get("type") != "close-chart-btn":
         raise PreventUpdate
 
-    btn_index = triggered["index"]           # e.g. "val-AIAIL--asset_profit"
+    btn_index = triggered["index"]  # e.g. "val-AIAIL--asset_profit"
     grid_idx = btn_index.rsplit("--", 1)[0]  # e.g. "val-AIAIL"
 
     grid_ids = [o["id"]["index"] for o in ctx.outputs_list]
@@ -313,7 +327,8 @@ def on_close_chart(n_clicks_list, all_grid_children):
             result.append(no_update)
             continue
         new_children = [
-            c for c in (children or [])
+            c
+            for c in (children or [])
             if not (
                 isinstance(c, dict)
                 and c.get("props", {}).get("id", {}).get("index") == btn_index

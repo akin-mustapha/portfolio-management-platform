@@ -25,7 +25,6 @@ from ..charts.asset_charts import (
 from ....controllers.asset_controller import AssetController
 from ....controllers.asset_profile_controller import AssetProfileController
 
-
 # ── Chart card builder ────────────────────────────────────────────
 
 

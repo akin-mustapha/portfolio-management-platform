@@ -33,7 +33,9 @@ class AssetPresenter:
                 data.get("asset_history", [])
             ),
             "asset_return": self._asset_return_series_vm(data.get("asset_history", [])),
-            "asset_daily_return": self._asset_daily_return_series_vm(data.get("asset_history", [])),
+            "asset_daily_return": self._asset_daily_return_series_vm(
+                data.get("asset_history", [])
+            ),
         }
 
     # ---------- Table ----------
