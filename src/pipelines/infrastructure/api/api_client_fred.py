@@ -1,4 +1,3 @@
-import os
 import logging
 import httpx
 from dotenv import load_dotenv
@@ -47,5 +46,7 @@ class FredAPIClient:
                 timeout=30.0,
             )
         response.raise_for_status()
-        logging.info(f"FRED series {series_id}: {len(response.json().get('observations', []))} observations")
+        logging.info(
+            f"FRED series {series_id}: {len(response.json().get('observations', []))} observations"
+        )
         return response.json()

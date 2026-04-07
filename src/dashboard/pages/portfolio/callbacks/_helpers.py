@@ -25,7 +25,6 @@ from ..charts.asset_charts import (
 from ....controllers.asset_controller import AssetController
 from ....controllers.asset_profile_controller import AssetProfileController
 
-
 # ── Chart card builder ────────────────────────────────────────────
 
 
@@ -90,6 +89,8 @@ def _kpi_groups(row: dict):
     volatility = row.get("volatility_30d")
     var_95 = row.get("var_95_1d")
     fx_impact = row.get("fx_impact")
+    beta = row.get("beta_60d")
+    asset_sharpe = row.get("asset_sharpe_ratio_30d")
 
     profit_str, profit_sign = _fmt_signed(profit, ",.2f")
     pnl_str, pnl_sign = _fmt_signed(pnl_pct, ".2f")
@@ -98,6 +99,7 @@ def _kpi_groups(row: dict):
         daily_ret * 100 if daily_ret is not None else None, ".2f"
     )
     dca_str, dca_sign = _fmt_signed(dca, ".3f")
+    sharpe_str, sharpe_sign = _fmt_signed(asset_sharpe, ".2f")
     drawdown_str, drawdown_sign = _fmt_signed(
         drawdown * 100 if drawdown is not None else None, ".1f"
     )
@@ -138,6 +140,8 @@ def _kpi_groups(row: dict):
             f"£{var_95:,.2f}" if var_95 is not None else "—",
             change_sign=-1,
         ),
+        _kpi_badge("Beta 60D", f"{beta:.2f}" if beta is not None else "—"),
+        _kpi_badge("Sharpe 30D", sharpe_str, change_sign=sharpe_sign),
         _draggable(
             _kpi_badge("FX Impact", f"£{fx_str}", change_sign=fx_sign),
             "asset_fx_attribution",

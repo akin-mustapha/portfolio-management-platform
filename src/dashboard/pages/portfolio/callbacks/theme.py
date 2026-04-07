@@ -136,8 +136,20 @@ def update_workspace_chart_theme(theme, selected_assets, timeframe, asset_store)
     metadata_map = _fetch_asset_metadata(selected_row_objs)
 
     return (
-        _build_compare_rows(snapshots, current_theme, ns="val", names_map=names_map, metadata_map=metadata_map),
-        _build_compare_rows(snapshots, current_theme, ns="risk", names_map=names_map, metadata_map=metadata_map),
+        _build_compare_rows(
+            snapshots,
+            current_theme,
+            ns="val",
+            names_map=names_map,
+            metadata_map=metadata_map,
+        ),
+        _build_compare_rows(
+            snapshots,
+            current_theme,
+            ns="risk",
+            names_map=names_map,
+            metadata_map=metadata_map,
+        ),
     )
 
 

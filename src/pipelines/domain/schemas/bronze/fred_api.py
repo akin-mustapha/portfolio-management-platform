@@ -14,6 +14,7 @@ class FredObservationsResponse(BaseModel):
     extra="allow" tolerates FRED adding new envelope fields without breaking the pipeline.
     Validation failure raises — aborts the bronze run per bronze-layer policy.
     """
+
     model_config = ConfigDict(extra="allow")
 
     observations: list[FredObservationItem]
