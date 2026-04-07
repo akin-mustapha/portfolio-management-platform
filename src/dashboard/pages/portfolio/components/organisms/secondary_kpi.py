@@ -12,6 +12,9 @@ def secondary_kpi_row(data=None, theme="light"):
     daily_change_pct = data.get("daily_value_change_pct")
     daily_change_series = data.get("daily_change_series")
     portfolio_vol = data.get("portfolio_vol")
+    portfolio_beta = data.get("portfolio_beta")
+    sharpe = data.get("sharpe_ratio_30d")
+    vs_benchmark = data.get("portfolio_vs_benchmark_30d")
 
     return html.Div(
         [
@@ -22,6 +25,24 @@ def secondary_kpi_row(data=None, theme="light"):
                         "Volatility 30D",
                         f"{portfolio_vol:.2f}" if portfolio_vol is not None else "—",
                         unit="weighted",
+                    ),
+                    _kpi_badge(
+                        "Beta",
+                        f"{portfolio_beta:.2f}" if portfolio_beta is not None else "—",
+                        unit="weighted",
+                    ),
+                    _kpi_badge(
+                        "Sharpe 30D",
+                        f"{sharpe:.2f}" if sharpe is not None else "—",
+                    ),
+                    _kpi_badge(
+                        "vs SP500 30D",
+                        f"{vs_benchmark:+.2f}%" if vs_benchmark is not None else "—",
+                        change_sign=(
+                            1
+                            if (vs_benchmark or 0) > 0
+                            else -1 if (vs_benchmark or 0) < 0 else 0
+                        ),
                     ),
                 ],
                 className="kpi-badge-row",

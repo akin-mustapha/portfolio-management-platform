@@ -32,6 +32,10 @@ class PostgresAssetQueryRepository:
           COALESCE(fv.unrealized_pnl_pct, 0)            AS pnl_pct,
           ft.recent_profit_high_30d,
           ft.recent_profit_low_30d,
+          ft.recent_value_high_30d,
+          ft.recent_value_low_30d,
+          ft.value_high_alltime,
+          ft.value_low_alltime,
           ft.value_drawdown_pct_30d,
           ft.volatility_30d,
           ft.volatility_50d,
@@ -42,6 +46,8 @@ class PostgresAssetQueryRepository:
           fr.daily_value_return,
           fs.value_ma_crossover_signal,
           ft.var_95_1d,
+          ft.beta_60d,
+          ft.sharpe_ratio_30d                           AS asset_sharpe_ratio_30d,
           COALESCE(fv.fx_impact, 0)                     AS fx_impact,
           TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
       FROM analytics.fact_valuation fv
@@ -155,7 +161,11 @@ class PostgresSnapshotQueryRepository:
         COALESCE(fpd.portfolio_volatility_weighted, 0) AS portfolio_volatility_weighted,
         COALESCE(fpd.daily_value_change_pct, 0)        AS daily_value_change_pct,
         COALESCE(fpd.daily_value_change_abs, 0)        AS daily_value_change_abs,
-        COALESCE(fpd.fx_impact_total, 0)              AS fx_impact_total
+        COALESCE(fpd.fx_impact_total, 0)              AS fx_impact_total,
+        fpd.portfolio_beta_weighted,
+        fpd.sharpe_ratio_30d,
+        fpd.benchmark_return_daily,
+        fpd.portfolio_vs_benchmark_30d
     FROM analytics.fact_portfolio_daily fpd
     JOIN analytics.dim_portfolio dp ON dp.id = fpd.portfolio_id
     WHERE dp.portfolio_id = '21641310'

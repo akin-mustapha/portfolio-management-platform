@@ -72,9 +72,10 @@ Attribute
 - id
 - name
 - description
-- tag_type_id
+- tag_type_id  ← domain entity name; mapped to DB column `category_id` by the repository layer
 - is_active
 - created_timestamp
+- updated_timestamp
 
 Behaviour
 
@@ -86,7 +87,7 @@ Constraint
 
 - Unique(name)
 - PK(id)
-- FK(tag_type_id) REF (category.id)
+- FK(category_id) REF (category.id)  ← DB column name; domain uses `tag_type_id`
 
 ### category
 
@@ -97,6 +98,7 @@ Attribute
 - name
 - is_active
 - created_timestamp
+- updated_timestamp
 
 Behaviour
 
@@ -117,6 +119,7 @@ Attribute
 - tag_id
 - is_active
 - created_timestamp
+- updated_timestamp
 
 Behaviour
 

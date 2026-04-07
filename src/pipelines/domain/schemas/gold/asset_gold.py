@@ -56,6 +56,10 @@ class AssetGoldRecord(BaseModel):
     recent_value_high_30d: Optional[float] = None
     recent_value_low_30d: Optional[float] = None
 
+    # FRED metrics (fact_technical)
+    beta_60d: Optional[float] = None  # 60-day rolling Beta vs SP500
+    sharpe_ratio_30d: Optional[float] = None  # 30-day annualised Sharpe ratio
+
     # Signals / Opportunities (fact_signal)
     dca_bias: Optional[float] = None
     value_ma_crossover_signal: Optional[float] = (
