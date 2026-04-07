@@ -6,8 +6,8 @@ interface AssetPriceChartProps {
   series?: {
     dates: string[]
     values: (number | null)[]
-    value_ma_30d?: (number | null)[]
-    value_ma_50d?: (number | null)[]
+    price_ma_20d?: (number | null)[]
+    price_ma_50d?: (number | null)[]
   }
 }
 
@@ -19,8 +19,8 @@ export default function AssetPriceChart({ series }: AssetPriceChartProps) {
   const data = series.dates.map((d, i) => ({
     date: d,
     price: series.values[i],
-    ma30: series.value_ma_30d?.[i],
-    ma50: series.value_ma_50d?.[i],
+    ma30: series.price_ma_20d?.[i],
+    ma50: series.price_ma_50d?.[i],
   }))
 
   return (
@@ -32,7 +32,7 @@ export default function AssetPriceChart({ series }: AssetPriceChartProps) {
         <Tooltip contentStyle={tooltipStyle} />
         <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }} />
         <Line type="monotone" dataKey="price" name="Price" stroke={theme.palette.primary.main} strokeWidth={1.5} dot={false} />
-        <Line type="monotone" dataKey="ma30" name="MA 30d" stroke={theme.palette.warning.main} strokeWidth={1} strokeDasharray="4 2" dot={false} />
+        <Line type="monotone" dataKey="ma30" name="MA 20d" stroke={theme.palette.warning.main} strokeWidth={1} strokeDasharray="4 2" dot={false} />
         <Line type="monotone" dataKey="ma50" name="MA 50d" stroke={theme.palette.secondary.main} strokeWidth={1} strokeDasharray="4 2" dot={false} />
       </ComposedChart>
     </ResponsiveContainer>

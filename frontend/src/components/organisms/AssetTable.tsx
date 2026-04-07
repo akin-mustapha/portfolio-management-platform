@@ -9,6 +9,7 @@ import { Box, Chip, Typography, useTheme, type Theme } from '@mui/material'
 import { useAppStore } from '../../store/useAppStore'
 import SparklineChart from '../charts/SparklineChart'
 import MetricInfo from '../atoms/MetricInfo'
+import TickerLogo from '../atoms/TickerLogo'
 
 interface AssetTableProps {
   rows: Record<string, unknown>[]
@@ -55,7 +56,18 @@ function buildColumns(theme: Theme): GridColDef[] {
         return <SparklineChart values={values} sentiment={sentiment} height={32} />
       },
     },
-    { field: 'ticker', headerName: 'Ticker', width: 90, pinnable: true },
+    {
+      field: 'ticker',
+      headerName: 'Ticker',
+      width: 110,
+      pinnable: true,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <TickerLogo ticker={params.value as string} size={20} />
+          <span>{params.value as string}</span>
+        </Box>
+      ),
+    },
     { field: 'name', headerName: 'Name', width: 220 },
     { field: 'price', headerName: 'Price', width: 90, valueFormatter: (v) => numFmt(v) },
     { field: 'avg_price', headerName: 'Avg Price', width: 90, valueFormatter: (v) => numFmt(v), renderHeader: headerWithInfo('Avg Price', 'avg_price') },

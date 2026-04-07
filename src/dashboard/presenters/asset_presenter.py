@@ -58,8 +58,8 @@ class AssetPresenter:
         return {
             "dates": [r["data_date"] for r in rows],
             "values": [r["price"] for r in rows],
-            "value_ma_30d": [r.get("value_ma_30d") for r in rows],
-            "value_ma_50d": [r.get("value_ma_50d") for r in rows],
+            "price_ma_20d": [r.get("price_ma_20d") for r in rows],
+            "price_ma_50d": [r.get("price_ma_50d") for r in rows],
             "title": "Price",
         }
 

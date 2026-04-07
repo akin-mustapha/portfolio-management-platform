@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 import Section from '../../../components/molecules/Section'
 import PortfolioValueChart from '../../../components/charts/PortfolioValueChart'
 import PortfolioPnlChart from '../../../components/charts/PortfolioPnlChart'
@@ -24,9 +24,29 @@ export default function PortfolioTab({ data }: PortfolioTabProps) {
         <PortfolioPnlChart series={data.portfolio_pnl_series as Parameters<typeof PortfolioPnlChart>[0]['series']} />
       </Section>
 
-      <Section title="Position Weights" metricKey="position_weight_chart">
-        <PositionWeightChart distribution={data.position_distribution as Parameters<typeof PositionWeightChart>[0]['distribution']} />
-      </Section>
+      {/* Container query wrapper — breakpoint is container width, not viewport */}
+      <Box sx={{ containerType: 'inline-size', mb: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 1,
+            alignItems: 'stretch',
+            flexDirection: 'row',
+            '@container (max-width: 900px)': { flexDirection: 'column' },
+          }}
+        >
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <Section title="Position Weights" metricKey="position_weight_chart" sx={{ flex: 1, mb: 0 }}>
+              <PositionWeightChart distribution={data.position_distribution as Parameters<typeof PositionWeightChart>[0]['distribution']} />
+            </Section>
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+            <Section title="Daily Movers" sx={{ flex: 1, mb: 0 }}>
+              <DailyMoversTable movers={data.daily_movers as Parameters<typeof DailyMoversTable>[0]['movers']} />
+            </Section>
+          </Box>
+        </Box>
+      </Box>
 
       <Section title="Winners & Losers">
         <Grid container spacing={1}>
@@ -39,10 +59,6 @@ export default function PortfolioTab({ data }: PortfolioTabProps) {
             <LosersChart losers={data.losers as Parameters<typeof LosersChart>[0]['losers']} />
           </Grid>
         </Grid>
-      </Section>
-
-      <Section title="Daily Movers">
-        <DailyMoversTable movers={data.daily_movers as Parameters<typeof DailyMoversTable>[0]['movers']} />
       </Section>
     </div>
   )

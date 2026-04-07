@@ -12,6 +12,7 @@ from ..charts.portfolio_charts import (
     PositionConcentrationTreemapChart,
     daily_movers_table,
 )
+from ..components.molecules.collapsible_section import collapsible_section
 from ..components.organisms.secondary_kpi import secondary_kpi_row
 from ._helpers import _GRAPH_CONFIG, _chart_section, _loading_placeholder
 
@@ -59,152 +60,140 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
     return html.Div(
         [
             # ── Portfolio Overview — collapsible ───────────────────────
-            html.Div(
-                [
-                    html.Div(
-                        ["Portfolio Overview", html.Span("›", className="tv-chevron")],
-                        id="portfolio-section-header",
-                        className="tv-section-header tv-section-header--section",
-                        n_clicks=0,
-                        style={"cursor": "pointer"},
-                    ),
-                    secondary_kpi_row(kpi_data, theme=theme),
-                    # _cash_bar(kpi_data),
-                    dbc.Collapse(
-                        id="portfolio-charts-collapse",
-                        is_open=False,
-                        children=[
-                            # Row 1: Value + P&L
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        _chart_section(
-                                            "Portfolio Value",
-                                            dcc.Graph(
-                                                id="value_chart",
-                                                figure=PortfolioPerformancePlotlyLineChart().render(
-                                                    value_series, theme=theme
-                                                ),
-                                                config=_GRAPH_CONFIG,
-                                            ),
-                                        )
+            collapsible_section(
+                section_id="portfolio",
+                title="Portfolio Overview",
+                is_open=False,
+                subheader=secondary_kpi_row(kpi_data, theme=theme),
+                children=[
+                    # Row 1: Value + P&L
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                _chart_section(
+                                    "Portfolio Value",
+                                    dcc.Graph(
+                                        id="value_chart",
+                                        figure=PortfolioPerformancePlotlyLineChart().render(
+                                            value_series, theme=theme
+                                        ),
+                                        config=_GRAPH_CONFIG,
                                     ),
-                                    dbc.Col(
-                                        _chart_section(
-                                            "Portfolio P&L",
-                                            dcc.Graph(
-                                                id="pnl_chart",
-                                                figure=PortfolioPNLPlotlyLineChart().render(
-                                                    pnl_series,
-                                                    theme=theme,
-                                                    currency=currency_symbol,
-                                                ),
-                                                config=_GRAPH_CONFIG,
-                                            ),
-                                        )
-                                    ),
-                                ],
-                                className="mb-6 workspace-chart-grid",
+                                )
                             ),
-                            html.Hr(className="tv-divider"),
-                            # Row 2: Winners / Losers / Weight / FX Attribution
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        html.Div(
-                                            [
-                                                html.Div(
-                                                    "Top Losers",
-                                                    className="tv-section-header",
-                                                ),
-                                                html.Div(
-                                                    id="losers-table",
-                                                    children=_ranked_panel(
-                                                        losers, "profit", False
-                                                    ),
-                                                    className="movers-table-scroll",
-                                                ),
-                                            ]
-                                        )
+                            dbc.Col(
+                                _chart_section(
+                                    "Portfolio P&L",
+                                    dcc.Graph(
+                                        id="pnl_chart",
+                                        figure=PortfolioPNLPlotlyLineChart().render(
+                                            pnl_series,
+                                            theme=theme,
+                                            currency=currency_symbol,
+                                        ),
+                                        config=_GRAPH_CONFIG,
                                     ),
-                                    dbc.Col(
-                                        html.Div(
-                                            [
-                                                html.Div(
-                                                    "Top Winners",
-                                                    className="tv-section-header",
-                                                ),
-                                                html.Div(
-                                                    id="winners-table",
-                                                    children=_ranked_panel(
-                                                        winners, "profit", True
-                                                    ),
-                                                    className="movers-table-scroll",
-                                                ),
-                                            ]
-                                        )
-                                    ),
-                                    dbc.Col(
-                                        _chart_section(
-                                            "Position Weight",
-                                            dcc.Graph(
-                                                id="position_weight_donut_chart",
-                                                figure=PositionWeightPlotlyDonutChart().render(
-                                                    position_weight_series,
-                                                    avg_weight=position_weight_avg,
-                                                    theme=theme,
-                                                ),
-                                                config=_GRAPH_CONFIG,
-                                            ),
-                                        )
-                                    ),
-                                    dbc.Col(
-                                        _chart_section(
-                                            "Return Attribution (FX vs Price)",
-                                            dcc.Graph(
-                                                id="portfolio_fx_attribution_chart",
-                                                figure=PortfolioFXAttributionDonutChart().render(
-                                                    fx_attribution, theme=theme
-                                                ),
-                                                config=_GRAPH_CONFIG,
-                                            ),
-                                        )
-                                    ),
-                                ],
-                                className="mb-6 workspace-chart-grid",
-                                style={"gridTemplateColumns": "1fr 1fr 25% 25%"},
-                            ),
-                            html.Hr(className="tv-divider"),
-                            # Row 3: Concentration treemap
-                            _chart_section(
-                                "Portfolio Concentration (size = weight, colour = ROI)",
-                                dcc.Graph(
-                                    id="position_concentration_treemap",
-                                    figure=PositionConcentrationTreemapChart().render(
-                                        position_distribution, theme=theme
-                                    ),
-                                    config=_GRAPH_CONFIG,
-                                ),
-                            ),
-                            html.Hr(className="tv-divider"),
-                            # Row 4: Daily movers
-                            html.Div(
-                                [
-                                    html.Div(
-                                        "Today's Movers", className="tv-section-header"
-                                    ),
-                                    html.Div(
-                                        id="daily-movers-table",
-                                        children=daily_movers_table(daily_movers, n=5),
-                                        className="movers-table-scroll",
-                                    ),
-                                ],
-                                className="mb-6",
+                                )
                             ),
                         ],
+                        className="mb-6 workspace-chart-grid",
+                    ),
+                    html.Hr(className="tv-divider"),
+                    # Row 2: Winners / Losers / Weight / FX Attribution
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            "Top Losers",
+                                            className="tv-section-header",
+                                        ),
+                                        html.Div(
+                                            id="losers-table",
+                                            children=_ranked_panel(
+                                                losers, "profit", False
+                                            ),
+                                            className="movers-table-scroll",
+                                        ),
+                                    ]
+                                )
+                            ),
+                            dbc.Col(
+                                html.Div(
+                                    [
+                                        html.Div(
+                                            "Top Winners",
+                                            className="tv-section-header",
+                                        ),
+                                        html.Div(
+                                            id="winners-table",
+                                            children=_ranked_panel(
+                                                winners, "profit", True
+                                            ),
+                                            className="movers-table-scroll",
+                                        ),
+                                    ]
+                                )
+                            ),
+                            dbc.Col(
+                                _chart_section(
+                                    "Position Weight",
+                                    dcc.Graph(
+                                        id="position_weight_donut_chart",
+                                        figure=PositionWeightPlotlyDonutChart().render(
+                                            position_weight_series,
+                                            avg_weight=position_weight_avg,
+                                            theme=theme,
+                                        ),
+                                        config=_GRAPH_CONFIG,
+                                    ),
+                                )
+                            ),
+                            dbc.Col(
+                                _chart_section(
+                                    "Return Attribution (FX vs Price)",
+                                    dcc.Graph(
+                                        id="portfolio_fx_attribution_chart",
+                                        figure=PortfolioFXAttributionDonutChart().render(
+                                            fx_attribution, theme=theme
+                                        ),
+                                        config=_GRAPH_CONFIG,
+                                    ),
+                                )
+                            ),
+                        ],
+                        className="mb-6 workspace-chart-grid",
+                        style={"gridTemplateColumns": "1fr 1fr 25% 25%"},
+                    ),
+                    html.Hr(className="tv-divider"),
+                    # Row 3: Concentration treemap
+                    _chart_section(
+                        "Portfolio Concentration (size = weight, colour = ROI)",
+                        dcc.Graph(
+                            id="position_concentration_treemap",
+                            figure=PositionConcentrationTreemapChart().render(
+                                position_distribution, theme=theme
+                            ),
+                            config=_GRAPH_CONFIG,
+                        ),
+                    ),
+                    html.Hr(className="tv-divider"),
+                    # Row 4: Daily movers
+                    html.Div(
+                        [
+                            html.Div(
+                                "Today's Movers", className="tv-section-header"
+                            ),
+                            html.Div(
+                                id="daily-movers-table",
+                                children=daily_movers_table(daily_movers, n=5),
+                                className="movers-table-scroll",
+                            ),
+                        ],
+                        className="mb-6",
                     ),
                 ],
-                className="tv-section-container",
             ),
             # ── Asset detail — populated on row selection ──────────────
             # DISABLED
