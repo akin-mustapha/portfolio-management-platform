@@ -13,15 +13,15 @@ export default function RiskTab({ data }: RiskTabProps) {
 
   return (
     <div>
-      <Section title="Portfolio Drawdown">
+      <Section title="Portfolio Drawdown" metricKey="portfolio_drawdown_chart">
         <DrawdownChart drawdown={data.portfolio_drawdown as Parameters<typeof DrawdownChart>[0]['drawdown']} />
       </Section>
 
-      <Section title="Profitability Distribution">
+      <Section title="Profitability Distribution" metricKey="position_profitability_chart">
         <ProfitabilityChart assets={data.profitability as Parameters<typeof ProfitabilityChart>[0]['assets']} />
       </Section>
 
-      <Section title="VaR by Position">
+      <Section title="VaR by Position" metricKey="var_by_position_chart">
         <VarByPositionChart varData={data.var_by_position as Parameters<typeof VarByPositionChart>[0]['varData']} />
       </Section>
 
