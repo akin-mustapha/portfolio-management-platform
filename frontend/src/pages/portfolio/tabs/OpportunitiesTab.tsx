@@ -4,6 +4,7 @@ import LosersChart from '../../../components/charts/LosersChart'
 import PositionPerformanceMap from '../../../components/charts/PositionPerformanceMap'
 import OpportunitiesChart from '../../../components/charts/OpportunitiesChart'
 import { useAppStore } from '../../../store/useAppStore'
+import MetricInfo from '../../../components/atoms/MetricInfo'
 
 interface OpportunitiesTabProps {
   data?: Record<string, unknown>
@@ -30,9 +31,12 @@ export default function OpportunitiesTab({ data }: OpportunitiesTabProps) {
       </Box>
 
       <Box>
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-          Position Performance Map
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+          <Typography variant="subtitle2" fontWeight={600}>
+            Position Performance Map
+          </Typography>
+          <MetricInfo metricKey="position_performance_map_chart" />
+        </Box>
         <PositionPerformanceMap
           distribution={distribution}
           currencySymbol={currencySymbol}
