@@ -47,13 +47,15 @@ export default function KpiRow({ kpi, loading = false }: KpiRowProps) {
       value: kpi?.daily_value_change_pct as number | undefined,
       suffix: '%',
       colorCode: ((kpi?.daily_value_change_pct as number) ?? 0) >= 0 ? 'positive' : 'negative',
+      metricKey: 'daily_change_pct',
     } as const,
     {
       label: 'Vol (weighted)',
       value: kpi?.portfolio_vol as number | undefined,
       suffix: '%',
       colorCode: 'neutral' as const,
-    },
+      metricKey: 'portfolio_volatility_30d',
+    } as const,
   ]
 
   return (

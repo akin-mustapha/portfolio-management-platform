@@ -1,5 +1,7 @@
 import { Box, Card, CardContent, Skeleton, Typography, useTheme } from '@mui/material'
 import PrivacyValue from './PrivacyValue'
+import MetricInfo from './MetricInfo'
+import type { MetricKey } from '../../constants/metricDefinitions'
 
 interface KpiCardProps {
   label: string
@@ -10,6 +12,7 @@ interface KpiCardProps {
   colorCode?: 'positive' | 'negative' | 'neutral'
   loading?: boolean
   compact?: boolean
+  metricKey?: MetricKey
 }
 
 export default function KpiCard({
@@ -21,6 +24,7 @@ export default function KpiCard({
   colorCode = 'neutral',
   loading = false,
   compact = false,
+  metricKey,
 }: KpiCardProps) {
   const theme = useTheme()
   const colorMap = {
@@ -42,9 +46,12 @@ export default function KpiCard({
       }}
     >
       <CardContent sx={{ p: compact ? 1 : 1.5, '&:last-child': { pb: compact ? 1 : 1.5 } }}>
-        <Typography variant="caption" color="text.secondary" noWrap display="block" gutterBottom>
-          {label}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} mb={0.5}>
+          <Typography variant="caption" color="text.secondary" noWrap>
+            {label}
+          </Typography>
+          {metricKey && <MetricInfo metricKey={metricKey} size="inherit" />}
+        </Box>
         {loading ? (
           <Skeleton width="80%" height={28} />
         ) : (

@@ -16,15 +16,15 @@ export default function PortfolioTab({ data }: PortfolioTabProps) {
 
   return (
     <div>
-      <Section title="Portfolio Value">
+      <Section title="Portfolio Value" metricKey="portfolio_value_chart">
         <PortfolioValueChart series={data.portfolio_value_series as Parameters<typeof PortfolioValueChart>[0]['series']} />
       </Section>
 
-      <Section title="P&L Over Time">
+      <Section title="P&L Over Time" metricKey="portfolio_pnl_chart">
         <PortfolioPnlChart series={data.portfolio_pnl_series as Parameters<typeof PortfolioPnlChart>[0]['series']} />
       </Section>
 
-      <Section title="Position Weights">
+      <Section title="Position Weights" metricKey="position_weight_chart">
         <PositionWeightChart distribution={data.position_distribution as Parameters<typeof PositionWeightChart>[0]['distribution']} />
       </Section>
 

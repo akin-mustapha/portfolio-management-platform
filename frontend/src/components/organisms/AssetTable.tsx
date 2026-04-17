@@ -8,6 +8,7 @@ import {
 import { Box, Chip, Typography, useTheme, type Theme } from '@mui/material'
 import { useAppStore } from '../../store/useAppStore'
 import SparklineChart from '../charts/SparklineChart'
+import MetricInfo from '../atoms/MetricInfo'
 
 interface AssetTableProps {
   rows: Record<string, unknown>[]
@@ -25,6 +26,15 @@ function numFmt(v: unknown, decimals = 2) {
 function pctFmt(v: unknown) {
   if (v == null) return '—'
   return `${Number(v).toFixed(2)}%`
+}
+
+function headerWithInfo(label: string, metricKey: Parameters<typeof MetricInfo>[0]['metricKey']) {
+  return () => (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <span style={{ fontSize: 11, fontWeight: 700 }}>{label}</span>
+      <MetricInfo metricKey={metricKey} />
+    </Box>
+  )
 }
 
 function buildColumns(theme: Theme): GridColDef[] {
@@ -48,7 +58,7 @@ function buildColumns(theme: Theme): GridColDef[] {
     { field: 'ticker', headerName: 'Ticker', width: 90, pinnable: true },
     { field: 'name', headerName: 'Name', width: 220 },
     { field: 'price', headerName: 'Price', width: 90, valueFormatter: (v) => numFmt(v) },
-    { field: 'avg_price', headerName: 'Avg Price', width: 90, valueFormatter: (v) => numFmt(v) },
+    { field: 'avg_price', headerName: 'Avg Price', width: 90, valueFormatter: (v) => numFmt(v), renderHeader: headerWithInfo('Avg Price', 'avg_price') },
     {
       field: 'price_vs_avg_pct',
       headerName: 'vs Avg %',
@@ -70,6 +80,7 @@ function buildColumns(theme: Theme): GridColDef[] {
       width: 110,
       valueFormatter: (v) => numFmt(v),
       cellClassName: (p) => (Number(p.value) >= 0 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('P&L', 'profit'),
     },
     {
       field: 'pnl_pct',
@@ -77,14 +88,16 @@ function buildColumns(theme: Theme): GridColDef[] {
       width: 90,
       valueFormatter: pctFmt,
       cellClassName: (p) => (Number(p.value) >= 0 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('P&L %', 'pnl_pct'),
     },
-    { field: 'weight_pct', headerName: 'Weight %', width: 90, valueFormatter: pctFmt },
+    { field: 'weight_pct', headerName: 'Weight %', width: 90, valueFormatter: pctFmt, renderHeader: headerWithInfo('Weight %', 'weight_pct') },
     {
       field: 'daily_value_return',
       headerName: 'Daily Return',
       width: 100,
       valueFormatter: (v) => (v != null ? `${(Number(v) * 100).toFixed(2)}%` : '—'),
       cellClassName: (p) => (Number(p.value) >= 0 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('Daily Return', 'daily_value_return'),
     },
     {
       field: 'cumulative_value_return',
@@ -92,11 +105,13 @@ function buildColumns(theme: Theme): GridColDef[] {
       width: 110,
       valueFormatter: pctFmt,
       cellClassName: (p) => (Number(p.value) >= 0 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('Cum. Return', 'cumulative_value_return'),
     },
     {
       field: 'trend',
       headerName: 'Trend',
       width: 100,
+      renderHeader: headerWithInfo('Trend', 'trend'),
       renderCell: (params: GridRenderCellParams) => {
         const val = params.value as string
         const isBullish = val === 'Bullish'
@@ -121,10 +136,11 @@ function buildColumns(theme: Theme): GridColDef[] {
       width: 90,
       valueFormatter: (v) => numFmt(v, 4),
       cellClassName: (p) => (Number(p.value) < 1 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('DCA Bias', 'dca_bias'),
     },
-    { field: 'volatility_30d', headerName: 'Vol 30d', width: 90, valueFormatter: (v) => numFmt(v, 4) },
+    { field: 'volatility_30d', headerName: 'Vol 30d', width: 90, valueFormatter: (v) => numFmt(v, 4), renderHeader: headerWithInfo('Vol 30d', 'volatility_30d') },
     { field: 'volatility_50d', headerName: 'Vol 50d', width: 90, valueFormatter: (v) => numFmt(v, 4) },
-    { field: 'var_95_1d', headerName: 'VaR 95%', width: 90, valueFormatter: (v) => numFmt(v, 4) },
+    { field: 'var_95_1d', headerName: 'VaR 95%', width: 90, valueFormatter: (v) => numFmt(v, 4), renderHeader: headerWithInfo('VaR 95%', 'var_95_1d') },
     {
       field: 'beta_60d',
       headerName: 'Beta 60d',
@@ -150,6 +166,7 @@ function buildColumns(theme: Theme): GridColDef[] {
       valueFormatter: pctFmt,
       // drawdown is 0 or negative — 0 means at peak (good), negative means below peak
       cellClassName: (p) => (Number(p.value) >= 0 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('Drawdown 30d', 'value_drawdown_pct_30d'),
     },
     {
       field: 'recent_profit_high_30d',
@@ -157,6 +174,7 @@ function buildColumns(theme: Theme): GridColDef[] {
       width: 120,
       valueFormatter: (v) => numFmt(v),
       cellClassName: (p) => (Number(p.value) >= 0 ? 'cell-positive' : 'cell-negative'),
+      renderHeader: headerWithInfo('P&L High 30d', 'recent_profit_high_30d'),
     },
     {
       field: 'recent_profit_low_30d',
