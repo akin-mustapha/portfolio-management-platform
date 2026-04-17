@@ -1,4 +1,22 @@
-WITH asset_daily AS (
+WITH fred_rfr AS (
+    SELECT
+        observation_date,
+        value / 100.0 / 252.0                               AS daily_rfr
+    FROM staging.fred_observation
+    WHERE series_id = 'DTB3'
+),
+
+fred_sp500 AS (
+    SELECT
+        observation_date,
+        (value - LAG(value) OVER (ORDER BY observation_date))
+            / NULLIF(LAG(value) OVER (ORDER BY observation_date), 0)
+                                                            AS sp500_daily_return
+    FROM staging.fred_observation
+    WHERE series_id = 'SP500'
+),
+
+asset_daily AS (
     SELECT
         id,
         ticker,
@@ -36,6 +54,16 @@ asset_base AS (
         )                                                       AS daily_return
     FROM asset_daily
     WHERE rn = 1
+),
+
+asset_base_with_fred AS (
+    SELECT
+        ab.*,
+        COALESCE(rfr.daily_rfr, 0)                          AS daily_rfr,
+        sp.sp500_daily_return
+    FROM asset_base ab
+    LEFT JOIN fred_rfr rfr  ON rfr.observation_date = ab.data_timestamp::DATE
+    LEFT JOIN fred_sp500 sp ON sp.observation_date  = ab.data_timestamp::DATE
 ),
 
 asset_stats AS (
@@ -101,8 +129,28 @@ asset_stats AS (
         )                                                       AS recent_profit_low_30d,
 
         MAX(value) OVER (PARTITION BY ticker)                   AS value_high_alltime,
-        MIN(value) OVER (PARTITION BY ticker)                   AS value_low_alltime
-    FROM asset_base
+        MIN(value) OVER (PARTITION BY ticker)                   AS value_low_alltime,
+
+        COVAR_POP(daily_return, sp500_daily_return) OVER (
+            PARTITION BY ticker ORDER BY data_timestamp
+            ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+        ) / NULLIF(
+            VAR_POP(sp500_daily_return) OVER (
+                PARTITION BY ticker ORDER BY data_timestamp
+                ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+            ), 0
+        )                                                       AS beta_60d,
+
+        AVG(daily_return - daily_rfr) OVER (
+            PARTITION BY ticker ORDER BY data_timestamp
+            ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+        ) / NULLIF(
+            STDDEV_POP(daily_return) OVER (
+                PARTITION BY ticker ORDER BY data_timestamp
+                ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+            ), 0
+        ) * SQRT(252)                                           AS sharpe_ratio_30d
+    FROM asset_base_with_fred
 ),
 
 asset_latest AS (
@@ -135,6 +183,48 @@ account_ranked AS (
     WHERE rn = 1
 ),
 
+account_with_fred AS (
+    SELECT
+        ar.*,
+        COALESCE(rfr.daily_rfr, 0)                          AS daily_rfr,
+        COALESCE(sp.sp500_daily_return, 0)                  AS sp500_daily_return,
+        ((ar.investments_total_cost + ar.investments_unrealized_pnl)
+            - COALESCE(
+                ar.prev_invested_value,
+                ar.investments_total_cost + ar.investments_unrealized_pnl
+            ))
+            / NULLIF(ar.prev_invested_value, 0)             AS portfolio_daily_return
+    FROM account_ranked ar
+    LEFT JOIN fred_rfr rfr  ON rfr.observation_date = ar.data_timestamp::DATE
+    LEFT JOIN fred_sp500 sp ON sp.observation_date  = ar.data_timestamp::DATE
+),
+
+portfolio_metrics AS (
+    SELECT
+        snapshot_id,
+        sp500_daily_return                                   AS benchmark_return_daily,
+
+        AVG(portfolio_daily_return - daily_rfr) OVER (
+            ORDER BY data_timestamp
+            ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+        ) / NULLIF(
+            STDDEV_POP(portfolio_daily_return) OVER (
+                ORDER BY data_timestamp
+                ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+            ), 0
+        ) * SQRT(252)                                        AS sharpe_ratio_30d,
+
+        (EXP(SUM(LN(1 + COALESCE(portfolio_daily_return, 0))) OVER (
+            ORDER BY data_timestamp
+            ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+        )) - 1)
+        - (EXP(SUM(LN(1 + COALESCE(sp500_daily_return, 0))) OVER (
+            ORDER BY data_timestamp
+            ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+        )) - 1)                                              AS portfolio_vs_benchmark_30d
+    FROM account_with_fred
+),
+
 portfolio_agg AS (
     SELECT
         al.snapshot_id,
@@ -142,9 +232,13 @@ portfolio_agg AS (
         SUM(
             al.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0)
             * COALESCE(al.volatility_30d, 0)
-        )                                                       AS portfolio_volatility_weighted
+        )                                                       AS portfolio_volatility_weighted,
+        SUM(
+            al.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0)
+            * COALESCE(al.beta_60d, 0)
+        )                                                       AS portfolio_beta_weighted
     FROM asset_latest al
-    JOIN account_ranked acc ON acc.snapshot_id = al.snapshot_id
+    JOIN account_with_fred acc ON acc.snapshot_id = al.snapshot_id
     WHERE al.rn = 1
     GROUP BY al.snapshot_id
 )
@@ -165,7 +259,7 @@ SELECT
     a.profit / NULLIF(a.cost, 0) * 100                          AS unrealized_pnl_pct,
     NULL::FLOAT                                                  AS realized_pnl,
     a.value / NULLIF(acc.investments_total_cost + acc.investments_unrealized_pnl, 0) * 100
-                                                                AS position_weight_pct,
+                                                                 AS position_weight_pct,
     a.fx_impact,
 
     -- fact_return
@@ -192,6 +286,10 @@ SELECT
     a.recent_profit_low_30d,
     a.recent_value_high_30d,
     a.recent_value_low_30d,
+
+    -- fact_technical (FRED)
+    a.beta_60d,
+    a.sharpe_ratio_30d,
 
     -- fact_signal
     a.price / NULLIF(a.avg_price, 0)                            AS dca_bias,
@@ -223,10 +321,16 @@ SELECT
     (acc.total_value - acc.cash_available_to_trade)
         / NULLIF(acc.total_value, 0) * 100                      AS cash_deployment_ratio,
     pa.fx_impact_total,
-    pa.portfolio_volatility_weighted
+    pa.portfolio_volatility_weighted,
+    pa.portfolio_beta_weighted,
+
+    -- fact_portfolio_daily (FRED)
+    pm.sharpe_ratio_30d                                      AS acct_sharpe_ratio_30d,
+    pm.benchmark_return_daily                                 AS acct_benchmark_return_daily,
+    pm.portfolio_vs_benchmark_30d                             AS acct_portfolio_vs_benchmark_30d
 
 FROM asset_latest a
-JOIN account_ranked acc ON acc.snapshot_id = a.snapshot_id
+JOIN account_with_fred acc ON acc.snapshot_id = a.snapshot_id
 JOIN analytics.dim_asset da
     ON da.ticker = a.ticker
 CROSS JOIN (
@@ -235,4 +339,5 @@ CROSS JOIN (
     WHERE portfolio_id = :portfolio_id
 ) dp
 LEFT JOIN portfolio_agg pa ON pa.snapshot_id = a.snapshot_id
+LEFT JOIN portfolio_metrics pm ON pm.snapshot_id = a.snapshot_id
 WHERE a.rn = 1
