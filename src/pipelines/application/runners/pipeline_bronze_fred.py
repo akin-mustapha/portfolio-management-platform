@@ -15,7 +15,7 @@ from pydantic import ValidationError
 from ...application.protocols import Source, Destination
 from ...application.policies import Pipeline
 from .loaders.loader_bronze_fred import FullLoaderPostgresFred
-from ...infrastructure.api.api_client_fred import FredAPIClient
+from ...infrastructure.clients.api_client_fred import FredAPIClient
 from ...domain.schemas.bronze.fred_api import FredObservationsResponse
 
 from shared.database.client import SQLModelClient

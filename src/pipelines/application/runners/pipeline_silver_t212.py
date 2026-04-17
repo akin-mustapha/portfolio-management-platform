@@ -12,16 +12,18 @@ from pathlib import Path
 from dotenv import load_dotenv
 from typing import List, Dict, Any
 
+from ...domain.schemas.silver.asset import AssetRecord
+from ...domain.schemas.silver.account import AccountRecord
+
 from ...application.policies import Pipeline
 from ...application.protocols import Source, Destination, Transformation, RejectedRecord
 from ...application.validators.schema_validator import SchemaValidator
 
+# TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
 from ...infrastructure.repositories.repository_factory import RepositoryFactory
 from ...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
-from ...domain.schemas.silver.asset import AssetRecord
-from ...domain.schemas.silver.account import AccountRecord
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 

@@ -16,7 +16,7 @@ from ...application.protocols import Destination
 
 from .loaders.loader_bronze_t212 import FullLoaderPostgresT212
 
-from ...infrastructure.api.api_client_trading212 import Trading212APIClient
+from ...infrastructure.clients.api_client_trading212 import Trading212APIClient
 from ...factories.schema import Schema
 
 logging.basicConfig(
