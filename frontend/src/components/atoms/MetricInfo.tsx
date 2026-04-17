@@ -9,9 +9,9 @@ interface MetricInfoProps {
 }
 
 export default function MetricInfo({ metricKey, size = 'small' }: MetricInfoProps) {
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation()
     setAnchorEl(event.currentTarget)
   }
@@ -24,6 +24,7 @@ export default function MetricInfo({ metricKey, size = 'small' }: MetricInfoProp
   return (
     <>
       <IconButton
+        component="span"
         size="small"
         onClick={handleClick}
         sx={{

@@ -1,12 +1,12 @@
 """Opportunities tab — performance scatter, profitable positions P&L."""
 
-import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from ..charts.portfolio_charts import (
     PortfolioPerformanceScatterPlot,
     WinnersPnLPlotlyLineChart,
 )
+from ..components.molecules.collapsible_section import collapsible_section
 from ..components.organisms.secondary_kpi import secondary_kpi_row
 from ._helpers import _GRAPH_CONFIG, _chart_section, _loading_placeholder
 
@@ -24,52 +24,41 @@ def opportunities_tab_content(view_model=None, theme="light", kpi_data=None):
     return html.Div(
         [
             # ── Portfolio Overview — collapsible ───────────────────────
-            html.Div(
-                [
+            collapsible_section(
+                section_id="opportunities-portfolio",
+                title="Portfolio Overview",
+                is_open=True,
+                subheader=secondary_kpi_row(kpi_data, theme=theme),
+                children=[
+                    html.Hr(className="tv-divider"),
+                    # Row 1: Performance scatter + Winners P&L
                     html.Div(
-                        ["Portfolio Overview", html.Span("›", className="tv-chevron")],
-                        id="opportunities-portfolio-section-header",
-                        className="tv-section-header tv-section-header--section",
-                        n_clicks=0,
-                        style={"cursor": "pointer"},
+                        _chart_section(
+                            "Position Performance Map",
+                            dcc.Graph(
+                                id="portfolio_performance_map",
+                                figure=PortfolioPerformanceScatterPlot().render(
+                                    position_distribution,
+                                    theme=theme,
+                                    currency=currency_symbol,
+                                ),
+                                config=_GRAPH_CONFIG,
+                            ),
+                        )
                     ),
-                    secondary_kpi_row(kpi_data, theme=theme),
-                    dbc.Collapse(
-                        id="opportunities-portfolio-charts-collapse",
-                        is_open=True,
-                        children=[
-                            html.Hr(className="tv-divider"),
-                            # Row 1: Performance scatter + Winners P&L
-                            html.Div(
-                                _chart_section(
-                                    "Position Performance Map",
-                                    dcc.Graph(
-                                        id="portfolio_performance_map",
-                                        figure=PortfolioPerformanceScatterPlot().render(
-                                            position_distribution,
-                                            theme=theme,
-                                            currency=currency_symbol,
-                                        ),
-                                        config=_GRAPH_CONFIG,
-                                    ),
-                                )
+                    html.Div(
+                        _chart_section(
+                            "Profitable Positions P&L",
+                            dcc.Graph(
+                                id="winners_pnl_chart",
+                                figure=WinnersPnLPlotlyLineChart().render(
+                                    winners_pnl, theme=theme
+                                ),
+                                config=_GRAPH_CONFIG,
                             ),
-                            html.Div(
-                                _chart_section(
-                                    "Profitable Positions P&L",
-                                    dcc.Graph(
-                                        id="winners_pnl_chart",
-                                        figure=WinnersPnLPlotlyLineChart().render(
-                                            winners_pnl, theme=theme
-                                        ),
-                                        config=_GRAPH_CONFIG,
-                                    ),
-                                )
-                            ),
-                        ],
+                        )
                     ),
                 ],
-                className="tv-section-container",
             ),
             # ── Asset detail — populated on row selection ──────────────
             # DISABLE

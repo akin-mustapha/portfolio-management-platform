@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Box, LinearProgress } from '@mui/material'
 import { usePortfolioSummary } from '../../hooks/usePortfolio'
 import { useAppStore } from '../../store/useAppStore'
@@ -19,7 +19,7 @@ import AssetProfileTab from './tabs/AssetProfileTab'
 export default function PortfolioPage() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [rebalanceOpen, setRebalanceOpen] = useState(false)
-  const { selectedTickers, selectedTags } = useAppStore()
+  const { selectedTickers, setSelectedTickers, selectedTags } = useAppStore()
 
   const { data: summary, isLoading } = usePortfolioSummary()
 
@@ -34,6 +34,13 @@ export default function PortfolioPage() {
       return selectedTags.some((t) => tags.includes(t))
     })
   }, [summary, selectedTags])
+
+  // Auto-select the first row on initial load if nothing is selected
+  useEffect(() => {
+    if (selectedTickers.length === 0 && allRows.length > 0) {
+      setSelectedTickers([allRows[0].ticker as string])
+    }
+  }, [allRows]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // The first selected ticker's full row for the Asset Profile tab
   const selectedAssetRow = useMemo(() => {
@@ -56,7 +63,7 @@ export default function PortfolioPage() {
 
       <Box sx={{ px: 1.5, pt: 1 }}>
         <KpiRow kpi={summary?.kpi as Record<string, unknown>} loading={isLoading} />
-        <FilterBar availableTags={availableTags} />
+        <FilterBar availableTags={availableTags}  />
       </Box>
 
       <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', mt: 1 }}>
