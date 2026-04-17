@@ -8,6 +8,7 @@ raw observations in raw.fred_observations (JSONB, date-partitioned).
 import os
 import logging
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Any
 from dotenv import load_dotenv
 from pydantic import ValidationError
@@ -19,6 +20,9 @@ from ...infrastructure.clients.api_client_fred import FredAPIClient
 from ...domain.schemas.bronze.fred_api import FredObservationsResponse
 
 from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
+
+_QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -65,11 +69,7 @@ class FredBronzeSource(Source):
         return results
 
     def _get_observation_start(self, series_id: str) -> str:
-        sql = """
-            SELECT MAX(observation_date) AS max_date
-            FROM staging.fred_observation
-            WHERE series_id = :series_id
-        """
+        sql = load_query(_QUERIES_DIR / "silver" / "fred_observation_start.sql")
         with self._db_client as client:
             result = client.execute(sql, params={"series_id": series_id})
             row = result.fetchone()

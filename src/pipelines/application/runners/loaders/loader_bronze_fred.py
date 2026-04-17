@@ -2,14 +2,18 @@ import os
 import uuid
 import json
 from datetime import datetime
+from pathlib import Path
 from dotenv import load_dotenv
 
 from ....application.policies import FullLoader
 from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
 
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+_QUERIES_DIR = Path(__file__).parent.parent.parent.parent / "infrastructure" / "queries"
 
 
 class FullLoaderPostgresFred(FullLoader):
@@ -19,11 +23,10 @@ class FullLoaderPostgresFred(FullLoader):
         self._client = SQLModelClient(DATABASE_URL)
 
     def _create_partition(self):
-        sql = f"""
-            CREATE TABLE IF NOT EXISTS {self._partition_name}
-            PARTITION OF {self._table_name}
-            FOR VALUES FROM (:day) TO (:next_day);
-        """
+        sql = load_query(_QUERIES_DIR / "bronze" / "create_partition.sql").format(
+            partition_name=self._partition_name,
+            table_name=self._table_name,
+        )
         with self._client as client:
             client.execute(sql, {"day": self._day, "next_day": self._next_day})
 
@@ -33,22 +36,9 @@ class FullLoaderPostgresFred(FullLoader):
         Inserts one row per series per run.
         """
         ingested_date = datetime.now().date()
-        sql = f"""
-            INSERT INTO {self._table_name} (
-                id,
-                series_id,
-                ingested_date,
-                observation_start,
-                observations
-            )
-            VALUES (
-                :id,
-                :series_id,
-                :ingested_date,
-                :observation_start,
-                :observations
-            )
-        """
+        sql = load_query(_QUERIES_DIR / "bronze" / "fred_observations_insert.sql").format(
+            table_name=self._table_name
+        )
         with self._client as client:
             for record in data:
                 params = {

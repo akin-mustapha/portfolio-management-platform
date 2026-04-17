@@ -9,8 +9,10 @@ Source -> Destination (no transformation)
 import os
 import logging
 from dataclasses import dataclass, asdict
+from pathlib import Path
 from dotenv import load_dotenv
 from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
 
 from ...application.protocols import Source, Destination
 from ...application.policies import Pipeline
@@ -26,6 +28,8 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+_QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
+
 
 @dataclass
 class Asset:
@@ -36,25 +40,19 @@ class Asset:
 
 
 class AssetPortfolioSource(Source):
+    def __init__(self):
+        self._sql = load_query(_QUERIES_DIR / "portfolio" / "asset_portfolio_source.sql")
+
     def extract(self) -> list:
-        sql = """
-      SELECT ticker, name, broker, currency
-      FROM (
-          SELECT *,
-                ROW_NUMBER() OVER (
-                    PARTITION BY ticker, broker, currency
-                    ORDER BY data_timestamp DESC
-                ) as rn
-          FROM staging.asset
-      ) t
-      WHERE rn = 1;
-    """
         with SQLModelClient(DATABASE_URL) as client:
-            res = client.execute(sql)
+            res = client.execute(self._sql)
             return res.fetchall()
 
 
 class AssetPortfolioDestination(Destination):
+    def __init__(self):
+        self._template = load_query(_QUERIES_DIR / "portfolio" / "asset_portfolio_upsert.sql")
+
     def load(self, data: list[dict]) -> None:
         # INSERTION POLICY: IDEMPOTENT
         merge_value_mapping = ",".join([f"""(
@@ -65,29 +63,10 @@ class AssetPortfolioDestination(Destination):
           )
         """ for r in data])
 
-        destination_table_name = "portfolio.asset"
-        asset_upsert_sql = f"""
-      MERGE INTO {destination_table_name} AS tgt
-      USING
-        (
-          VALUES
-            {merge_value_mapping}
+        asset_upsert_sql = self._template.format(
+            destination_table_name="portfolio.asset",
+            values=merge_value_mapping,
         )
-      AS src (ticker, name, broker, currency)
-      ON    tgt.ticker = src.ticker
-        AND tgt.broker = src.broker
-        AND tgt.currency = src.currency
-      WHEN NOT MATCHED THEN
-        INSERT (ticker, name, broker, currency)
-        VALUES (src.ticker, src.name, src.broker, src.currency)
-      WHEN MATCHED AND tgt.name <> src.name THEN
-      UPDATE
-        SET   name = src.name
-            , updated_timestamp = NOW()
-      WHEN NOT MATCHED BY SOURCE THEN
-        UPDATE
-          SET to_timestamp = NOW();
-    """
 
         with SQLModelClient(DATABASE_URL) as client:
             client.execute(asset_upsert_sql)
