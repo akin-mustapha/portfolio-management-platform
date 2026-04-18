@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Legend,
 } from 'recharts'
 import { useTooltipStyle, fmtNum } from '../../utils/chartUtils'
 
@@ -21,65 +22,29 @@ export default function PortfolioValueChart({ series }: PortfolioValueChartProps
 
   const data = series.dates.map((d, i) => ({
     date: d,
-    cost: series.costs[i],
-    pnl: series.values[i] - series.costs[i],
     value: series.values[i],
+    cost: series.costs[i],
   }))
-
-  function CustomTooltip({ active, payload }: { active?: boolean; payload?: unknown[] }) {
-    if (!active || !payload?.length) return null
-    const d = (payload as Array<{ payload: typeof data[number] }>)[0].payload
-    const isPositive = d.pnl >= 0
-    return (
-      <div style={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, padding: '6px 10px', fontSize: 11, borderRadius: 4 }}>
-        <div style={{ marginBottom: 2, color: theme.palette.text.secondary, fontSize: 10 }}>{d.date}</div>
-        <div>Value: {fmtNum(d.value)}</div>
-        <div>Cost: {fmtNum(d.cost)}</div>
-        <div style={{ color: isPositive ? theme.palette.success.main : theme.palette.error.main }}>
-          P&L: {isPositive ? '+' : ''}{fmtNum(d.pnl)}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <ResponsiveContainer width="100%" height={220}>
       <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
-          <linearGradient id="pnlGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={theme.palette.success.main} stopOpacity={0.4} />
-            <stop offset="95%" stopColor={theme.palette.success.main} stopOpacity={0.05} />
+          <linearGradient id="valueGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
+            <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
         <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
         <YAxis tick={{ fontSize: 10 }} tickLine={false} width={60} />
-        <Tooltip content={<CustomTooltip />} />
-        {/* Base: cost line — transparent fill, dashed stroke */}
-        <Area
-          type="monotone"
-          dataKey="cost"
-          stackId="pv"
-          stroke={theme.palette.text.secondary}
-          fill="transparent"
-          strokeDasharray="4 2"
-          strokeWidth={1}
-          dot={false}
-          name="Total Cost"
-          legendType="none"
+        <Tooltip
+          contentStyle={tooltipStyle}
+          formatter={(v: unknown) => [fmtNum(v), '']}
         />
-        {/* Gap: P&L above cost — green fill highlights the gain */}
-        <Area
-          type="monotone"
-          dataKey="pnl"
-          stackId="pv"
-          stroke={theme.palette.primary.main}
-          fill="url(#pnlGrad)"
-          strokeWidth={1.5}
-          dot={false}
-          name="Portfolio Value"
-          legendType="none"
-        />
+        <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }} />
+        <Area type="monotone" dataKey="value" name="Portfolio Value" stroke={theme.palette.primary.main} fill="url(#valueGrad)" strokeWidth={1.5} dot={false} />
+        <Area type="monotone" dataKey="cost" name="Total Cost" stroke={theme.palette.text.secondary} fill="none" strokeDasharray="4 2" strokeWidth={1} dot={false} />
       </AreaChart>
     </ResponsiveContainer>
   )
