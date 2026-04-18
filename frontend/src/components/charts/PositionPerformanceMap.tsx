@@ -220,7 +220,7 @@ export default function PositionPerformanceMap({
           content={(props) => (
             <CustomTooltip
               active={props.active}
-              payload={props.payload as Array<{ payload: EnrichedPoint }>}
+              payload={props.payload as unknown as Array<{ payload: EnrichedPoint }>}
               currencySymbol={currencySymbol}
             />
           )}
