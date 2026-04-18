@@ -21,9 +21,11 @@ A personal stock portfolio monitoring system. It pulls data from [Trading212](ht
 Four layers, each with a single responsibility:
 
 ```
-Frontend        src/dashboard/            Dash UI — reads from services
+Frontend        frontend/                 React (Vite) — primary UI on :5172
+                src/dashboard/            Dash UI — legacy dashboard on :8050
+API             src/api/                  FastAPI — serves React frontend on :8001
 Orchestration   src/orchestration/        Prefect — schedules pipelines
-Backend         src/pipelines/    ETL pipelines and Kafka events
+Backend         src/pipelines/            ETL pipelines and Kafka events
                 src/backend/services/     Portfolio domain logic
 Storage         raw → staging → analytics (Postgres, 3 schemas)
 ```
@@ -36,7 +38,7 @@ The storage layer uses a medallion architecture inside Postgres:
 |-------------|--------|--------------------------------------------------|
 | `raw`       | Bronze | Append-only, partitioned by date, data as received |
 | `staging`   | Silver | Typed, deduplicated, computed metrics            |
-| `analytics` | Gold   | Built to answer dashboard questions (in progress) |
+| `analytics` | Gold   | Kimball star schema — built to answer dashboard questions |
 
 ---
 
@@ -44,7 +46,9 @@ The storage layer uses a medallion architecture inside Postgres:
 
 | Concern        | Tool                          |
 |----------------|-------------------------------|
-| Dashboard      | Dash, Plotly, Dash Bootstrap  |
+| React frontend | React, Vite, MUI, Recharts    |
+| API            | FastAPI, Uvicorn              |
+| Dash dashboard | Dash, Plotly, Dash Bootstrap  |
 | Orchestration  | Prefect                       |
 | Messaging      | Kafka (Confluent)             |
 | Validation     | Pydantic                      |
@@ -52,7 +56,7 @@ The storage layer uses a medallion architecture inside Postgres:
 | HTTP Client    | HTTPX                         |
 | Data           | Pandas                        |
 | Testing        | Pytest                        |
-| Runtime        | Python 3.13                   |
+| Runtime        | Python 3.13 / Node 20         |
 
 ---
 
@@ -124,11 +128,25 @@ docker exec -it kafka kafka-topics \
 
 ## Running
 
-### Dashboard
+### React frontend
+
+```sh
+cd frontend
+npm install
+npm run dev        # http://localhost:5172
+```
+
+### API (FastAPI)
+
+```sh
+uvicorn src.api.main:app --reload --port 8001
+```
+
+### Dash dashboard (legacy)
 
 ```sh
 cd src
-python -m dashboard.app
+python -m dashboard.app   # http://localhost:8050
 ```
 
 ### Pipelines (via Prefect)
@@ -141,7 +159,7 @@ python -m dashboard.app
 
 ```sh
 cd src
-python3 -m pipelines.application.runners.pipeline_account_bronze
+python3 -m pipelines.application.runners.pipeline_bronze_t212
 ```
 
 ---
@@ -149,9 +167,11 @@ python3 -m pipelines.application.runners.pipeline_account_bronze
 ## Project Structure
 
 ```
+frontend/               # React UI (Vite + MUI + Recharts) — port 5172
 src/
-├── dashboard/          # Frontend — Dash UI
-├── orchestration/      # Orchestration — Prefect flows
+├── api/                # FastAPI — serves the React frontend — port 8001
+├── dashboard/          # Dash UI (legacy dashboard) — port 8050
+├── orchestration/      # Prefect flows
 ├── pipelines/          # ETL pipelines, Kafka producer/consumer
 ├── backend/
 │   └── services/       # Portfolio domain logic
