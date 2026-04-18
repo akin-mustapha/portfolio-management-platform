@@ -124,6 +124,7 @@ class PortfolioPresenter:
                 "ticker": a["ticker"],
                 "var_95_1d": float(a["var_95_1d"]),
                 "label": a["ticker"],
+                "name": a["name"],
             }
             for a in assets
             if a.get("var_95_1d") is not None
@@ -147,6 +148,7 @@ class PortfolioPresenter:
                     "ticker": a["ticker"],
                     "daily_value_return": daily_value_return,
                     "label": a["ticker"],
+                    "name": a["name"],
                 }
             )
 

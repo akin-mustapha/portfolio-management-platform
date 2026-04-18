@@ -1,7 +1,7 @@
 import { Box, Table, TableBody, TableCell, TableHead, TableRow, useTheme } from '@mui/material'
 
 interface DailyMoversTableProps {
-  movers?: Array<{ ticker: string; daily_value_return: number }>
+  movers?: Array<{ ticker: string; daily_value_return: number; name: string }>
 }
 
 export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
@@ -14,6 +14,7 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
         <TableHead>
           <TableRow>
             <TableCell sx={{ fontSize: 11, fontWeight: 700 }}>Ticker</TableCell>
+            <TableCell sx={{ fontSize: 11, fontWeight: 700 }}>Name</TableCell>
             <TableCell align="right" sx={{ fontSize: 11, fontWeight: 700 }}>Daily Return</TableCell>
           </TableRow>
         </TableHead>
@@ -21,6 +22,19 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
           {movers.map((m) => (
             <TableRow key={m.ticker} hover>
               <TableCell sx={{ fontSize: 11 }}>{m.ticker}</TableCell>
+              <TableCell
+                sx={{
+                  fontSize: 11,
+                  color: theme.palette.text.secondary,
+                  maxWidth: 180,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={m.name}
+              >
+                {m.name}
+              </TableCell>
               <TableCell
                 align="right"
                 sx={{
