@@ -40,6 +40,7 @@ export default function OpportunitiesChart({ distribution }: OpportunitiesChartP
     return (
       <div style={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, padding: '6px 10px', fontSize: 11, borderRadius: 4 }}>
         <div style={{ fontWeight: 600 }}>{d.ticker}</div>
+        <div style={{ color: theme.palette.text.secondary, fontSize: 10, marginBottom: 2 }}>{d.name}</div>
         <div>Weight: {d.weight_pct.toFixed(1)}%</div>
         <div>ROI: {d.roi_pct > 0 ? '+' : ''}{d.roi_pct.toFixed(2)}%</div>
         <div>P&L: {fmtNum(d.profit)}</div>

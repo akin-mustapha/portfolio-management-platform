@@ -1,9 +1,16 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { useTheme } from '@mui/material'
-import { useTooltipStyle } from '../../utils/chartUtils'
+
+interface DistributionItem {
+  ticker: string
+  weight_pct: number
+  profit: number
+  value: number
+  name: string
+}
 
 interface PositionWeightChartProps {
-  distribution?: Array<{ ticker: string; weight_pct: number; profit: number; value: number }>
+  distribution?: DistributionItem[]
 }
 
 // Reordered so high-contrast colors are never adjacent in the ring
@@ -23,13 +30,24 @@ const PALETTE = [
 
 export default function PositionWeightChart({ distribution }: PositionWeightChartProps) {
   const theme = useTheme()
-  const tooltipStyle = useTooltipStyle()
   if (!distribution?.length) return null
 
   const sorted = [...distribution].sort((a, b) => b.weight_pct - a.weight_pct).slice(0, 10)
 
   const textSecondary = theme.palette.text.secondary
   const textPrimary = theme.palette.text.primary
+
+  function CustomTooltip({ active, payload }: { active?: boolean; payload?: unknown[] }) {
+    if (!active || !payload?.length) return null
+    const d = (payload as Array<{ payload: DistributionItem }>)[0].payload
+    return (
+      <div style={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, padding: '6px 10px', fontSize: 11, borderRadius: 4 }}>
+        <div style={{ fontWeight: 600 }}>{d.ticker}</div>
+        <div style={{ color: textSecondary, fontSize: 10, marginBottom: 2 }}>{d.name}</div>
+        <div>Weight: {d.weight_pct.toFixed(2)}%</div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', height: 300, padding: '10px' }}>
@@ -51,10 +69,7 @@ export default function PositionWeightChart({ distribution }: PositionWeightChar
                 <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={tooltipStyle}
-              formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'Weight']}
-            />
+            <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
       </div>
