@@ -1,0 +1,47 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5172
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "uvicorn",
+      "runtimeArgs": ["src.api.main:app", "--reload", "--port", "8001"],
+      "port": 8001
+    },
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "src.dashboard.app"],
+      "port": 8050
+    },
+    {
+      "name": "prefect-server",
+      "runtimeExecutable": "prefect",
+      "runtimeArgs": ["server", "start"],
+      "port": 4200
+    },
+    {
+      "name": "prefect-worker",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["scripts/prefect_worker_local.sh", "start", "--pool", "asset-monitoring-pool"],
+      "port": null
+    },
+    {
+      "name": "postgres",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["up", "postgres"],
+      "port": 5432
+    },
+    {
+      "name": "kafka",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["up", "kafka"],
+      "port": 9092
+    }
+  ]
+}
