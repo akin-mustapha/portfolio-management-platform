@@ -18,8 +18,8 @@ export default function DrawdownChart({ drawdown }: DrawdownChartProps) {
       <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="ddGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={theme.palette.error.main} stopOpacity={0.4} />
-            <stop offset="95%" stopColor={theme.palette.error.main} stopOpacity={0} />
+            <stop offset="5%" stopColor={theme.palette.error.main} stopOpacity={0} />
+            <stop offset="95%" stopColor={theme.palette.error.main} stopOpacity={0.4} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
@@ -30,7 +30,7 @@ export default function DrawdownChart({ drawdown }: DrawdownChartProps) {
           formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'Drawdown']}
         />
         <ReferenceLine y={0} stroke={theme.palette.divider} />
-        <Area type="monotone" dataKey="drawdown" stroke={theme.palette.error.main} fill="url(#ddGrad)" strokeWidth={1.5} dot={false} />
+        <Area type="monotone" dataKey="drawdown" stroke={theme.palette.error.main} fill="url(#ddGrad)" strokeWidth={1.5} dot={false} baseValue={0} />
       </AreaChart>
     </ResponsiveContainer>
   )
