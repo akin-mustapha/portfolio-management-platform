@@ -1,12 +1,11 @@
 """
 Unified Gold Pipeline for Trading212
 
-Reads from staging.asset and staging.account in a single source query.
-All computation (window functions, derived metrics) is done here — no dependency
-on staging.asset_computed or staging.account_computed.
-
-One wide row per (asset, date) is returned. Asset facts fan out via column projection.
-Account fact deduplicates to one row per (date_id, portfolio_id) before loading.
+Refreshes the staging materialised views that hold all window computation
+(`v_fred_rfr`, `v_fred_sp500`, `v_asset_metrics`, `v_account_metrics`), then
+runs one projection query per fact table. Each query is a thin SELECT that
+joins the metrics views with `analytics.dim_asset` / `analytics.dim_portfolio`
+and returns exactly the columns its fact table expects.
 """
 
 import os
@@ -16,15 +15,11 @@ from dotenv import load_dotenv
 from typing import List, Dict
 
 from ...application.policies import Pipeline
-from ...application.protocols import Source, Destination, Transformation
-from ...application.validators.schema_validator import SchemaValidator
+from ...application.protocols import Source, Destination
 
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
 from ...infrastructure.repositories.repository_factory import RepositoryFactory
-from ...infrastructure.repositories.dead_letter_destination import DeadLetterDestination
-from ...domain.schemas.gold.asset_gold import AssetGoldRecord
-from ...domain.schemas.gold.account_gold import AccountGoldRecord
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
@@ -42,223 +37,93 @@ portfolio_id = 21641310
 
 
 # ---------------------------------------------------------------------------
-# Source
+# Source — refresh views + load per-fact SQL
 # ---------------------------------------------------------------------------
+
+
+_MATERIALIZED_VIEWS = [
+    "staging.v_fred_rfr",
+    "staging.v_fred_sp500",
+    "staging.v_asset_metrics",
+    "staging.v_account_metrics",
+]
 
 
 class T212GoldSource(Source):
-    """
-    Unified source that joins staging.asset and staging.account via snapshot_id.
-
-    snapshot_id is the shared key written by PipelineT212Silver — both asset and
-    account rows from the same API call carry the same snapshot_id, so the join
-    is exact rather than approximate (no date-level matching needed).
-
-    CTE structure:
-      asset_base     — computes daily_return via LAG (required before STDDEV)
-      asset_stats    — all window functions on top of asset_base
-      asset_latest   — deduplicates to one row per (ticker, date)
-      account_ranked — adds prev_total_value for daily change calculation
-      portfolio_agg  — aggregates fx_impact and weighted volatility per snapshot
-
-    Returns one wide row per (asset, date). Account columns are prefixed with acct_
-    to avoid naming conflicts with asset columns of the same name.
-    """
+    """Refreshes the staging metrics views. Queries themselves live on each destination."""
 
     def __init__(self):
         self._client = SQLModelClient(DATABASE_URL)
-        self._sql = load_query(_QUERIES_DIR / "gold" / "t212_gold_source.sql")
 
     def extract(self):
         with self._client as db:
-            result = db.execute(self._sql, params={"portfolio_id": str(portfolio_id)})
-        return result.fetchall()
-
+            for view in _MATERIALIZED_VIEWS:
+                db.execute(f"REFRESH MATERIALIZED VIEW CONCURRENTLY {view}")
 
 
 # ---------------------------------------------------------------------------
-# Transformations
+# Destinations — each owns its SQL and its repository
 # ---------------------------------------------------------------------------
 
 
-class AssetGoldTransformation(Transformation):
-    """Row → dict. Validator picks up the asset columns."""
-
-    def transform(self, data: list) -> list[Dict]:
-        return [dict(row._mapping) for row in data]
-
-
-# acct_ prefix is removed so AccountGoldRecord field names match
-_ACCT_RENAMES = {
-    "acct_total_value": "total_value",
-    "acct_total_cost": "total_cost",
-    "acct_unrealized_pnl": "unrealized_pnl",
-    "acct_unrealized_pnl_pct": "unrealized_pnl_pct",
-    "acct_realized_pnl": "realized_pnl",
-    "acct_sharpe_ratio_30d": "sharpe_ratio_30d",
-    "acct_benchmark_return_daily": "benchmark_return_daily",
-    "acct_portfolio_vs_benchmark_30d": "portfolio_vs_benchmark_30d",
-}
-
-
-class AccountGoldTransformation(Transformation):
+class _FactDestination(Destination):
     """
-    Strips acct_ prefix and drops asset-only columns.
-    Deduplication to one row per (date_id, portfolio_id) is handled in run().
+    Base for fact destinations. Subclasses declare fact_name, sql_file, unique_key.
     """
 
-    def transform(self, record: Dict) -> Dict:
-        return {_ACCT_RENAMES.get(k, k): v for k, v in record.items()}
-
-
-# ---------------------------------------------------------------------------
-# Destinations — asset facts
-# ---------------------------------------------------------------------------
-
-
-class FactPriceDestination(Destination):
-    _COLUMNS = {"date_id", "asset_id", "portfolio_id", "price", "avg_price"}
+    fact_name: str
+    sql_file: str
+    unique_key: List[str]
 
     def __init__(self):
-        self._repository = RepositoryFactory.get("fact_price", schema_name="analytics")
+        self._client = SQLModelClient(DATABASE_URL)
+        self._repository = RepositoryFactory.get(self.fact_name, schema_name="analytics")
+        self._sql = load_query(_QUERIES_DIR / "gold" / self.sql_file)
 
-    def load(self, data: List[Dict]) -> None:
-        records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
-
-
-class FactValuationDestination(Destination):
-    _COLUMNS = {
-        "date_id",
-        "asset_id",
-        "portfolio_id",
-        "value",
-        "cost_basis",
-        "unrealized_pnl",
-        "unrealized_pnl_pct",
-        "realized_pnl",
-        "position_weight_pct",
-        "fx_impact",
-    }
-
-    def __init__(self):
-        self._repository = RepositoryFactory.get(
-            "fact_valuation", schema_name="analytics"
-        )
-
-    def load(self, data: List[Dict]) -> None:
-        records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
+    def load(self, _: Dict = None) -> None:
+        with self._client as db:
+            rows = db.execute(self._sql, params={"portfolio_id": str(portfolio_id)}).fetchall()
+        records = [dict(row._mapping) for row in rows]
+        if not records:
+            logging.warning(f"[t212_gold:{self.fact_name}] NO RECORDS — skipping")
+            return
+        self._repository.upsert(records=records, unique_key=self.unique_key)
 
 
-class FactReturnDestination(Destination):
-    _COLUMNS = {
-        "date_id",
-        "asset_id",
-        "portfolio_id",
-        "daily_value_return",
-        "cumulative_value_return",
-    }
-
-    def __init__(self):
-        self._repository = RepositoryFactory.get("fact_return", schema_name="analytics")
-
-    def load(self, data: List[Dict]) -> None:
-        records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
+class FactPriceDestination(_FactDestination):
+    fact_name = "fact_price"
+    sql_file = "fact_price.sql"
+    unique_key = ["date_id", "asset_id"]
 
 
-class FactTechnicalDestination(Destination):
-    _COLUMNS = {
-        "date_id",
-        "asset_id",
-        "portfolio_id",
-        "value_drawdown_pct_30d",
-        "value_high_alltime",
-        "value_low_alltime",
-        "value_ma_20d",
-        "value_ma_30d",
-        "value_ma_50d",
-        "price_ma_20d",
-        "price_ma_50d",
-        "volatility_20d",
-        "volatility_30d",
-        "volatility_50d",
-        "var_95_1d",
-        "profit_range_30d",
-        "recent_profit_high_30d",
-        "recent_profit_low_30d",
-        "recent_value_high_30d",
-        "recent_value_low_30d",
-        "beta_60d",
-        "sharpe_ratio_30d",
-    }
-
-    def __init__(self):
-        self._repository = RepositoryFactory.get(
-            "fact_technical", schema_name="analytics"
-        )
-
-    def load(self, data: List[Dict]) -> None:
-        records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
+class FactValuationDestination(_FactDestination):
+    fact_name = "fact_valuation"
+    sql_file = "fact_valuation.sql"
+    unique_key = ["date_id", "asset_id"]
 
 
-class FactSignalDestination(Destination):
-    _COLUMNS = {
-        "date_id",
-        "asset_id",
-        "portfolio_id",
-        "dca_bias",
-        "value_ma_crossover_signal",
-        "price_above_ma_20d",
-        "price_above_ma_50d",
-    }
-
-    def __init__(self):
-        self._repository = RepositoryFactory.get("fact_signal", schema_name="analytics")
-
-    def load(self, data: List[Dict]) -> None:
-        records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=["date_id", "asset_id"])
+class FactReturnDestination(_FactDestination):
+    fact_name = "fact_return"
+    sql_file = "fact_return.sql"
+    unique_key = ["date_id", "asset_id"]
 
 
-# ---------------------------------------------------------------------------
-# Destination — account fact
-# ---------------------------------------------------------------------------
+class FactTechnicalDestination(_FactDestination):
+    fact_name = "fact_technical"
+    sql_file = "fact_technical.sql"
+    unique_key = ["date_id", "asset_id"]
 
 
-class FactPortfolioDailyDestination(Destination):
-    _COLUMNS = {
-        "date_id",
-        "portfolio_id",
-        "total_value",
-        "total_cost",
-        "unrealized_pnl",
-        "unrealized_pnl_pct",
-        "realized_pnl",
-        "daily_value_change_abs",
-        "daily_value_change_pct",
-        "cash_available",
-        "cash_reserved",
-        "cash_in_pies",
-        "cash_deployment_ratio",
-        "fx_impact_total",
-        "portfolio_volatility_weighted",
-        "portfolio_beta_weighted",
-        "sharpe_ratio_30d",
-        "benchmark_return_daily",
-        "portfolio_vs_benchmark_30d",
-    }
+class FactSignalDestination(_FactDestination):
+    fact_name = "fact_signal"
+    sql_file = "fact_signal.sql"
+    unique_key = ["date_id", "asset_id"]
 
-    def __init__(self):
-        self._repository = RepositoryFactory.get(
-            "fact_portfolio_daily", schema_name="analytics"
-        )
 
-    def load(self, data: List[Dict]) -> None:
-        records = [{k: v for k, v in r.items() if k in self._COLUMNS} for r in data]
-        self._repository.upsert(records=records, unique_key=["date_id", "portfolio_id"])
+class FactPortfolioDailyDestination(_FactDestination):
+    fact_name = "fact_portfolio_daily"
+    sql_file = "fact_portfolio_daily.sql"
+    unique_key = ["date_id", "portfolio_id"]
 
 
 # ---------------------------------------------------------------------------
@@ -272,66 +137,20 @@ class PipelineT212Gold(Pipeline):
     def __init__(self):
         self._db = SQLModelClient(DATABASE_URL)
         self._source = T212GoldSource()
-        self._asset_transformation = AssetGoldTransformation()
-        self._account_transformation = AccountGoldTransformation()
-        self._asset_validator = SchemaValidator(AssetGoldRecord, layer="gold")
-        self._account_validator = SchemaValidator(AccountGoldRecord, layer="gold")
-        self._dead_letter = DeadLetterDestination()
-        self._asset_destinations = [
+        self._destinations = [
             FactPriceDestination(),
             FactValuationDestination(),
             FactReturnDestination(),
             FactTechnicalDestination(),
             FactSignalDestination(),
+            FactPortfolioDailyDestination(),
         ]
-        self._account_destination = FactPortfolioDailyDestination()
 
     def run(self):
         self._ensure_dimensions()
-
-        rows = self._source.extract()
-        if not rows:
-            logging.warning(f"[{self._pipeline_name}] NO RECORD — skipping")
-            return
-
-        wide_records = self._asset_transformation.transform(rows)
-
-        # --- Asset facts ---
-        asset_result = self._asset_validator.validate(wide_records)
-        if asset_result.invalid:
-            for r in asset_result.invalid:
-                r.pipeline_name = f"{self._pipeline_name}_asset"
-            self._dead_letter.load(asset_result.invalid)
-            logging.warning(
-                f"[{self._pipeline_name}_asset] {len(asset_result.invalid)} records rejected"
-            )
-
-        if asset_result.valid:
-            asset_dicts = [r.model_dump() for r in asset_result.valid]
-            for destination in self._asset_destinations:
-                destination.load(asset_dicts)
-
-        # --- Account fact — deduplicate to one row per (date_id, portfolio_id) ---
-        seen: set = set()
-        account_records = []
-        for r in wide_records:
-            key = (r["date_id"], str(r["portfolio_id"]))
-            if key not in seen:
-                seen.add(key)
-                account_records.append(self._account_transformation.transform(r))
-
-        account_result = self._account_validator.validate(account_records)
-        if account_result.invalid:
-            for r in account_result.invalid:
-                r.pipeline_name = f"{self._pipeline_name}_account"
-            self._dead_letter.load(account_result.invalid)
-            logging.warning(
-                f"[{self._pipeline_name}_account] {len(account_result.invalid)} records rejected"
-            )
-
-        if account_result.valid:
-            account_dicts = [r.model_dump() for r in account_result.valid]
-            self._account_destination.load(account_dicts)
+        self._source.extract()
+        for destination in self._destinations:
+            destination.load()
 
     def _ensure_dimensions(self):
         with self._db as db:
