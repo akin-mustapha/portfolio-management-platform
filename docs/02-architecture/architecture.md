@@ -4,11 +4,11 @@ Four layers. Each has a single responsibility.
 
 ```
 ┌─────────────────────────────────┐
-│           Frontend              │  Dash UI — portfolio & asset views
+│           Frontend              │  React UI (primary) + Dash UI (legacy)
 ├─────────────────────────────────┤
 │         Orchestration           │  Prefect — schedules and coordinates pipelines
 ├─────────────────────────────────┤
-│           Backend               │  Pipelines, events, services
+│           Backend               │  Pipelines, events, services, FastAPI
 ├─────────────────────────────────┤
 │           Storage               │  raw → staging → analytics
 └─────────────────────────────────┘
@@ -16,7 +16,56 @@ Four layers. Each has a single responsibility.
 
 ---
 
-## Frontend (`src/dashboard/`)
+## Frontend
+
+The project has two frontends. The React app is the primary UI; Dash remains as a legacy dashboard.
+
+### React frontend (`frontend/`)
+
+Vite + React + MUI + Recharts. Served on **:5172** in development.
+Reads all data from the FastAPI backend at `src/api/` (`:8001`).
+
+Internal structure:
+
+```
+frontend/src/
+├── api/            — API client functions (axios, one file per resource)
+├── components/     — shared UI components (charts, atoms, molecules, organisms)
+├── hooks/          — React Query data hooks
+├── pages/          — page-level components (PortfolioPage, tabs)
+├── store/          — Zustand global state
+├── theme/          — MUI theme tokens and config
+└── utils/          — chart formatters and helpers
+```
+
+### Dash dashboard (`src/dashboard/`)
+
+Legacy Dash application. Reads from the analytics (gold) layer via backend services.
+Served on **:8050**. Does no data transformation — only displays what services provide.
+
+Internal structure:
+
+```
+assets/          — CSS split by concern: theme, base, layout, components, charts, ag-grid
+api/             — Flask/Dash server-side API routes
+components/      — shared UI primitives (atoms only at this level)
+  atoms/         — pure primitives: value formatters, badge elements
+layouts/         — top-level shell: navbar, page router, settings modal
+pages/portfolio/ — portfolio page: layout, tabs, callbacks, charts
+  tabs/          — one file per tab: Valuation, Risk, Opportunities, Asset Profile
+  charts/        — chart implementations: portfolio_charts, asset_charts
+  callbacks/     — callbacks package split by concern: data, filters, selection, tags, ui, theme, settings
+  components/    — atomic design: atoms → molecules → organisms
+    atoms/       — pure primitives: value formatters, badge elements
+    molecules/   — atoms with a single job: KPI cards
+    organisms/   — full sections: KPI row, table, filter bar, tab assembler
+controllers/     — orchestrate data fetch and presenter calls
+presenters/      — transform DB data into dashboard-ready view models
+infrastructure/  — SQL queries against analytics schema
+utils/           — dashboard-local utility functions
+```
+
+## API (`src/api/`)
 
 Dash application. Reads from the analytics (gold) layer via backend services.
 Does no data transformation — only displays what services provide.
@@ -42,6 +91,8 @@ presenters/      — transform DB data into dashboard-ready view models
 infrastructure/  — SQL queries against analytics schema
 utils/           — dashboard-local utility functions
 ```
+
+FastAPI application served on **:8001**. Exposes REST endpoints consumed by the React frontend. Routes live in `src/api/routers/` — one file per resource (`portfolio`, `assets`, `tags`, `rebalance`, `credentials`). Uses `PortfolioController` and presenter layer from `src/dashboard/` to produce view-model responses.
 
 ## Orchestration (`src/orchestration/`)
 
