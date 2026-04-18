@@ -7,19 +7,24 @@ description: Documentation on asset data ingestion pipeline
 
 ## Overview
 
-Pipeline to ingest the Trading 212 Positions API. Each position is one held asset (stock/ETF) in the portfolio. Three pipelines run in sequence per orchestration cycle.
+Pipeline to ingest the Trading 212 Positions API. Each position is one held asset (stock/ETF) in the portfolio. Two pipelines run in sequence per orchestration cycle.
+
+> **Note:** Bronze and Silver are unified pipelines — `PipelineT212Bronze` and `PipelineT212Silver` handle both asset and account data in a single run. There are no separate asset-only pipeline classes.
 
 ## Flow
 
 ```
-Bronze → Silver → Computed Silver
+Bronze → Silver → Gold
 ```
+
+Metrics (moving averages, rolling volatility, LAG-based returns, drawdown) are computed in the Gold layer via SQL window functions inside `PipelineT212Gold`. There is no Computed Silver stage for assets.
 
 ---
 
 ## Bronze Layer
 
-**Class:** `PipelineAssetBronze`
+**Class:** `PipelineT212Bronze`
+**File:** `src/pipelines/application/runners/pipeline_bronze_t212.py`
 **Source:** Trading 212 Positions API
 **Destination:** `PostgresAssetFullLoader` → `raw.asset`
 
@@ -46,7 +51,8 @@ Bronze → Silver → Computed Silver
 
 ## Silver Layer
 
-**Class:** `PipelineAssetSilver`
+**Class:** `PipelineT212Silver`
+**File:** `src/pipelines/application/runners/pipeline_silver_t212.py`
 **Extends:** `BaseSilverPipeline`
 **Source:** `raw.v_bronze_asset`
 **Destination:** `staging.asset` (upsert on `business_key`)
@@ -66,53 +72,9 @@ Bronze → Silver → Computed Silver
 
 ---
 
-## Computed Silver Layer
+## Gold Layer
 
-**Class:** `PipelineAssetComputedSilver`
-**Extends:** `Pipeline` (bare — not `BaseSilverPipeline`)
-**Source:** `staging.asset` (SQL window functions)
-**Destination:** `staging.asset_computed` (upsert on `asset_id`)
+**Class:** `PipelineT212Gold`
+**File:** `src/pipelines/application/runners/pipeline_gold_t212.py`
 
-### What It Does
-
-1. Runs a single SQL query against `staging.asset` computing all metrics as window functions (partitioned by `ticker`, ordered by `created_timestamp`).
-2. Python transformation handles null-coercion and the 4 derived metrics that can't be expressed purely in SQL.
-3. Maps output to `AssetComputed` dataclass (not Pydantic — no validation layer).
-4. Upserts to `staging.asset_computed` using `asset_id` as unique key.
-
-### Computed Metrics
-
-| Field | Computed In | Notes |
-|-------|-------------|-------|
-| `cost_basis` | SQL | Aliased from `cost` (renamed from `cashflow` in migration 011) |
-| `daily_return` | SQL | LAG-based % change in value per ticker |
-| `cumulative_return` | SQL | `EXP(SUM(LN(1 + daily_return)))` over all rows |
-| `dca_bias` | SQL | `(value - cost) / cost` |
-| `pct_drawdown` | SQL | `(value - recent_value_high_30d) / recent_value_high_30d` |
-| `recent_value_high_30d` | SQL | 30-row rolling MAX(value) per ticker |
-| `recent_value_low_30d` | SQL | 30-row rolling MIN(value) per ticker |
-| `recent_profit_high_30d` | SQL | 30-row rolling MAX(profit) per ticker |
-| `recent_profit_low_30d` | SQL | 30-row rolling MIN(profit) per ticker |
-| `value_high` | SQL | All-time MAX(value) per ticker |
-| `value_low` | SQL | All-time MIN(value) per ticker |
-| `ma_20d` | SQL | 20-row rolling AVG(value) per ticker |
-| `ma_30d` | SQL | 30-row rolling AVG(value) per ticker |
-| `ma_50d` | SQL | 50-row rolling AVG(value) per ticker |
-| `volatility_20d` | SQL | 20-row rolling STDDEV(daily_return) per ticker |
-| `volatility_30d` | SQL | 30-row rolling STDDEV(daily_return) per ticker |
-| `volatility_50d` | SQL | 50-row rolling STDDEV(daily_return) per ticker |
-| `pnl_pct` | Python | `profit / cost_basis * 100` |
-| `var_95_1d` | Python | `volatility_30d * value * 1.65` |
-| `profit_range_30d` | Python | `recent_profit_high_30d - recent_profit_low_30d` |
-| `ma_crossover_signal` | Python | `ma_20d - ma_50d` |
-
-### Computed Tables
-
-| Table | Description |
-|-------|-------------|
-| `staging.asset_computed` | One row per asset position; upserted on each run |
-
-### Known Issues
-
-- No Pydantic validation layer — transformation errors raise and halt the pipeline.
-- Source query recomputes all window functions across the full history on every run. No incremental optimisation.
+All computed metrics for assets are produced here via SQL window functions. See `doc-pipelines.md` for the full Gold pattern and `schema-analytics.md` for the fact table schema.

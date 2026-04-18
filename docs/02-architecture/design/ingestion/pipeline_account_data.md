@@ -9,21 +9,24 @@ description: Documentation on account data ingestion pipeline
 
 Pipeline to ingest the Trading 212 Account Summary API (`equity/account/summary`). The account represents the overall portfolio state — cash, investments, and unrealized/realized P&L — as a single record per run.
 
+> **Note:** Bronze and Silver are unified pipelines — `PipelineT212Bronze` and `PipelineT212Silver` handle both asset and account data in a single run. There are no separate account-only pipeline classes.
+
 ## Flow
 
 ```
-Bronze → Silver → Computed Silver
+Bronze → Silver → Gold
 ```
 
-Orchestrated as a Prefect flow (`flow_t212_account`) with sequential task execution. Each stage retries up to 2 times with a 60-second delay on failure.
+Orchestrated as a Prefect flow with sequential task execution. Each stage retries up to 2 times with a 60-second delay on failure. Account-level metrics (daily change, total return) are computed in the Gold layer via SQL — there is no Computed Silver stage.
 
 ---
 
 ## Bronze Layer
 
-**Class:** `PipelineAccountBronze`
+**Class:** `PipelineT212Bronze`
+**File:** `src/pipelines/application/runners/pipeline_bronze_t212.py`
 **Source:** `Trading212AccountSource` — calls `equity/account/summary` endpoint
-**Destination:** `Trading212AccountDestination` → `PostgresAccountFullLoader` → `raw.account`
+**Destination:** `PostgresAccountFullLoader` → `raw.account`
 
 ### What It Does
 
@@ -61,10 +64,11 @@ Orchestrated as a Prefect flow (`flow_t212_account`) with sequential task execut
 
 ## Silver Layer
 
-**Class:** `PipelineAccountSilver`
+**Class:** `PipelineT212Silver`
+**File:** `src/pipelines/application/runners/pipeline_silver_t212.py`
 **Extends:** `BaseSilverPipeline`
 **Source:** `Trading212AccountSourceSilver` — queries `raw.v_bronze_account`
-**Destination:** `Trading212AccountDestination` → `staging.account` (upsert on `business_key`)
+**Destination:** `staging.account` (upsert on `business_key`)
 
 ### What It Does
 
@@ -99,41 +103,15 @@ Orchestrated as a Prefect flow (`flow_t212_account`) with sequential task execut
 
 ---
 
-## Computed Silver Layer
+## Gold Layer
 
-**Class:** `PipelineAccountComputedSilver`
-**Extends:** `Pipeline` (bare — not `BaseSilverPipeline`)
-**Source:** `Trading212AccountComputedSourceSilver` — queries `staging.account`
-**Destination:** `Trading212AccountComputedDestination` → `staging.account_computed` (upsert on `account_id`)
+**Class:** `PipelineT212Gold`
+**File:** `src/pipelines/application/runners/pipeline_gold_t212.py`
 
-### What It Does
-
-1. Extracts all rows from `staging.account`, including `LAG(total_value) OVER (ORDER BY data_timestamp)` to compute day-over-day change.
-2. Computes 5 metrics per account row (see table below). Nulls are treated as 0 to avoid division errors.
-3. Maps output to `AccountComputed` dataclass (not Pydantic — no validation layer).
-4. Upserts to `staging.account_computed` using `account_id` as the unique key.
-
-### Computed Metrics
-
-| Field | Formula |
-|-------|---------|
-| `total_return_abs` | `unrealized_pnl + realized_pnl` |
-| `total_return_pct` | `total_return_abs / investments_total_cost * 100` |
-| `cash_deployment_ratio` | `(total_value - cash_available_to_trade) / total_value * 100` |
-| `daily_change_abs` | `total_value - prev_total_value` |
-| `daily_change_pct` | `daily_change_abs / prev_total_value * 100` |
-
-All metrics default to `0` when divisor is zero or source value is null.
-
-### Computed Tables
-
-| Table | Description |
-|-------|-------------|
-| `staging.account_computed` | One row per account; upserted on each run |
+Account-level facts (`fact_portfolio_daily`) are computed and written here. The gold pipeline reads directly from `staging.account` — it does not depend on any computed silver table. See `doc-pipelines.md` for the Gold pattern and `schema-analytics.md` for the fact table schema.
 
 ---
 
 ## Known Issues
 
 - `v_bronze_account` is dropped and recreated on every bronze run, so it always reflects the current day's partition only. Historical rows are preserved in the partitioned table and accessible via direct query.
-- `PipelineAccountComputedSilver` has no Pydantic validation layer — transformation errors raise and halt the pipeline.

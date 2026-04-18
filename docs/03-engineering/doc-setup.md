@@ -28,6 +28,23 @@ Add the following variables to env file
 - API_TOKEN
 - SECRET_TOKEN
 - DATABASE_URL
+- POSTGRES_USER
+- POSTGRES_PASSWORD
+- POSTGRES_DB
+
+## React frontend setup
+
+```sh
+cd frontend
+npm install
+npm run dev    # http://localhost:5172
+```
+
+The frontend proxies `/api` requests to the FastAPI backend. Start the API server separately:
+
+```sh
+uvicorn src.api.main:app --reload --port 8001
+```
 
 ## Start infrastructure
 

@@ -86,21 +86,6 @@ Rather than directly subclassing `Pipeline`, most concrete pipelines extend one 
 
 Both are defined in `src/pipelines/application/policies.py`.
 
-## Computed Silver Pattern
-
-Computed silver pipelines (`PipelineAssetComputedSilver`, `PipelineAccountComputedSilver`) follow a different pattern from standard silver pipelines:
-
-| Aspect | Silver (`BaseSilverPipeline`) | Computed Silver (bare `Pipeline`) |
-|--------|-------------------------------|-----------------------------------|
-| Base class | `BaseSilverPipeline` | `Pipeline` |
-| Output type | Pydantic model | Dataclass |
-| Validation | `_to_records()` — logs and skips bad records | None — errors raise and halt |
-| Source | Reads from silver table (full recompute) | Reads from silver table (full recompute) |
-| Computation | Python transform | SQL window functions; Python handles null-coercion only |
-| Unique key | `business_key` | Entity ID (`asset_id` / `account_id`) |
-
-Use this pattern when metrics require window functions over the full history of a table (rolling averages, cumulative returns, LAG-based daily change). All computation lives in the SQL source query; Python only coerces nulls to 0 and maps rows to dataclasses.
-
 ## Gold Pattern
 
 The canonical gold pipeline is `PipelineT212Gold` (`src/pipelines/application/runners/pipeline_gold_t212.py`). It is a unified pipeline that handles both asset-level and account-level facts in a single run.
