@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material'
 import Section from '../../../components/molecules/Section'
 import PortfolioValueChart from '../../../components/charts/PortfolioValueChart'
-import PortfolioPnlChart from '../../../components/charts/PortfolioPnlChart'
 import PositionWeightChart from '../../../components/charts/PositionWeightChart'
 import WinnersChart from '../../../components/charts/WinnersChart'
 import LosersChart from '../../../components/charts/LosersChart'
@@ -16,12 +15,11 @@ export default function PortfolioTab({ data }: PortfolioTabProps) {
 
   return (
     <div>
-      <Section title="Portfolio Value" metricKey="portfolio_value_chart">
-        <PortfolioValueChart series={data.portfolio_value_series as Parameters<typeof PortfolioValueChart>[0]['series']} />
-      </Section>
-
-      <Section title="P&L Over Time" metricKey="portfolio_pnl_chart">
-        <PortfolioPnlChart series={data.portfolio_pnl_series as Parameters<typeof PortfolioPnlChart>[0]['series']} />
+      <Section title="Portfolio Value & P&L" metricKey="portfolio_value_chart">
+        <PortfolioValueChart
+          valueSeries={data.portfolio_value_series as Parameters<typeof PortfolioValueChart>[0]['valueSeries']}
+          pnlSeries={data.portfolio_pnl_series as Parameters<typeof PortfolioValueChart>[0]['pnlSeries']}
+        />
       </Section>
 
       {/* Container query wrapper — breakpoint is container width, not viewport */}
