@@ -1,5 +1,6 @@
+import { useMemo } from 'react'
 import { useTheme } from '@mui/material'
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { useTooltipStyle } from '../../utils/chartUtils'
 
 interface AssetReturnChartProps {
@@ -9,26 +10,36 @@ interface AssetReturnChartProps {
 export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartProps) {
   const theme = useTheme()
   const tooltipStyle = useTooltipStyle()
+  const data = useMemo(
+    () =>
+      (cumulativeSeries?.dates ?? []).map((d, i) => ({
+        date: d,
+        return: cumulativeSeries?.values[i] != null ? Number(cumulativeSeries.values[i]) * 100 : null,
+      })),
+    [cumulativeSeries?.dates, cumulativeSeries?.values],
+  )
   if (!cumulativeSeries?.dates?.length) return null
-
-  const data = cumulativeSeries.dates.map((d, i) => ({
-    date: d,
-    return: cumulativeSeries.values[i] != null ? Number(cumulativeSeries.values[i]) * 100 : null,
-  }))
+  const color = theme.palette.primary.main
 
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-        <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
-        <YAxis tick={{ fontSize: 10 }} tickLine={false} width={50} unit="%" />
+      <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+        <defs>
+          <linearGradient id="retGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity={0.28} />
+            <stop offset="100%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} strokeOpacity={0.5} vertical={false} />
+        <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: theme.palette.divider }} />
+        <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={50} unit="%" />
         <Tooltip
           contentStyle={tooltipStyle}
           formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'Cumulative Return']}
         />
         <ReferenceLine y={0} stroke={theme.palette.divider} />
-        <Line type="monotone" dataKey="return" stroke={theme.palette.primary.main} strokeWidth={1.5} dot={false} />
-      </LineChart>
+        <Area type="monotone" dataKey="return" stroke={color} fill="url(#retGrad)" strokeWidth={2.25} dot={false} />
+      </AreaChart>
     </ResponsiveContainer>
   )
 }

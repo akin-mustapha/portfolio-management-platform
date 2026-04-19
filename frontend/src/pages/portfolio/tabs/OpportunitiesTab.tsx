@@ -4,12 +4,10 @@ import PositionPerformanceMap from '../../../components/charts/PositionPerforman
 import OpportunitiesChart from '../../../components/charts/OpportunitiesChart'
 import { useAppStore } from '../../../store/useAppStore'
 import Section from '../../../components/molecules/Section'
+import { usePortfolioContext } from '../PortfolioContext'
 
-interface OpportunitiesTabProps {
-  data?: Record<string, unknown>
-}
-
-export default function OpportunitiesTab({ data }: OpportunitiesTabProps) {
+export default function OpportunitiesTab() {
+  const { summary: data } = usePortfolioContext()
   const { selectedTickers } = useAppStore()
 
   if (!data) return null
