@@ -1,23 +1,18 @@
-import { Box, Chip, Typography, Divider, Button } from '@mui/material'
-import { useState } from 'react'
+import { Box, Typography, Stack } from '@mui/material'
 import { useAssetHistory } from '../../../hooks/useAssetHistory'
 import { useAppStore } from '../../../store/useAppStore'
 import AssetPriceChart from '../../../components/charts/AssetPriceChart'
 import AssetValueChart from '../../../components/charts/AssetValueChart'
 import AssetPnlChart from '../../../components/charts/AssetPnlChart'
 import AssetReturnChart from '../../../components/charts/AssetReturnChart'
-import EditTagsModal from '../../../components/organisms/EditTagsModal'
-import KpiCard from '../../../components/atoms/KpiCard'
-import TickerLogo from '../../../components/atoms/TickerLogo'
 import Section from '../../../components/molecules/Section'
-import { Grid } from '@mui/material'
+import KpiGroup, { type KpiGroupItem } from '../../../components/molecules/KpiGroup'
+import { usePortfolioContext } from '../PortfolioContext'
 
-interface AssetProfileTabProps {
-  assetRow?: Record<string, unknown>
-}
+type KpiDef = KpiGroupItem
 
-export default function AssetProfileTab({ assetRow }: AssetProfileTabProps) {
-  const [tagsOpen, setTagsOpen] = useState(false)
+export default function AssetProfileTab() {
+  const { selectedAssetRow: assetRow } = usePortfolioContext()
   const { fromDate, toDate } = useAppStore()
 
   const ticker = assetRow?.ticker as string | undefined
@@ -34,48 +29,48 @@ export default function AssetProfileTab({ assetRow }: AssetProfileTabProps) {
     )
   }
 
-  const tags = (assetRow?.tags as string[]) ?? []
+  const profit = assetRow?.profit as number | undefined
+  const pnlPct = assetRow?.pnl_pct as number | undefined
+
+  const performanceKpis: KpiDef[] = [
+    { label: 'Value', value: assetRow?.value as number | undefined },
+    {
+      label: 'P&L',
+      value: profit,
+      colorCode: (profit ?? 0) >= 0 ? 'positive' : 'negative',
+      metricKey: 'profit',
+    },
+    {
+      label: 'P&L %',
+      value: pnlPct,
+      suffix: '%',
+      colorCode: (pnlPct ?? 0) >= 0 ? 'positive' : 'negative',
+      metricKey: 'pnl_pct',
+    },
+  ]
+
+  const riskKpis: KpiDef[] = [
+    { label: 'Vol 30d', value: assetRow?.volatility_30d as number | undefined, metricKey: 'volatility_30d' },
+    { label: 'VaR 95%', value: assetRow?.var_95_1d as number | undefined, metricKey: 'var_95_1d' },
+    { label: 'Beta 60d', value: assetRow?.beta_60d as number | undefined },
+  ]
+
+  const allocationKpis: KpiDef[] = [
+    { label: 'Weight', value: assetRow?.weight_pct as number | undefined, suffix: '%', metricKey: 'weight_pct' },
+    { label: 'Avg Price', value: assetRow?.avg_price as number | undefined, metricKey: 'avg_price' },
+    { label: 'Cost', value: assetRow?.cost as number | undefined },
+  ]
 
   return (
-    <Box>
-      {/* Header row */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-        <TickerLogo ticker={ticker} />
-        <Typography variant="subtitle1" fontWeight={700}>{ticker}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-          {assetRow?.name as string}
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-          {tags.map((t) => (
-            <Chip key={t} label={t} size="small" variant="outlined" sx={{ fontSize: 10 }} />
-          ))}
-          <Button size="small" variant="outlined" sx={{ fontSize: 10, height: 22 }} onClick={() => setTagsOpen(true)}>
-            Edit Tags
-          </Button>
-        </Box>
-      </Box>
+    <Box sx={{ animation: 'fadeIn 220ms ease', '@keyframes fadeIn': { from: { opacity: 0 }, to: { opacity: 1 } } }}>
+      <Stack spacing={1.5} sx={{ mb: 3 }}>
+        <KpiGroup label="Performance" cards={performanceKpis} overflow="wrap" dimmed={false} />
+        <KpiGroup label="Risk" cards={riskKpis} overflow="wrap" dimmed={false} />
+        <KpiGroup label="Allocation" cards={allocationKpis} overflow="wrap" dimmed={false} />
+      </Stack>
 
-      {/* KPI mini row */}
-      <Grid container spacing={1} sx={{ mb: 1 }}>
-        {[
-          { label: 'Value', value: assetRow?.value as number | undefined },
-          { label: 'P&L', value: assetRow?.profit as number | undefined, colorCode: ((assetRow?.profit as number) ?? 0) >= 0 ? 'positive' : 'negative', metricKey: 'profit' },
-          { label: 'P&L %', value: assetRow?.pnl_pct as number | undefined, suffix: '%', colorCode: ((assetRow?.pnl_pct as number) ?? 0) >= 0 ? 'positive' : 'negative', metricKey: 'pnl_pct' },
-          { label: 'Weight', value: assetRow?.weight_pct as number | undefined, suffix: '%', metricKey: 'weight_pct' },
-          { label: 'Vol 30d', value: assetRow?.volatility_30d as number | undefined, metricKey: 'volatility_30d' },
-          { label: 'VaR 95%', value: assetRow?.var_95_1d as number | undefined, metricKey: 'var_95_1d' },
-        ].map((c) => (
-          <Grid key={c.label} size={{ xs: 6, sm: 4, md: 2 }}>
-            <KpiCard {...(c as Parameters<typeof KpiCard>[0])} compact />
-          </Grid>
-        ))}
-      </Grid>
-
-      <Divider sx={{ mb: 1 }} />
-
-      {/* Charts */}
       {!isLoading && history && (
-        <div>
+        <Stack spacing={1.5}>
           <Section title="Price + Moving Averages" metricKey="asset_price_chart">
             <AssetPriceChart series={history.asset_price} />
           </Section>
@@ -88,15 +83,9 @@ export default function AssetProfileTab({ assetRow }: AssetProfileTabProps) {
           <Section title="Cumulative Return" metricKey="asset_vs_portfolio_return_chart">
             <AssetReturnChart cumulativeSeries={history.asset_return} />
           </Section>
-        </div>
+        </Stack>
       )}
 
-      <EditTagsModal
-        open={tagsOpen}
-        onClose={() => setTagsOpen(false)}
-        ticker={ticker}
-        currentTags={tags}
-      />
     </Box>
   )
 }
