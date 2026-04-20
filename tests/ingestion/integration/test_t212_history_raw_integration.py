@@ -65,7 +65,7 @@ _TRANSACTION_PAGE = {
 
 
 def _fake_paginated_factory():
-    async def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
+    def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
         if endpoint.endswith("history/dividends"):
             yield _DIVIDEND_PAGE
         elif endpoint.endswith("history/orders"):
@@ -85,7 +85,7 @@ def _run_pipeline():
         Trading212APIClient,
     )
 
-    with patch.object(Trading212APIClient, "get_paginated", _fake_paginated_factory()):
+    with patch.object(Trading212APIClient, "iter_paginated", _fake_paginated_factory()):
         PipelineT212History().run()
 
 
