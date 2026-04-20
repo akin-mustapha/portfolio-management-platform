@@ -3,7 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 import { buildTheme } from './theme/theme'
 import { useAppStore } from './store/useAppStore'
-import PortfolioPage from './pages/portfolio/PortfolioPage'
+import AppShell from './pages/portfolio/AppShell'
+import PortfolioTab from './pages/portfolio/tabs/PortfolioTab'
+import RiskTab from './pages/portfolio/tabs/RiskTab'
+import OpportunitiesTab from './pages/portfolio/tabs/OpportunitiesTab'
 
 export default function App() {
   const themeMode = useAppStore((s) => s.themeMode)
@@ -14,7 +17,11 @@ export default function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
-          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route element={<AppShell />}>
+            <Route path="/portfolio" element={<PortfolioTab />} />
+            <Route path="/risk" element={<RiskTab />} />
+            <Route path="/opportunities" element={<OpportunitiesTab />} />
+          </Route>
           <Route path="*" element={<Navigate to="/portfolio" replace />} />
         </Routes>
       </BrowserRouter>

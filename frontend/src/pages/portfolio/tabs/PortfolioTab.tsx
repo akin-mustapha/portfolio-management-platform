@@ -5,12 +5,10 @@ import PositionWeightChart from '../../../components/charts/PositionWeightChart'
 import WinnersChart from '../../../components/charts/WinnersChart'
 import LosersChart from '../../../components/charts/LosersChart'
 import DailyMoversTable from '../../../components/charts/DailyMoversTable'
+import { usePortfolioContext } from '../PortfolioContext'
 
-interface PortfolioTabProps {
-  data?: Record<string, unknown>
-}
-
-export default function PortfolioTab({ data }: PortfolioTabProps) {
+export default function PortfolioTab() {
+  const { summary: data } = usePortfolioContext()
   if (!data) return null
 
   return (

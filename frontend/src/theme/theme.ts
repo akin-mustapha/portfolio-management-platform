@@ -1,6 +1,27 @@
 import { createTheme, type PaletteMode } from '@mui/material'
 import { lightTokens, darkTokens } from './tokens'
 
+declare module '@mui/material/styles' {
+  interface Theme {
+    custom: {
+      shadowCard: string
+      shadowCardHover: string
+      bgZebra: string
+      bgRowHover: string
+      bgRowSelected: string
+    }
+  }
+  interface ThemeOptions {
+    custom?: {
+      shadowCard?: string
+      shadowCardHover?: string
+      bgZebra?: string
+      bgRowHover?: string
+      bgRowSelected?: string
+    }
+  }
+}
+
 export function buildTheme(mode: PaletteMode) {
   const t = mode === 'dark' ? darkTokens : lightTokens
 
@@ -18,10 +39,23 @@ export function buildTheme(mode: PaletteMode) {
         primary: t.textPrimary,
         secondary: t.textSecondary,
       },
+      divider: t.bgCardBorder,
     },
+    shape: { borderRadius: 10 },
     typography: {
       fontFamily: '"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif',
       fontSize: 13,
+      h6: { letterSpacing: '-0.01em', fontWeight: 700 },
+      subtitle1: { letterSpacing: '-0.01em' },
+      subtitle2: { letterSpacing: '-0.005em' },
+      button: { textTransform: 'none', fontWeight: 500 },
+    },
+    custom: {
+      shadowCard: t.shadowCard,
+      shadowCardHover: t.shadowCardHover,
+      bgZebra: t.bgZebra,
+      bgRowHover: t.bgRowHover,
+      bgRowSelected: t.bgRowSelected,
     },
     components: {
       MuiCssBaseline: {
@@ -29,19 +63,35 @@ export function buildTheme(mode: PaletteMode) {
           body: {
             backgroundColor: t.bgApp,
             color: t.textPrimary,
+            fontVariantNumeric: 'tabular-nums',
+          },
+          'input, button, select, textarea': {
+            fontFeatureSettings: '"tnum" 1',
           },
         },
       },
       MuiCard: {
+        defaultProps: { elevation: 0 },
         styleOverrides: {
           root: {
             border: `1px solid ${t.bgCardBorder}`,
-            borderRadius: 8,
+            borderRadius: 12,
+            boxShadow: t.shadowCard,
+            transition: 'box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease',
           },
         },
       },
-      // MuiDataGrid overrides are applied via `sx` prop in the component directly
-      // (the theme augmentation for DataGrid requires @mui/x-data-grid/themeAugmentation)
+      MuiButtonBase: {
+        defaultProps: { disableRipple: false },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            fontSize: 11,
+            borderRadius: 6,
+          },
+        },
+      },
     },
   })
 }

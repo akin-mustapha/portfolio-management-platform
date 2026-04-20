@@ -4,9 +4,14 @@
     {
       "name": "frontend",
       "runtimeExecutable": "npm",
+<<<<<<< HEAD
       "runtimeArgs": ["run", "dev"],
       "cwd": "frontend",
       "port": 5172
+=======
+      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
+      "port": 5173
+>>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
     },
     {
       "name": "api",

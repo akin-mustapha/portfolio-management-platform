@@ -18,6 +18,14 @@ deployments:
       - interval: 3600          # hourly
         anchor_date: "2024-01-01T00:00:00Z"
 
+  - name: t212_history_bronze
+    entrypoint: ./src/orchestration/prefect/flow_t212_history_bronze.py:flow_t212_history_bronze
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
   - name: t212_silver
     entrypoint: ./src/orchestration/prefect/flow_t212_silver.py:flow_t212_silver
     work_pool:
