@@ -10,9 +10,8 @@ Skipped automatically if the DB isn't reachable.
 """
 
 from datetime import date
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-import pytest
 from sqlalchemy import text
 
 

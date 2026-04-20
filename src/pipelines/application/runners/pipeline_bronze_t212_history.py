@@ -16,7 +16,7 @@ import logging
 import asyncio
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 from dotenv import load_dotenv
 
 from ...application.protocols import Source, Destination

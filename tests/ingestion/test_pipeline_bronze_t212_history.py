@@ -13,10 +13,8 @@ All DB and API interactions are mocked (unittest.mock), matching the
 repo's existing test style (see tests/ingestion/test_pipeline_bugs.py).
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 
 # ---------------------------------------------------------------------------
