@@ -22,14 +22,9 @@ export default function DrawdownChart({ drawdown }: DrawdownChartProps) {
       <AreaChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="ddGrad" x1="0" y1="0" x2="0" y2="1">
-<<<<<<< HEAD
-            <stop offset="5%" stopColor={theme.palette.error.main} stopOpacity={0} />
-            <stop offset="95%" stopColor={theme.palette.error.main} stopOpacity={0.4} />
-=======
             <stop offset="0%" stopColor={errorColor} stopOpacity={0.55} />
             <stop offset="60%" stopColor={errorColor} stopOpacity={0.18} />
             <stop offset="100%" stopColor={errorColor} stopOpacity={0} />
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
           </linearGradient>
           <filter id="ddGlow" x="-10%" y="-10%" width="120%" height="130%">
             <feGaussianBlur stdDeviation="2.4" result="blur" />
@@ -44,9 +39,6 @@ export default function DrawdownChart({ drawdown }: DrawdownChartProps) {
           formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'Drawdown']}
         />
         <ReferenceLine y={0} stroke={theme.palette.divider} />
-<<<<<<< HEAD
-        <Area type="monotone" dataKey="drawdown" stroke={theme.palette.error.main} fill="url(#ddGrad)" strokeWidth={1.5} dot={false} baseValue={0} />
-=======
         <Area
           type="monotone"
           dataKey="drawdown"
@@ -59,7 +51,6 @@ export default function DrawdownChart({ drawdown }: DrawdownChartProps) {
           isAnimationActive
           animationDuration={700}
         />
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
       </AreaChart>
     </ResponsiveContainer>
   )

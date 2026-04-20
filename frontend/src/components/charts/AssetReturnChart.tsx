@@ -25,16 +25,6 @@ export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartP
     <ResponsiveContainer width="100%" height={180}>
       <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
-<<<<<<< HEAD
-          <linearGradient id="returnGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
-            <stop offset="95%" stopColor={theme.palette.primary.main} stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-        <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
-        <YAxis tick={{ fontSize: 10 }} tickLine={false} width={50} unit="%" />
-=======
           <linearGradient id="retGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={color} stopOpacity={0.28} />
             <stop offset="100%" stopColor={color} stopOpacity={0} />
@@ -43,25 +33,12 @@ export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartP
         <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} strokeOpacity={0.5} vertical={false} />
         <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: theme.palette.divider }} />
         <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={50} unit="%" />
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
         <Tooltip
           contentStyle={tooltipStyle}
           formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'Cumulative Return']}
         />
         <ReferenceLine y={0} stroke={theme.palette.divider} />
-<<<<<<< HEAD
-        <Area
-          type="monotone"
-          dataKey="return"
-          stroke={theme.palette.primary.main}
-          fill="url(#returnGrad)"
-          strokeWidth={1.5}
-          dot={false}
-          baseValue={0}
-        />
-=======
         <Area type="monotone" dataKey="return" stroke={color} fill="url(#retGrad)" strokeWidth={2.25} dot={false} />
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
       </AreaChart>
     </ResponsiveContainer>
   )
