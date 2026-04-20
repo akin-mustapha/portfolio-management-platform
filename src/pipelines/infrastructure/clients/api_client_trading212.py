@@ -1,7 +1,10 @@
 import os
+import asyncio
+import time
 import httpx
 import base64
 import logging
+from typing import AsyncIterator, Callable, Optional
 from urllib.parse import urljoin
 
 from ...application.interfaces.interface_api_client import APIClient
@@ -46,3 +49,47 @@ class Trading212APIClient(APIClient):
                     f"API call failed with status code {response.status_code}"
                 )
                 return {"error": response.status_code, "message": "API call failed"}
+
+    async def get_paginated(
+        self,
+        endpoint: str,
+        cursor: Optional[str] = None,
+        limit: int = 50,
+        stop_predicate: Optional[Callable[[dict], bool]] = None,
+    ) -> AsyncIterator[dict]:
+        """
+        Iterate T212 cursor-paginated endpoints following nextPagePath until
+        exhausted or stop_predicate(page) returns True.
+
+        On HTTP 429, reads x-ratelimit-reset and sleeps until reset.
+        On other non-200, raises httpx.HTTPStatusError rather than returning
+        an error-dict, so callers can safely loop on successful pages only.
+        """
+        header = {"Authorization": f"Basic {self.credentials()}"}
+
+        next_path = f"{endpoint}?limit={limit}"
+        if cursor is not None:
+            next_path = f"{next_path}&cursor={cursor}"
+
+        async with httpx.AsyncClient() as client:
+            while next_path:
+                url = urljoin(self.url, next_path)
+                logging.info(f"Paginated API call to {url}")
+                response = await client.get(url, headers=header)
+
+                if response.status_code == 429:
+                    reset = response.headers.get("x-ratelimit-reset")
+                    wait_s = max(int(reset) - int(time.time()), 1) if reset else 5
+                    logging.warning(f"Rate limited; sleeping {wait_s}s")
+                    await asyncio.sleep(wait_s)
+                    continue
+
+                response.raise_for_status()
+                page = response.json()
+
+                yield page
+
+                if stop_predicate is not None and stop_predicate(page):
+                    return
+
+                next_path = page.get("nextPagePath")
