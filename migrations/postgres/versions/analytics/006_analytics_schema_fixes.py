@@ -356,7 +356,21 @@ def downgrade() -> None:
     op.drop_column("dim_sector", "created_timestamp", schema="analytics")
     op.add_column("dim_sector", sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True), schema="analytics")
 
-    # Restore original fact tables (pre-fix state)
+    # Restore original fact tables (pre-fix state, including fact_cashflow which 006 upgrade dropped)
+    op.create_table(
+        "fact_cashflow",
+        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
+        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
+        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
+        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
+        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
+        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column("cashflow", sa.Float, nullable=False),
+        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
+        schema="analytics",
+    )
     op.create_table(
         "fact_price",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),

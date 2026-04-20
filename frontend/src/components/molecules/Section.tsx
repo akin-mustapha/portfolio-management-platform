@@ -18,7 +18,25 @@ export default function Section({ title, children, metricKey, sx }: SectionProps
       defaultExpanded
       disableGutters
       elevation={0}
+<<<<<<< HEAD
       sx={{ border: '1px solid', borderColor: 'divider', mb: 1, '&:before': { display: 'none' }, ...sx }}
+=======
+      sx={[
+        (theme) => ({
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 3,
+          mb: 1,
+          overflow: 'hidden',
+          bgcolor: 'background.paper',
+          boxShadow: theme.custom.shadowCard,
+          transition: 'box-shadow 180ms ease, border-color 180ms ease',
+          '&:hover': { boxShadow: theme.custom.shadowCardHover },
+          '&:before': { display: 'none' },
+        }),
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
+>>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}

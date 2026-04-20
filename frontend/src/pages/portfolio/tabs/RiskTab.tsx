@@ -3,12 +3,10 @@ import DrawdownChart from '../../../components/charts/DrawdownChart'
 import ProfitabilityChart from '../../../components/charts/ProfitabilityChart'
 import VarByPositionChart from '../../../components/charts/VarByPositionChart'
 import UnprofitablePnlChart from '../../../components/charts/UnprofitablePnlChart'
+import { usePortfolioContext } from '../PortfolioContext'
 
-interface RiskTabProps {
-  data?: Record<string, unknown>
-}
-
-export default function RiskTab({ data }: RiskTabProps) {
+export default function RiskTab() {
+  const { summary: data } = usePortfolioContext()
   if (!data) return null
 
   return (
