@@ -100,8 +100,8 @@ class FullLoaderPostgresT212History(FullLoader):
 
     @staticmethod
     def _extract_id(endpoint: str, item: dict):
-        # dividends + transactions: `reference` (string)
-        # orders: `id` (int64)  → cast to str for TEXT column
+        # dividends + transactions: top-level `reference` (string)
+        # orders: HistoricalOrder wraps {order, fill} — id is nested under `order`
         if endpoint == "orders":
-            return item.get("id")
+            return (item.get("order") or {}).get("id")
         return item.get("reference")
