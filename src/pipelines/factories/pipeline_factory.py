@@ -5,6 +5,7 @@ from ..application.runners.portfolio_enrichment_synchronizer import (
     enrichment_sychronization,
 )
 from ..application.runners.pipeline_bronze_t212 import PipelineT212Bronze
+from ..application.runners.pipeline_bronze_t212_history import PipelineT212History
 from ..application.runners.pipeline_silver_t212 import PipelineT212Silver
 from ..application.runners.pipeline_gold_t212 import PipelineT212Gold
 from ..application.runners.pipeline_bronze_fred import PipelineFredBronze
@@ -16,6 +17,7 @@ class PipelineFactory:
         "asset_portfolio": PipelineAssetPortfolio,
         "enrichment_sychronization": enrichment_sychronization,
         "t212_bronze": PipelineT212Bronze,
+        "t212_history_bronze": PipelineT212History,
         "t212_silver": PipelineT212Silver,
         "t212_gold": PipelineT212Gold,
         "fred_bronze": PipelineFredBronze,
