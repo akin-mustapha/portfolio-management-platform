@@ -13,7 +13,6 @@ event timestamp, so steady-state runs are cheap under the 6 req/min limit.
 
 import os
 import logging
-import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -96,9 +95,7 @@ class Trading212HistorySource(Source):
         for endpoint_key, path in _ENDPOINTS.items():
             try:
                 stored_ts = self._get_stored_high_water_mark(endpoint_key)
-                items, newest_ts, newest_cursor = asyncio.run(
-                    self._pull_endpoint(endpoint_key, path, stored_ts)
-                )
+                items, newest_ts, newest_cursor = self._pull_endpoint(endpoint_key, path, stored_ts)
                 result[endpoint_key] = items
                 result["cursors"][endpoint_key] = {
                     "last_cursor": newest_cursor,
@@ -116,7 +113,7 @@ class Trading212HistorySource(Source):
 
         return result
 
-    async def _pull_endpoint(self, endpoint_key: str, path: str, stored_ts):
+    def _pull_endpoint(self, endpoint_key: str, path: str, stored_ts):
         """Page through endpoint, collecting items newer than stored_ts."""
         collected: list[dict] = []
         newest_ts = None
@@ -136,7 +133,7 @@ class Trading212HistorySource(Source):
                 return False
             return oldest <= stored_ts
 
-        async for page in self._api_client.get_paginated(
+        for page in self._api_client.iter_paginated(
             endpoint=path,
             stop_predicate=stop_once_page_is_older,
         ):

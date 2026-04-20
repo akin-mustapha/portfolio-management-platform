@@ -52,7 +52,7 @@ class TestSourcePagination:
         with patch.object(Trading212HistorySource, "__init__", lambda self: None):
             source = Trading212HistorySource()
         source._api_client = MagicMock()
-        source._api_client.get_paginated = paginated_factory
+        source._api_client.iter_paginated = paginated_factory
         source._db_client = MagicMock()
         source._get_stored_high_water_mark = MagicMock(return_value=stored_ts)
         return source
@@ -83,7 +83,7 @@ class TestSourcePagination:
             ],
         }
 
-        async def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
+        def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
             for page in pages_by_endpoint[endpoint]:
                 yield page
 
@@ -113,7 +113,7 @@ class TestSourcePagination:
             "equity/history/transactions": [],
         }
 
-        async def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
+        def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
             if endpoint == "equity/history/dividends":
                 for page in dividend_pages:
                     yield page
@@ -131,7 +131,7 @@ class TestSourcePagination:
         assert result["cursors"]["dividends"]["last_event_ts"] == _ts("2026-04-19T12:00:00Z")
 
     def test_isolates_endpoint_failures(self):
-        async def failing_divs(endpoint, cursor=None, limit=50, stop_predicate=None):
+        def failing_divs(endpoint, cursor=None, limit=50, stop_predicate=None):
             if endpoint == "equity/history/dividends":
                 raise RuntimeError("boom")
             if endpoint == "equity/history/orders":
