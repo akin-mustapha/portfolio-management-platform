@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
+from sqlalchemy import text
 
 from ....application.policies import FullLoader
 from shared.database.client import SQLModelClient
@@ -105,3 +106,22 @@ class FullLoaderPostgresT212History(FullLoader):
         if endpoint == "orders":
             return (item.get("order") or {}).get("id")
         return item.get("reference")
+
+
+    def _exposition_abstraction(self):
+        drop_dividend = "DROP VIEW IF EXISTS raw.v_bronze_dividend"
+        create_dividend = load_query(_QUERIES_DIR / "bronze" / "v_bronze_dividend.sql").format(
+            table_name=_ENDPOINT_TABLES["dividends"]
+        )
+
+        drop_order = "DROP VIEW IF EXISTS raw.v_bronze_order"
+        create_order = load_query(_QUERIES_DIR / "bronze" / "v_bronze_order.sql").format(
+            table_name=_ENDPOINT_TABLES["orders"]
+        )
+
+        with self._client.engine.connect() as conn:
+            conn.execute(text(drop_dividend))
+            conn.execute(text(create_dividend))
+            conn.execute(text(drop_order))
+            conn.execute(text(create_order))
+            conn.commit()
