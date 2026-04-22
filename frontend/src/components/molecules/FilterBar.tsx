@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import { Box, ToggleButtonGroup, ToggleButton, Autocomplete, TextField, useTheme } from '@mui/material'
-=======
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Box, ButtonBase, useTheme } from '@mui/material'
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 import { alpha } from '@mui/material/styles'
 import { useAppStore } from '../../store/useAppStore'
 import { TIMEFRAME_OPTIONS } from '../../constants/timeframes'
@@ -14,21 +10,6 @@ export default function FilterBar() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [indicator, setIndicator] = useState<{ left: number; width: number } | null>(null)
 
-<<<<<<< HEAD
-export const TIMEFRAME_OPTIONS = [
-  { value: '1d', label: '1D' },
-  { value: '1w', label: '1W' },
-  { value: '1m', label: '1M' },
-  { value: '3m', label: '3M' },
-  { value: '6m', label: '6M' },
-  { value: '1y', label: '1Y' },
-  { value: 'all', label: 'All' },
-]
-
-export default function FilterBar({ availableTags = [] }: FilterBarProps) {
-  const theme = useTheme()
-  const { timeframe, setTimeframe, selectedTags, setSelectedTags } = useAppStore()
-=======
   useLayoutEffect(() => {
     if (!containerRef.current) return
     const active = containerRef.current.querySelector<HTMLElement>(`[data-tf="${timeframe}"]`)
@@ -37,7 +18,6 @@ export default function FilterBar({ availableTags = [] }: FilterBarProps) {
     const rect = active.getBoundingClientRect()
     setIndicator({ left: rect.left - container.left, width: rect.width })
   }, [timeframe])
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 
   const toggleGroupSx = {
     '& .MuiToggleButton-root': {
@@ -62,34 +42,6 @@ export default function FilterBar({ availableTags = [] }: FilterBarProps) {
     <Box sx={{
       display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap',
       border: '1px solid', borderColor: 'divider',
-<<<<<<< HEAD
-      borderRadius: 1, px: 1.5, py: 0.75, mb: 1,
-    }}>
-      <ToggleButtonGroup
-        value={timeframe}
-        exclusive
-        onChange={(_, val) => { if (val) setTimeframe(val) }}
-        size="small"
-        sx={toggleGroupSx}
-      >
-        {TIMEFRAME_OPTIONS.map((o) => (
-          <ToggleButton key={o.value} value={o.value}>
-            {o.label}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-
-      <Autocomplete
-        multiple
-        size="small"
-        options={availableTags}
-        value={selectedTags}
-        onChange={(_, val) => setSelectedTags(val)}
-        renderInput={(params) => <TextField {...params} placeholder="Filter by tag..." />}
-        sx={{ minWidth: 220 }}
-        disableCloseOnSelect
-      />
-=======
       borderRadius: 3, px: 0.75, py: 0.5, mb: 1,
       bgcolor: 'background.paper',
     }}>
@@ -139,7 +91,6 @@ export default function FilterBar({ availableTags = [] }: FilterBarProps) {
           )
         })}
       </Box>
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
     </Box>
   )
 }

@@ -93,16 +93,6 @@ function buildColumns(theme: Theme, onOpenDetails?: (ticker: string) => void): G
       pinnable: true,
       renderCell: (params: GridRenderCellParams) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-<<<<<<< HEAD
-          <TickerLogo ticker={params.value as string} size={20} />
-          <span>{params.value as string}</span>
-        </Box>
-      ),
-    },
-    { field: 'name', headerName: 'Name', width: 220 },
-    { field: 'price', headerName: 'Price', width: 90, valueFormatter: (v) => numFmt(v) },
-    { field: 'avg_price', headerName: 'Avg Price', width: 90, valueFormatter: (v) => numFmt(v), renderHeader: headerWithInfo('Avg Price', 'avg_price') },
-=======
           <TickerLogo ticker={params.value as string} size={22} />
           <span style={{ fontWeight: 600, fontSize: 12.5 }}>{params.value as string}</span>
         </Box>
@@ -149,7 +139,6 @@ function buildColumns(theme: Theme, onOpenDetails?: (ticker: string) => void): G
     },
     { field: 'price', headerName: 'Price', width: 90, valueFormatter: (v) => numFmt(v), ...NUM },
     { field: 'avg_price', headerName: 'Avg Price', width: 90, valueFormatter: (v) => numFmt(v), renderHeader: headerWithInfo('Avg Price', 'avg_price'), ...NUM },
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
     {
       field: 'price_vs_avg_pct',
       headerName: 'vs Avg %',

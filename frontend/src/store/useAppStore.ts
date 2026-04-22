@@ -1,13 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PaletteMode } from '@mui/material'
-<<<<<<< HEAD
-import { TIMEFRAME_OPTIONS } from '../components/molecules/FilterBar'
-
-export type TimeframeOption = '1d' | '1w' | '1m' | '3m' | '6m' | '1y' | 'all'
-
-const VALID_TIMEFRAMES = new Set(TIMEFRAME_OPTIONS.map((o) => o.value))
-=======
 import { TIMEFRAME_OPTIONS, type TimeframeOption } from '../constants/timeframes'
 
 export type { TimeframeOption }
@@ -15,7 +8,6 @@ export type { TimeframeOption }
 export type Density = 'compact' | 'comfortable'
 
 const VALID_TIMEFRAMES: Set<string> = new Set(TIMEFRAME_OPTIONS.map((o) => o.value))
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 
 interface AppState {
   // Theme
