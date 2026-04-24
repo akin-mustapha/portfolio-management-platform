@@ -39,6 +39,10 @@ class AssetGoldRecord(BaseModel):
 
     # Technical / Risk (fact_technical)
     value_drawdown_pct_30d: Optional[float] = None
+    price_drawdown_pct_30d: Optional[float] = None
+    price_drawdown_pct_90d: Optional[float] = None
+    price_drawdown_pct_180d: Optional[float] = None
+    price_drawdown_pct_365d: Optional[float] = None
     value_high_alltime: Optional[float] = None
     value_low_alltime: Optional[float] = None
     value_ma_20d: Optional[float] = None
