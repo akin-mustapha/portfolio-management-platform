@@ -85,7 +85,7 @@ def _kpi_groups(row: dict):
     daily_ret = row.get("daily_value_return")
     weight = row.get("weight_pct")
     dca = row.get("dca_bias")
-    drawdown = row.get("value_drawdown_pct_30d")
+    drawdown = row.get("price_drawdown_pct_30d")
     volatility = row.get("volatility_30d")
     var_95 = row.get("var_95_1d")
     fx_impact = row.get("fx_impact")
