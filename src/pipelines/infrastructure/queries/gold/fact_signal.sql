@@ -3,7 +3,7 @@ SELECT
     dp.id                                           AS portfolio_id,
     da.asset_id,
 
-    # TODO: Compare old dca formula with new one and evaluate which is better
+    -- TODO: Compare old dca formula with new one and evaluate which is better
     -- df['dca_bias'] = (
     --     -0.5 * df['pct_drawdown']
     --     -0.4 * df['price_vs_ma_50']
