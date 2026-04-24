@@ -58,14 +58,14 @@ class FullLoaderPostgresT212(FullLoader):
 
     def _exposition_abstraction(self):
         drop_account = "DROP VIEW IF EXISTS raw.v_bronze_account"
-        create_account = load_query(_QUERIES_DIR / "bronze" / "v_bronze_account.sql").format(
-            table_name=self._table_name
-        )
+        create_account = load_query(
+            _QUERIES_DIR / "bronze" / "v_bronze_account.sql"
+        ).format(table_name=self._table_name)
 
         drop_position = "DROP VIEW IF EXISTS raw.v_bronze_position"
-        create_position = load_query(_QUERIES_DIR / "bronze" / "v_bronze_position.sql").format(
-            table_name=self._table_name
-        )
+        create_position = load_query(
+            _QUERIES_DIR / "bronze" / "v_bronze_position.sql"
+        ).format(table_name=self._table_name)
 
         with self._client.engine.connect() as conn:
             conn.execute(text(drop_account))

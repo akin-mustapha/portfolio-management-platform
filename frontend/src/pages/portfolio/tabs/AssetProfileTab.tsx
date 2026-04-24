@@ -5,17 +5,10 @@ import AssetPriceChart from '../../../components/charts/AssetPriceChart'
 import AssetValueChart from '../../../components/charts/AssetValueChart'
 import AssetPnlChart from '../../../components/charts/AssetPnlChart'
 import AssetReturnChart from '../../../components/charts/AssetReturnChart'
-<<<<<<< HEAD
-import EditTagsModal from '../../../components/organisms/EditTagsModal'
-import KpiCard from '../../../components/atoms/KpiCard'
 import TickerLogo from '../../../components/atoms/TickerLogo'
-import Section from '../../../components/molecules/Section'
-import { Grid } from '@mui/material'
-=======
 import Section from '../../../components/molecules/Section'
 import KpiGroup, { type KpiGroupItem } from '../../../components/molecules/KpiGroup'
 import { usePortfolioContext } from '../PortfolioContext'
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 
 type KpiDef = KpiGroupItem
 
@@ -70,39 +63,15 @@ export default function AssetProfileTab() {
   ]
 
   return (
-<<<<<<< HEAD
-    <Box>
-      {/* Header row */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
-        <TickerLogo ticker={ticker} />
-        <Typography variant="subtitle1" fontWeight={700}>{ticker}</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-          {assetRow?.name as string}
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-          {tags.map((t) => (
-            <Chip key={t} label={t} size="small" variant="outlined" sx={{ fontSize: 10 }} />
-          ))}
-          <Button size="small" variant="outlined" sx={{ fontSize: 10, height: 22 }} onClick={() => setTagsOpen(true)}>
-            Edit Tags
-          </Button>
-        </Box>
-      </Box>
-=======
     <Box sx={{ animation: 'fadeIn 220ms ease', '@keyframes fadeIn': { from: { opacity: 0 }, to: { opacity: 1 } } }}>
       <Stack spacing={1.5} sx={{ mb: 3 }}>
         <KpiGroup label="Performance" cards={performanceKpis} overflow="wrap" dimmed={false} />
         <KpiGroup label="Risk" cards={riskKpis} overflow="wrap" dimmed={false} />
         <KpiGroup label="Allocation" cards={allocationKpis} overflow="wrap" dimmed={false} />
       </Stack>
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 
       {!isLoading && history && (
-<<<<<<< HEAD
-        <div>
-=======
         <Stack spacing={1.5}>
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
           <Section title="Price + Moving Averages" metricKey="asset_price_chart">
             <AssetPriceChart series={history.asset_price} />
           </Section>
@@ -115,11 +84,7 @@ export default function AssetProfileTab() {
           <Section title="Cumulative Return" metricKey="asset_vs_portfolio_return_chart">
             <AssetReturnChart cumulativeSeries={history.asset_return} />
           </Section>
-<<<<<<< HEAD
-        </div>
-=======
         </Stack>
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
       )}
 
     </Box>

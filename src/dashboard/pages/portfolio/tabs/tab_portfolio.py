@@ -182,9 +182,7 @@ def portfolio_tab_content(view_model=None, theme="light", kpi_data=None):
                     # Row 4: Daily movers
                     html.Div(
                         [
-                            html.Div(
-                                "Today's Movers", className="tv-section-header"
-                            ),
+                            html.Div("Today's Movers", className="tv-section-header"),
                             html.Div(
                                 id="daily-movers-table",
                                 children=daily_movers_table(daily_movers, n=5),

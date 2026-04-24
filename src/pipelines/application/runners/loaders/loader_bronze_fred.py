@@ -36,9 +36,9 @@ class FullLoaderPostgresFred(FullLoader):
         Inserts one row per series per run.
         """
         ingested_date = datetime.now().date()
-        sql = load_query(_QUERIES_DIR / "bronze" / "fred_observations_insert.sql").format(
-            table_name=self._table_name
-        )
+        sql = load_query(
+            _QUERIES_DIR / "bronze" / "fred_observations_insert.sql"
+        ).format(table_name=self._table_name)
         with self._client as client:
             for record in data:
                 params = {

@@ -67,11 +67,7 @@ export default function KpiCard({
     <Box
       sx={{
         height: '100%',
-<<<<<<< HEAD
-        minWidth: compact ? 115 : 140,
-=======
         minWidth: isCompact ? 110 : isHero ? 220 : 140,
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
         display: 'flex',
         flexDirection: 'column',
         justifyContent: isHero ? 'flex-start' : 'center',
@@ -89,40 +85,6 @@ export default function KpiCard({
             : undefined,
       }}
     >
-<<<<<<< HEAD
-      <CardContent sx={{ p: compact ? 1.25 : 1.5, '&:last-child': { pb: compact ? 1.25 : 1.5 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }} mb={0.5}>
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {label}
-          </Typography>
-          {metricKey && <MetricInfo metricKey={metricKey} size="inherit" />}
-        </Box>
-        {loading ? (
-          <Skeleton width="80%" height={28} />
-        ) : (
-          <Box>
-            <Typography
-              variant={compact ? 'body2' : 'h6'}
-              fontWeight={700}
-              sx={{ color: valueColor, lineHeight: 1.2 }}
-            >
-              {value != null ? (
-                <PrivacyValue
-                  value={`${prefix}${
-                    typeof value === 'number'
-                      ? value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                      : value
-                  }${suffix}`}
-                />
-              ) : (
-                '—'
-              )}
-            </Typography>
-            {subValue && (
-              <Typography variant="caption" color="text.secondary">
-                {subValue}
-              </Typography>
-=======
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, mb: isHero ? 1 : 0.5 }}>
         <Typography
           variant="caption"
@@ -154,7 +116,6 @@ export default function KpiCard({
               />
             ) : (
               '—'
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
             )}
           </Typography>
           {subValue && (

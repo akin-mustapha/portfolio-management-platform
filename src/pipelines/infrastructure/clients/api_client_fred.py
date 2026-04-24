@@ -11,7 +11,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
 )
 
-# TODO: move to config
+# TODO: move to config
 BASE_URL = "https://api.stlouisfed.org/fred/"
 
 
