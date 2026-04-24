@@ -1,6 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material'
 import Section from '../../../components/molecules/Section'
 import PortfolioValueChart from '../../../components/charts/PortfolioValueChart'
+import PortfolioPnlChart from '../../../components/charts/PortfolioPnlChart'
 import PositionWeightChart from '../../../components/charts/PositionWeightChart'
 import WinnersChart from '../../../components/charts/WinnersChart'
 import LosersChart from '../../../components/charts/LosersChart'
