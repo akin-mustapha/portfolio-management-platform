@@ -89,7 +89,10 @@ class FullLoaderPostgresT212History(FullLoader):
                         )
 
                 cursor = (data.get("cursors") or {}).get(endpoint) or {}
-                if cursor.get("last_cursor") is not None or cursor.get("last_event_ts") is not None:
+                if (
+                    cursor.get("last_cursor") is not None
+                    or cursor.get("last_event_ts") is not None
+                ):
                     client.execute(
                         cursor_sql,
                         params={

@@ -41,7 +41,9 @@ class Asset:
 
 class AssetPortfolioSource(Source):
     def __init__(self):
-        self._sql = load_query(_QUERIES_DIR / "portfolio" / "asset_portfolio_source.sql")
+        self._sql = load_query(
+            _QUERIES_DIR / "portfolio" / "asset_portfolio_source.sql"
+        )
 
     def extract(self) -> list:
         with SQLModelClient(DATABASE_URL) as client:
@@ -51,7 +53,9 @@ class AssetPortfolioSource(Source):
 
 class AssetPortfolioDestination(Destination):
     def __init__(self):
-        self._template = load_query(_QUERIES_DIR / "portfolio" / "asset_portfolio_upsert.sql")
+        self._template = load_query(
+            _QUERIES_DIR / "portfolio" / "asset_portfolio_upsert.sql"
+        )
 
     def load(self, data: list[dict]) -> None:
         # INSERTION POLICY: IDEMPOTENT

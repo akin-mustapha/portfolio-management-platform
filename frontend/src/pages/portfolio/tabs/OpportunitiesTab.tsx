@@ -4,10 +4,7 @@ import PositionPerformanceMap from '../../../components/charts/PositionPerforman
 import OpportunitiesChart from '../../../components/charts/OpportunitiesChart'
 import { useAppStore } from '../../../store/useAppStore'
 import Section from '../../../components/molecules/Section'
-<<<<<<< HEAD
-=======
 import { usePortfolioContext } from '../PortfolioContext'
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 
 export default function OpportunitiesTab() {
   const { summary: data } = usePortfolioContext()

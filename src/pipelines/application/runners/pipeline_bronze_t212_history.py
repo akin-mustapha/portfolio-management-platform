@@ -45,14 +45,14 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
 _ENDPOINTS = {
-    "dividends":    "equity/history/dividends",
-    "orders":       "equity/history/orders",
+    "dividends": "equity/history/dividends",
+    "orders": "equity/history/orders",
     "transactions": "equity/history/transactions",
 }
 
 _EVENT_TS_KEY = {
-    "dividends":    "paidOn",
-    "orders":       None,  # nested — handled in _item_event_ts
+    "dividends": "paidOn",
+    "orders": None,  # nested — handled in _item_event_ts
     "transactions": "dateTime",
 }
 
@@ -95,7 +95,9 @@ class Trading212HistorySource(Source):
         for endpoint_key, path in _ENDPOINTS.items():
             try:
                 stored_ts = self._get_stored_high_water_mark(endpoint_key)
-                items, newest_ts, newest_cursor = self._pull_endpoint(endpoint_key, path, stored_ts)
+                items, newest_ts, newest_cursor = self._pull_endpoint(
+                    endpoint_key, path, stored_ts
+                )
                 result[endpoint_key] = items
                 result["cursors"][endpoint_key] = {
                     "last_cursor": newest_cursor,
@@ -107,7 +109,9 @@ class Trading212HistorySource(Source):
                 )
             except Exception as e:
                 # Isolate endpoint failures so one broken stream doesn't poison the others.
-                logging.exception(f"[t212_history:{endpoint_key}] extraction failed: {e}")
+                logging.exception(
+                    f"[t212_history:{endpoint_key}] extraction failed: {e}"
+                )
                 result[endpoint_key] = []
                 result["cursors"][endpoint_key] = {}
 
@@ -126,7 +130,11 @@ class Trading212HistorySource(Source):
             if not items:
                 return True
             oldest = min(
-                (ts for ts in (_item_event_ts(endpoint_key, i) for i in items) if ts is not None),
+                (
+                    ts
+                    for ts in (_item_event_ts(endpoint_key, i) for i in items)
+                    if ts is not None
+                ),
                 default=None,
             )
             if oldest is None:

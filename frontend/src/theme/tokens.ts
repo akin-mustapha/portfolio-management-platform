@@ -1,16 +1,9 @@
 export const lightTokens = {
-<<<<<<< HEAD
-  primary: '#0057ff',
-  positive: '#16c264',
-  negative: '#e82020',
-  bgApp: '#ffffff',
-=======
   primary: '#3b5bff',
   accent: '#3b5bff',
   positive: '#16a34a',
   negative: '#dc2626',
   bgApp: '#fafbfc',
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
   bgSidebar: '#f8f9fa',
   bgCard: '#ffffff',
   bgCardBorder: '#eef0f3',
@@ -24,17 +17,6 @@ export const lightTokens = {
 }
 
 export const darkTokens = {
-<<<<<<< HEAD
-  primary: '#4d8fff',
-  positive: '#2ecf7e',
-  negative: '#ff3333',
-  bgApp: '#0a0a0a',
-  bgSidebar: '#0d0d0d',
-  bgCard: '#111111',
-  bgCardBorder: '#1f1f1f',
-  textPrimary: '#d1d4dc',
-  textSecondary: '#868e9c',
-=======
   primary: '#6b8cff',
   accent: '#6b8cff',
   positive: '#22c55e',
@@ -50,16 +32,11 @@ export const darkTokens = {
   textSecondary: '#8a919e',
   shadowCard: '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
   shadowCardHover: '0 4px 20px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)',
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
 }
 
 // Three asset accent colours — light/dark variants
 export const assetColors = {
-<<<<<<< HEAD
-  asset1: { light: '#0057ff', dark: '#4d8fff' },
-=======
   asset1: { light: '#3b5bff', dark: '#6b8cff' },
->>>>>>> 74aff6ca946f0bd151cffbd68dda9e801cfa3223
   asset2: { light: '#fd7e14', dark: '#ffaa55' },
   asset3: { light: '#6f42c1', dark: '#b08ae0' },
 }

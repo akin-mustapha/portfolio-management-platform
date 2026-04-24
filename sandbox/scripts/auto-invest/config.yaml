@@ -1,0 +1,11 @@
+budget: 50
+assets:
+  - name: Vanguard S&P 500 (Dist)
+    ticker: VUSAl
+    allocation: 0.5
+  - name: Vanguard FTSE All-World (Acc)
+    ticker: VWRPl
+    allocation: 0.3
+  - name: iShares MSCI World Mid-Cap Equal Weight (Acc)
+    ticker: IWSZl
+    allocation: 0.2
