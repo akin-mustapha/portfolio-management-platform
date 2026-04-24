@@ -110,17 +110,16 @@ class FullLoaderPostgresT212History(FullLoader):
             return (item.get("order") or {}).get("id")
         return item.get("reference")
 
-
     def _exposition_abstraction(self):
         drop_dividend = "DROP VIEW IF EXISTS raw.v_bronze_dividend"
-        create_dividend = load_query(_QUERIES_DIR / "bronze" / "v_bronze_dividend.sql").format(
-            table_name=_ENDPOINT_TABLES["dividends"]
-        )
+        create_dividend = load_query(
+            _QUERIES_DIR / "bronze" / "v_bronze_dividend.sql"
+        ).format(table_name=_ENDPOINT_TABLES["dividends"])
 
         drop_order = "DROP VIEW IF EXISTS raw.v_bronze_order"
-        create_order = load_query(_QUERIES_DIR / "bronze" / "v_bronze_order.sql").format(
-            table_name=_ENDPOINT_TABLES["orders"]
-        )
+        create_order = load_query(
+            _QUERIES_DIR / "bronze" / "v_bronze_order.sql"
+        ).format(table_name=_ENDPOINT_TABLES["orders"])
 
         with self._client.engine.connect() as conn:
             conn.execute(text(drop_dividend))
