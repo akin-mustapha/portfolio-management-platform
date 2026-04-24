@@ -28,7 +28,9 @@ def _run_sync(query_file: str, target: str, source: str) -> None:
 
 
 def sychronize_industry():
-    _run_sync("sync_industry.sql", target="staging.industry", source="portfolio.industry")
+    _run_sync(
+        "sync_industry.sql", target="staging.industry", source="portfolio.industry"
+    )
 
 
 def sychronize_sector():
@@ -40,11 +42,15 @@ def sychronize_tag():
 
 
 def sychronize_category():
-    _run_sync("sync_category.sql", target="staging.category", source="portfolio.category")
+    _run_sync(
+        "sync_category.sql", target="staging.category", source="portfolio.category"
+    )
 
 
 def sychronize_asset_tag():
-    _run_sync("sync_asset_tag.sql", target="staging.asset_tag", source="portfolio.asset_tag")
+    _run_sync(
+        "sync_asset_tag.sql", target="staging.asset_tag", source="portfolio.asset_tag"
+    )
 
 
 def enrichment_sychronization():

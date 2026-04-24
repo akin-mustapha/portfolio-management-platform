@@ -77,12 +77,16 @@ class _FactDestination(Destination):
 
     def __init__(self):
         self._client = SQLModelClient(DATABASE_URL)
-        self._repository = RepositoryFactory.get(self.fact_name, schema_name="analytics")
+        self._repository = RepositoryFactory.get(
+            self.fact_name, schema_name="analytics"
+        )
         self._sql = load_query(_QUERIES_DIR / "gold" / self.sql_file)
 
     def load(self, _: Dict = None) -> None:
         with self._client as db:
-            rows = db.execute(self._sql, params={"portfolio_id": str(portfolio_id)}).fetchall()
+            rows = db.execute(
+                self._sql, params={"portfolio_id": str(portfolio_id)}
+            ).fetchall()
         records = [dict(row._mapping) for row in rows]
         if not records:
             logging.warning(f"[t212_gold:{self.fact_name}] NO RECORDS — skipping")
