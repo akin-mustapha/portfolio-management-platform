@@ -5,12 +5,8 @@ This script is responsible for executing the auto-investment strategy based on t
 
 python ./sandbox/scripts/auto-invest/main.py
 """
-from unittest import result
-
-from prefect import logging
 from sqlmodel import SQLModel, Session, create_engine, text
 import yaml
-import requests
 
 
 
@@ -66,22 +62,12 @@ def create_order(ticker: str, quantity: int):
     """
     Placeholder function to create an order. In a real implementation, this would interact with a brokerage API.
     """
-    url = "https://demo.trading212.com/api/v0/equity/orders/market"
-
     payload = {
       "extendedHours": True,
       "quantity": quantity,
       "ticker": ticker
     }
 
-    headers = {
-      "Content-Type": "application/json",
-      "Authorization": "YOUR_API_KEY_HERE"
-    }
-
-    # response = requests.post(url, json=payload, headers=headers, auth=('<username>','<password>'))
-
-    # data = response.json()
     print(f"API Request to create order: {payload}")
     print(f"Creating order for {quantity} shares of {ticker}")
     
