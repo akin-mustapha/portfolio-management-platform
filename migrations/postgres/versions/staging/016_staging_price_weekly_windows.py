@@ -1,15 +1,9 @@
 """016_staging_price_weekly_windows
 
-Adds 7-day and 14-day rolling price columns to staging.v_asset_metrics:
-
-  recent_price_high_7d   — gated: NULL until 7 rows of history
-  recent_price_low_7d    — ungated: best available within the window
-  recent_price_high_14d  — gated: NULL until 14 rows of history
-  recent_price_low_14d   — ungated: best available within the window
-
-Lows are intentionally ungated — a partial-window low is still meaningful
-for DCA context. Highs (and the drawdown derived from them) are gated so
-the drawdown percentage is not artificially shallow when the window is short.
+Adds 7-day and 14-day rolling price columns to staging.v_asset_metrics.
+All high/low columns across all windows are ungated — they return the best
+available value within whatever history exists rather than NULL until the
+window is fully populated.
 
 Revision ID: 2200000000b16
 Revises: 2200000000b15
@@ -80,14 +74,14 @@ _V_ASSET_METRICS = """
         MAX(profit) OVER w_30 AS recent_profit_high_30d,
         MIN(profit) OVER w_30 AS recent_profit_low_30d,
 
-        CASE WHEN COUNT(price) OVER w_7   = 7   THEN MAX(price) OVER w_7   END AS recent_price_high_7d,
-        MIN(price) OVER w_7                                                     AS recent_price_low_7d,
-        CASE WHEN COUNT(price) OVER w_14  = 14  THEN MAX(price) OVER w_14  END AS recent_price_high_14d,
-        MIN(price) OVER w_14                                                    AS recent_price_low_14d,
-        CASE WHEN COUNT(price) OVER w_30  = 30  THEN MAX(price) OVER w_30  END AS recent_price_high_30d,
-        CASE WHEN COUNT(price) OVER w_90  = 90  THEN MAX(price) OVER w_90  END AS recent_price_high_90d,
-        CASE WHEN COUNT(price) OVER w_180 = 180 THEN MAX(price) OVER w_180 END AS recent_price_high_180d,
-        CASE WHEN COUNT(price) OVER w_365 = 365 THEN MAX(price) OVER w_365 END AS recent_price_high_365d,
+        MAX(price) OVER w_7   AS recent_price_high_7d,
+        MIN(price) OVER w_7   AS recent_price_low_7d,
+        MAX(price) OVER w_14  AS recent_price_high_14d,
+        MIN(price) OVER w_14  AS recent_price_low_14d,
+        MAX(price) OVER w_30  AS recent_price_high_30d,
+        MAX(price) OVER w_90  AS recent_price_high_90d,
+        MAX(price) OVER w_180 AS recent_price_high_180d,
+        MAX(price) OVER w_365 AS recent_price_high_365d,
 
         MAX(value) OVER (PARTITION BY ticker) AS value_high_alltime,
         MIN(value) OVER (PARTITION BY ticker) AS value_low_alltime,

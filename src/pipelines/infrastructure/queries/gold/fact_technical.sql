@@ -6,6 +6,15 @@ SELECT
     (am.value - am.recent_value_high_30d)
         / NULLIF(am.recent_value_high_30d, 0)       AS value_drawdown_pct_30d,
 
+    am.recent_price_high_7d,
+    am.recent_price_low_7d,
+    (am.price - am.recent_price_high_7d)
+        / NULLIF(am.recent_price_high_7d, 0)        AS price_drawdown_pct_7d,
+    am.recent_price_high_14d,
+    am.recent_price_low_14d,
+    (am.price - am.recent_price_high_14d)
+        / NULLIF(am.recent_price_high_14d, 0)       AS price_drawdown_pct_14d,
+
     (am.price - am.recent_price_high_30d)
         / NULLIF(am.recent_price_high_30d, 0)       AS price_drawdown_pct_30d,
     (am.price - am.recent_price_high_90d)
