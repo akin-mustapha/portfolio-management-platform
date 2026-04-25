@@ -11,7 +11,7 @@ interface HoldingsTableProps {
   sector?: string
 }
 
-type SortKey = 'ticker' | 'value' | 'pnl_pct' | 'weight_pct' | 'daily_value_return'
+type SortKey = 'ticker' | 'value' | 'pnl_pct' | 'weight_pct' | 'daily_value_return' | 'avg_price' | 'price'
 
 function makeSparkline(asset: RawAsset): number[] {
   const series = asset.price_series
@@ -42,23 +42,25 @@ export default function HoldingsTable({ rows, search = '', sector = 'All' }: Hol
       if (typeof av === 'string' && typeof bv === 'string') return av.localeCompare(bv) * sort.dir
       return ((Number(av) || 0) - (Number(bv) || 0)) * sort.dir
     })
-  }, [rows, search, sort])
+  }, [rows, search, sort, sector])
 
   const col = theme.palette.text.secondary
   const line = theme.palette.divider
   const hov = (theme as Theme & { custom: { bgRowHover: string } }).custom.bgRowHover
 
-  const headers: { key: SortKey | null; label: string; w: number; align: 'left' | 'right' | 'center' }[] = [
-    { key: 'ticker',              label: 'Ticker',  w: 130, align: 'left' },
-    { key: null,                  label: 'Sector',  w: 100, align: 'left' },
-    { key: 'value',               label: 'Value',   w: 100, align: 'right' },
-    { key: 'pnl_pct',             label: 'Return',  w: 80,  align: 'right' },
-    { key: null,                  label: '30D',     w: 90,  align: 'center' },
-    { key: 'weight_pct',          label: 'Weight',  w: 110, align: 'left' },
-    { key: 'daily_value_return',  label: 'Today',   w: 80,  align: 'right' },
+  const headers: { key: SortKey | null; label: string; fr: string; align: 'left' | 'right' | 'center' }[] = [
+    { key: 'ticker',             label: 'Ticker',  fr: 'minmax(120px, 1.6fr)', align: 'left' },
+    { key: null,                 label: 'Sector',  fr: 'minmax(90px, 1.3fr)',  align: 'left' },
+    { key: 'price',              label: 'Price',   fr: 'minmax(72px, 1fr)',    align: 'left' },
+    { key: 'avg_price',          label: 'Avg',     fr: 'minmax(72px, 1fr)',    align: 'left' },
+    { key: 'pnl_pct',            label: 'Return',  fr: 'minmax(68px, 1fr)',    align: 'left' },
+    { key: null,                 label: '30D',     fr: 'minmax(72px, 1fr)',    align: 'center' },
+    { key: 'value',              label: 'Value',   fr: 'minmax(80px, 1fr)',    align: 'left' },
+    { key: 'weight_pct',         label: 'Weight',  fr: 'minmax(120px, 1.4fr)', align: 'left' },
+    { key: 'daily_value_return', label: 'Today',   fr: 'minmax(64px, 1fr)',    align: 'right' },
   ]
 
-  const gridCols = headers.map(h => h.w + 'px').join(' ')
+  const gridCols = headers.map(h => h.fr).join(' ')
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
@@ -103,6 +105,8 @@ function HoldingsRow({ asset, gridCols, line, hov, theme }: {
   const pnlPct = Number(asset.pnl_pct) || 0
   const weight = Number(asset.weight_pct) || 0
   const dayRet = Number(asset.daily_value_return) || 0
+  const avgPrice = Number(asset.avg_price) || 0
+  const price = Number(asset.price) || 0
   const spark = useMemo(() => makeSparkline(asset), [asset])
   const sector = asset.sector ?? asset.tags?.[0] ?? ''
   const upColor = theme.palette.success.main
@@ -129,15 +133,21 @@ function HoldingsRow({ asset, gridCols, line, hov, theme }: {
       <div style={{ fontSize: 11.5, color: theme.palette.text.secondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {sector || '—'}
       </div>
-      <div style={{ textAlign: 'right', fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: theme.palette.text.primary }}>
-        {fmtEUR(value, 0)}
+      <div style={{ fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', color: theme.palette.text.primary, fontSize: 11.5 }}>
+        {price > 0 ? fmtEUR(price, 2) : '—'}
       </div>
-      <div style={{ textAlign: 'right', fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: pnlPct >= 0 ? upColor : dnColor }}>
+      <div style={{ fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', color: theme.palette.text.secondary, fontSize: 11.5 }}>
+        {avgPrice > 0 ? fmtEUR(avgPrice, 2) : '—'}
+      </div>
+      <div style={{ fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: pnlPct >= 0 ? upColor : dnColor }}>
         {fmtPct(pnlPct, 1)}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Spark data={spark} w={70} h={20}
                color={pnlPct >= 0 ? upColor : dnColor} />
+      </div>
+      <div style={{ fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: theme.palette.text.primary }}>
+        {fmtEUR(value, 0)}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ flex: 1, height: 4, background: theme.palette.mode === 'dark' ? '#1f1f24' : '#f4f1ec', borderRadius: 999, position: 'relative' }}>
@@ -146,7 +156,7 @@ function HoldingsRow({ asset, gridCols, line, hov, theme }: {
         <span style={{ fontSize: 11, color: theme.palette.text.secondary, fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', minWidth: 36, textAlign: 'right' }}>{weight.toFixed(1)}%</span>
       </div>
       <div style={{ textAlign: 'right', fontFamily: 'ui-monospace', fontVariantNumeric: 'tabular-nums', fontWeight: 600, color: dayRet >= 0 ? upColor : dnColor }}>
-        {dayRet !== 0 ? fmtPct(dayRet * 100, 2) : '—'}
+        {dayRet !== 0 ? fmtPct(dayRet, 2) : '—'}
       </div>
     </div>
   )

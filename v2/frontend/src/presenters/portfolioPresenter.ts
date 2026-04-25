@@ -11,6 +11,8 @@ export interface RawAsset {
   pnl_pct: number | null
   var_95_1d: number | null
   daily_value_return: number | null
+  avg_price: number | null
+  price: number | null
   value_ma_crossover_signal: number | null
   price_series: number[]
   tags: string[]

@@ -51,7 +51,7 @@ function buildSectors(summary: NonNullable<ReturnType<typeof usePortfolioContext
   const totalValue = rows.reduce((s, r) => s + (Number(r.value) || 0), 0)
   const map: Record<string, number> = {}
   rows.forEach(r => {
-    const sector = (r.tags?.[0] as string) ?? (r as Record<string, unknown>).sector as string ?? 'Other'
+    const sector = r.sector ?? r.tags?.[0] ?? 'Other'
     map[sector] = (map[sector] ?? 0) + (Number(r.value) || 0)
   })
   return Object.entries(map)
