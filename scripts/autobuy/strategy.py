@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from budget import MonthlyBudget
-from config import Asset, Tranche, ASSETS, MONTHLY_LIMIT
+from config import Asset, Tranche, ASSETS
 from db import get_drawdown, get_cash_available
 from t212_client import T212Client
 
