@@ -5,9 +5,9 @@ All cases can be driven by constructing domain objects directly.
 
 from datetime import date, timedelta
 
-from backend.domain.rebalancing.entities import RebalanceConfig
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
-from backend.application.rebalancing.plan_generator import generate_plan
+from v2.backend.domain.rebalancing.entities import RebalanceConfig
+from v2.backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
+from v2.backend.application.rebalancing.plan_generator import generate_plan
 
 
 def _config(

@@ -1,6 +1,6 @@
 import pytest
 
-from backend.domain.rebalancing.value_objects import (
+from v2.backend.domain.rebalancing.value_objects import (
     WeightBand,
     RebalanceThreshold,
     PlanStatus,

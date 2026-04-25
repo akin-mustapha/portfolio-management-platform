@@ -6,9 +6,9 @@ No database connection is required.
 import pytest
 from unittest.mock import MagicMock, patch
 
-from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
-from backend.application.rebalancing.service import RebalancingService
+from v2.backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from v2.backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
+from v2.backend.application.rebalancing.service import RebalancingService
 
 _RAW_CONFIG_ROW = {
     "id": "cfg-1",

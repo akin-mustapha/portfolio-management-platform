@@ -6,8 +6,8 @@ No database connection is required.
 import pytest
 from unittest.mock import MagicMock, patch
 
-from backend.domain.portfolio.value_objects import Ticker
-from backend.domain.portfolio.entities import (
+from v2.backend.domain.portfolio.value_objects import Ticker
+from v2.backend.domain.portfolio.entities import (
     Asset,
     Tag,
     Category,
@@ -15,7 +15,7 @@ from backend.domain.portfolio.entities import (
     Industry,
     Sector,
 )
-from backend.application.portfolio.service import PortfolioService
+from v2.backend.application.portfolio.service import PortfolioService
 
 
 @pytest.fixture
@@ -26,12 +26,22 @@ def mock_repo_factory():
 
 @pytest.fixture
 def service(mock_repo_factory):
+    mock_analytics_repo = MagicMock()
+    mock_portfolio_query_repo = MagicMock()
     with patch(
         "backend.application.portfolio.service.RepositoryFactory",
         return_value=mock_repo_factory,
+    ), patch(
+        "backend.application.portfolio.service.AssetAnalyticsRepository",
+        return_value=mock_analytics_repo,
+    ), patch(
+        "backend.application.portfolio.service.PortfolioQueryRepository",
+        return_value=mock_portfolio_query_repo,
     ):
         svc = PortfolioService()
     svc._repo_factory = mock_repo_factory
+    svc._analytics_repo = mock_analytics_repo
+    svc._portfolio_query_repo = mock_portfolio_query_repo
     return svc
 
 
