@@ -7,7 +7,7 @@ from datetime import date, timedelta
 
 from v2.backend.domain.rebalancing.entities import RebalanceConfig
 from v2.backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
-from v2.backend.application.rebalancing.plan_generator import generate_plan
+from v2.backend.domain.rebalancing.plan_generator import generate_plan
 
 
 def _config(
