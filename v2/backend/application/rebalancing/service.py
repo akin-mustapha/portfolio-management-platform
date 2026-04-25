@@ -6,9 +6,7 @@ from shared.notifications.email import EmailClient
 
 from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
 from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
-from backend.infrastructure.rebalancing.repository_factory import (
-    RebalancingRepositoryFactory,
-)
+from backend.application.rebalancing.ports import RebalanceConfigPort, RebalancePlanPort
 from backend.application.rebalancing.plan_generator import generate_plan
 
 load_dotenv()
@@ -17,14 +15,14 @@ logging = customer_logger("rebalancing_service")
 
 
 class RebalancingService:
-    def __init__(self):
+    def __init__(self, config_repo: RebalanceConfigPort, plan_repo: RebalancePlanPort):
         logging.info("Initializing RebalancingService")
-        self._repo_factory = RebalancingRepositoryFactory()
+        self._config_repo = config_repo
+        self._plan_repo = plan_repo
 
     def load_configs(self) -> list[RebalanceConfig]:
         """Load all active rebalance configs with tickers from portfolio schema."""
-        repo = self._repo_factory.get_config_repo()
-        rows = repo.select_all_active_with_ticker()
+        rows = self._config_repo.select_all_active_with_ticker()
         return [
             RebalanceConfig(
                 id=str(r["id"]) if r["id"] is not None else None,
@@ -51,15 +49,14 @@ class RebalancingService:
             logging.info("No active rebalance configs — skipping plan generation")
             return None
 
-        current_weights = self._repo_factory.get_plan_repo().load_current_weights()
+        current_weights = self._plan_repo.load_current_weights()
         plan = generate_plan(configs, current_weights)
 
         if plan is None:
             logging.info("All assets within threshold — no plan generated")
             return None
 
-        repo = self._repo_factory.get_plan_repo()
-        repo.insert_plan(plan.to_record())
+        self._plan_repo.insert_plan(plan.to_record())
         logging.info(f"Rebalance plan saved: {plan.plan_json['summary']}")
 
         try:
@@ -67,9 +64,9 @@ class RebalancingService:
                 subject="Rebalancing Plan — " + plan.created_date,
                 body_text=_format_plan_email(plan),
             )
-            latest = repo.get_latest()
+            latest = self._plan_repo.get_latest()
             if latest:
-                repo.mark_email_sent(str(latest["id"]))
+                self._plan_repo.mark_email_sent(str(latest["id"]))
         except (ValueError, smtplib.SMTPException) as e:
             logging.error(f"Email failed — plan saved but not emailed: {e}")
 
@@ -77,17 +74,16 @@ class RebalancingService:
 
     def get_latest_plan(self) -> dict | None:
         """Return the most recently created plan row, or None."""
-        return self._repo_factory.get_plan_repo().get_latest()
+        return self._plan_repo.get_latest()
 
     def get_asset_id_by_ticker(self, ticker: str) -> str | None:
         """Look up the current asset_id for a ticker directly from portfolio.asset."""
-        return self._repo_factory.get_config_repo().get_asset_id_by_ticker(ticker)
+        return self._config_repo.get_asset_id_by_ticker(ticker)
 
     def upsert_config(self, config: RebalanceConfig) -> None:
         """Create or update a rebalance config for an asset (upsert on asset_id)."""
-        repo = self._repo_factory.get_config_repo()
         try:
-            repo.upsert(records=[config.to_record()], unique_key=["asset_id"])
+            self._config_repo.upsert(records=[config.to_record()], unique_key=["asset_id"])
             logging.info(f"Upserted rebalance config for asset_id={config.asset_id}")
         except Exception as e:
             logging.error(f"Error upserting rebalance config: {e}")
@@ -117,10 +113,6 @@ class RebalancingService:
             correction_days=correction_days,
             is_active=is_active,
         )
-
-
-def build_rebalancing_service() -> RebalancingService:
-    return RebalancingService()
 
 
 def _format_plan_email(plan: RebalancePlan) -> str:

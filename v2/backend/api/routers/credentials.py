@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.application.credentials.service import build_credentials_service
+from backend.application.credentials.factory import build_credentials_service
 from backend.api.serialization import date_response
 
 router = APIRouter(tags=["credentials"])

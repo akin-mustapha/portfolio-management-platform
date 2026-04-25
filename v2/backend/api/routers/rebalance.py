@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.application.rebalancing.service import build_rebalancing_service
+from backend.application.rebalancing.factory import build_rebalancing_service
 from backend.domain.rebalancing.entities import RebalanceConfig
 from backend.api.serialization import date_response
 

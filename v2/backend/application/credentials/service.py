@@ -1,8 +1,8 @@
-from backend.infrastructure.credentials.repository import CredentialsRepository
+from backend.application.credentials.ports import CredentialsPort
 
 
 class CredentialsService:
-    def __init__(self, repo: CredentialsRepository):
+    def __init__(self, repo: CredentialsPort):
         self._repo = repo
 
     def get(self, provider: str) -> dict:
@@ -20,7 +20,3 @@ class CredentialsService:
         if not api_key:
             raise ValueError("api_key is required")
         self._repo.save(provider, api_key, secret_token.strip(), api_url.strip())
-
-
-def build_credentials_service() -> CredentialsService:
-    return CredentialsService(CredentialsRepository())

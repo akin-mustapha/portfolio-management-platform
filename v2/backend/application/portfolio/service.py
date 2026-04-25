@@ -2,12 +2,10 @@
 Portfolio Service Module
 """
 
-from backend.infrastructure.portfolio.repository_factory import RepositoryFactory
-from backend.infrastructure.portfolio.asset_analytics_repository import (
-    AssetAnalyticsRepository,
-)
-from backend.infrastructure.portfolio.portfolio_query_repository import (
-    PortfolioQueryRepository,
+from backend.application.portfolio.ports import (
+    AssetAnalyticsPort,
+    PortfolioQueryPort,
+    RepositoryFactoryPort,
 )
 from backend.domain.portfolio.entities import (
     Asset,
@@ -26,16 +24,17 @@ logging = customer_logger("portfolio_service")
 class PortfolioService:
     def __init__(
         self,
-        analytics_repo: AssetAnalyticsRepository | None = None,
-        portfolio_query_repo: PortfolioQueryRepository | None = None,
+        repo_factory: RepositoryFactoryPort,
+        analytics_repo: AssetAnalyticsPort,
+        portfolio_query_repo: PortfolioQueryPort,
     ):
         logging.info("=" * 20)
         logging.info("Initializing Portfolio Service")
         logging.info("=" * 20)
 
-        self._repo_factory = RepositoryFactory()
-        self._analytics_repo = analytics_repo or AssetAnalyticsRepository()
-        self._portfolio_query_repo = portfolio_query_repo or PortfolioQueryRepository()
+        self._repo_factory = repo_factory
+        self._analytics_repo = analytics_repo
+        self._portfolio_query_repo = portfolio_query_repo
 
     def create_industry(self, industry: Industry):
         repo_industry = self._repo_factory.get("industry")
