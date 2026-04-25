@@ -218,6 +218,32 @@ class AssetSilverDestination(Destination):
         self._repository.upsert(records=data, unique_key=["business_key"])
 
 
+class SectorEnrichmentStep:
+    """
+    Post-load enrichment: copies sector_id and industry_id from portfolio.asset
+    onto staging.asset rows where the mapping exists and the columns are still NULL.
+
+    Matches on ticker (case-insensitive). ETFs and unmapped assets are left NULL.
+    Runs as a bulk UPDATE — not part of the row-by-row transform.
+    """
+
+    _SQL = """
+        UPDATE staging.asset sa
+        SET
+            sector_id   = pa.sector_id,
+            industry_id = pa.industry_id
+        FROM portfolio.asset pa
+        WHERE LOWER(sa.ticker) = LOWER(pa.ticker)
+          AND pa.sector_id   IS NOT NULL
+          AND pa.industry_id IS NOT NULL
+          AND (sa.sector_id IS NULL OR sa.industry_id IS NULL)
+    """
+
+    def run(self) -> None:
+        with SQLModelClient(DATABASE_URL) as client:
+            client.execute(self._SQL)
+
+
 class AccountSilverDestination(Destination):
     def __init__(self):
         self._repository = RepositoryFactory.get("account", schema_name="staging")
@@ -243,6 +269,7 @@ class PipelineT212Silver(Pipeline):
         self._asset_destination = AssetSilverDestination()
         self._account_destination = AccountSilverDestination()
         self._dead_letter = DeadLetterDestination()
+        self._sector_enrichment = SectorEnrichmentStep()
 
     def run(self):
         snapshots = self._source.extract()
@@ -281,6 +308,9 @@ class PipelineT212Silver(Pipeline):
 
         self._asset_destination.load([r.model_dump() for r in asset_result.valid])
         self._account_destination.load([r.model_dump() for r in account_result.valid])
+
+        self._sector_enrichment.run()
+        logging.info(f"[{self._pipeline_name}] sector enrichment applied")
 
 
 if __name__ == "__main__":

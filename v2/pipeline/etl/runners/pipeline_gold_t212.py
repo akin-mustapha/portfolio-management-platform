@@ -160,6 +160,8 @@ class PipelineT212Gold(Pipeline):
         with self._db as db:
             db.execute(load_query(_QUERIES_DIR / "gold" / "dim_portfolio_seed.sql"))
             db.execute(load_query(_QUERIES_DIR / "gold" / "dim_asset_seed.sql"))
+            db.execute(load_query(_QUERIES_DIR / "gold" / "dim_industry_seed.sql"))
+            db.execute(load_query(_QUERIES_DIR / "gold" / "dim_sector_seed.sql"))
 
 
 if __name__ == "__main__":

@@ -34,8 +34,10 @@ interface NavbarProps {
 
 const NAV_LINKS = [
   { to: '/portfolio', label: 'Portfolio' },
+  { to: '/performance', label: 'Performance' },
   { to: '/risk', label: 'Risk' },
   { to: '/opportunities', label: 'Opportunities' },
+  { to: '/tax', label: 'Tax' },
 ]
 
 export default function Navbar({ onSettingsOpen, onRebalanceOpen, onProfileToggle, profileOpen }: NavbarProps) {
@@ -56,10 +58,16 @@ export default function Navbar({ onSettingsOpen, onRebalanceOpen, onProfileToggl
         color: 'text.primary',
       }}
     >
-      <Toolbar variant="dense" sx={{ gap: 2 }}>
-        <Typography variant="subtitle1" fontWeight={700}>
-          Portfolio
-        </Typography>
+      <Toolbar variant="dense" sx={{ gap: 2, minHeight: '56px !important' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
+          <Box sx={{
+            width: 22, height: 22, borderRadius: 1.5, bgcolor: 'primary.main',
+            display: 'grid', placeItems: 'center', color: '#fff', fontSize: 13, fontWeight: 700,
+          }}>L</Box>
+          <Typography variant="subtitle1" fontWeight={700} letterSpacing='-0.02em'>
+            Ledger
+          </Typography>
+        </Box>
 
         <Box sx={{ display: 'flex', gap: 0.5, flexGrow: 1, ml: 2 }}>
           {NAV_LINKS.map((link) => (

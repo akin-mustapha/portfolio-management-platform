@@ -2,15 +2,10 @@ import { useCallback, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Box, LinearProgress } from '@mui/material'
 import Navbar from '../components/organisms/Navbar'
-import KpiRow from '../components/molecules/KpiRow'
-import FilterBar from '../components/molecules/FilterBar'
-import AssetTable from '../components/organisms/AssetTable'
-import WorkspaceSplit from '../components/organisms/WorkspaceSplit'
 import SettingsModal from '../components/organisms/SettingsModal'
 import RebalanceDrawer from '../components/organisms/RebalanceDrawer'
 import AssetProfileDrawer from '../components/organisms/AssetProfileDrawer'
 import { PortfolioProvider, usePortfolioContext } from '../pages/portfolio/PortfolioContext'
-import { useAppStore } from '../store/useAppStore'
 
 function ShellInner({
   onSettingsOpen,
@@ -27,7 +22,7 @@ function ShellInner({
   onProfileOpen: (ticker: string) => void
   onProfileClose: () => void
 }) {
-  const { summary, loading, allRows, availableTags } = usePortfolioContext()
+  const { loading } = usePortfolioContext()
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -40,53 +35,11 @@ function ShellInner({
 
       {loading && <LinearProgress sx={{ height: 2 }} />}
 
-      <Box sx={{ px: 1.5, pt: 1 }}>
-        <KpiRow
-          kpi={summary?.kpi}
-          valueSeries={summary?.portfolio_value_series}
-          pnlSeries={summary?.portfolio_pnl_series}
-          loading={loading}
-        />
-        <FilterBar />
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <Outlet context={{ onProfileOpen }} />
       </Box>
 
-      <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'row', mt: 1 }}>
-        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <WorkspaceSplit
-            left={
-              <Box
-                sx={(theme) => ({
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  mx: 1.5,
-                  mt: 3,
-                  mb: 1,
-                  overflow: 'hidden',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 3,
-                  bgcolor: 'background.paper',
-                  boxShadow: theme.custom.shadowCard,
-                })}
-              >
-                <AssetTable
-                  rows={allRows}
-                  loading={loading}
-                  availableTags={availableTags}
-                  onOpenDetails={onProfileOpen}
-                />
-              </Box>
-            }
-            right={
-              <Box sx={{ height: '100%', overflow: 'auto', p: 1 }}>
-                <Outlet />
-              </Box>
-            }
-          />
-        </Box>
-        <AssetProfileDrawer open={profileOpen} onClose={onProfileClose} />
-      </Box>
+      <AssetProfileDrawer open={profileOpen} onClose={onProfileClose} />
     </Box>
   )
 }
@@ -95,7 +48,6 @@ export default function AppShell() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [rebalanceOpen, setRebalanceOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const setSelectedTickers = useAppStore((s) => s.setSelectedTickers)
 
   const handleSettingsOpen = useCallback(() => setSettingsOpen(true), [])
   const handleSettingsClose = useCallback(() => setSettingsOpen(false), [])
@@ -103,13 +55,11 @@ export default function AppShell() {
   const handleRebalanceClose = useCallback(() => setRebalanceOpen(false), [])
   const handleProfileToggle = useCallback(() => setProfileOpen((v) => !v), [])
   const handleProfileClose = useCallback(() => setProfileOpen(false), [])
-  const handleProfileOpen = useCallback(
-    (ticker: string) => {
-      setSelectedTickers([ticker])
-      setProfileOpen(true)
-    },
-    [setSelectedTickers],
-  )
+  const handleProfileOpen = useCallback((ticker: string) => {
+    setProfileOpen(true)
+    // ticker passed via outlet context to child pages
+    void ticker
+  }, [])
 
   return (
     <PortfolioProvider>

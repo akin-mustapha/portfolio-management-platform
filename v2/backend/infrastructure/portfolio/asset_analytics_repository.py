@@ -50,6 +50,8 @@ class AssetAnalyticsRepository:
             ft.beta_60d,
             ft.sharpe_ratio_30d                           AS asset_sharpe_ratio_30d,
             COALESCE(fv.fx_impact, 0)                     AS fx_impact,
+            ds.name                                       AS sector,
+            di.name                                       AS industry,
             TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date
         FROM analytics.fact_valuation fv
         JOIN latest ON fv.asset_id = latest.asset_id AND fv.date_id = latest.max_date_id
@@ -58,6 +60,8 @@ class AssetAnalyticsRepository:
         LEFT JOIN analytics.fact_technical ft ON ft.asset_id = fv.asset_id AND ft.date_id = fv.date_id
         LEFT JOIN analytics.fact_signal fs ON fs.asset_id = fv.asset_id AND fs.date_id = fv.date_id
         LEFT JOIN analytics.fact_return fr ON fr.asset_id = fv.asset_id AND fr.date_id = fv.date_id
+        LEFT JOIN analytics.dim_sector ds ON ds.id = fv.sector_id
+        LEFT JOIN analytics.dim_industry di ON di.id = ds.industry_id
         """
         with self._client as client:
             res = client.execute(sql)

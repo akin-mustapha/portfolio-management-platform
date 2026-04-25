@@ -6,18 +6,22 @@ declare module '@mui/material/styles' {
     custom: {
       shadowCard: string
       shadowCardHover: string
+      shadowPop: string
       bgZebra: string
       bgRowHover: string
       bgRowSelected: string
+      bgSurface: string
     }
   }
   interface ThemeOptions {
     custom?: {
       shadowCard?: string
       shadowCardHover?: string
+      shadowPop?: string
       bgZebra?: string
       bgRowHover?: string
       bgRowSelected?: string
+      bgSurface?: string
     }
   }
 }
@@ -53,9 +57,11 @@ export function buildTheme(mode: PaletteMode) {
     custom: {
       shadowCard: t.shadowCard,
       shadowCardHover: t.shadowCardHover,
+      shadowPop: t.shadowPop,
       bgZebra: t.bgZebra,
       bgRowHover: t.bgRowHover,
       bgRowSelected: t.bgRowSelected,
+      bgSurface: t.bgSurface,
     },
     components: {
       MuiCssBaseline: {

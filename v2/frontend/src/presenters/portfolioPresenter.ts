@@ -14,6 +14,8 @@ export interface RawAsset {
   value_ma_crossover_signal: number | null
   price_series: number[]
   tags: string[]
+  sector: string | null
+  industry: string | null
   trend?: string
   [key: string]: unknown
 }
