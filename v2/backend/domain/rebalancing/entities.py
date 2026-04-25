@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from .value_objects import WeightBand, RebalanceThreshold, PlanStatus
@@ -30,6 +32,32 @@ class RebalanceConfig:
     @property
     def rebalance_threshold_pct(self) -> float:
         return self.rebalance_threshold.value
+
+    @classmethod
+    def from_primitives(
+        cls,
+        asset_id: str,
+        ticker: str,
+        target_weight_pct: float,
+        min_weight_pct: float,
+        max_weight_pct: float,
+        rebalance_threshold_pct: float,
+        correction_days: int,
+        is_active: bool,
+    ) -> RebalanceConfig:
+        return cls(
+            id=None,
+            asset_id=asset_id,
+            ticker=ticker,
+            weight_band=WeightBand(
+                target=target_weight_pct,
+                min=min_weight_pct,
+                max=max_weight_pct,
+            ),
+            rebalance_threshold=RebalanceThreshold(rebalance_threshold_pct),
+            correction_days=correction_days,
+            is_active=is_active,
+        )
 
     def to_record(self):
         # excludes id (DB-generated) and ticker (not a column, from JOIN)

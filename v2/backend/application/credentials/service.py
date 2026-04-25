@@ -1,4 +1,5 @@
 from backend.application.credentials.ports import CredentialsPort
+from backend.domain.credentials.value_objects import ApiKey
 
 
 class CredentialsService:
@@ -16,7 +17,5 @@ class CredentialsService:
         return {"api_key": "", "secret_token": "", "api_url": ""}
 
     def save(self, provider: str, api_key: str, secret_token: str, api_url: str) -> None:
-        api_key = api_key.strip()
-        if not api_key:
-            raise ValueError("api_key is required")
-        self._repo.save(provider, api_key, secret_token.strip(), api_url.strip())
+        validated_key = ApiKey(api_key)
+        self._repo.save(provider, str(validated_key), secret_token.strip(), api_url.strip())

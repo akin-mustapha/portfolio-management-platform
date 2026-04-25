@@ -5,9 +5,8 @@ from shared.utils.custom_logger import customer_logger
 from shared.notifications.email import EmailClient
 
 from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
+from backend.domain.rebalancing.plan_generator import generate_plan
 from backend.application.rebalancing.ports import RebalanceConfigPort, RebalancePlanPort
-from backend.application.rebalancing.plan_generator import generate_plan
 
 load_dotenv()
 
@@ -100,16 +99,13 @@ class RebalancingService:
         correction_days: int,
         is_active: bool,
     ) -> RebalanceConfig:
-        return RebalanceConfig(
-            id=None,
+        return RebalanceConfig.from_primitives(
             asset_id=asset_id,
             ticker=ticker,
-            weight_band=WeightBand(
-                target=target_weight_pct,
-                min=min_weight_pct,
-                max=max_weight_pct,
-            ),
-            rebalance_threshold=RebalanceThreshold(rebalance_threshold_pct),
+            target_weight_pct=target_weight_pct,
+            min_weight_pct=min_weight_pct,
+            max_weight_pct=max_weight_pct,
+            rebalance_threshold_pct=rebalance_threshold_pct,
             correction_days=correction_days,
             is_active=is_active,
         )

@@ -7,6 +7,7 @@ from backend.application.portfolio.ports import (
     PortfolioQueryPort,
     RepositoryFactoryPort,
 )
+from backend.domain.portfolio.value_objects import TrendSignal
 from backend.domain.portfolio.entities import (
     Asset,
     AssetTag,
@@ -265,11 +266,7 @@ class PortfolioService:
         for row in asset_rows:
             row["price_series"] = price_map.get(row["ticker"], [])
             row["tags"] = tag_map.get(row["ticker"].upper(), [])
-            row["trend"] = (
-                "Bullish"
-                if (row.get("value_ma_crossover_signal") or 0) > 0
-                else "Bearish"
-            )
+            row["trend"] = str(TrendSignal.from_ma_crossover(row.get("value_ma_crossover_signal")))
 
         portfolio_history_rows = [
             dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()
