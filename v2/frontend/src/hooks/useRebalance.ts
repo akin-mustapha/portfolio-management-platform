@@ -4,11 +4,20 @@ import {
   saveRebalanceConfig,
   generateRebalancePlan,
 } from '../api/rebalance'
+import {
+  presentRebalanceConfigs,
+  presentRebalancePlanResult,
+  type RebalanceConfigVM,
+  type RebalancePlanResultVM,
+} from '../presenters/rebalancePresenter'
+
+export type { RebalanceConfigVM, RebalancePlanResultVM }
 
 export function useRebalanceConfigs() {
   return useQuery({
     queryKey: ['rebalance', 'configs'],
-    queryFn: fetchRebalanceConfigs,
+    queryFn: async (): Promise<RebalanceConfigVM[]> =>
+      presentRebalanceConfigs(await fetchRebalanceConfigs() as unknown[]),
     staleTime: 60 * 1000,
   })
 }
@@ -22,5 +31,8 @@ export function useSaveRebalanceConfig() {
 }
 
 export function useGenerateRebalancePlan() {
-  return useMutation({ mutationFn: generateRebalancePlan })
+  return useMutation({
+    mutationFn: async (): Promise<RebalancePlanResultVM> =>
+      presentRebalancePlanResult(await generateRebalancePlan()),
+  })
 }

@@ -1,7 +1,15 @@
 import { Box, Table, TableBody, TableCell, TableHead, TableRow, useTheme } from '@mui/material'
 
+export interface DailyMoverRow {
+  ticker: string
+  daily_value_return: number
+  name: string
+  /** Pre-formatted return string, e.g. "+1.23%" — from portfolioPresenter */
+  formattedReturn: string
+}
+
 interface DailyMoversTableProps {
-  movers?: Array<{ ticker: string; daily_value_return: number; name: string }>
+  movers?: DailyMoverRow[]
 }
 
 export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
@@ -43,7 +51,7 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
                   color: m.daily_value_return >= 0 ? theme.palette.success.main : theme.palette.error.main,
                 }}
               >
-                {m.daily_value_return >= 0 ? '+' : ''}{m.daily_value_return.toFixed(2)}%
+                {m.formattedReturn}
               </TableCell>
             </TableRow>
           ))}

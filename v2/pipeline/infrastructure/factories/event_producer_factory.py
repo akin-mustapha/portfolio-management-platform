@@ -5,7 +5,9 @@ from pipeline.etl.events.trading212_event_producer import (
 )
 
 from pipeline.infrastructure.kafka.producer_origins import Trading212AssetAPIOrigin
-from pipeline.infrastructure.kafka.producer_destination import Trading212KafkaDestination
+from pipeline.infrastructure.kafka.producer_destination import (
+    Trading212KafkaDestination,
+)
 
 EVENT_PRODUCER_REGISTERY = {}
 

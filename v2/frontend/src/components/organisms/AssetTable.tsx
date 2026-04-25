@@ -20,6 +20,7 @@ import { useAppStore } from '../../store/useAppStore'
 import SparklineChart from '../charts/SparklineChart'
 import MetricInfo from '../atoms/MetricInfo'
 import TickerLogo from '../atoms/TickerLogo'
+import { fmtNum as numFmt, fmtPct as pctFmt, sparklineSentiment } from '../../presenters/assetPresenter'
 
 interface AssetTableProps {
   rows: Record<string, unknown>[]
@@ -42,18 +43,6 @@ function getRowClassName(params: {
   return `${parity} ${sentiment}`
 }
 
-function numFmt(v: unknown, decimals = 2) {
-  if (v == null) return '—'
-  return Number(v).toLocaleString(undefined, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  })
-}
-
-function pctFmt(v: unknown) {
-  if (v == null) return '—'
-  return `${Number(v).toFixed(2)}%`
-}
 
 function headerWithInfo(label: string, metricKey: Parameters<typeof MetricInfo>[0]['metricKey']) {
   return () => (
@@ -79,11 +68,7 @@ function buildColumns(theme: Theme, onOpenDetails?: (ticker: string) => void): G
       renderCell: (params: GridRenderCellParams) => {
         const values = params.value as (number | null)[] | undefined
         if (!values?.length) return null
-        const last = values.filter((v) => v != null)
-        const sentiment = last.length >= 2
-          ? last[last.length - 1]! >= last[0]! ? 'positive' : 'negative'
-          : 'neutral'
-        return <SparklineChart values={values} sentiment={sentiment} height={32} />
+        return <SparklineChart values={values} sentiment={sparklineSentiment(values)} height={32} />
       },
     },
     {

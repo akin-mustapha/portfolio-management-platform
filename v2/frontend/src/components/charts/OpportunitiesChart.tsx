@@ -12,27 +12,20 @@ import {
   Label,
 } from 'recharts'
 import { fmtNum } from '../../utils/chartUtils'
+import type { OpportunitiesChartVM } from '../../presenters/opportunitiesPresenter'
+
+type DistributionItem = OpportunitiesChartVM['distribution'][number]
 
 interface OpportunitiesChartProps {
-  /** position_distribution from presenter */
-  distribution?: Array<{
-    ticker: string
-    weight_pct: number
-    roi_pct: number
-    profit: number
-    value: number
-    name: string
-  }>
+  vm?: OpportunitiesChartVM
 }
 
-type DistributionItem = NonNullable<OpportunitiesChartProps['distribution']>[number]
-
-export default function OpportunitiesChart({ distribution }: OpportunitiesChartProps) {
+export default function OpportunitiesChart({ vm }: OpportunitiesChartProps) {
   const theme = useTheme()
 
-  if (!distribution?.length) return null
+  if (!vm?.distribution?.length) return null
 
-  const avgWeight = distribution.reduce((s, d) => s + d.weight_pct, 0) / distribution.length
+  const { distribution, avgWeight } = vm
 
   function CustomTooltip({ active, payload }: { active?: boolean; payload?: unknown[] }) {
     if (!active || !payload?.length) return null
@@ -72,7 +65,6 @@ export default function OpportunitiesChart({ distribution }: OpportunitiesChartP
           unit="%"
         />
         <Tooltip content={<CustomTooltip />} />
-        {/* quadrant lines */}
         <ReferenceLine y={0} stroke={theme.palette.divider} strokeDasharray="4 2" />
         <ReferenceLine x={avgWeight} stroke={theme.palette.divider} strokeDasharray="4 2" />
         <Scatter data={distribution} name="Positions">

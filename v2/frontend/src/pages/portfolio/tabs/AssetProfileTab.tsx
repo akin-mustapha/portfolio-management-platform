@@ -5,12 +5,10 @@ import AssetPriceChart from '../../../components/charts/AssetPriceChart'
 import AssetValueChart from '../../../components/charts/AssetValueChart'
 import AssetPnlChart from '../../../components/charts/AssetPnlChart'
 import AssetReturnChart from '../../../components/charts/AssetReturnChart'
-import TickerLogo from '../../../components/atoms/TickerLogo'
 import Section from '../../../components/molecules/Section'
-import KpiGroup, { type KpiGroupItem } from '../../../components/molecules/KpiGroup'
+import KpiGroup from '../../../components/molecules/KpiGroup'
 import { usePortfolioContext } from '../PortfolioContext'
-
-type KpiDef = KpiGroupItem
+import { presentAssetKpis } from '../../../presenters/assetPresenter'
 
 export default function AssetProfileTab() {
   const { selectedAssetRow: assetRow } = usePortfolioContext()
@@ -30,44 +28,14 @@ export default function AssetProfileTab() {
     )
   }
 
-  const profit = assetRow?.profit as number | undefined
-  const pnlPct = assetRow?.pnl_pct as number | undefined
-
-  const performanceKpis: KpiDef[] = [
-    { label: 'Value', value: assetRow?.value as number | undefined },
-    {
-      label: 'P&L',
-      value: profit,
-      colorCode: (profit ?? 0) >= 0 ? 'positive' : 'negative',
-      metricKey: 'profit',
-    },
-    {
-      label: 'P&L %',
-      value: pnlPct,
-      suffix: '%',
-      colorCode: (pnlPct ?? 0) >= 0 ? 'positive' : 'negative',
-      metricKey: 'pnl_pct',
-    },
-  ]
-
-  const riskKpis: KpiDef[] = [
-    { label: 'Vol 30d', value: assetRow?.volatility_30d as number | undefined, metricKey: 'volatility_30d' },
-    { label: 'VaR 95%', value: assetRow?.var_95_1d as number | undefined, metricKey: 'var_95_1d' },
-    { label: 'Beta 60d', value: assetRow?.beta_60d as number | undefined },
-  ]
-
-  const allocationKpis: KpiDef[] = [
-    { label: 'Weight', value: assetRow?.weight_pct as number | undefined, suffix: '%', metricKey: 'weight_pct' },
-    { label: 'Avg Price', value: assetRow?.avg_price as number | undefined, metricKey: 'avg_price' },
-    { label: 'Cost', value: assetRow?.cost as number | undefined },
-  ]
+  const kpis = presentAssetKpis(assetRow as Record<string, unknown>)
 
   return (
     <Box sx={{ animation: 'fadeIn 220ms ease', '@keyframes fadeIn': { from: { opacity: 0 }, to: { opacity: 1 } } }}>
       <Stack spacing={1.5} sx={{ mb: 3 }}>
-        <KpiGroup label="Performance" cards={performanceKpis} overflow="wrap" dimmed={false} />
-        <KpiGroup label="Risk" cards={riskKpis} overflow="wrap" dimmed={false} />
-        <KpiGroup label="Allocation" cards={allocationKpis} overflow="wrap" dimmed={false} />
+        <KpiGroup label="Performance" cards={kpis.performance} overflow="wrap" dimmed={false} />
+        <KpiGroup label="Risk" cards={kpis.risk} overflow="wrap" dimmed={false} />
+        <KpiGroup label="Allocation" cards={kpis.allocation} overflow="wrap" dimmed={false} />
       </Stack>
 
       {!isLoading && history && (
@@ -86,7 +54,6 @@ export default function AssetProfileTab() {
           </Section>
         </Stack>
       )}
-
     </Box>
   )
 }

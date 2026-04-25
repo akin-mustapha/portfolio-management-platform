@@ -23,7 +23,9 @@ from pipeline.etl.validators.schema_validator import SchemaValidator
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
 from pipeline.infrastructure.repositories.repository_factory import RepositoryFactory
-from pipeline.infrastructure.repositories.dead_letter_destination import DeadLetterDestination
+from pipeline.infrastructure.repositories.dead_letter_destination import (
+    DeadLetterDestination,
+)
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 

@@ -3,8 +3,12 @@ Portfolio Service Module
 """
 
 from backend.infrastructure.portfolio.repository_factory import RepositoryFactory
-from backend.infrastructure.portfolio.asset_analytics_repository import AssetAnalyticsRepository
-from backend.infrastructure.portfolio.portfolio_query_repository import PortfolioQueryRepository
+from backend.infrastructure.portfolio.asset_analytics_repository import (
+    AssetAnalyticsRepository,
+)
+from backend.infrastructure.portfolio.portfolio_query_repository import (
+    PortfolioQueryRepository,
+)
 from backend.domain.portfolio.entities import (
     Asset,
     AssetTag,
@@ -228,7 +232,9 @@ class PortfolioService:
         return [dict(r._mapping) for r in rows]
 
     def get_most_recent_assets(self, tag_filter: str | None = None) -> list[dict]:
-        rows = [dict(r._mapping) for r in self._analytics_repo.get_most_recent_asset_data()]
+        rows = [
+            dict(r._mapping) for r in self._analytics_repo.get_most_recent_asset_data()
+        ]
         if tag_filter:
             tag_rows = [dict(r._mapping) for r in self._analytics_repo.get_asset_tags()]
             tag_map: dict[str, list[str]] = {}
@@ -236,7 +242,8 @@ class PortfolioService:
                 tag_map.setdefault(r["ticker"].upper(), []).append(r["tag_name"])
             requested = {t.strip().lower() for t in tag_filter.split(",") if t.strip()}
             rows = [
-                r for r in rows
+                r
+                for r in rows
                 if requested & {t.lower() for t in tag_map.get(r["ticker"].upper(), [])}
             ]
         return rows
@@ -268,28 +275,114 @@ class PortfolioService:
         portfolio_history_rows = [
             dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()
         ]
-        portfolio_snapshot = (
-            sorted(portfolio_history_rows, key=lambda r: r["data_date"], reverse=True)[:1]
-        )
+        portfolio_snapshot = sorted(
+            portfolio_history_rows, key=lambda r: r["data_date"], reverse=True
+        )[:1]
 
         available_tags = sorted({tag for tags in tag_map.values() for tag in tags})
 
-        assets_history = [dict(r._mapping) for r in self._analytics_repo.get_asset_history()]
+        assets_history = [
+            dict(r._mapping) for r in self._analytics_repo.get_asset_history()
+        ]
 
         return {
             "assets": asset_rows,
             "assets_history": assets_history,
             "portfolio_history": portfolio_history_rows,
-            "portfolio_current_snapshot": portfolio_snapshot[0] if portfolio_snapshot else {},
+            "portfolio_current_snapshot": (
+                portfolio_snapshot[0] if portfolio_snapshot else {}
+            ),
             "available_tags": available_tags,
         }
 
     def get_portfolio_history(
         self, from_date: str | None = None, to_date: str | None = None
     ) -> list[dict]:
-        rows = [dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()]
+        rows = [
+            dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()
+        ]
         if from_date:
             rows = [r for r in rows if str(r["data_date"]) >= from_date]
         if to_date:
             rows = [r for r in rows if str(r["data_date"]) <= to_date]
         return rows
+
+    def get_asset_profile(self, ticker: str) -> dict | None:
+        rows = self.get_most_recent_assets()
+        asset_row = next((r for r in rows if r["ticker"].upper() == ticker.upper()), None)
+        if asset_row is None:
+            return None
+        tags = self.get_all_tags()
+        industries = self.get_all_industries()
+        sectors = self.get_all_sectors()
+        categories = self.get_all_categories()
+        current_tags = self._resolve_current_tags(
+            asset_row.get("ticker", ""),
+            tags,
+            asset_row.get("broker"),
+            asset_row.get("currency"),
+        )
+        return _present_asset_profile(asset_row, tags, industries, sectors, categories, current_tags)
+
+    def _resolve_current_tags(
+        self,
+        ticker: str,
+        all_tags: list,
+        broker: str | None = None,
+        currency: str | None = None,
+    ) -> list:
+        if not ticker:
+            return []
+        asset = self.get_asset_by_ticker(ticker, broker, currency)
+        if not asset:
+            return []
+        tag_links = self.search_tag_by_asset_id(asset["id"])
+        tag_id_to_name = {
+            t["id"]: t["name"] for t in all_tags if t.get("id") and t.get("name")
+        }
+        return [
+            tag_id_to_name[link["tag_id"]]
+            for link in tag_links
+            if link.get("tag_id") in tag_id_to_name
+        ]
+
+    def assign_tag(self, ticker: str, tag_id: int) -> None:
+        asset = self.get_asset_by_ticker(ticker)
+        if not asset:
+            raise KeyError(f"Asset '{ticker}' not found")
+        self.tag_asset({"asset_id": asset["id"], "tag_id": tag_id})
+
+
+def _present_asset_profile(
+    asset_row: dict,
+    tags: list,
+    industries: list,
+    sectors: list,
+    categories: list,
+    current_tags: list,
+) -> dict:
+    def _format_date(v) -> str:
+        if v is None:
+            return "—"
+        s = str(v)
+        return s[:10] if len(s) >= 10 else s
+
+    def _to_options(items: list, label_key: str, value_key: str) -> list:
+        return [
+            {"label": i[label_key], "value": i[value_key]}
+            for i in items
+            if i.get(label_key) and i.get(value_key) is not None
+        ]
+
+    return {
+        "ticker": asset_row.get("ticker", "—"),
+        "name": asset_row.get("name", "—"),
+        "description": asset_row.get("asset_description") or asset_row.get("name", "—"),
+        "created": _format_date(asset_row.get("data_date")),
+        "last_ingestion": _format_date(asset_row.get("data_date")),
+        "tag_options": _to_options(tags, "name", "id"),
+        "industry_options": _to_options(industries, "name", "id"),
+        "sector_options": _to_options(sectors, "name", "id"),
+        "category_options": _to_options(categories, "name", "id"),
+        "current_tags": current_tags or [],
+    }

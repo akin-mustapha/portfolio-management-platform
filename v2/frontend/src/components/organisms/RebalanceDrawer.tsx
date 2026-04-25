@@ -11,6 +11,7 @@ import {
   Stack,
 } from '@mui/material'
 import { useRebalanceConfigs, useSaveRebalanceConfig, useGenerateRebalancePlan } from '../../hooks/useRebalance'
+import type { RebalanceConfigVM, RebalancePlanResultVM } from '../../hooks/useRebalance'
 
 interface RebalanceDrawerProps {
   open: boolean
@@ -22,26 +23,24 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
   const save = useSaveRebalanceConfig()
   const generate = useGenerateRebalancePlan()
   const [weights, setWeights] = useState<Record<string, number>>({})
-  const [planResult, setPlanResult] = useState<string | null>(null)
+  const [planResult, setPlanResult] = useState<RebalancePlanResultVM | null>(null)
 
-  const getWeight = (c: Record<string, unknown>) =>
-    weights[c.ticker as string] ?? (c.target_weight_pct as number)
+  const getWeight = (c: RebalanceConfigVM) =>
+    weights[c.ticker] ?? c.target_weight_pct
 
   const handleSlider = (ticker: string, val: number) =>
     setWeights((prev) => ({ ...prev, [ticker]: val }))
 
   const handleSave = async () => {
-    const pending = (configs as Array<Record<string, unknown>>).filter(
-      (c) => weights[c.ticker as string] !== undefined,
-    )
+    const pending = configs.filter((c) => weights[c.ticker] !== undefined)
     await Promise.all(
       pending.map((c) =>
         save.mutateAsync({
-          asset_id: c.asset_id as string,
-          ticker: c.ticker as string,
-          target_weight_pct: weights[c.ticker as string],
-          min_weight_pct: c.min_weight_pct as number,
-          max_weight_pct: c.max_weight_pct as number,
+          asset_id: c.asset_id,
+          ticker: c.ticker,
+          target_weight_pct: weights[c.ticker],
+          min_weight_pct: c.min_weight_pct,
+          max_weight_pct: c.max_weight_pct,
         }),
       ),
     )
@@ -50,7 +49,7 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
 
   const handleGenerate = async () => {
     const result = await generate.mutateAsync()
-    setPlanResult(result.status === 'no_drift' ? 'All assets within threshold — no plan needed.' : 'Rebalancing plan generated.')
+    setPlanResult(result)
   }
 
   return (
@@ -68,17 +67,16 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
 
       {isLoading && <CircularProgress size={20} />}
 
-      {planResult && <Alert severity="info" sx={{ mb: 1, fontSize: 12 }}>{planResult}</Alert>}
+      {planResult && <Alert severity="info" sx={{ mb: 1, fontSize: 12 }}>{planResult.message}</Alert>}
 
       <Box sx={{ overflowY: 'auto', flex: 1 }}>
         <Stack spacing={2}>
-          {(configs as Array<Record<string, unknown>>).map((c) => {
-            const ticker = c.ticker as string
+          {configs.map((c) => {
             const target = getWeight(c)
             return (
-              <Box key={ticker}>
+              <Box key={c.ticker}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" fontWeight={600}>{ticker}</Typography>
+                  <Typography variant="body2" fontWeight={600}>{c.ticker}</Typography>
                   <Typography variant="body2" color="text.secondary">{target.toFixed(1)}%</Typography>
                 </Box>
                 <Slider
@@ -87,7 +85,7 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
                   max={100}
                   step={0.5}
                   size="small"
-                  onChange={(_, val) => handleSlider(ticker, val as number)}
+                  onChange={(_, val) => handleSlider(c.ticker, val as number)}
                 />
               </Box>
             )

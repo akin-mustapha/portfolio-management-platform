@@ -106,6 +106,30 @@ export interface AssetTableVM {
   rows: RawAsset[]
 }
 
+export interface PortfolioValueChartRow {
+  date: string
+  cost: number
+  pnl: number
+  value: number
+  realized: number | null
+  totalPnl: number | null
+}
+
+export interface PortfolioPnlChartRow {
+  date: string
+  unrealized: number
+  realized: number
+  total: number
+}
+
+export interface PositionWeightTop10Item {
+  ticker: string
+  weight_pct: number
+  profit: number
+  value: number
+  name: string
+}
+
 export interface PositionDistributionItem {
   ticker: string
   weight_pct: number
@@ -134,6 +158,8 @@ export interface DailyMoverItem {
   daily_value_return: number
   label: string
   name: string
+  /** Pre-formatted for display, e.g. "+1.23%" */
+  formattedReturn: string
 }
 
 export interface VarItem {
@@ -156,10 +182,15 @@ export interface PortfolioSummaryVM {
   daily_movers: DailyMoverItem[]
   var_by_position: VarItem[]
   portfolio_fx_attribution: { fx_impact_total: number; unrealized_pnl: number }
-  /** Subset of asset rows used by ProfitabilityChart — just needs ticker + profit */
   profitability: Array<{ ticker: string; profit: number }>
-  /** Date → summed profit of losing positions, used by UnprofitablePnlChart */
-  losers_pnl: Record<string, number>
+  /** Pre-merged rows for PortfolioValueChart — pnl derived here, not in component */
+  portfolio_value_chart_rows: PortfolioValueChartRow[]
+  /** Pre-merged rows for PortfolioPnlChart */
+  portfolio_pnl_chart_rows: PortfolioPnlChartRow[]
+  /** Top-10 by weight, pre-sorted, for PositionWeightChart */
+  position_weight_top10: PositionWeightTop10Item[]
+  /** Summed profit of losing positions, sorted by date, for UnprofitablePnlChart */
+  losers_pnl: Array<{ date: string; value: number }>
   available_tags: string[]
 }
 
@@ -223,7 +254,7 @@ function assetTable(assets: RawAsset[]): AssetTableVM {
   return { fields: Object.keys(assets[0]), rows: assets }
 }
 
-function portfolioValueSeries(rows: RawPortfolioHistoryRow[]): PortfolioValueSeriesVM {
+export function portfolioValueSeries(rows: RawPortfolioHistoryRow[]): PortfolioValueSeriesVM {
   return {
     dates: rows.map((r) => String(r.data_date)),
     values: rows.map((r) => toFloat(r.investments_total_cost) + toFloat(r.investments_unrealized_pnl)),
@@ -231,7 +262,7 @@ function portfolioValueSeries(rows: RawPortfolioHistoryRow[]): PortfolioValueSer
   }
 }
 
-function portfolioPnlSeries(rows: RawPortfolioHistoryRow[]): PortfolioPnlSeriesVM {
+export function portfolioPnlSeries(rows: RawPortfolioHistoryRow[]): PortfolioPnlSeriesVM {
   return {
     dates: rows.map((r) => String(r.data_date)),
     values: rows.map((r) => toFloat(r.investments_unrealized_pnl)),
@@ -242,7 +273,7 @@ function portfolioPnlSeries(rows: RawPortfolioHistoryRow[]): PortfolioPnlSeriesV
   }
 }
 
-function portfolioDrawdown(rows: RawPortfolioHistoryRow[]): PortfolioDrawdownVM {
+export function portfolioDrawdown(rows: RawPortfolioHistoryRow[]): PortfolioDrawdownVM {
   const dates = rows.map((r) => String(r.data_date))
   let peak = 0
   const drawdown_pct = rows.map((r) => {
@@ -341,7 +372,14 @@ function dailyMovers(assets: RawAsset[]): DailyMoverItem[] {
     } else {
       continue
     }
-    items.push({ ticker: a.ticker, daily_value_return, label: a.ticker, name: a.name })
+    const sign = daily_value_return >= 0 ? '+' : ''
+    items.push({
+      ticker: a.ticker,
+      daily_value_return,
+      label: a.ticker,
+      name: a.name,
+      formattedReturn: `${sign}${daily_value_return.toFixed(2)}%`,
+    })
   }
   return items.sort((a, b) => Math.abs(b.daily_value_return) - Math.abs(a.daily_value_return)).slice(0, 15)
 }
@@ -350,15 +388,17 @@ function profitability(assets: RawAsset[]): Array<{ ticker: string; profit: numb
   return assets.map((a) => ({ ticker: a.ticker, profit: toFloat(a.profit) }))
 }
 
-function losersPnl(history: RawAssetHistoryRow[]): Record<string, number> {
-  const result: Record<string, number> = {}
+function losersPnl(history: RawAssetHistoryRow[]): Array<{ date: string; value: number }> {
+  const byDate: Record<string, number> = {}
   for (const row of history) {
     if (row.is_profitable === 0) {
       const date = String(row.data_date)
-      result[date] = (result[date] ?? 0) + toFloat(row.profit)
+      byDate[date] = (byDate[date] ?? 0) + toFloat(row.profit)
     }
   }
-  return result
+  return Object.entries(byDate)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, value]) => ({ date, value }))
 }
 
 function varByPosition(assets: RawAsset[]): VarItem[] {
@@ -369,13 +409,56 @@ function varByPosition(assets: RawAsset[]): VarItem[] {
     .slice(0, 10)
 }
 
+function portfolioValueChartRows(
+  valueSeries: PortfolioValueSeriesVM,
+  pnlSeries: PortfolioPnlSeriesVM,
+): PortfolioValueChartRow[] {
+  return valueSeries.dates.map((date, i) => ({
+    date,
+    cost: valueSeries.costs[i],
+    pnl: valueSeries.values[i] - valueSeries.costs[i],
+    value: valueSeries.values[i],
+    realized: pnlSeries.realized[i] ?? null,
+    totalPnl: pnlSeries.total_pnl[i] ?? null,
+  }))
+}
+
+function portfolioPnlChartRows(pnlSeries: PortfolioPnlSeriesVM): PortfolioPnlChartRow[] {
+  return pnlSeries.dates.map((date, i) => ({
+    date,
+    unrealized: pnlSeries.values[i],
+    realized: pnlSeries.realized[i],
+    total: pnlSeries.total_pnl[i],
+  }))
+}
+
+function positionWeightTop10(assets: RawAsset[]): PositionWeightTop10Item[] {
+  return [...assets]
+    .map((a) => ({
+      ticker: a.ticker,
+      weight_pct: toFloat(a.weight_pct),
+      profit: toFloat(a.profit),
+      value: toFloat(a.value),
+      name: a.name,
+    }))
+    .sort((a, b) => b.weight_pct - a.weight_pct)
+    .slice(0, 10)
+}
+
+export function filterAssetsByTags(rows: RawAsset[], selectedTags: string[]): RawAsset[] {
+  if (!selectedTags.length) return rows
+  return rows.filter((r) => selectedTags.some((t) => r.tags.includes(t)))
+}
+
 export function presentPortfolioSummary(raw: RawPortfolioSummary): PortfolioSummaryVM {
   const { assets, assets_history, portfolio_history, portfolio_current_snapshot, available_tags } = raw
+  const valueSeries = portfolioValueSeries(portfolio_history)
+  const pnlSeries = portfolioPnlSeries(portfolio_history)
   return {
     kpi: kpi(portfolio_current_snapshot, portfolio_history),
     asset_table: assetTable(assets),
-    portfolio_value_series: portfolioValueSeries(portfolio_history),
-    portfolio_pnl_series: portfolioPnlSeries(portfolio_history),
+    portfolio_value_series: valueSeries,
+    portfolio_pnl_series: pnlSeries,
     portfolio_drawdown: portfolioDrawdown(portfolio_history),
     position_weight_series: positionWeightSeries(assets),
     position_distribution: positionDistribution(assets),
@@ -385,6 +468,9 @@ export function presentPortfolioSummary(raw: RawPortfolioSummary): PortfolioSumm
     var_by_position: varByPosition(assets),
     portfolio_fx_attribution: portfolioFxAttribution(portfolio_history),
     profitability: profitability(assets),
+    portfolio_value_chart_rows: portfolioValueChartRows(valueSeries, pnlSeries),
+    portfolio_pnl_chart_rows: portfolioPnlChartRows(pnlSeries),
+    position_weight_top10: positionWeightTop10(assets),
     losers_pnl: losersPnl(assets_history),
     available_tags,
   }

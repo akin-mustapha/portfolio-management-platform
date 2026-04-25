@@ -26,6 +26,7 @@ def _run_sync(query_file: str, target: str, source: str) -> None:
     with SQLModelClient(database_url=DATABASE_URL) as client:
         client.execute(sql)
 
+
 # Todo - dry up the individual synchronizer functions by passing in the query file, target and source as parameters. This will make it easier to add new synchronizers in the future without having to write a new function for each one.
 def sychronize_industry():
     _run_sync(

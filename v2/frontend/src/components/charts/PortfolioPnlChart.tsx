@@ -12,26 +12,20 @@ import {
   ReferenceLine,
 } from 'recharts'
 import { useTooltipStyle, fmtNum } from '../../utils/chartUtils'
+import type { PortfolioPnlChartRow } from '../../presenters/portfolioPresenter'
 
 interface PortfolioPnlChartProps {
-  series?: { dates: string[]; values: number[]; realized: number[]; total_pnl: number[] }
+  rows?: PortfolioPnlChartRow[]
 }
 
-export default function PortfolioPnlChart({ series }: PortfolioPnlChartProps) {
+export default function PortfolioPnlChart({ rows }: PortfolioPnlChartProps) {
   const theme = useTheme()
   const tooltipStyle = useTooltipStyle()
-  if (!series?.dates?.length) return null
-
-  const data = series.dates.map((d, i) => ({
-    date: d,
-    unrealized: series.values[i],
-    realized: series.realized[i],
-    total: series.total_pnl[i],
-  }))
+  if (!rows?.length) return null
 
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <ComposedChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+      <ComposedChart data={rows} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
         <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
         <YAxis tick={{ fontSize: 10 }} tickLine={false} width={60} />

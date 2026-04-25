@@ -2,6 +2,7 @@ import { createContext, useContext, useMemo, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { usePortfolioSummary } from '../../hooks/usePortfolio'
 import { useAppStore } from '../../store/useAppStore'
+import { filterAssetsByTags } from '../../presenters/portfolioPresenter'
 import type { PortfolioSummaryVM, RawAsset } from '../../presenters/portfolioPresenter'
 
 interface PortfolioContextValue {
@@ -22,11 +23,10 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
 
   const availableTags = summary?.available_tags ?? EMPTY_TAGS
 
-  const allRows = useMemo(() => {
-    const rows = summary?.asset_table?.rows ?? []
-    if (!selectedTags.length) return rows
-    return rows.filter((r) => selectedTags.some((t) => r.tags.includes(t)))
-  }, [summary?.asset_table?.rows, selectedTags])
+  const allRows = useMemo(
+    () => filterAssetsByTags(summary?.asset_table?.rows ?? [], selectedTags),
+    [summary?.asset_table?.rows, selectedTags],
+  )
 
   useEffect(() => {
     if (selectedTickers.length === 0 && allRows.length > 0) {

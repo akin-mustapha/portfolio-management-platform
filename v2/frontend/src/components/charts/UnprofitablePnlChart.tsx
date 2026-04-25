@@ -1,25 +1,22 @@
 import { useTheme } from '@mui/material'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { useTooltipStyle, fmtNum } from '../../utils/chartUtils'
+import type { UnprofitablePnlPoint } from '../../presenters/riskPresenter'
 
 interface UnprofitablePnlChartProps {
-  /** losers_pnl from presenter: { [date]: summed_profit } */
-  losersData?: Record<string, number>
+  /** Pre-sorted by date from riskPresenter.presentUnprofitablePnl */
+  losersData?: UnprofitablePnlPoint[]
 }
 
 export default function UnprofitablePnlChart({ losersData }: UnprofitablePnlChartProps) {
   const theme = useTheme()
   const tooltipStyle = useTooltipStyle()
 
-  if (!losersData || !Object.keys(losersData).length) return null
-
-  const data = Object.entries(losersData)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, value]) => ({ date, value }))
+  if (!losersData?.length) return null
 
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+      <AreaChart data={losersData} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
         <defs>
           <linearGradient id="lossPnlGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor={theme.palette.error.main} stopOpacity={0} />

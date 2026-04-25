@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.application.rebalancing.service import RebalancingService
+from backend.application.rebalancing.service import build_rebalancing_service
 from backend.domain.rebalancing.entities import RebalanceConfig
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
 from backend.api.serialization import date_response
 
 router = APIRouter(tags=["rebalance"])
@@ -19,48 +18,35 @@ class RebalanceConfigRequest(BaseModel):
     is_active: bool = True
 
 
+def _serialize_config(c: RebalanceConfig) -> dict:
+    return {
+        "id": c.id,
+        "asset_id": c.asset_id,
+        "ticker": c.ticker,
+        "target_weight_pct": c.target_weight_pct,
+        "min_weight_pct": c.min_weight_pct,
+        "max_weight_pct": c.max_weight_pct,
+        "rebalance_threshold_pct": c.rebalance_threshold_pct,
+        "correction_days": c.correction_days,
+        "is_active": c.is_active,
+    }
+
+
 @router.get("/rebalance/configs")
 def get_rebalance_configs():
     """Return all active rebalance configs with their tickers."""
-    service = RebalancingService()
-    configs = service.load_configs()
-    return date_response(
-        [
-            {
-                "id": c.id,
-                "asset_id": c.asset_id,
-                "ticker": c.ticker,
-                "target_weight_pct": c.target_weight_pct,
-                "min_weight_pct": c.min_weight_pct,
-                "max_weight_pct": c.max_weight_pct,
-                "rebalance_threshold_pct": c.rebalance_threshold_pct,
-                "correction_days": c.correction_days,
-                "is_active": c.is_active,
-            }
-            for c in configs
-        ]
-    )
+    svc = build_rebalancing_service()
+    configs = svc.load_configs()
+    return date_response([_serialize_config(c) for c in configs])
 
 
 @router.post("/rebalance/configs")
 def save_rebalance_config(body: RebalanceConfigRequest):
     """Create or update a rebalance config for an asset (upsert on asset_id)."""
-    service = RebalancingService()
-    config = RebalanceConfig(
-        id=None,
-        asset_id=body.asset_id,
-        ticker=body.ticker,
-        weight_band=WeightBand(
-            target=body.target_weight_pct,
-            min=body.min_weight_pct,
-            max=body.max_weight_pct,
-        ),
-        rebalance_threshold=RebalanceThreshold(body.rebalance_threshold_pct),
-        correction_days=body.correction_days,
-        is_active=body.is_active,
-    )
+    svc = build_rebalancing_service()
+    config = svc.create_config(**body.model_dump())
     try:
-        service.upsert_config(config)
+        svc.upsert_config(config)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return date_response({"status": "saved"})
@@ -69,9 +55,9 @@ def save_rebalance_config(body: RebalanceConfigRequest):
 @router.post("/rebalance/plan")
 def generate_rebalance_plan():
     """Generate (and persist) a rebalancing plan based on current configs."""
-    service = RebalancingService()
+    svc = build_rebalancing_service()
     try:
-        plan = service.generate_and_save_plan()
+        plan = svc.generate_and_save_plan()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -21,7 +21,9 @@ from dotenv import load_dotenv
 from pipeline.etl.protocols import Source, Destination
 from pipeline.etl.policies import Pipeline
 
-from pipeline.etl.loaders.loader_bronze_t212_history import FullLoaderPostgresT212History
+from pipeline.etl.loaders.loader_bronze_t212_history import (
+    FullLoaderPostgresT212History,
+)
 
 from pipeline.infrastructure.clients.api_client_trading212 import Trading212APIClient
 

@@ -51,13 +51,7 @@ def get_asset_profile(ticker: str):
     Asset profile metadata: tags, industries, sectors, categories for a given ticker.
     Uses the most-recent asset row from the analytics layer.
     """
-    svc = build_portfolio_service()
-    rows = svc.get_most_recent_assets()
-    asset_row = next((r for r in rows if r["ticker"].upper() == ticker.upper()), None)
-    if asset_row is None:
+    profile = build_portfolio_service().get_asset_profile(ticker.upper())
+    if profile is None:
         return date_response({"error": f"Asset '{ticker}' not found"})
-
-    from dashboard.controllers.asset_profile_controller import AssetProfileController
-
-    profile = AssetProfileController().get_profile(asset_row)
     return date_response(profile)

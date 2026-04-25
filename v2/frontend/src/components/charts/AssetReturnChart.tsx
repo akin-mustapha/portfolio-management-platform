@@ -2,9 +2,11 @@ import { useMemo } from 'react'
 import { useTheme } from '@mui/material'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { useTooltipStyle } from '../../utils/chartUtils'
+import type { AssetReturnSeriesVM } from '../../presenters/assetPresenter'
 
 interface AssetReturnChartProps {
-  cumulativeSeries?: { dates: string[]; values: (number | null)[] }
+  /** Values are already in % (multiplied by 100 in the presenter) */
+  cumulativeSeries?: AssetReturnSeriesVM
 }
 
 export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartProps) {
@@ -14,7 +16,7 @@ export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartP
     () =>
       (cumulativeSeries?.dates ?? []).map((d, i) => ({
         date: d,
-        return: cumulativeSeries?.values[i] != null ? Number(cumulativeSeries.values[i]) * 100 : null,
+        return: cumulativeSeries?.values[i],
       })),
     [cumulativeSeries?.dates, cumulativeSeries?.values],
   )

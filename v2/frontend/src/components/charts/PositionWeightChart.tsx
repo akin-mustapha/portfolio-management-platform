@@ -1,16 +1,10 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { useTheme } from '@mui/material'
-
-interface DistributionItem {
-  ticker: string
-  weight_pct: number
-  profit: number
-  value: number
-  name: string
-}
+import type { PositionWeightTop10Item } from '../../presenters/portfolioPresenter'
 
 interface PositionWeightChartProps {
-  distribution?: DistributionItem[]
+  /** Pre-sorted top-10 by weight — from portfolioPresenter.position_weight_top10 */
+  top10?: PositionWeightTop10Item[]
 }
 
 // Reordered so high-contrast colors are never adjacent in the ring
@@ -28,18 +22,16 @@ const PALETTE = [
   '#6c757d', // gray
 ]
 
-export default function PositionWeightChart({ distribution }: PositionWeightChartProps) {
+export default function PositionWeightChart({ top10 }: PositionWeightChartProps) {
   const theme = useTheme()
-  if (!distribution?.length) return null
-
-  const sorted = [...distribution].sort((a, b) => b.weight_pct - a.weight_pct).slice(0, 10)
+  if (!top10?.length) return null
 
   const textSecondary = theme.palette.text.secondary
   const textPrimary = theme.palette.text.primary
 
   function CustomTooltip({ active, payload }: { active?: boolean; payload?: unknown[] }) {
     if (!active || !payload?.length) return null
-    const d = (payload as Array<{ payload: DistributionItem }>)[0].payload
+    const d = (payload as Array<{ payload: PositionWeightTop10Item }>)[0].payload
     return (
       <div style={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, padding: '6px 10px', fontSize: 11, borderRadius: 4 }}>
         <div style={{ fontWeight: 600 }}>{d.ticker}</div>
@@ -51,12 +43,11 @@ export default function PositionWeightChart({ distribution }: PositionWeightChar
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', height: 300, padding: '10px' }}>
-      {/* Donut */}
       <div style={{ flex: '0 0 55%', minWidth: 0, height: '100%' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={sorted}
+              data={top10}
               dataKey="weight_pct"
               nameKey="ticker"
               cx="50%"
@@ -65,7 +56,7 @@ export default function PositionWeightChart({ distribution }: PositionWeightChar
               innerRadius={62}
               paddingAngle={2}
             >
-              {sorted.map((_, i) => (
+              {top10.map((_, i) => (
                 <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
               ))}
             </Pie>
@@ -74,33 +65,15 @@ export default function PositionWeightChart({ distribution }: PositionWeightChar
         </ResponsiveContainer>
       </div>
 
-      {/* Ranked legend */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 7, overflowY: 'auto', maxHeight: 300 }}>
-        {sorted.map((item, i) => (
-          <div
-            key={item.ticker}
-            style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-          >
-            {/* Rank */}
+        {top10.map((item, i) => (
+          <div key={item.ticker} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 10, color: textSecondary, width: 14, textAlign: 'right', flexShrink: 0 }}>
               {i + 1}
             </span>
-            {/* Color dot */}
-            <span style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              backgroundColor: PALETTE[i % PALETTE.length],
-              flexShrink: 0,
-            }} />
-            {/* Ticker */}
-            <span style={{ fontSize: 11, color: textPrimary, width: 52, fontWeight: 500 }}>
-              {item.ticker}
-            </span>
-            {/* Weight */}
-            <span style={{ fontSize: 11, color: textSecondary, flexShrink: 0 }}>
-              {item.weight_pct.toFixed(1)}%
-            </span>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: PALETTE[i % PALETTE.length], flexShrink: 0 }} />
+            <span style={{ fontSize: 11, color: textPrimary, width: 52, fontWeight: 500 }}>{item.ticker}</span>
+            <span style={{ fontSize: 11, color: textSecondary, flexShrink: 0 }}>{item.weight_pct.toFixed(1)}%</span>
           </div>
         ))}
       </div>

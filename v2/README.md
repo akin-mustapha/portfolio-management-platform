@@ -15,11 +15,13 @@ uvicorn backend.api.main:app --reload --port 8001
 ## Prefect
 
 **Deploy all flows:**
+
 ```bash
 prefect deploy --all
 ```
 
 **Run a flow directly:**
+
 ```bash
 python -m pipeline.orchestration.flow_t212_bronze
 python -m pipeline.orchestration.flow_t212_silver
