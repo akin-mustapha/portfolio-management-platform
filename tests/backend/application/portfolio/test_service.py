@@ -4,7 +4,7 @@ No database connection is required.
 """
 
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from v2.backend.domain.portfolio.value_objects import Ticker
 from v2.backend.domain.portfolio.entities import (
