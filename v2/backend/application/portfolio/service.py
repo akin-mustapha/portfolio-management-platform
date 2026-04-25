@@ -266,7 +266,9 @@ class PortfolioService:
         for row in asset_rows:
             row["price_series"] = price_map.get(row["ticker"], [])
             row["tags"] = tag_map.get(row["ticker"].upper(), [])
-            row["trend"] = str(TrendSignal.from_ma_crossover(row.get("value_ma_crossover_signal")))
+            row["trend"] = str(
+                TrendSignal.from_ma_crossover(row.get("value_ma_crossover_signal"))
+            )
 
         portfolio_history_rows = [
             dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()
@@ -305,7 +307,9 @@ class PortfolioService:
 
     def get_asset_profile(self, ticker: str) -> dict | None:
         rows = self.get_most_recent_assets()
-        asset_row = next((r for r in rows if r["ticker"].upper() == ticker.upper()), None)
+        asset_row = next(
+            (r for r in rows if r["ticker"].upper() == ticker.upper()), None
+        )
         if asset_row is None:
             return None
         tags = self.get_all_tags()
@@ -318,7 +322,9 @@ class PortfolioService:
             asset_row.get("broker"),
             asset_row.get("currency"),
         )
-        return _present_asset_profile(asset_row, tags, industries, sectors, categories, current_tags)
+        return _present_asset_profile(
+            asset_row, tags, industries, sectors, categories, current_tags
+        )
 
     def _resolve_current_tags(
         self,

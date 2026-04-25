@@ -1,10 +1,8 @@
 import { Box, Grid, Typography } from '@mui/material'
 import Section from '../../../components/molecules/Section'
-import PortfolioValueChart from '../../../components/charts/PortfolioValueChart'
-import PositionWeightChart from '../../../components/charts/PositionWeightChart'
-import WinnersChart from '../../../components/charts/WinnersChart'
-import LosersChart from '../../../components/charts/LosersChart'
-import DailyMoversTable from '../../../components/charts/DailyMoversTable'
+import { PortfolioValueChart } from '../../../components/charts/portfolio'
+import { PositionWeightChart } from '../../../components/charts/position'
+import { WinnersChart, LosersChart, DailyMoversTable } from '../../../components/charts/screener'
 import { usePortfolioContext } from '../PortfolioContext'
 
 export default function PortfolioTab() {

@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useAppStore } from '../../store/useAppStore'
-import SparklineChart from '../charts/SparklineChart'
+import { SparklineChart } from '../charts/shared'
 import MetricInfo from '../atoms/MetricInfo'
 import TickerLogo from '../atoms/TickerLogo'
 import { fmtNum as numFmt, fmtPct as pctFmt, sparklineSentiment } from '../../presenters/assetPresenter'

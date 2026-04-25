@@ -82,7 +82,9 @@ class RebalancingService:
     def upsert_config(self, config: RebalanceConfig) -> None:
         """Create or update a rebalance config for an asset (upsert on asset_id)."""
         try:
-            self._config_repo.upsert(records=[config.to_record()], unique_key=["asset_id"])
+            self._config_repo.upsert(
+                records=[config.to_record()], unique_key=["asset_id"]
+            )
             logging.info(f"Upserted rebalance config for asset_id={config.asset_id}")
         except Exception as e:
             logging.error(f"Error upserting rebalance config: {e}")

@@ -16,6 +16,10 @@ class CredentialsService:
             }
         return {"api_key": "", "secret_token": "", "api_url": ""}
 
-    def save(self, provider: str, api_key: str, secret_token: str, api_url: str) -> None:
+    def save(
+        self, provider: str, api_key: str, secret_token: str, api_url: str
+    ) -> None:
         validated_key = ApiKey(api_key)
-        self._repo.save(provider, str(validated_key), secret_token.strip(), api_url.strip())
+        self._repo.save(
+            provider, str(validated_key), secret_token.strip(), api_url.strip()
+        )

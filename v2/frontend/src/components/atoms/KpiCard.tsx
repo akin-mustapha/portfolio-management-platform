@@ -1,7 +1,7 @@
 import { Box, Skeleton, Typography, useTheme } from '@mui/material'
 import PrivacyValue from './PrivacyValue'
 import MetricInfo from './MetricInfo'
-import SparklineChart from '../charts/SparklineChart'
+import { SparklineChart } from '../charts/shared'
 import type { MetricKey } from '../../constants/metricDefinitions'
 
 type Variant = 'default' | 'compact' | 'hero'

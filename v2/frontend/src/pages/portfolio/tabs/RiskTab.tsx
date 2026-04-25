@@ -1,8 +1,8 @@
 import Section from '../../../components/molecules/Section'
-import DrawdownChart from '../../../components/charts/DrawdownChart'
-import ProfitabilityChart from '../../../components/charts/ProfitabilityChart'
-import VarByPositionChart from '../../../components/charts/VarByPositionChart'
-import UnprofitablePnlChart from '../../../components/charts/UnprofitablePnlChart'
+import { DrawdownChart } from '../../../components/charts/portfolio'
+import { ProfitabilityChart } from '../../../components/charts/shared'
+import { VarByPositionChart } from '../../../components/charts/position'
+import { UnprofitablePnlChart } from '../../../components/charts/screener'
 import { usePortfolioContext } from '../PortfolioContext'
 import { presentProfitability } from '../../../presenters/riskPresenter'
 
