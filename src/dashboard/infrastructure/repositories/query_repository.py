@@ -36,7 +36,7 @@ class PostgresAssetQueryRepository:
           ft.recent_value_low_30d,
           ft.value_high_alltime,
           ft.value_low_alltime,
-          ft.value_drawdown_pct_30d,
+          ft.price_drawdown_pct_30d,
           ft.volatility_30d,
           ft.volatility_50d,
           ft.value_ma_30d,
@@ -191,7 +191,7 @@ class PostgresSnapshotQueryRepository:
             fv.unrealized_pnl                             AS profit,
             COALESCE(fv.fx_impact, 0)                     AS fx_impact,
             ft.volatility_30d,
-            ft.value_drawdown_pct_30d,
+            ft.price_drawdown_pct_30d,
             fr.cumulative_value_return,
             fr.daily_value_return,
             TO_DATE(fv.date_id::TEXT, 'YYYYMMDD')         AS data_date

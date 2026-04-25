@@ -92,3 +92,24 @@ class Trading212APIClient(APIClient):
                     return
 
                 next_path = page.get("nextPagePath")
+
+    def get_positions(self) -> list[dict]:
+        """Return all open equity positions (synchronous)."""
+        header = {"Authorization": f"Basic {self.credentials()}"}
+        with httpx.Client() as client:
+            url = urljoin(self.url, "equity/positions")
+            response = client.get(url, headers=header, timeout=10)
+            response.raise_for_status()
+            result = response.json()
+        return result if isinstance(result, list) else result.get("items", [])
+
+    def place_market_order(self, ticker: str, value: float) -> dict:
+        """Place a market buy order for *ticker* at *value* GBP (synchronous)."""
+        header = {"Authorization": f"Basic {self.credentials()}"}
+        payload = {"ticker": ticker, "value": value}
+        logging.info(f"Placing market order: {payload}")
+        with httpx.Client() as client:
+            url = urljoin(self.url, "equity/orders/market")
+            response = client.post(url, json=payload, headers=header, timeout=10)
+            response.raise_for_status()
+        return response.json()

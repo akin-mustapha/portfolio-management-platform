@@ -208,7 +208,11 @@ fact_technical:
     - sector_id::uuid null
     - tag_id::uuid null
     - asset_type_id::uuid null
-    - value_drawdown_pct_30d::numeric   # (value - recent_value_high_30d) / recent_value_high_30d
+    - value_drawdown_pct_30d::numeric   # (value - recent_value_high_30d) / recent_value_high_30d — position-value based, used by dashboard
+    - price_drawdown_pct_30d::numeric   # (price - recent_price_high_30d)  / recent_price_high_30d  — NULL until 30 trading days of history
+    - price_drawdown_pct_90d::numeric   # (price - recent_price_high_90d)  / recent_price_high_90d  — NULL until 90 trading days of history
+    - price_drawdown_pct_180d::numeric  # (price - recent_price_high_180d) / recent_price_high_180d — NULL until 180 trading days of history
+    - price_drawdown_pct_365d::numeric  # (price - recent_price_high_365d) / recent_price_high_365d — NULL until 365 trading days of history
     - value_high_alltime::numeric       # all-time high position value (MAX over all rows)
     - value_low_alltime::numeric        # all-time low position value (MIN over all rows)
     - value_ma_20d::numeric             # 20-day moving average of position value (AVG(value))

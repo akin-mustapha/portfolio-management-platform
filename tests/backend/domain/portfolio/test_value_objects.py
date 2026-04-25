@@ -1,6 +1,6 @@
 import pytest
 
-from backend.domain.portfolio.value_objects import Ticker, Currency, Broker
+from v2.backend.domain.portfolio.value_objects import Ticker, Currency, Broker
 
 
 class TestTicker:

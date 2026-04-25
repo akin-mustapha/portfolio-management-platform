@@ -25,7 +25,7 @@ def asset_table(data=None):
         "cost",
         "weight_pct",
         "pnl_pct",
-        "value_drawdown_pct_30d",
+        "price_drawdown_pct_30d",
         "volatility_30d",
         "volatility_50d",
         "value_ma_30d",
@@ -46,7 +46,8 @@ def asset_table(data=None):
     # precision control
     decimals = 6
     df["weight_pct"] = df["weight_pct"].round(decimals)
-    df["value_drawdown_pct_30d"] = df["value_drawdown_pct_30d"].round(decimals)
+    if "price_drawdown_pct_30d" in df.columns:
+        df["price_drawdown_pct_30d"] = df["price_drawdown_pct_30d"].round(decimals)
     df["volatility_30d"] = df["volatility_30d"].round(decimals)
     df["recent_profit_high_30d"] = df["recent_profit_high_30d"].round(decimals)
     df["dca_bias"] = df["dca_bias"].round(decimals)
@@ -217,14 +218,14 @@ def asset_table(data=None):
                 ),
             },
             {
-                "field": "value_drawdown_pct_30d",
+                "field": "price_drawdown_pct_30d",
                 "headerName": "% DD",
                 "minWidth": 72,
                 "width": 72,
                 "type": "numericColumn",
                 "valueFormatter": {"function": "d3.format('.2%')(params.value)"},
                 "headerTooltip": (
-                    "% Drawdown: Percentage decline from the recent high. "
+                    "% Drawdown (30D): Price decline from the 30-day high. "
                     "More negative = deeper drawdown."
                 ),
                 "cellStyle": pnl_style(),

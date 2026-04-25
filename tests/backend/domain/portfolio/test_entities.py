@@ -1,5 +1,5 @@
-from backend.domain.portfolio.value_objects import Ticker, Currency, Broker
-from backend.domain.portfolio.entities import (
+from v2.backend.domain.portfolio.value_objects import Ticker, Currency, Broker
+from v2.backend.domain.portfolio.entities import (
     Asset,
     Tag,
     Category,

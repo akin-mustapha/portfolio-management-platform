@@ -13,7 +13,7 @@ The portfolio page is split into four tabs:
 |---|---|
 | Valuation | `fact_portfolio_daily`, `fact_valuation`, `fact_price`, `fact_return`, `fact_signal` |
 | Risk | `fact_technical`, `fact_valuation` (`position_weight_pct`) |
-| Opportunities | `fact_signal`, `fact_technical` (`pct_drawdown`, `volatility_*`) |
+| Opportunities | `fact_signal`, `fact_technical` (`value_drawdown_pct_30d`, `price_drawdown_pct_{30,90,180,365}d`, `volatility_*`) |
 | Asset Profile | `portfolio.asset`, `portfolio.tag`, `portfolio.asset_tag` |
 
 ---
@@ -44,7 +44,7 @@ Questions the asset detail page should answer:
 | How much have I spent on this asset (avg cost, cost basis)? | `fact_valuation`, `fact_price` | `cost_basis`, `avg_price` |
 | What is my current return on this asset (absolute and %)? | `fact_valuation` | `unrealized_pnl`, `unrealized_pnl_pct` |
 | What is the daily return trend over time? | `fact_return` | `daily_return`, `cumulative_return` |
-| What is the current drawdown — how far is it from its peak? | `fact_technical` | `pct_drawdown`, `value_high` |
+| What is the current drawdown — how far is it from its peak? | `fact_technical` | `value_drawdown_pct_30d` (position), `price_drawdown_pct_{30,90,180,365}d` (asset, multi-horizon), `value_high_alltime` |
 | Is now a good time to buy more? (DCA signal) | `fact_signal` | `dca_bias` |
 | What is the risk of buying more right now? | `fact_technical` | `volatility_30d`, `var_95_1d` |
 | Is this asset undervalued relative to its recent range? | `fact_technical` | `recent_value_high_30d`, `recent_value_low_30d`, `recent_profit_high_30d`, `recent_profit_low_30d` |

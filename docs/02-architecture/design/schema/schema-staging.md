@@ -50,7 +50,7 @@ asset_computed:
     - daily_return         # FLOAT
     - cumulative_return    # FLOAT
     - dca_bias             # FLOAT
-    - pct_drawdown         # FLOAT
+    - pct_drawdown         # FLOAT — deprecated; superseded by analytics.fact_technical.{value,price}_drawdown_pct_*
     - recent_value_high_30d   # FLOAT
     - recent_value_low_30d    # FLOAT
     - recent_profit_high_30d  # FLOAT

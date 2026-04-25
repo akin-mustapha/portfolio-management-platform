@@ -13,7 +13,7 @@ OPTIONAL_COLUMNS = [
     {"label": "Avg Cost", "value": "avg_price"},
     {"label": "Weight %", "value": "weight_pct"},
     {"label": "30D High", "value": "recent_profit_high_30d"},
-    {"label": "% Drawdown", "value": "value_drawdown_pct_30d"},
+    {"label": "% Drawdown", "value": "price_drawdown_pct_30d"},
     {"label": "Vol 30D", "value": "volatility_30d"},
     {"label": "VaR 95%", "value": "var_95_1d"},
     {"label": "DCA Bias", "value": "dca_bias"},

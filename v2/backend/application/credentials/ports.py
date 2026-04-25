@@ -1,0 +1,8 @@
+from typing import Protocol
+
+
+class CredentialsPort(Protocol):
+    def save(
+        self, provider: str, api_key: str, secret_token: str, api_url: str
+    ) -> None: ...
+    def load(self, provider: str) -> dict | None: ...
