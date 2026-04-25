@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { useTheme } from '@mui/material'
-import type { PositionWeightTop10Item } from '../../presenters/portfolioPresenter'
+import type { PositionWeightTop10Item } from '../../../presenters/portfolioPresenter'
 
 interface PositionWeightChartProps {
   /** Pre-sorted top-10 by weight — from portfolioPresenter.position_weight_top10 */

@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import { usePortfolioSummary } from '../../hooks/usePortfolio'
+import { usePortfolioSummary } from './hooks/usePortfolio'
 import { useAppStore } from '../../store/useAppStore'
 import { filterAssetsByTags } from '../../presenters/portfolioPresenter'
 import type { PortfolioSummaryVM, RawAsset } from '../../presenters/portfolioPresenter'

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTheme } from '@mui/material'
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, Legend } from 'recharts'
-import { useTooltipStyle } from '../../utils/chartUtils'
+import { useTooltipStyle } from '../../../utils/chartUtils'
 
 interface AssetPnlChartProps {
   series?: {

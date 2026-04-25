@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
-import { useTooltipStyle, fmtNum } from '../../utils/chartUtils'
-import type { UnprofitablePnlPoint } from '../../presenters/riskPresenter'
+import { useTooltipStyle, fmtNum } from '../../../utils/chartUtils'
+import type { UnprofitablePnlPoint } from '../../../presenters/riskPresenter'
 
 interface UnprofitablePnlChartProps {
   /** Pre-sorted by date from riskPresenter.presentUnprofitablePnl */

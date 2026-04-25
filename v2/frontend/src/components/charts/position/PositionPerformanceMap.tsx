@@ -11,7 +11,7 @@ import {
   ReferenceArea,
   CartesianGrid,
 } from 'recharts'
-import type { PerformanceMapVM, EnrichedPositionPoint } from '../../presenters/opportunitiesPresenter'
+import type { PerformanceMapVM, EnrichedPositionPoint } from '../../../presenters/opportunitiesPresenter'
 
 interface PositionPerformanceMapProps {
   vm?: PerformanceMapVM | null

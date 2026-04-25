@@ -11,8 +11,8 @@ import {
   Cell,
   Label,
 } from 'recharts'
-import { fmtNum } from '../../utils/chartUtils'
-import type { OpportunitiesChartVM } from '../../presenters/opportunitiesPresenter'
+import { fmtNum } from '../../../utils/chartUtils'
+import type { OpportunitiesChartVM } from '../../../presenters/opportunitiesPresenter'
 
 type DistributionItem = OpportunitiesChartVM['distribution'][number]
 

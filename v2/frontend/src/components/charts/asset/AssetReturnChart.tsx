@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { useTheme } from '@mui/material'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
-import { useTooltipStyle } from '../../utils/chartUtils'
-import type { AssetReturnSeriesVM } from '../../presenters/assetPresenter'
+import { useTooltipStyle } from '../../../utils/chartUtils'
+import type { AssetReturnSeriesVM } from '../../../presenters/assetPresenter'
 
 interface AssetReturnChartProps {
   /** Values are already in % (multiplied by 100 in the presenter) */

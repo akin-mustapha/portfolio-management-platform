@@ -12,8 +12,8 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts'
-import { fmtNum } from '../../utils/chartUtils'
-import type { PortfolioValueChartRow } from '../../presenters/portfolioPresenter'
+import { fmtNum } from '../../../utils/chartUtils'
+import type { PortfolioValueChartRow } from '../../../presenters/portfolioPresenter'
 
 interface PortfolioValueChartProps {
   rows?: PortfolioValueChartRow[]

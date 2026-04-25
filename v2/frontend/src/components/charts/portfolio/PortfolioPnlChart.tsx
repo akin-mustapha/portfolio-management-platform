@@ -11,8 +11,8 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts'
-import { useTooltipStyle, fmtNum } from '../../utils/chartUtils'
-import type { PortfolioPnlChartRow } from '../../presenters/portfolioPresenter'
+import { useTooltipStyle, fmtNum } from '../../../utils/chartUtils'
+import type { PortfolioPnlChartRow } from '../../../presenters/portfolioPresenter'
 
 interface PortfolioPnlChartProps {
   rows?: PortfolioPnlChartRow[]

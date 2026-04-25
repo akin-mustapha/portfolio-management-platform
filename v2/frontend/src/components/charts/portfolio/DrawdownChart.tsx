@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTheme } from '@mui/material'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
-import { useTooltipStyle } from '../../utils/chartUtils'
+import { useTooltipStyle } from '../../../utils/chartUtils'
 
 interface DrawdownChartProps {
   drawdown?: { dates: string[]; drawdown_pct: number[] }

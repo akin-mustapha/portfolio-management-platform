@@ -1,5 +1,5 @@
 import { Box, Typography, Stack } from '@mui/material'
-import { useAssetHistory } from '../../../hooks/useAssetHistory'
+import { useAssetHistory } from '../hooks/useAssetHistory'
 import { useAppStore } from '../../../store/useAppStore'
 import { AssetPriceChart, AssetValueChart, AssetPnlChart, AssetReturnChart } from '../../../components/charts/asset'
 import Section from '../../../components/molecules/Section'

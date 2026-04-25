@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchAssetHistory, fetchAssetProfile } from '../api/assets'
-import { presentAssetHistory, type RawAssetHistoryResponse, type AssetHistoryVM } from '../presenters/assetPresenter'
+import { fetchAssetHistory, fetchAssetProfile } from '../../../api/assets'
+import { presentAssetHistory, type RawAssetHistoryResponse, type AssetHistoryVM } from '../../../presenters/assetPresenter'
 
 export type { AssetHistoryVM }
 

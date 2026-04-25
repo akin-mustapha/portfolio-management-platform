@@ -5,6 +5,7 @@ from shared.utils.custom_logger import customer_logger
 from shared.notifications.email import EmailClient
 
 from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
 from backend.domain.rebalancing.plan_generator import generate_plan
 from backend.application.rebalancing.ports import RebalanceConfigPort, RebalancePlanPort
 

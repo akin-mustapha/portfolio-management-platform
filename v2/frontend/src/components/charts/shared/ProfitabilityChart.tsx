@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { useTooltipStyle } from '../../utils/chartUtils'
-import type { ProfitabilityVM } from '../../presenters/riskPresenter'
+import { useTooltipStyle } from '../../../utils/chartUtils'
+import type { ProfitabilityVM } from '../../../presenters/riskPresenter'
 
 interface ProfitabilityChartProps {
   vm?: ProfitabilityVM

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTheme } from '@mui/material'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { useTooltipStyle, fmtNum } from '../../utils/chartUtils'
+import { useTooltipStyle, fmtNum } from '../../../utils/chartUtils'
 
 interface AssetValueChartProps {
   series?: { dates: string[]; values: (number | null)[] }

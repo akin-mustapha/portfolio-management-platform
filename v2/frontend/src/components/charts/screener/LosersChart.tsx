@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { fmtNum } from '../../utils/chartUtils'
+import { fmtNum } from '../../../utils/chartUtils'
 
 interface LoserItem {
   ticker: string
