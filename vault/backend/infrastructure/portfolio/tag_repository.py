@@ -2,8 +2,7 @@ from shared.repositories.base_table_repository import BaseTableRepository
 
 
 class PostgresTagRepository(BaseTableRepository):
-    def __init__(self, db_type: str = "postgres"):
-        # Domain field -> DB column mapping
+    def __init__(self):
         field_map = {
             "id": "id",
             "name": "name",
@@ -11,22 +10,17 @@ class PostgresTagRepository(BaseTableRepository):
             "tag_type_id": "category_id",  # domain: tag_type_id, DB: category_id
             "created_timestamp": "created_timestamp",
         }
-
-        schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("tag", schema_name=schema_name, field_map=field_map)
+        super().__init__("tag", schema_name="portfolio", field_map=field_map)
 
 
 class SQLiteTagRepository(BaseTableRepository):
-    def __init__(self, db_type: str = "postgres"):
-        # Domain field -> DB column mapping
+    def __init__(self):
         field_map = {
             "id": "id",
             "name": "name",
             "description": "description",
             "category_id": "category_id",
             "is_active": "is_active",
-            "created_timestamp": "created_datetime",  # TODO: verify DB column name against portfolio schema
+            "created_timestamp": "created_datetime",
         }
-
-        schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("tag", schema_name=schema_name, field_map=field_map)
+        super().__init__("tag", schema_name=None, field_map=field_map)

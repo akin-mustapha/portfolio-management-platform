@@ -2,24 +2,20 @@ from shared.repositories.base_table_repository import BaseTableRepository
 
 
 class PostgresIndustryRepository(BaseTableRepository):
-    def __init__(self, db_type: str = "postgres"):
-        # Domain name -> DB column mapping
-        industry_dto = {
+    def __init__(self):
+        field_map = {
             "name": "name",
             "description": "description",
             "is_active": "is_active",
             "created_timestamp": "created_timestamp",
             "updated_timestamp": "updated_timestamp",
         }
-
-        schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("industry", schema_name=schema_name, field_map=industry_dto)
+        super().__init__("industry", schema_name="portfolio", field_map=field_map)
 
 
 class SQLiteIndustryRepository(BaseTableRepository):
-    def __init__(self, db_type: str = "postgres"):
-        # Domain name -> DB column mapping
-        industry_dto = {
+    def __init__(self):
+        field_map = {
             "id": "id",
             "name": "name",
             "description": "description",
@@ -27,6 +23,4 @@ class SQLiteIndustryRepository(BaseTableRepository):
             "created_timestamp": "created_timestamp",
             "updated_timestamp": "updated_timestamp",
         }
-
-        schema_name = "portfolio" if db_type == "postgres" else None
-        super().__init__("industry", schema_name=schema_name, field_map=industry_dto)
+        super().__init__("industry", schema_name=None, field_map=field_map)

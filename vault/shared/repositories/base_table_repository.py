@@ -5,13 +5,6 @@ from typing import Dict, Iterable
 from ..database.client import SQLModelClient
 from .interface import RepositoryInterface
 
-logging.basicConfig(
-    level=logging.INFO,
-    filename="logs/info.log",
-    filemode="a",
-    format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
-)
-
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")

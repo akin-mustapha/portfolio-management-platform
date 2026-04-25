@@ -38,7 +38,7 @@ class RepositoryFactory:
 
     @classmethod
     def get(cls, table_name: str, db_type: str = None):
-        db_type = db_type or os.getenv("DATABASE_TYPE", "sqlite").lower()
+        db_type = db_type or os.getenv("DATABASE_TYPE", "postgres").lower()
         table_entry = cls.registry.get(table_name)
         if not table_entry:
             raise ValueError(f"No repository registered for table: {table_name}")

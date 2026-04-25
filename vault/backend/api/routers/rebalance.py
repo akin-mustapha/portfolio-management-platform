@@ -44,7 +44,7 @@ def get_rebalance_configs():
 def save_rebalance_config(body: RebalanceConfigRequest):
     """Create or update a rebalance config for an asset (upsert on asset_id)."""
     svc = build_rebalancing_service()
-    config = svc.create_config(**body.model_dump())
+    config = RebalanceConfig.from_primitives(**body.model_dump())
     try:
         svc.upsert_config(config)
     except Exception as e:

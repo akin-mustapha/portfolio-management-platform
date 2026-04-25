@@ -91,27 +91,6 @@ class RebalancingService:
             logging.error(f"Error upserting rebalance config: {e}")
             raise
 
-    def create_config(
-        self,
-        asset_id: str,
-        ticker: str,
-        target_weight_pct: float,
-        min_weight_pct: float,
-        max_weight_pct: float,
-        rebalance_threshold_pct: float,
-        correction_days: int,
-        is_active: bool,
-    ) -> RebalanceConfig:
-        return RebalanceConfig.from_primitives(
-            asset_id=asset_id,
-            ticker=ticker,
-            target_weight_pct=target_weight_pct,
-            min_weight_pct=min_weight_pct,
-            max_weight_pct=max_weight_pct,
-            rebalance_threshold_pct=rebalance_threshold_pct,
-            correction_days=correction_days,
-            is_active=is_active,
-        )
 
 
 def _format_plan_email(plan: RebalancePlan) -> str:

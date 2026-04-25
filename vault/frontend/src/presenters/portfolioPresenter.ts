@@ -335,7 +335,11 @@ function roiLabel(a: RawAsset): string {
   return `${a.ticker} ${roi >= 0 ? '+' : ''}${roi}%`
 }
 
-function topWinners(assets: RawAsset[], sortBy: 'profit' | 'weight_pct' = 'profit'): WinnerLoserItem[] {
+function topByField(
+  assets: RawAsset[],
+  sortBy: 'profit' | 'weight_pct' = 'profit',
+  direction: 'asc' | 'desc' = 'desc',
+): WinnerLoserItem[] {
   return [...assets]
     .map((a) => ({
       ticker: a.ticker,
@@ -345,22 +349,16 @@ function topWinners(assets: RawAsset[], sortBy: 'profit' | 'weight_pct' = 'profi
       name: a.name,
       label: roiLabel(a),
     }))
-    .sort((a, b) => b[sortBy] - a[sortBy])
+    .sort((a, b) => direction === 'desc' ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy])
     .slice(0, 10)
 }
 
+function topWinners(assets: RawAsset[], sortBy: 'profit' | 'weight_pct' = 'profit'): WinnerLoserItem[] {
+  return topByField(assets, sortBy, 'desc')
+}
+
 function topLosers(assets: RawAsset[], sortBy: 'profit' | 'weight_pct' = 'profit'): WinnerLoserItem[] {
-  return [...assets]
-    .map((a) => ({
-      ticker: a.ticker,
-      weight_pct: toFloat(a.weight_pct),
-      profit: toFloat(a.profit),
-      value: toFloat(a.value),
-      name: a.name,
-      label: roiLabel(a),
-    }))
-    .sort((a, b) => a[sortBy] - b[sortBy])
-    .slice(0, 10)
+  return topByField(assets, sortBy, 'asc')
 }
 
 function dailyMovers(assets: RawAsset[]): DailyMoverItem[] {
