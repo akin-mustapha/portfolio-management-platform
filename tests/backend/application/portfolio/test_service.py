@@ -28,20 +28,11 @@ def mock_repo_factory():
 def service(mock_repo_factory):
     mock_analytics_repo = MagicMock()
     mock_portfolio_query_repo = MagicMock()
-    with patch(
-        "backend.application.portfolio.service.RepositoryFactory",
-        return_value=mock_repo_factory,
-    ), patch(
-        "backend.application.portfolio.service.AssetAnalyticsRepository",
-        return_value=mock_analytics_repo,
-    ), patch(
-        "backend.application.portfolio.service.PortfolioQueryRepository",
-        return_value=mock_portfolio_query_repo,
-    ):
-        svc = PortfolioService()
-    svc._repo_factory = mock_repo_factory
-    svc._analytics_repo = mock_analytics_repo
-    svc._portfolio_query_repo = mock_portfolio_query_repo
+    svc = PortfolioService(
+        repo_factory=mock_repo_factory,
+        analytics_repo=mock_analytics_repo,
+        portfolio_query_repo=mock_portfolio_query_repo,
+    )
     return svc
 
 

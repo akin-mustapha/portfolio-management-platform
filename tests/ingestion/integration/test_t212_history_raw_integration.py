@@ -65,15 +65,18 @@ _TRANSACTION_PAGE = {
 
 
 def _fake_paginated_factory():
-    def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
-        if endpoint.endswith("history/dividends"):
+    def fake_paginated(self_or_endpoint, endpoint=None, cursor=None, limit=50, stop_predicate=None):
+        # Handles both class-level patch (self passed as first positional) and
+        # instance-level assignment where endpoint is the first positional.
+        actual_endpoint = endpoint if endpoint is not None else self_or_endpoint
+        if actual_endpoint.endswith("history/dividends"):
             yield _DIVIDEND_PAGE
-        elif endpoint.endswith("history/orders"):
+        elif actual_endpoint.endswith("history/orders"):
             yield _ORDER_PAGE
-        elif endpoint.endswith("history/transactions"):
+        elif actual_endpoint.endswith("history/transactions"):
             yield _TRANSACTION_PAGE
         else:
-            raise AssertionError(f"unexpected endpoint: {endpoint}")
+            raise AssertionError(f"unexpected endpoint: {actual_endpoint}")
     return fake_paginated
 
 
