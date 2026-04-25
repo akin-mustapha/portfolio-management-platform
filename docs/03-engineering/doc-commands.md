@@ -51,6 +51,8 @@ docker exec -it kafka kafka-topics \
 
 Migrations are split into 4 independent tracks, one per layer. Each has its own ini file in `migrations/postgres/`.
 
+All migration commands must be run from the `vault/` directory.
+
 #### Apply all migrations (fresh database)
 
 ```sh
