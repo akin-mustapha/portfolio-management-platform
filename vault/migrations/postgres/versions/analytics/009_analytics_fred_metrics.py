@@ -16,16 +16,16 @@ Revises: 3300000000c8
 Create Date: 2026-04-04
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
-
+from alembic import op
 
 revision: str = "3300000000c9"
-down_revision: Union[str, Sequence[str], None] = "3300000000c8"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "3300000000c8"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -38,7 +38,11 @@ def upgrade() -> None:
         )
 
     # fact_portfolio_daily — portfolio-level FRED metrics
-    for col in ["sharpe_ratio_30d", "benchmark_return_daily", "portfolio_vs_benchmark_30d"]:
+    for col in [
+        "sharpe_ratio_30d",
+        "benchmark_return_daily",
+        "portfolio_vs_benchmark_30d",
+    ]:
         op.add_column(
             "fact_portfolio_daily",
             sa.Column(col, sa.Numeric(10, 6), nullable=True),
@@ -47,7 +51,11 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    for col in ["portfolio_vs_benchmark_30d", "benchmark_return_daily", "sharpe_ratio_30d"]:
+    for col in [
+        "portfolio_vs_benchmark_30d",
+        "benchmark_return_daily",
+        "sharpe_ratio_30d",
+    ]:
         op.drop_column("fact_portfolio_daily", col, schema="analytics")
 
     for col in ["sharpe_ratio_30d", "beta_60d"]:

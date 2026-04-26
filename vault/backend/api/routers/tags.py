@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.application.portfolio.factory import build_portfolio_service
+
 from backend.api.serialization import date_response
+from backend.application.portfolio.factory import build_portfolio_service
 
 router = APIRouter(tags=["tags"])
 

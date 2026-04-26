@@ -1,5 +1,3 @@
-from typing import Type
-
 from pydantic import BaseModel, ValidationError
 
 from ..protocols import RejectedRecord, ValidationResult
@@ -12,7 +10,7 @@ class SchemaValidator:
     pipeline_name is set to None here — the pipeline sets it before writing to dead letter.
     """
 
-    def __init__(self, model: Type[BaseModel], layer: str = "silver"):
+    def __init__(self, model: type[BaseModel], layer: str = "silver"):
         self._model = model
         self._layer = layer
 

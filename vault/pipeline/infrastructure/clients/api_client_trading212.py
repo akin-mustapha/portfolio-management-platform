@@ -1,14 +1,16 @@
-import os
-import time
-import httpx
 import base64
 import logging
-from typing import Callable, Iterator, Optional
+import os
+import time
+from collections.abc import Callable, Iterator
 from urllib.parse import urljoin
+
+import httpx
 
 from pipeline.etl.interfaces.interface_api_client import APIClient
 
-os.path.exists("logs") or os.makedirs("logs")
+if not os.path.exists("logs"):
+    os.makedirs("logs")
 log_dir_name = "logs"
 
 logging.basicConfig(
@@ -44,17 +46,15 @@ class Trading212APIClient(APIClient):
                 logging.info("Successful API call")
                 return response.json()
             else:
-                logging.error(
-                    f"API call failed with status code {response.status_code}"
-                )
+                logging.error(f"API call failed with status code {response.status_code}")
                 return {"error": response.status_code, "message": "API call failed"}
 
     def iter_paginated(
         self,
         endpoint: str,
-        cursor: Optional[str] = None,
+        cursor: str | None = None,
         limit: int = 50,
-        stop_predicate: Optional[Callable[[dict], bool]] = None,
+        stop_predicate: Callable[[dict], bool] | None = None,
     ) -> Iterator[dict]:
         """
         Synchronous page iterator for T212 cursor-paginated endpoints.

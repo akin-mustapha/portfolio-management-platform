@@ -1,12 +1,12 @@
-from v2.backend.domain.portfolio.value_objects import Ticker, Currency, Broker
 from v2.backend.domain.portfolio.entities import (
     Asset,
-    Tag,
-    Category,
     AssetTag,
+    Category,
     Industry,
     Sector,
+    Tag,
 )
+from v2.backend.domain.portfolio.value_objects import Broker, Currency, Ticker
 
 
 class TestAssetToRecord:

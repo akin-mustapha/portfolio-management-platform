@@ -1,5 +1,4 @@
 class AssetProfilePresenter:
-
     def present_profile(
         self,
         asset_row: dict,

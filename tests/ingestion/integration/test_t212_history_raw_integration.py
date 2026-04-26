@@ -14,7 +14,6 @@ from unittest.mock import patch
 
 from sqlalchemy import text
 
-
 _DIVIDEND_PAGE = {
     "items": [
         {
@@ -77,6 +76,7 @@ def _fake_paginated_factory():
             yield _TRANSACTION_PAGE
         else:
             raise AssertionError(f"unexpected endpoint: {actual_endpoint}")
+
     return fake_paginated
 
 
@@ -95,18 +95,10 @@ def _run_pipeline():
 def _table_counts(engine):
     with engine.connect() as conn:
         return {
-            "dividend": conn.execute(
-                text("SELECT count(*) FROM raw.t212_history_dividend")
-            ).scalar(),
-            "order": conn.execute(
-                text("SELECT count(*) FROM raw.t212_history_order")
-            ).scalar(),
-            "transaction": conn.execute(
-                text("SELECT count(*) FROM raw.t212_history_transaction")
-            ).scalar(),
-            "cursor": conn.execute(
-                text("SELECT count(*) FROM raw.t212_history_cursor")
-            ).scalar(),
+            "dividend": conn.execute(text("SELECT count(*) FROM raw.t212_history_dividend")).scalar(),
+            "order": conn.execute(text("SELECT count(*) FROM raw.t212_history_order")).scalar(),
+            "transaction": conn.execute(text("SELECT count(*) FROM raw.t212_history_transaction")).scalar(),
+            "cursor": conn.execute(text("SELECT count(*) FROM raw.t212_history_cursor")).scalar(),
         }
 
 
@@ -125,31 +117,20 @@ def test_full_pipeline_writes_rows_and_cursor_and_is_idempotent(
         # Partition for today must exist for at least the dividend parent.
         today_partition = f"raw.t212_history_dividend_{date.today().strftime('%Y_%m_%d')}"
         exists = conn.execute(
-            text(
-                "SELECT to_regclass(:name) IS NOT NULL AS exists"
-            ),
+            text("SELECT to_regclass(:name) IS NOT NULL AS exists"),
             {"name": today_partition},
         ).scalar()
         assert exists is True
 
         # JSONB round-trip preserves payload.
-        payload = conn.execute(
-            text(
-                "SELECT payload FROM raw.t212_history_dividend WHERE id = 'DIV-001'"
-            )
-        ).scalar()
+        payload = conn.execute(text("SELECT payload FROM raw.t212_history_dividend WHERE id = 'DIV-001'")).scalar()
         assert payload["ticker"] == "AAPL_US_EQ"
         assert payload["type"] == "ORDINARY"
 
         # Cursor populated with newest event timestamp per endpoint.
         cursor_rows = {
             row.endpoint: row
-            for row in conn.execute(
-                text(
-                    "SELECT endpoint, last_cursor, last_event_ts "
-                    "FROM raw.t212_history_cursor"
-                )
-            )
+            for row in conn.execute(text("SELECT endpoint, last_cursor, last_event_ts FROM raw.t212_history_cursor"))
         }
         assert set(cursor_rows) == {"dividends", "orders", "transactions"}
         assert cursor_rows["dividends"].last_event_ts is not None
@@ -164,9 +145,6 @@ def test_full_pipeline_writes_rows_and_cursor_and_is_idempotent(
 
     with engine.connect() as conn:
         cursor_after = conn.execute(
-            text(
-                "SELECT last_event_ts FROM raw.t212_history_cursor "
-                "WHERE endpoint = 'dividends'"
-            )
+            text("SELECT last_event_ts FROM raw.t212_history_cursor WHERE endpoint = 'dividends'")
         ).scalar()
     assert cursor_after == cursor_before, "cursor must not regress on re-run"

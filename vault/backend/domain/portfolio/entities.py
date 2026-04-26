@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .value_objects import Ticker, Currency, Broker
+from .value_objects import Broker, Currency, Ticker
 
 
 @dataclass

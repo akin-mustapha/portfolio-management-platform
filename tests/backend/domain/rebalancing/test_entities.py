@@ -1,11 +1,10 @@
 import pytest
-
-from v2.backend.domain.rebalancing.value_objects import (
-    WeightBand,
-    RebalanceThreshold,
-    PlanStatus,
-)
 from v2.backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from v2.backend.domain.rebalancing.value_objects import (
+    PlanStatus,
+    RebalanceThreshold,
+    WeightBand,
+)
 
 
 class TestRebalanceConfigToRecord:

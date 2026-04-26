@@ -6,25 +6,25 @@ JSONB observation to a scalar row, validates against FredObservationRecord,
 and upserts to staging.fred_observation.
 """
 
-import os
 import logging
+import os
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
-from dotenv import load_dotenv
 
-from pipeline.etl.policies import BaseSilverPipeline
-from pipeline.etl.protocols import Source, Transformation, Destination
-from pipeline.etl.validators.schema_validator import SchemaValidator
+from dotenv import load_dotenv
+from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
+
 from pipeline.domain.schemas.silver.fred_observation import FredObservationRecord
-from pipeline.infrastructure.repositories.repository_factory import RepositoryFactory
+from pipeline.etl.policies import BaseSilverPipeline
+from pipeline.etl.protocols import Destination, Source, Transformation
+from pipeline.etl.validators.schema_validator import SchemaValidator
 from pipeline.infrastructure.repositories.dead_letter_destination import (
     DeadLetterDestination,
 )
-
-from shared.database.client import SQLModelClient
-from shared.database.query_loader import load_query
+from pipeline.infrastructure.repositories.repository_factory import RepositoryFactory
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,9 +84,7 @@ class FredObservationTransformation(Transformation):
 
 class FredObservationDestination(Destination):
     def __init__(self):
-        self._repository = RepositoryFactory.get(
-            "fred_observation", schema_name="staging"
-        )
+        self._repository = RepositoryFactory.get("fred_observation", schema_name="staging")
 
     def load(self, data: list[dict]) -> None:
         self._repository.upsert(records=data, unique_key=["business_key"])

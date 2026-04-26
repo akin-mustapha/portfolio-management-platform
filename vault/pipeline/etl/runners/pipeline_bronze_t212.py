@@ -2,20 +2,18 @@
 Bronze Pipeline for Trading212
 """
 
-import os
-import logging
 import asyncio
+import logging
+import os
 import time
-from typing import Dict, Any
+from typing import Any
+
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
-from pipeline.etl.protocols import Source
-from pipeline.etl.policies import Pipeline
-from pipeline.etl.protocols import Destination
-
 from pipeline.etl.loaders.loader_bronze_t212 import FullLoaderPostgresT212
-
+from pipeline.etl.policies import Pipeline
+from pipeline.etl.protocols import Destination, Source
 from pipeline.infrastructure.clients.api_client_trading212 import Trading212APIClient
 from pipeline.infrastructure.factories.schema import Schema
 
@@ -46,12 +44,9 @@ class Trading212BronzeSource(Source):
         }
         self._api_token = API_TOKEN
         self._secret_token = SECRET_TOKEN
-        self._api_client = Trading212APIClient(
-            self._url, self._api_token, self._secret_token
-        )
+        self._api_client = Trading212APIClient(self._url, self._api_token, self._secret_token)
 
     def extract(self):
-
         data = {}
         for key, value in self._endpoint.items():
             try:
@@ -82,7 +77,7 @@ class PipelineT212Bronze(Pipeline):
 
     def run(self):
         try:
-            data: Dict = self._source.extract()
+            data: dict = self._source.extract()
             self._validate_structure(data)
             self._destination.load(data)
             return None
@@ -94,17 +89,13 @@ class PipelineT212Bronze(Pipeline):
         try:
             Schema.get("account_data")(**data["account_data"])
         except ValidationError as e:
-            raise ValueError(
-                f"account_data API response failed structural validation: {e}"
-            )
+            raise ValueError(f"account_data API response failed structural validation: {e}")
 
         try:
             for record in data["position_data"]:
                 Schema.get("position_data")(**record)
         except ValidationError as e:
-            raise ValueError(
-                f"position_data API response failed structural validation: {e}"
-            )
+            raise ValueError(f"position_data API response failed structural validation: {e}")
 
 
 if __name__ == "__main__":

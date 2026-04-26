@@ -1,10 +1,9 @@
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 from budget import MonthlyBudget
-from config import Asset, Tranche, ASSETS
-from db import get_drawdown, get_cash_available
+from config import ASSETS, Asset, Tranche
+from db import get_cash_available, get_drawdown
 from t212_client import T212Client
 
 log = logging.getLogger(__name__)
@@ -46,7 +45,7 @@ def _deepest_untriggered(
     drawdown_pct: float,
     tranches: tuple[Tranche, ...],
     state: TrancheState,
-) -> Optional[Tranche]:
+) -> Tranche | None:
     """Return the highest-threshold tranche that is breached and not yet triggered.
 
     Args:
@@ -59,8 +58,7 @@ def _deepest_untriggered(
         The deepest eligible Tranche, or None if no tranche should fire.
     """
     candidates = [
-        t for t in tranches
-        if drawdown_pct >= t.drawdown_pct and not state.is_triggered(ticker, t.drawdown_pct)
+        t for t in tranches if drawdown_pct >= t.drawdown_pct and not state.is_triggered(ticker, t.drawdown_pct)
     ]
     return max(candidates, key=lambda t: t.drawdown_pct) if candidates else None
 
@@ -89,8 +87,12 @@ def run_check(
     tickers = [a.ticker for a in ASSETS]
     drawdowns = get_drawdown(conn, tickers)
     cash = get_cash_available(conn)
-    log.info("Cash available: £%.2f | Monthly remaining: £%.2f / £%.2f",
-             cash, budget.remaining, budget.limit)
+    log.info(
+        "Cash available: £%.2f | Monthly remaining: £%.2f / £%.2f",
+        cash,
+        budget.remaining,
+        budget.limit,
+    )
 
     asset_map: dict[str, Asset] = {a.ticker: a for a in ASSETS}
 
@@ -105,27 +107,37 @@ def run_check(
 
         tranche = _deepest_untriggered(ticker, drawdown_pct, asset.tranches, state)
         if tranche is None:
-            log.info("ticker=%s | drawdown=%.2f%% | no tranche triggered", ticker, drawdown_pct)
+            log.info(
+                "ticker=%s | drawdown=%.2f%% | no tranche triggered",
+                ticker,
+                drawdown_pct,
+            )
             continue
 
         if cash < tranche.order_value:
             log.warning(
                 "SKIP | ticker=%s | reason=insufficient cash | available=£%.2f | required=£%.2f",
-                ticker, cash, tranche.order_value,
+                ticker,
+                cash,
+                tranche.order_value,
             )
             continue
 
         if not budget.can_spend(tranche.order_value):
             log.warning(
                 "SKIP | ticker=%s | reason=monthly limit reached | remaining=£%.2f | required=£%.2f",
-                ticker, budget.remaining, tranche.order_value,
+                ticker,
+                budget.remaining,
+                tranche.order_value,
             )
             continue
 
         if dry_run:
             log.info(
                 "DRY RUN | ticker=%s | drawdown=%.2f%% | tranche=£%.2f",
-                ticker, drawdown_pct, tranche.order_value,
+                ticker,
+                drawdown_pct,
+                tranche.order_value,
             )
             state.mark_triggered(ticker, tranche.drawdown_pct)
             continue
@@ -134,7 +146,10 @@ def run_check(
             response = client.place_market_order(ticker, tranche.order_value)
             log.info(
                 "ORDER PLACED | ticker=%s | drawdown=%.2f%% | tranche=£%.2f | response=%s",
-                ticker, drawdown_pct, tranche.order_value, response,
+                ticker,
+                drawdown_pct,
+                tranche.order_value,
+                response,
             )
             state.mark_triggered(ticker, tranche.drawdown_pct)
             budget.record(tranche.order_value)

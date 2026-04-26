@@ -18,12 +18,7 @@ def _default(obj):
 def _normalize_keys(obj):
     """Recursively convert non-string dict keys (e.g. date) to strings."""
     if isinstance(obj, dict):
-        return {
-            (k.isoformat() if isinstance(k, (date, datetime)) else k): _normalize_keys(
-                v
-            )
-            for k, v in obj.items()
-        }
+        return {(k.isoformat() if isinstance(k, (date, datetime)) else k): _normalize_keys(v) for k, v in obj.items()}
     if isinstance(obj, list):
         return [_normalize_keys(i) for i in obj]
     return obj

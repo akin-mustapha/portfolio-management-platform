@@ -1,18 +1,11 @@
 import logging
 from dataclasses import replace
-from pipeline.etl.policies import Origin
-from pipeline.etl.policies import EventDestination
-from pipeline.etl.policies import EventProducer
+
 from pipeline.domain import Event
+from pipeline.etl.policies import EventDestination, EventProducer, Origin
 
 logging.basicConfig(
-    level="INFO",
-    filemode="w",
-    file_name="trading212_event_producer.log",
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logging.basicConfig(
-    level="DEBUG",
+    level=logging.DEBUG,
     filemode="w",
     filename="trading212_event_producer.log",
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -45,9 +38,7 @@ class Trading212EventProducer(EventProducer):
             logging.info("Fetching data from origin")
             event: Event = self._origin.fetch()
             logging.info("Data fetched from origin")
-            logging.info(
-                f"Sending event to destination: {dict(replace(event, payload='xxxx'))}"
-            )
+            logging.info(f"Sending event to destination: {dict(replace(event, payload='xxxx'))}")
             # Save to Destination
             self._destination.send(event)
             logging.info("Event sent to destination")

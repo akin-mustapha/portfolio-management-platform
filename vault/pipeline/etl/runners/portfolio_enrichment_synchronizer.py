@@ -1,9 +1,10 @@
+import logging
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
-import logging
 
 load_dotenv()
 
@@ -20,18 +21,14 @@ logging.basicConfig(
 
 
 def _run_sync(query_file: str, target: str, source: str) -> None:
-    sql = load_query(_QUERIES_DIR / "portfolio" / query_file).format(
-        target=target, source=source
-    )
-    with SQLModelClient(database_url=DATABASE_URL) as client:
+    sql = load_query(_QUERIES_DIR / "portfolio" / query_file).format(target=target, source=source)
+    with SQLModelClient(database_url=DATABASE_URL or "") as client:
         client.execute(sql)
 
 
 # Todo - dry up the individual synchronizer functions by passing in the query file, target and source as parameters. This will make it easier to add new synchronizers in the future without having to write a new function for each one.
 def sychronize_industry():
-    _run_sync(
-        "sync_industry.sql", target="staging.industry", source="portfolio.industry"
-    )
+    _run_sync("sync_industry.sql", target="staging.industry", source="portfolio.industry")
 
 
 def sychronize_sector():
@@ -43,15 +40,11 @@ def sychronize_tag():
 
 
 def sychronize_category():
-    _run_sync(
-        "sync_category.sql", target="staging.category", source="portfolio.category"
-    )
+    _run_sync("sync_category.sql", target="staging.category", source="portfolio.category")
 
 
 def sychronize_asset_tag():
-    _run_sync(
-        "sync_asset_tag.sql", target="staging.asset_tag", source="portfolio.asset_tag"
-    )
+    _run_sync("sync_asset_tag.sql", target="staging.asset_tag", source="portfolio.asset_tag")
 
 
 def enrichment_sychronization():

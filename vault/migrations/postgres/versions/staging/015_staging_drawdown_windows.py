@@ -17,15 +17,15 @@ Revision ID: 2200000000b15
 Revises: 2200000000b14
 Create Date: 2026-04-24
 """
-from typing import Sequence, Union
+
+from collections.abc import Sequence
 
 from alembic import op
 
-
 revision: str = "2200000000b15"
-down_revision: Union[str, Sequence[str], None] = "2200000000b14"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "2200000000b14"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 _V_ASSET_METRICS_V2 = """

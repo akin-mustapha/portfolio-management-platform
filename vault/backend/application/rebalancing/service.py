@@ -1,13 +1,13 @@
 import smtplib
+
 from dotenv import load_dotenv
-
-from shared.utils.custom_logger import customer_logger
 from shared.notifications.email import EmailClient
+from shared.utils.custom_logger import customer_logger
 
-from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
-from backend.domain.rebalancing.plan_generator import generate_plan
 from backend.application.rebalancing.ports import RebalanceConfigPort, RebalancePlanPort
+from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from backend.domain.rebalancing.plan_generator import generate_plan
+from backend.domain.rebalancing.value_objects import RebalanceThreshold, WeightBand
 
 load_dotenv()
 
@@ -33,9 +33,7 @@ class RebalancingService:
                     min=float(r["min_weight_pct"]),
                     max=float(r["max_weight_pct"]),
                 ),
-                rebalance_threshold=RebalanceThreshold(
-                    float(r["rebalance_threshold_pct"])
-                ),
+                rebalance_threshold=RebalanceThreshold(float(r["rebalance_threshold_pct"])),
                 correction_days=int(r["correction_days"]),
                 is_active=bool(r["is_active"]),
             )
@@ -83,14 +81,11 @@ class RebalancingService:
     def upsert_config(self, config: RebalanceConfig) -> None:
         """Create or update a rebalance config for an asset (upsert on asset_id)."""
         try:
-            self._config_repo.upsert(
-                records=[config.to_record()], unique_key=["asset_id"]
-            )
+            self._config_repo.upsert(records=[config.to_record()], unique_key=["asset_id"])
             logging.info(f"Upserted rebalance config for asset_id={config.asset_id}")
         except Exception as e:
             logging.error(f"Error upserting rebalance config: {e}")
             raise
-
 
 
 def _format_plan_email(plan: RebalancePlan) -> str:

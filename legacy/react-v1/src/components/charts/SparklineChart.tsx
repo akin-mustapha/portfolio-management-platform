@@ -1,38 +1,38 @@
-import { useId, useMemo } from 'react'
-import { useTheme } from '@mui/material'
-import { AreaChart, Area, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { useId, useMemo } from "react";
+import { useTheme } from "@mui/material";
+import { AreaChart, Area, ResponsiveContainer, ReferenceLine } from "recharts";
 
 interface SparklineChartProps {
-  values?: (number | null)[]
+  values?: (number | null)[];
   /** 'positive' | 'negative' | 'neutral' drives line color; defaults to neutral */
-  sentiment?: 'positive' | 'negative' | 'neutral'
-  height?: number
+  sentiment?: "positive" | "negative" | "neutral";
+  height?: number;
   /** Render a subtle gradient fill under the line */
-  fill?: boolean
+  fill?: boolean;
 }
 
 export default function SparklineChart({
   values,
-  sentiment = 'neutral',
+  sentiment = "neutral",
   height = 36,
   fill = false,
 }: SparklineChartProps) {
-  const theme = useTheme()
-  const rawId = useId()
-  const gradId = useMemo(() => rawId.replace(/[^a-zA-Z0-9]/g, ''), [rawId])
+  const theme = useTheme();
+  const rawId = useId();
+  const gradId = useMemo(() => rawId.replace(/[^a-zA-Z0-9]/g, ""), [rawId]);
   const data = useMemo(
     () => (values ?? []).map((v, i) => ({ i, v })),
     [values],
-  )
+  );
 
-  if (!values?.length) return null
+  if (!values?.length) return null;
 
   const color =
-    sentiment === 'positive'
+    sentiment === "positive"
       ? theme.palette.success.main
-      : sentiment === 'negative'
+      : sentiment === "negative"
         ? theme.palette.error.main
-        : theme.palette.text.secondary
+        : theme.palette.text.secondary;
 
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -45,13 +45,17 @@ export default function SparklineChart({
             </linearGradient>
           </defs>
         )}
-        <ReferenceLine y={0} stroke={theme.palette.divider} strokeDasharray="2 2" />
+        <ReferenceLine
+          y={0}
+          stroke={theme.palette.divider}
+          strokeDasharray="2 2"
+        />
         <Area
           type="monotone"
           dataKey="v"
           stroke={color}
           strokeWidth={2}
-          fill={fill ? `url(#spark-${gradId})` : 'transparent'}
+          fill={fill ? `url(#spark-${gradId})` : "transparent"}
           dot={false}
           activeDot={false}
           isAnimationActive={true}
@@ -59,5 +63,5 @@ export default function SparklineChart({
         />
       </AreaChart>
     </ResponsiveContainer>
-  )
+  );
 }

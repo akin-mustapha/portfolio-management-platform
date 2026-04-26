@@ -7,7 +7,9 @@ def _kpi_badge(label, value_str, unit="", change_sign=0):
     change_class = (
         "kpi-change-positive"
         if change_sign > 0
-        else "kpi-change-negative" if change_sign < 0 else "kpi-change-neutral"
+        else "kpi-change-negative"
+        if change_sign < 0
+        else "kpi-change-neutral"
     )
     return html.Div(
         [

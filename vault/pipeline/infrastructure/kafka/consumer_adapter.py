@@ -1,9 +1,11 @@
+import json
 import logging
+
 from confluent_kafka import Consumer
+
 from pipeline.etl.events.trading212_asset_consumer import (
     Trading212AssetConsumer,
 )
-import json
 
 logging.basicConfig(level="INFO")
 

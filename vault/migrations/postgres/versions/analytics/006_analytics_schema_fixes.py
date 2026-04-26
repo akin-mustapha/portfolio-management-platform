@@ -20,17 +20,17 @@ Revises: 3300000000c5
 Create Date: 2026-03-20
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
-
 revision: str = "3300000000c6"
-down_revision: Union[str, Sequence[str], None] = "3300000000c5"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "3300000000c5"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -114,21 +114,36 @@ def upgrade() -> None:
     op.drop_column("dim_asset_type", "created_datetime", schema="analytics")
     op.add_column(
         "dim_asset_type",
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         schema="analytics",
     )
 
     op.drop_column("dim_industry", "created_datetime", schema="analytics")
     op.add_column(
         "dim_industry",
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         schema="analytics",
     )
 
     op.drop_column("dim_sector", "created_datetime", schema="analytics")
     op.add_column(
         "dim_sector",
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         schema="analytics",
     )
 
@@ -148,16 +163,56 @@ def upgrade() -> None:
     # open_price, close_price, high, low removed.
     op.create_table(
         "fact_price",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", sa.Integer, sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=True),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=True),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=True),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            sa.Integer,
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=True,
+        ),
         sa.Column("price", sa.Numeric, nullable=False),
         sa.Column("avg_price", sa.Numeric, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("date_id", "asset_id", name="uq_fact_price_date_asset"),
         schema="analytics",
@@ -168,21 +223,61 @@ def upgrade() -> None:
     # Portfolio tab can rank positions and sum FX impact without joins.
     op.create_table(
         "fact_valuation",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", sa.Integer, sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=True),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=True),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=True),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            sa.Integer,
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=True,
+        ),
         sa.Column("value", sa.Numeric, nullable=False),
         sa.Column("cost_basis", sa.Numeric, nullable=False),
         sa.Column("unrealized_pnl", sa.Numeric, nullable=False),
-        sa.Column("unrealized_pnl_pct", sa.Numeric, nullable=True),    # null-safe: cost_basis could be 0
+        sa.Column("unrealized_pnl_pct", sa.Numeric, nullable=True),  # null-safe: cost_basis could be 0
         sa.Column("realized_pnl", sa.Numeric, nullable=True),
-        sa.Column("position_weight_pct", sa.Numeric, nullable=True),   # value / portfolio total_value
+        sa.Column("position_weight_pct", sa.Numeric, nullable=True),  # value / portfolio total_value
         sa.Column("fx_impact", sa.Numeric, nullable=True),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("date_id", "asset_id", name="uq_fact_valuation_date_asset"),
         schema="analytics",
@@ -192,16 +287,56 @@ def upgrade() -> None:
     # "return" renamed to daily_return — Python reserved keyword.
     op.create_table(
         "fact_return",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", sa.Integer, sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=True),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=True),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=True),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            sa.Integer,
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=True,
+        ),
         sa.Column("daily_return", sa.Numeric, nullable=True),
         sa.Column("cumulative_return", sa.Numeric, nullable=True),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("date_id", "asset_id", name="uq_fact_return_date_asset"),
         schema="analytics",
@@ -212,25 +347,65 @@ def upgrade() -> None:
     # can be served from this table alone.
     op.create_table(
         "fact_technical",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", sa.Integer, sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=True),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=True),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=True),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            sa.Integer,
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=True,
+        ),
         sa.Column("pct_drawdown", sa.Numeric, nullable=True),
-        sa.Column("value_high", sa.Numeric, nullable=True),            # all-time high position value
-        sa.Column("value_low", sa.Numeric, nullable=True),             # all-time low position value
+        sa.Column("value_high", sa.Numeric, nullable=True),  # all-time high position value
+        sa.Column("value_low", sa.Numeric, nullable=True),  # all-time low position value
         sa.Column("ma_20d", sa.Numeric, nullable=True),
         sa.Column("ma_30d", sa.Numeric, nullable=True),
         sa.Column("ma_50d", sa.Numeric, nullable=True),
         sa.Column("volatility_20d", sa.Numeric, nullable=True),
         sa.Column("volatility_30d", sa.Numeric, nullable=True),
         sa.Column("volatility_50d", sa.Numeric, nullable=True),
-        sa.Column("var_95_1d", sa.Numeric, nullable=True),             # volatility_30d * value * 1.65
-        sa.Column("profit_range_30d", sa.Numeric, nullable=True),      # recent_profit_high_30d - recent_profit_low_30d
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("var_95_1d", sa.Numeric, nullable=True),  # volatility_30d * value * 1.65
+        sa.Column("profit_range_30d", sa.Numeric, nullable=True),  # recent_profit_high_30d - recent_profit_low_30d
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("date_id", "asset_id", name="uq_fact_technical_date_asset"),
         schema="analytics",
@@ -240,18 +415,58 @@ def upgrade() -> None:
     # Entry/opportunity signals per position. Drives the Opportunities tab.
     op.create_table(
         "fact_signal",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", sa.Integer, sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=True),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=True),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=True),
-        sa.Column("dca_bias", sa.Numeric, nullable=True),              # price / avg_price; <1 = below avg cost
-        sa.Column("ma_crossover_signal", sa.Numeric, nullable=True),   # ma_20d - ma_50d; positive = bullish
-        sa.Column("price_above_ma_20d", sa.Boolean, nullable=True),    # price > ma_20d
-        sa.Column("price_above_ma_50d", sa.Boolean, nullable=True),    # price > ma_50d
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            sa.Integer,
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=True,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=True,
+        ),
+        sa.Column("dca_bias", sa.Numeric, nullable=True),  # price / avg_price; <1 = below avg cost
+        sa.Column("ma_crossover_signal", sa.Numeric, nullable=True),  # ma_20d - ma_50d; positive = bullish
+        sa.Column("price_above_ma_20d", sa.Boolean, nullable=True),  # price > ma_20d
+        sa.Column("price_above_ma_50d", sa.Boolean, nullable=True),  # price > ma_50d
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("date_id", "asset_id", name="uq_fact_signal_date_asset"),
         schema="analytics",
@@ -263,23 +478,43 @@ def upgrade() -> None:
     # No asset_id dimension — this is account-level, not position-level.
     op.create_table(
         "fact_portfolio_daily",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", sa.Integer, sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            sa.Integer,
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
         sa.Column("total_value", sa.Numeric, nullable=False),
         sa.Column("total_cost", sa.Numeric, nullable=False),
         sa.Column("unrealized_pnl", sa.Numeric, nullable=False),
         sa.Column("unrealized_pnl_pct", sa.Numeric, nullable=True),
         sa.Column("realized_pnl", sa.Numeric, nullable=True),
-        sa.Column("daily_change_abs", sa.Numeric, nullable=True),      # total_value(T) - total_value(T-1)
-        sa.Column("daily_change_pct", sa.Numeric, nullable=True),      # daily_change_abs / total_value(T-1)
+        sa.Column("daily_change_abs", sa.Numeric, nullable=True),  # total_value(T) - total_value(T-1)
+        sa.Column("daily_change_pct", sa.Numeric, nullable=True),  # daily_change_abs / total_value(T-1)
         sa.Column("cash_available", sa.Numeric, nullable=True),
         sa.Column("cash_reserved", sa.Numeric, nullable=True),
         sa.Column("cash_in_pies", sa.Numeric, nullable=True),
-        sa.Column("cash_deployment_ratio", sa.Numeric, nullable=True), # (total_value - cash_available) / total_value
-        sa.Column("fx_impact_total", sa.Numeric, nullable=True),       # SUM(fx_impact) across all positions
+        sa.Column("cash_deployment_ratio", sa.Numeric, nullable=True),  # (total_value - cash_available) / total_value
+        sa.Column("fx_impact_total", sa.Numeric, nullable=True),  # SUM(fx_impact) across all positions
         sa.Column("portfolio_volatility_weighted", sa.Numeric, nullable=True),  # Σ(weight_i * volatility_30d_i)
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("date_id", "portfolio_id", name="uq_fact_portfolio_daily_date_portfolio"),
         schema="analytics",
@@ -298,9 +533,7 @@ def downgrade() -> None:
     op.execute("TRUNCATE analytics.dim_date")
     op.execute("ALTER TABLE analytics.dim_date DROP CONSTRAINT dim_date_pkey")
     op.execute("ALTER TABLE analytics.dim_date DROP COLUMN id")
-    op.execute(
-        "ALTER TABLE analytics.dim_date ADD COLUMN id UUID DEFAULT gen_random_uuid()"
-    )
+    op.execute("ALTER TABLE analytics.dim_date ADD COLUMN id UUID DEFAULT gen_random_uuid()")
     op.execute("ALTER TABLE analytics.dim_date ADD PRIMARY KEY (id)")
     op.execute("""
         INSERT INTO analytics.dim_date (
@@ -328,12 +561,22 @@ def downgrade() -> None:
     # Restore dim_time
     op.create_table(
         "dim_time",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
         sa.Column("time", sa.Time, nullable=False, unique=True),
         sa.Column("hour", sa.Integer, nullable=False),
         sa.Column("minute", sa.Integer, nullable=False),
         sa.Column("second", sa.Integer, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True), nullable=True),
         schema="analytics",
     )
@@ -344,61 +587,196 @@ def downgrade() -> None:
     """)
 
     # Restore dimension duplicate columns
-    op.add_column("dim_portfolio", sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True), schema="analytics")
-    op.add_column("dim_tag", sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True), schema="analytics")
+    op.add_column(
+        "dim_portfolio",
+        sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True),
+        schema="analytics",
+    )
+    op.add_column(
+        "dim_tag",
+        sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True),
+        schema="analytics",
+    )
 
     op.drop_column("dim_asset_type", "created_timestamp", schema="analytics")
-    op.add_column("dim_asset_type", sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True), schema="analytics")
+    op.add_column(
+        "dim_asset_type",
+        sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True),
+        schema="analytics",
+    )
 
     op.drop_column("dim_industry", "created_timestamp", schema="analytics")
-    op.add_column("dim_industry", sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True), schema="analytics")
+    op.add_column(
+        "dim_industry",
+        sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True),
+        schema="analytics",
+    )
 
     op.drop_column("dim_sector", "created_timestamp", schema="analytics")
-    op.add_column("dim_sector", sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True), schema="analytics")
+    op.add_column(
+        "dim_sector",
+        sa.Column("created_datetime", sa.DateTime(timezone=True), nullable=True),
+        schema="analytics",
+    )
 
     # Restore original fact tables (pre-fix state, including fact_cashflow which 006 upgrade dropped)
     op.create_table(
         "fact_cashflow",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False,
+        ),
         sa.Column("cashflow", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics",
     )
     op.create_table(
         "fact_price",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False,
+        ),
         sa.Column("price", sa.Float, nullable=False),
         sa.Column("average_price", sa.Float, nullable=False),
         sa.Column("open_price", sa.Float, nullable=False),
         sa.Column("close_price", sa.Float, nullable=False),
         sa.Column("high", sa.Float, nullable=False),
         sa.Column("low", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics",
     )
     op.create_table(
         "fact_technical",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False,
+        ),
         sa.Column("pct_drawdown", sa.Float, nullable=False),
         sa.Column("ma_20d", sa.Float, nullable=False),
         sa.Column("ma_30d", sa.Float, nullable=False),
@@ -406,51 +784,176 @@ def downgrade() -> None:
         sa.Column("volatility_20d", sa.Float, nullable=False),
         sa.Column("volatility_30d", sa.Float, nullable=False),
         sa.Column("volatility_50d", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics",
     )
     op.create_table(
         "fact_signal",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False,
+        ),
         sa.Column("dca_bias", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics",
     )
     op.create_table(
         "fact_valuation",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False,
+        ),
         sa.Column("value", sa.Float, nullable=False),
         sa.Column("unrealized_pnl", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics",
     )
     op.create_table(
         "fact_return",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("date_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_date.id"), nullable=False),
-        sa.Column("asset_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset.asset_id"), nullable=False),
-        sa.Column("portfolio_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_portfolio.id"), nullable=False),
-        sa.Column("sector_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_sector.id"), nullable=False),
-        sa.Column("tag_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_tag.id"), nullable=False),
-        sa.Column("asset_type_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("analytics.dim_asset_type.id"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            primary_key=True,
+            server_default=sa.text("gen_random_uuid()"),
+        ),
+        sa.Column(
+            "date_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_date.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset.asset_id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "portfolio_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_portfolio.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "sector_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_sector.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "tag_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_tag.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "asset_type_id",
+            postgresql.UUID(as_uuid=True),
+            sa.ForeignKey("analytics.dim_asset_type.id"),
+            nullable=False,
+        ),
         sa.Column("return", sa.Float, nullable=False),
         sa.Column("cumulative_return", sa.Float, nullable=False),
-        sa.Column("created_timestamp", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column(
+            "created_timestamp",
+            sa.DateTime(timezone=True),
+            server_default=sa.func.now(),
+            nullable=False,
+        ),
         sa.Column("updated_timestamp", sa.DateTime(timezone=True)),
         schema="analytics",
     )

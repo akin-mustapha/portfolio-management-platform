@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Query
 from legacy.dashboard.controllers.asset_controller import AssetController
-from legacy.dashboard.infrastructure.repositories.repository_factory import RepositoryFactory
+from legacy.dashboard.infrastructure.repositories.repository_factory import (
+    RepositoryFactory,
+)
 from api.serialization import date_response
 import datetime
 
@@ -17,7 +19,7 @@ def _default_date_range():
 
 @router.get("/assets")
 def get_assets(
-    tags: str = Query(None, description="Comma-separated tag names to filter")
+    tags: str = Query(None, description="Comma-separated tag names to filter"),
 ):
     """
     Most recent asset data row per ticker, with price_series and tags attached.
@@ -73,7 +75,9 @@ def get_asset_profile(ticker: str):
     if asset_row is None:
         return date_response({"error": f"Asset '{ticker}' not found"})
 
-    from legacy.dashboard.controllers.asset_profile_controller import AssetProfileController
+    from legacy.dashboard.controllers.asset_profile_controller import (
+        AssetProfileController,
+    )
 
     profile = AssetProfileController().get_profile(asset_row)
     return date_response(profile)

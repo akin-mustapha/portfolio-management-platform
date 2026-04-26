@@ -6,8 +6,8 @@ All cases can be driven by constructing domain objects directly.
 from datetime import date, timedelta
 
 from v2.backend.domain.rebalancing.entities import RebalanceConfig
-from v2.backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
 from v2.backend.domain.rebalancing.plan_generator import generate_plan
+from v2.backend.domain.rebalancing.value_objects import RebalanceThreshold, WeightBand
 
 
 def _config(
@@ -21,9 +21,7 @@ def _config(
         id=None,
         asset_id="asset-1",
         ticker=ticker,
-        weight_band=WeightBand(
-            target=target, min=max(0.0, target - 10), max=min(100.0, target + 10)
-        ),
+        weight_band=WeightBand(target=target, min=max(0.0, target - 10), max=min(100.0, target + 10)),
         rebalance_threshold=RebalanceThreshold(threshold),
         correction_days=correction_days,
         is_active=is_active,

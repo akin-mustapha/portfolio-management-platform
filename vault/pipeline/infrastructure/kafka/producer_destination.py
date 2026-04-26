@@ -1,11 +1,11 @@
-import os
-from dotenv import load_dotenv
 import json
+import os
+
+from confluent_kafka import Producer
+from dotenv import load_dotenv
 
 from pipeline.domain import Event
 from pipeline.etl.policies import EventDestination
-
-from confluent_kafka import Producer
 
 load_dotenv()
 

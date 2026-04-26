@@ -3,12 +3,12 @@ RebalancingService unit tests — all repository calls are mocked.
 No database connection is required.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
 
-from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
-from backend.domain.rebalancing.value_objects import WeightBand, RebalanceThreshold
+import pytest
 from backend.application.rebalancing.service import RebalancingService
+from backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+from backend.domain.rebalancing.value_objects import RebalanceThreshold, WeightBand
 
 _RAW_CONFIG_ROW = {
     "id": "cfg-1",
@@ -71,9 +71,7 @@ class TestLoadConfigs:
 class TestGenerateAndSavePlan:
     def test_happy_path_saves_and_returns_plan(self, service, mock_config_repo, mock_plan_repo):
         mock_config_repo.select_all_active_with_ticker.return_value = [_RAW_CONFIG_ROW]
-        mock_plan_repo.load_current_weights.return_value = {
-            "AAPL": 20.0
-        }  # drift = 10 > threshold 2
+        mock_plan_repo.load_current_weights.return_value = {"AAPL": 20.0}  # drift = 10 > threshold 2
         mock_plan_repo.get_latest.return_value = {"id": "plan-1"}
 
         with patch("backend.application.rebalancing.service.EmailClient") as MockEmail:
@@ -93,9 +91,7 @@ class TestGenerateAndSavePlan:
 
     def test_returns_none_when_all_within_threshold(self, service, mock_config_repo, mock_plan_repo):
         mock_config_repo.select_all_active_with_ticker.return_value = [_RAW_CONFIG_ROW]
-        mock_plan_repo.load_current_weights.return_value = {
-            "AAPL": 10.5
-        }  # drift 0.5 < threshold 2.0
+        mock_plan_repo.load_current_weights.return_value = {"AAPL": 10.5}  # drift 0.5 < threshold 2.0
 
         result = service.generate_and_save_plan()
 
@@ -110,9 +106,7 @@ class TestGenerateAndSavePlan:
         mock_plan_repo.get_latest.return_value = {"id": "plan-1"}
 
         with patch("backend.application.rebalancing.service.EmailClient") as MockEmail:
-            MockEmail.return_value.send.side_effect = smtplib.SMTPException(
-                "SMTP error"
-            )
+            MockEmail.return_value.send.side_effect = smtplib.SMTPException("SMTP error")
             result = service.generate_and_save_plan()
 
         # Plan must be saved even when email fails
@@ -165,9 +159,7 @@ class TestUpsertConfig:
         )
         service.upsert_config(config)
 
-        mock_config_repo.upsert.assert_called_once_with(
-            records=[config.to_record()], unique_key=["asset_id"]
-        )
+        mock_config_repo.upsert.assert_called_once_with(records=[config.to_record()], unique_key=["asset_id"])
 
     def test_raises_when_repo_raises(self, service, mock_config_repo):
         mock_config_repo.upsert.side_effect = RuntimeError("DB write error")

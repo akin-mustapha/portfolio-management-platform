@@ -1,11 +1,13 @@
 import pandas as pd
+
 # from src.shared.database.client import SQLModelClient
 # from src.infra.repositories.query_repository import SnapshotSQLQueryRepository
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_URL = 'data/csv'
+BASE_URL = "data/csv"
+
 
 class LocalPortfolioService:
     def __init__(self):

@@ -6,16 +6,17 @@ Sync asset list from silver asset store to OLTP portfolio asset table
 Source -> Destination (no transformation)
 """
 
-import os
 import logging
-from dataclasses import dataclass, asdict
+import os
+from dataclasses import asdict, dataclass
 from pathlib import Path
+
 from dotenv import load_dotenv
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
 
-from pipeline.etl.protocols import Source, Destination
 from pipeline.etl.policies import Pipeline
+from pipeline.etl.protocols import Destination, Source
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,37 +42,38 @@ class Asset:
 
 class AssetPortfolioSource(Source):
     def __init__(self):
-        self._sql = load_query(
-            _QUERIES_DIR / "portfolio" / "asset_portfolio_source.sql"
-        )
+        self._sql = load_query(_QUERIES_DIR / "portfolio" / "asset_portfolio_source.sql")
 
     def extract(self) -> list:
-        with SQLModelClient(DATABASE_URL) as client:
+        with SQLModelClient(DATABASE_URL or "") as client:
             return client.execute(self._sql)
 
 
 class AssetPortfolioDestination(Destination):
     def __init__(self):
-        self._template = load_query(
-            _QUERIES_DIR / "portfolio" / "asset_portfolio_upsert.sql"
-        )
+        self._template = load_query(_QUERIES_DIR / "portfolio" / "asset_portfolio_upsert.sql")
 
     def load(self, data: list[dict]) -> None:
         # INSERTION POLICY: IDEMPOTENT
-        merge_value_mapping = ",".join([f"""(
-            '{r.get('ticker')}'
-          , '{r.get('name')}'
-          , '{r.get('broker')}'
-          , '{r.get('currency')}'
+        merge_value_mapping = ",".join(
+            [
+                f"""(
+            '{r.get("ticker")}'
+          , '{r.get("name")}'
+          , '{r.get("broker")}'
+          , '{r.get("currency")}'
           )
-        """ for r in data])
+        """
+                for r in data
+            ]
+        )
 
         asset_upsert_sql = self._template.format(
             destination_table_name="portfolio.asset",
             values=merge_value_mapping,
         )
 
-        with SQLModelClient(DATABASE_URL) as client:
+        with SQLModelClient(DATABASE_URL or "") as client:
             client.execute(asset_upsert_sql)
 
 

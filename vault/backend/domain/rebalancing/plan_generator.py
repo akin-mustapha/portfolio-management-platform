@@ -17,7 +17,7 @@ def generate_plan(
     Returns:
         RebalancePlan if any asset is outside its threshold, else None.
     """
-    actions = []
+    actions: list[dict] = []
 
     for config in configs:
         if not config.is_active:

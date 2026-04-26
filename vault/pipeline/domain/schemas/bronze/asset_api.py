@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
@@ -16,7 +15,7 @@ class AssetWalletImpact(BaseModel):
     totalCost: float
     currentValue: float
     unrealizedProfitLoss: float
-    fxImpact: Optional[float] = None
+    fxImpact: float | None = None
 
 
 class AssetAPIRecord(BaseModel):
@@ -33,5 +32,5 @@ class AssetAPIRecord(BaseModel):
     averagePricePaid: float
     walletImpact: AssetWalletImpact
     createdAt: str
-    quantityAvailableForTrading: Optional[float] = None
-    quantityInPies: Optional[float] = None
+    quantityAvailableForTrading: float | None = None
+    quantityInPies: float | None = None

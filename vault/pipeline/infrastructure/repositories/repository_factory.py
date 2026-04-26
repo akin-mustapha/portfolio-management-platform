@@ -1,6 +1,7 @@
 import os
-from typing import Dict
+
 from shared.repositories.interface import RepositoryInterface
+
 from .repository_postgres import PostgresRepository
 from .repository_sqlite import SQLiteRepository
 
@@ -15,7 +16,7 @@ class RepositoryFactory:
 
     @classmethod
     def get(
-        cls, entity_name: str, schema_name: str = None, field_map: Dict[str, str] = None
+        cls, entity_name: str, schema_name: str | None = None, field_map: dict[str, str] | None = None
     ) -> RepositoryInterface:
         repo_class = cls.registry.get(DATABASE_TYPE)
         if not repo_class:

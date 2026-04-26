@@ -2,8 +2,8 @@ import datetime
 
 from fastapi import APIRouter, Query
 
-from backend.application.portfolio.factory import build_portfolio_service
 from backend.api.serialization import date_response
+from backend.application.portfolio.factory import build_portfolio_service
 
 router = APIRouter(tags=["assets"])
 
@@ -18,7 +18,7 @@ def _default_date_range():
 
 @router.get("/assets")
 def get_assets(
-    tags: str = Query(None, description="Comma-separated tag names to filter")
+    tags: str = Query(None, description="Comma-separated tag names to filter"),
 ):
     """
     Most recent asset data row per ticker, with price_series and tags attached.

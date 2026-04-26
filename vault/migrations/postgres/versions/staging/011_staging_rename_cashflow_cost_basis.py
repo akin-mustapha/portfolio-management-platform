@@ -10,15 +10,15 @@ Revises: 2200000000b10
 Create Date: 2026-03-20
 
 """
-from typing import Sequence, Union
+
+from collections.abc import Sequence
 
 from alembic import op
 
-
-revision: str = '2200000000b11'
-down_revision: Union[str, Sequence[str], None] = '2200000000b10'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "2200000000b11"
+down_revision: str | Sequence[str] | None = "2200000000b10"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

@@ -1,25 +1,39 @@
-import { useMemo } from 'react'
-import { useTheme } from '@mui/material'
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
-import { useTooltipStyle } from '../../utils/chartUtils'
+import { useMemo } from "react";
+import { useTheme } from "@mui/material";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  ReferenceLine,
+} from "recharts";
+import { useTooltipStyle } from "../../utils/chartUtils";
 
 interface AssetReturnChartProps {
-  cumulativeSeries?: { dates: string[]; values: (number | null)[] }
+  cumulativeSeries?: { dates: string[]; values: (number | null)[] };
 }
 
-export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartProps) {
-  const theme = useTheme()
-  const tooltipStyle = useTooltipStyle()
+export default function AssetReturnChart({
+  cumulativeSeries,
+}: AssetReturnChartProps) {
+  const theme = useTheme();
+  const tooltipStyle = useTooltipStyle();
   const data = useMemo(
     () =>
       (cumulativeSeries?.dates ?? []).map((d, i) => ({
         date: d,
-        return: cumulativeSeries?.values[i] != null ? Number(cumulativeSeries.values[i]) * 100 : null,
+        return:
+          cumulativeSeries?.values[i] != null
+            ? Number(cumulativeSeries.values[i]) * 100
+            : null,
       })),
     [cumulativeSeries?.dates, cumulativeSeries?.values],
-  )
-  if (!cumulativeSeries?.dates?.length) return null
-  const color = theme.palette.primary.main
+  );
+  if (!cumulativeSeries?.dates?.length) return null;
+  const color = theme.palette.primary.main;
 
   return (
     <ResponsiveContainer width="100%" height={180}>
@@ -30,16 +44,42 @@ export default function AssetReturnChart({ cumulativeSeries }: AssetReturnChartP
             <stop offset="100%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} strokeOpacity={0.5} vertical={false} />
-        <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} axisLine={{ stroke: theme.palette.divider }} />
-        <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={50} unit="%" />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke={theme.palette.divider}
+          strokeOpacity={0.5}
+          vertical={false}
+        />
+        <XAxis
+          dataKey="date"
+          tick={{ fontSize: 10 }}
+          tickLine={false}
+          axisLine={{ stroke: theme.palette.divider }}
+        />
+        <YAxis
+          tick={{ fontSize: 10 }}
+          tickLine={false}
+          axisLine={false}
+          width={50}
+          unit="%"
+        />
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={(v: unknown) => [`${Number(v).toFixed(2)}%`, 'Cumulative Return']}
+          formatter={(v: unknown) => [
+            `${Number(v).toFixed(2)}%`,
+            "Cumulative Return",
+          ]}
         />
         <ReferenceLine y={0} stroke={theme.palette.divider} />
-        <Area type="monotone" dataKey="return" stroke={color} fill="url(#retGrad)" strokeWidth={2.25} dot={false} />
+        <Area
+          type="monotone"
+          dataKey="return"
+          stroke={color}
+          fill="url(#retGrad)"
+          strokeWidth={2.25}
+          dot={false}
+        />
       </AreaChart>
     </ResponsiveContainer>
-  )
+  );
 }

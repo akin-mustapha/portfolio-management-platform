@@ -18,7 +18,6 @@ class AssetPresenter:
         }
 
     def present_asset_history(self, data: dict) -> dict:
-
         return {
             "asset_price": self._asset_price_series_vm(data.get("asset_history", [])),
             "asset_value": self._asset_value_series_vm(data.get("asset_history", [])),

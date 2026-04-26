@@ -7,7 +7,7 @@ before any logic is exercised.
 
 class TestDomainPortfolioImports:
     def test_value_objects_importable(self):
-        from v2.backend.domain.portfolio.value_objects import Ticker, Currency, Broker
+        from v2.backend.domain.portfolio.value_objects import Broker, Currency, Ticker
 
         assert Ticker
         assert Currency
@@ -16,11 +16,11 @@ class TestDomainPortfolioImports:
     def test_entities_importable(self):
         from v2.backend.domain.portfolio.entities import (
             Asset,
-            Tag,
-            Category,
             AssetTag,
+            Category,
             Industry,
             Sector,
+            Tag,
         )
 
         assert Asset
@@ -39,9 +39,9 @@ class TestDomainPortfolioImports:
 class TestDomainRebalancingImports:
     def test_value_objects_importable(self):
         from v2.backend.domain.rebalancing.value_objects import (
-            WeightBand,
-            RebalanceThreshold,
             PlanStatus,
+            RebalanceThreshold,
+            WeightBand,
         )
 
         assert WeightBand
@@ -49,7 +49,10 @@ class TestDomainRebalancingImports:
         assert PlanStatus
 
     def test_entities_importable(self):
-        from v2.backend.domain.rebalancing.entities import RebalanceConfig, RebalancePlan
+        from v2.backend.domain.rebalancing.entities import (
+            RebalanceConfig,
+            RebalancePlan,
+        )
 
         assert RebalanceConfig
         assert RebalancePlan
@@ -172,6 +175,8 @@ class TestInfrastructureRebalancingImports:
 
 class TestInfrastructureCredentialsImports:
     def test_credentials_repository_importable(self):
-        from v2.backend.infrastructure.credentials.repository import CredentialsRepository
+        from v2.backend.infrastructure.credentials.repository import (
+            CredentialsRepository,
+        )
 
         assert CredentialsRepository

@@ -13,7 +13,9 @@ def _daily_change_card(daily_change_pct, daily_change_series, theme="light"):
     change_class = (
         "kpi-change-positive"
         if change_sign > 0
-        else "kpi-change-negative" if change_sign < 0 else "kpi-change-neutral"
+        else "kpi-change-negative"
+        if change_sign < 0
+        else "kpi-change-neutral"
     )
     value_str = _fmt_pct(daily_change_pct) if daily_change_pct is not None else "—"
     has_series = daily_change_series is not None and daily_change_series.get("dates")
@@ -57,7 +59,9 @@ def _dark_kpi_card(
     change_class = (
         "kpi-change-positive"
         if change_sign > 0
-        else "kpi-change-negative" if change_sign < 0 else "kpi-change-neutral"
+        else "kpi-change-negative"
+        if change_sign < 0
+        else "kpi-change-neutral"
     )
     card_class = f"kpi-card {extra_class}".strip()
     return html.Div(

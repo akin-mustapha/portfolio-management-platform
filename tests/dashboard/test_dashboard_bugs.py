@@ -10,8 +10,8 @@ Tests are written to FAIL before the fix and PASS after.
 """
 
 import inspect
-import pytest
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # Bug 1: workspace_tabs.py — risk_tab_content() and opportunities_tab_content()
@@ -44,6 +44,7 @@ class TestBug1WorkspaceTabsMissingArgs:
         from dashboard.pages.portfolio.components.organisms.workspace_tabs import (
             workspace_tabs,
         )
+
         src = inspect.getsource(workspace_tabs)
         assert "risk_tab_content()" not in src, (
             "workspace_tabs() calls risk_tab_content() with no arguments. "
@@ -60,6 +61,7 @@ class TestBug1WorkspaceTabsMissingArgs:
         from dashboard.pages.portfolio.components.organisms.workspace_tabs import (
             workspace_tabs,
         )
+
         src = inspect.getsource(workspace_tabs)
         assert "opportunities_tab_content()" not in src, (
             "workspace_tabs() calls opportunities_tab_content() with no arguments. "
@@ -75,10 +77,10 @@ class TestBug1WorkspaceTabsMissingArgs:
         from dashboard.pages.portfolio.components.organisms.workspace_tabs import (
             workspace_tabs,
         )
+
         src = inspect.getsource(workspace_tabs)
         assert "portfolio_tab_content(view_model" in src, (
-            "portfolio_tab_content() is no longer receiving view_model — "
-            "regression introduced in the fix."
+            "portfolio_tab_content() is no longer receiving view_model — regression introduced in the fix."
         )
 
     def test_risk_tab_content_returns_loading_placeholder_without_view_model(self):
@@ -93,7 +95,9 @@ class TestBug1WorkspaceTabsMissingArgs:
             "risk_tab_content(None) should return the loading placeholder."
         )
 
-    def test_opportunities_tab_content_returns_loading_placeholder_without_view_model(self):
+    def test_opportunities_tab_content_returns_loading_placeholder_without_view_model(
+        self,
+    ):
         """
         Regression guard: opportunities_tab_content(view_model=None) must return
         the loading placeholder.

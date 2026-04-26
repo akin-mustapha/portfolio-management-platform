@@ -115,7 +115,6 @@ class PortfolioPresenter:
         }
 
     def _profitablity_vm(self, assets: list[dict]) -> dict:
-
         return assets
 
     def _var_bar_vm(self, assets):
@@ -259,7 +258,6 @@ class PortfolioPresenter:
         }
 
     def _top_winner_bar_vm(self, assets: list[dict], sort_by: str = "profit") -> dict:
-
         try:
 
             def _label(a):
@@ -291,7 +289,6 @@ class PortfolioPresenter:
         return top
 
     def _top_losers_bar_vm(self, assets: list[dict], sort_by: str = "profit") -> dict:
-
         try:
 
             def _label(a):

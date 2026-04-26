@@ -1,13 +1,14 @@
+import json
 import os
 import uuid
-import json
 from datetime import datetime
 from pathlib import Path
-from dotenv import load_dotenv
 
-from pipeline.etl.policies import FullLoader
+from dotenv import load_dotenv
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
+
+from pipeline.etl.policies import FullLoader
 
 load_dotenv()
 
@@ -17,7 +18,6 @@ _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries
 
 
 class FullLoaderPostgresFred(FullLoader):
-
     def __init__(self, table_name):
         super().__init__(table_name)
         self._client = SQLModelClient(DATABASE_URL)
@@ -36,9 +36,7 @@ class FullLoaderPostgresFred(FullLoader):
         Inserts one row per series per run.
         """
         ingested_date = datetime.now().date()
-        sql = load_query(
-            _QUERIES_DIR / "bronze" / "fred_observations_insert.sql"
-        ).format(table_name=self._table_name)
+        sql = load_query(_QUERIES_DIR / "bronze" / "fred_observations_insert.sql").format(table_name=self._table_name)
         with self._client as client:
             for record in data:
                 params = {

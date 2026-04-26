@@ -1,6 +1,7 @@
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
 from prefect.logging import get_run_logger
+
 from pipeline.infrastructure.factories.event_producer_factory import (
     EventProducerFactory,
 )

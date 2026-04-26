@@ -1,6 +1,6 @@
 from prefect import flow, task
-from prefect.logging import loggers
 from prefect.cache_policies import NO_CACHE
+from prefect.logging import loggers
 
 from pipeline.infrastructure.factories.pipeline_factory import PipelineFactory
 

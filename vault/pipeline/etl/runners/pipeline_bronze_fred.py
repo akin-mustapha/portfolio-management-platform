@@ -5,22 +5,22 @@ Fetches DTB3 (3-Month T-Bill rate) and SP500 from the FRED API and stores
 raw observations in raw.fred_observations (JSONB, date-partitioned).
 """
 
-import os
 import logging
+import os
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
+
 from dotenv import load_dotenv
 from pydantic import ValidationError
-
-from pipeline.etl.protocols import Source, Destination
-from pipeline.etl.policies import Pipeline
-from pipeline.etl.loaders.loader_bronze_fred import FullLoaderPostgresFred
-from pipeline.infrastructure.clients.api_client_fred import FredAPIClient
-from pipeline.domain.schemas.bronze.fred_api import FredObservationsResponse
-
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
+
+from pipeline.domain.schemas.bronze.fred_api import FredObservationsResponse
+from pipeline.etl.loaders.loader_bronze_fred import FullLoaderPostgresFred
+from pipeline.etl.policies import Pipeline
+from pipeline.etl.protocols import Destination, Source
+from pipeline.infrastructure.clients.api_client_fred import FredAPIClient
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
@@ -85,9 +85,7 @@ class FredBronzeSource(Source):
         try:
             FredObservationsResponse(**response)
         except ValidationError as e:
-            raise ValueError(
-                f"FRED API response for {series_id} failed structural validation: {e}"
-            )
+            raise ValueError(f"FRED API response for {series_id} failed structural validation: {e}")
 
 
 # ─────────────────────────────────────────────

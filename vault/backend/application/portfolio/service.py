@@ -2,22 +2,22 @@
 Portfolio Service Module
 """
 
+from shared.utils.custom_logger import customer_logger
+
 from backend.application.portfolio.ports import (
     AssetAnalyticsPort,
     PortfolioQueryPort,
     RepositoryFactoryPort,
 )
-from backend.domain.portfolio.value_objects import TrendSignal
 from backend.domain.portfolio.entities import (
     Asset,
     AssetTag,
-    Tag,
     Category,
     Industry,
     Sector,
+    Tag,
 )
-
-from shared.utils.custom_logger import customer_logger
+from backend.domain.portfolio.value_objects import TrendSignal
 
 logging = customer_logger("portfolio_service")
 
@@ -106,9 +106,7 @@ class PortfolioService:
         asset_tag_repo = self._repo_factory.get("asset_tag")
 
         if not asset_repo.select({"id": asset_tag.get("asset_id")}):
-            raise ValueError(
-                f"Asset with ID {asset_tag.get('asset_id')} does not exist."
-            )
+            raise ValueError(f"Asset with ID {asset_tag.get('asset_id')} does not exist.")
 
         if not tag_repo.select({"id": asset_tag.get("tag_id")}):
             raise ValueError(f"Tag with ID {asset_tag.get('tag_id')} does not exist.")
@@ -124,9 +122,7 @@ class PortfolioService:
         asset_tag_repo = self._repo_factory.get("asset_tag")
 
         try:
-            asset_tag_repo.delete(
-                {"asset_id": item_tag.asset_id, "tag_id": item_tag.tag_id}
-            )
+            asset_tag_repo.delete({"asset_id": item_tag.asset_id, "tag_id": item_tag.tag_id})
         except Exception as e:
             logging.error(f"Error removing tag from asset: {e}")
             raise
@@ -142,9 +138,7 @@ class PortfolioService:
             raise ValueError(f"Sector with ID {sector_id} does not exist.")
 
         try:
-            sector_repo.update(
-                params={"id": sector_id}, data={"industry_id": industry_id}
-            )
+            sector_repo.update(params={"id": sector_id}, data={"industry_id": industry_id})
         except Exception as e:
             logging.error(f"Error assigning industry to sector: {e}")
             raise
@@ -232,20 +226,14 @@ class PortfolioService:
         return [dict(r._mapping) for r in rows]
 
     def get_most_recent_assets(self, tag_filter: str | None = None) -> list[dict]:
-        rows = [
-            dict(r._mapping) for r in self._analytics_repo.get_most_recent_asset_data()
-        ]
+        rows = [dict(r._mapping) for r in self._analytics_repo.get_most_recent_asset_data()]
         if tag_filter:
             tag_rows = [dict(r._mapping) for r in self._analytics_repo.get_asset_tags()]
             tag_map: dict[str, list[str]] = {}
             for r in tag_rows:
                 tag_map.setdefault(r["ticker"].upper(), []).append(r["tag_name"])
             requested = {t.strip().lower() for t in tag_filter.split(",") if t.strip()}
-            rows = [
-                r
-                for r in rows
-                if requested & {t.lower() for t in tag_map.get(r["ticker"].upper(), [])}
-            ]
+            rows = [r for r in rows if requested & {t.lower() for t in tag_map.get(r["ticker"].upper(), [])}]
         return rows
 
     def get_portfolio_summary(self) -> dict:
@@ -266,44 +254,30 @@ class PortfolioService:
         for row in asset_rows:
             row["price_series"] = price_map.get(row["ticker"], [])
             row["tags"] = tag_map.get(row["ticker"].upper(), [])
-            row["trend"] = str(
-                TrendSignal.from_ma_crossover(row.get("value_ma_crossover_signal"))
-            )
+            row["trend"] = str(TrendSignal.from_ma_crossover(row.get("value_ma_crossover_signal")))
 
-        portfolio_history_rows = [
-            dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()
-        ]
-        portfolio_snapshot = sorted(
-            portfolio_history_rows, key=lambda r: r["data_date"], reverse=True
-        )[:1]
+        portfolio_history_rows = [dict(r._mapping) for r in self._portfolio_query_repo.get_unrealized_profit()]
+        portfolio_snapshot = sorted(portfolio_history_rows, key=lambda r: r["data_date"], reverse=True)[:1]
 
         available_tags = sorted({tag for tags in tag_map.values() for tag in tags})
 
-        assets_history = [
-            dict(r._mapping) for r in self._analytics_repo.get_asset_history()
-        ]
+        assets_history = [dict(r._mapping) for r in self._analytics_repo.get_asset_history()]
 
         return {
             "assets": asset_rows,
             "assets_history": assets_history,
             "portfolio_history": portfolio_history_rows,
-            "portfolio_current_snapshot": (
-                portfolio_snapshot[0] if portfolio_snapshot else {}
-            ),
+            "portfolio_current_snapshot": (portfolio_snapshot[0] if portfolio_snapshot else {}),
             "available_tags": available_tags,
         }
 
-    def get_portfolio_history(
-        self, from_date: str | None = None, to_date: str | None = None
-    ) -> list[dict]:
+    def get_portfolio_history(self, from_date: str | None = None, to_date: str | None = None) -> list[dict]:
         rows = self._portfolio_query_repo.get_unrealized_profit(from_date, to_date)
         return [dict(r._mapping) for r in rows]
 
     def get_asset_profile(self, ticker: str) -> dict | None:
         rows = self.get_most_recent_assets()
-        asset_row = next(
-            (r for r in rows if r["ticker"].upper() == ticker.upper()), None
-        )
+        asset_row = next((r for r in rows if r["ticker"].upper() == ticker.upper()), None)
         if asset_row is None:
             return None
         tags = self.get_all_tags()
@@ -316,9 +290,7 @@ class PortfolioService:
             asset_row.get("broker"),
             asset_row.get("currency"),
         )
-        return _present_asset_profile(
-            asset_row, tags, industries, sectors, categories, current_tags
-        )
+        return _present_asset_profile(asset_row, tags, industries, sectors, categories, current_tags)
 
     def _resolve_current_tags(
         self,
@@ -333,14 +305,8 @@ class PortfolioService:
         if not asset:
             return []
         tag_links = self.search_tag_by_asset_id(asset["id"])
-        tag_id_to_name = {
-            t["id"]: t["name"] for t in all_tags if t.get("id") and t.get("name")
-        }
-        return [
-            tag_id_to_name[link["tag_id"]]
-            for link in tag_links
-            if link.get("tag_id") in tag_id_to_name
-        ]
+        tag_id_to_name = {t["id"]: t["name"] for t in all_tags if t.get("id") and t.get("name")}
+        return [tag_id_to_name[link["tag_id"]] for link in tag_links if link.get("tag_id") in tag_id_to_name]
 
     def assign_tag(self, ticker: str, tag_id: int) -> None:
         asset = self.get_asset_by_ticker(ticker)

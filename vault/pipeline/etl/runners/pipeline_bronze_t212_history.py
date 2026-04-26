@@ -11,24 +11,22 @@ to stop pagination once a page's oldest event is at or before the last seen
 event timestamp, so steady-state runs are cheap under the 6 req/min limit.
 """
 
-import os
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from dotenv import load_dotenv
 
-from pipeline.etl.protocols import Source, Destination
-from pipeline.etl.policies import Pipeline
+from dotenv import load_dotenv
+from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
 
 from pipeline.etl.loaders.loader_bronze_t212_history import (
     FullLoaderPostgresT212History,
 )
-
+from pipeline.etl.policies import Pipeline
+from pipeline.etl.protocols import Destination, Source
 from pipeline.infrastructure.clients.api_client_trading212 import Trading212APIClient
-
-from shared.database.client import SQLModelClient
-from shared.database.query_loader import load_query
 
 logging.basicConfig(
     level=logging.INFO,
@@ -97,9 +95,7 @@ class Trading212HistorySource(Source):
         for endpoint_key, path in _ENDPOINTS.items():
             try:
                 stored_ts = self._get_stored_high_water_mark(endpoint_key)
-                items, newest_ts, newest_cursor = self._pull_endpoint(
-                    endpoint_key, path, stored_ts
-                )
+                items, newest_ts, newest_cursor = self._pull_endpoint(endpoint_key, path, stored_ts)
                 result[endpoint_key] = items
                 result["cursors"][endpoint_key] = {
                     "last_cursor": newest_cursor,
@@ -111,9 +107,7 @@ class Trading212HistorySource(Source):
                 )
             except Exception as e:
                 # Isolate endpoint failures so one broken stream doesn't poison the others.
-                logging.exception(
-                    f"[t212_history:{endpoint_key}] extraction failed: {e}"
-                )
+                logging.exception(f"[t212_history:{endpoint_key}] extraction failed: {e}")
                 result[endpoint_key] = []
                 result["cursors"][endpoint_key] = {}
 
@@ -132,11 +126,7 @@ class Trading212HistorySource(Source):
             if not items:
                 return True
             oldest = min(
-                (
-                    ts
-                    for ts in (_item_event_ts(endpoint_key, i) for i in items)
-                    if ts is not None
-                ),
+                (ts for ts in (_item_event_ts(endpoint_key, i) for i in items) if ts is not None),
                 default=None,
             )
             if oldest is None:

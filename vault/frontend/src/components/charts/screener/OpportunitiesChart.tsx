@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material'
+import { useTheme } from "@mui/material";
 import {
   ScatterChart,
   Scatter,
@@ -10,35 +10,60 @@ import {
   ReferenceLine,
   Cell,
   Label,
-} from 'recharts'
-import { fmtNum } from '../../../utils/chartUtils'
-import type { OpportunitiesChartVM } from '../../../presenters/opportunitiesPresenter'
+} from "recharts";
+import { fmtNum } from "../../../utils/chartUtils";
+import type { OpportunitiesChartVM } from "../../../presenters/opportunitiesPresenter";
 
-type DistributionItem = OpportunitiesChartVM['distribution'][number]
+type DistributionItem = OpportunitiesChartVM["distribution"][number];
 
 interface OpportunitiesChartProps {
-  vm?: OpportunitiesChartVM
+  vm?: OpportunitiesChartVM;
 }
 
 export default function OpportunitiesChart({ vm }: OpportunitiesChartProps) {
-  const theme = useTheme()
+  const theme = useTheme();
 
-  if (!vm?.distribution?.length) return null
+  if (!vm?.distribution?.length) return null;
 
-  const { distribution, avgWeight } = vm
+  const { distribution, avgWeight } = vm;
 
-  function CustomTooltip({ active, payload }: { active?: boolean; payload?: unknown[] }) {
-    if (!active || !payload?.length) return null
-    const d = (payload as Array<{ payload: DistributionItem }>)[0].payload
+  function CustomTooltip({
+    active,
+    payload,
+  }: {
+    active?: boolean;
+    payload?: unknown[];
+  }) {
+    if (!active || !payload?.length) return null;
+    const d = (payload as Array<{ payload: DistributionItem }>)[0].payload;
     return (
-      <div style={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, padding: '6px 10px', fontSize: 11, borderRadius: 4 }}>
+      <div
+        style={{
+          background: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+          padding: "6px 10px",
+          fontSize: 11,
+          borderRadius: 4,
+        }}
+      >
         <div style={{ fontWeight: 600 }}>{d.ticker}</div>
-        <div style={{ color: theme.palette.text.secondary, fontSize: 10, marginBottom: 2 }}>{d.name}</div>
+        <div
+          style={{
+            color: theme.palette.text.secondary,
+            fontSize: 10,
+            marginBottom: 2,
+          }}
+        >
+          {d.name}
+        </div>
         <div>Weight: {d.weight_pct.toFixed(1)}%</div>
-        <div>ROI: {d.roi_pct > 0 ? '+' : ''}{d.roi_pct.toFixed(2)}%</div>
+        <div>
+          ROI: {d.roi_pct > 0 ? "+" : ""}
+          {d.roi_pct.toFixed(2)}%
+        </div>
         <div>P&L: {fmtNum(d.profit)}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -53,7 +78,12 @@ export default function OpportunitiesChart({ vm }: OpportunitiesChartProps) {
           tickLine={false}
           unit="%"
         >
-          <Label value="Portfolio Weight %" position="insideBottom" offset={-12} style={{ fontSize: 10, fill: theme.palette.text.secondary }} />
+          <Label
+            value="Portfolio Weight %"
+            position="insideBottom"
+            offset={-12}
+            style={{ fontSize: 10, fill: theme.palette.text.secondary }}
+          />
         </XAxis>
         <YAxis
           type="number"
@@ -65,13 +95,25 @@ export default function OpportunitiesChart({ vm }: OpportunitiesChartProps) {
           unit="%"
         />
         <Tooltip content={<CustomTooltip />} />
-        <ReferenceLine y={0} stroke={theme.palette.divider} strokeDasharray="4 2" />
-        <ReferenceLine x={avgWeight} stroke={theme.palette.divider} strokeDasharray="4 2" />
+        <ReferenceLine
+          y={0}
+          stroke={theme.palette.divider}
+          strokeDasharray="4 2"
+        />
+        <ReferenceLine
+          x={avgWeight}
+          stroke={theme.palette.divider}
+          strokeDasharray="4 2"
+        />
         <Scatter data={distribution} name="Positions">
           {distribution.map((d) => (
             <Cell
               key={d.ticker}
-              fill={d.roi_pct >= 0 ? theme.palette.success.main : theme.palette.error.main}
+              fill={
+                d.roi_pct >= 0
+                  ? theme.palette.success.main
+                  : theme.palette.error.main
+              }
               opacity={0.85}
               r={Math.max(5, Math.min(14, Math.sqrt(Math.abs(d.value)) / 10))}
             />
@@ -79,5 +121,5 @@ export default function OpportunitiesChart({ vm }: OpportunitiesChartProps) {
         </Scatter>
       </ScatterChart>
     </ResponsiveContainer>
-  )
+  );
 }

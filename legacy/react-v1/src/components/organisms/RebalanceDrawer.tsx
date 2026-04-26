@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -9,31 +9,38 @@ import {
   CircularProgress,
   Divider,
   Stack,
-} from '@mui/material'
-import { useRebalanceConfigs, useSaveRebalanceConfig, useGenerateRebalancePlan } from '../../hooks/useRebalance'
+} from "@mui/material";
+import {
+  useRebalanceConfigs,
+  useSaveRebalanceConfig,
+  useGenerateRebalancePlan,
+} from "../../hooks/useRebalance";
 
 interface RebalanceDrawerProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
-export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps) {
-  const { data: configs = [], isLoading } = useRebalanceConfigs()
-  const save = useSaveRebalanceConfig()
-  const generate = useGenerateRebalancePlan()
-  const [weights, setWeights] = useState<Record<string, number>>({})
-  const [planResult, setPlanResult] = useState<string | null>(null)
+export default function RebalanceDrawer({
+  open,
+  onClose,
+}: RebalanceDrawerProps) {
+  const { data: configs = [], isLoading } = useRebalanceConfigs();
+  const save = useSaveRebalanceConfig();
+  const generate = useGenerateRebalancePlan();
+  const [weights, setWeights] = useState<Record<string, number>>({});
+  const [planResult, setPlanResult] = useState<string | null>(null);
 
   const getWeight = (c: Record<string, unknown>) =>
-    weights[c.ticker as string] ?? (c.target_weight_pct as number)
+    weights[c.ticker as string] ?? (c.target_weight_pct as number);
 
   const handleSlider = (ticker: string, val: number) =>
-    setWeights((prev) => ({ ...prev, [ticker]: val }))
+    setWeights((prev) => ({ ...prev, [ticker]: val }));
 
   const handleSave = async () => {
     const pending = (configs as Array<Record<string, unknown>>).filter(
       (c) => weights[c.ticker as string] !== undefined,
-    )
+    );
     await Promise.all(
       pending.map((c) =>
         save.mutateAsync({
@@ -44,42 +51,67 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
           max_weight_pct: c.max_weight_pct as number,
         }),
       ),
-    )
-    setWeights({})
-  }
+    );
+    setWeights({});
+  };
 
   const handleGenerate = async () => {
-    const result = await generate.mutateAsync()
-    setPlanResult(result.status === 'no_drift' ? 'All assets within threshold — no plan needed.' : 'Rebalancing plan generated.')
-  }
+    const result = await generate.mutateAsync();
+    setPlanResult(
+      result.status === "no_drift"
+        ? "All assets within threshold — no plan needed."
+        : "Rebalancing plan generated.",
+    );
+  };
 
   return (
     <Drawer
       anchor="bottom"
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { maxHeight: '60vh', borderRadius: '12px 12px 0 0', p: 2 } }}
+      PaperProps={{
+        sx: { maxHeight: "60vh", borderRadius: "12px 12px 0 0", p: 2 },
+      }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-        <Typography variant="subtitle1" fontWeight={700}>Rebalancing</Typography>
-        <Button size="small" onClick={onClose}>Close</Button>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1,
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight={700}>
+          Rebalancing
+        </Typography>
+        <Button size="small" onClick={onClose}>
+          Close
+        </Button>
       </Box>
       <Divider sx={{ mb: 2 }} />
 
       {isLoading && <CircularProgress size={20} />}
 
-      {planResult && <Alert severity="info" sx={{ mb: 1, fontSize: 12 }}>{planResult}</Alert>}
+      {planResult && (
+        <Alert severity="info" sx={{ mb: 1, fontSize: 12 }}>
+          {planResult}
+        </Alert>
+      )}
 
-      <Box sx={{ overflowY: 'auto', flex: 1 }}>
+      <Box sx={{ overflowY: "auto", flex: 1 }}>
         <Stack spacing={2}>
           {(configs as Array<Record<string, unknown>>).map((c) => {
-            const ticker = c.ticker as string
-            const target = getWeight(c)
+            const ticker = c.ticker as string;
+            const target = getWeight(c);
             return (
               <Box key={ticker}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" fontWeight={600}>{ticker}</Typography>
-                  <Typography variant="body2" color="text.secondary">{target.toFixed(1)}%</Typography>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {ticker}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {target.toFixed(1)}%
+                  </Typography>
                 </Box>
                 <Slider
                   value={target}
@@ -90,20 +122,20 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
                   onChange={(_, val) => handleSlider(ticker, val as number)}
                 />
               </Box>
-            )
+            );
           })}
         </Stack>
       </Box>
 
       <Divider sx={{ mt: 2, mb: 1 }} />
-      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+      <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
         <Button
           size="small"
           variant="outlined"
           onClick={handleSave}
           disabled={save.isPending || Object.keys(weights).length === 0}
         >
-          {save.isPending ? <CircularProgress size={14} /> : 'Save Weights'}
+          {save.isPending ? <CircularProgress size={14} /> : "Save Weights"}
         </Button>
         <Button
           size="small"
@@ -111,9 +143,13 @@ export default function RebalanceDrawer({ open, onClose }: RebalanceDrawerProps)
           onClick={handleGenerate}
           disabled={generate.isPending}
         >
-          {generate.isPending ? <CircularProgress size={14} /> : 'Generate Plan'}
+          {generate.isPending ? (
+            <CircularProgress size={14} />
+          ) : (
+            "Generate Plan"
+          )}
         </Button>
       </Box>
     </Drawer>
-  )
+  );
 }

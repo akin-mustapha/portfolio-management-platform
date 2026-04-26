@@ -7,15 +7,15 @@ Revision ID: 4400000000dd
 Revises: 4400000000dc
 Create Date: 2026-04-24
 """
-from typing import Sequence, Union
+
+from collections.abc import Sequence
 
 from alembic import op
 
-
 revision: str = "4400000000dd"
-down_revision: Union[str, Sequence[str], None] = "4400000000dc"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "4400000000dc"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

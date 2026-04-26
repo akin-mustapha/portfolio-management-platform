@@ -18,6 +18,7 @@ class MonthlyBudget:
 
     def __init__(self, limit: float) -> None:
         import config  # local import avoids circular dependency at module level
+
         self.limit = limit
         self._database_url = config.DATABASE_URL
         self._month: str = self._current_month()

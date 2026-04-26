@@ -1,6 +1,6 @@
-import json
 import dataclasses
-from datetime import datetime, date
+import json
+from datetime import date, datetime
 from decimal import Decimal
 
 from psycopg2.extras import Json
@@ -24,9 +24,7 @@ class DeadLetterDestination:
     """
 
     def __init__(self):
-        self._repository = RepositoryFactory.get(
-            "dead_letter", schema_name="monitoring"
-        )
+        self._repository = RepositoryFactory.get("dead_letter", schema_name="monitoring")
 
     def load(self, data: list) -> None:
         records = []

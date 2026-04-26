@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.api.routers import portfolio, assets, tags, rebalance, credentials
+from backend.api.routers import assets, credentials, portfolio, rebalance, tags
 
 ROOT = Path(__file__).resolve().parents[2]
 

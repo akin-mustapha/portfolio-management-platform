@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
-from backend.application.portfolio.factory import build_portfolio_service
 from backend.api.serialization import date_response
+from backend.application.portfolio.factory import build_portfolio_service
 
 router = APIRouter(tags=["portfolio"])
 

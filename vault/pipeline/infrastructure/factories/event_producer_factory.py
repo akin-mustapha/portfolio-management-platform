@@ -1,13 +1,11 @@
-from pipeline.etl.policies import EventProducer
-
 from pipeline.etl.events.trading212_event_producer import (
     Trading212EventProducer,
 )
-
-from pipeline.infrastructure.kafka.producer_origins import Trading212AssetAPIOrigin
+from pipeline.etl.policies import EventProducer
 from pipeline.infrastructure.kafka.producer_destination import (
     Trading212KafkaDestination,
 )
+from pipeline.infrastructure.kafka.producer_origins import Trading212AssetAPIOrigin
 
 EVENT_PRODUCER_REGISTERY = {}
 

@@ -1,8 +1,8 @@
 from prefect import flow, task
 from prefect.cache_policies import NO_CACHE
-from pipeline.infrastructure.factories.pipeline_factory import PipelineFactory
-
 from shared.utils.custom_logger import customer_logger
+
+from pipeline.infrastructure.factories.pipeline_factory import PipelineFactory
 
 logging = customer_logger("asset_snapshot_flow_run")
 

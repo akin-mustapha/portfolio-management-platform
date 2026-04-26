@@ -16,16 +16,16 @@ Revises: 3300000000c7
 Create Date: 2026-03-25
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
-
+from alembic import op
 
 revision: str = "3300000000c8"
-down_revision: Union[str, Sequence[str], None] = "3300000000c7"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "3300000000c7"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -38,9 +38,7 @@ def upgrade() -> None:
         ("value_low", "value_low_alltime"),
         ("pct_drawdown", "value_drawdown_pct_30d"),
     ]:
-        op.alter_column(
-            "fact_technical", old, new_column_name=new, schema="analytics"
-        )
+        op.alter_column("fact_technical", old, new_column_name=new, schema="analytics")
 
     # fact_technical — add price MAs (were computed but not persisted)
     for col in ["price_ma_20d", "price_ma_50d"]:
@@ -63,18 +61,14 @@ def upgrade() -> None:
         ("daily_return", "daily_value_return"),
         ("cumulative_return", "cumulative_value_return"),
     ]:
-        op.alter_column(
-            "fact_return", old, new_column_name=new, schema="analytics"
-        )
+        op.alter_column("fact_return", old, new_column_name=new, schema="analytics")
 
     # fact_portfolio_daily
     for old, new in [
         ("daily_change_abs", "daily_value_change_abs"),
         ("daily_change_pct", "daily_value_change_pct"),
     ]:
-        op.alter_column(
-            "fact_portfolio_daily", old, new_column_name=new, schema="analytics"
-        )
+        op.alter_column("fact_portfolio_daily", old, new_column_name=new, schema="analytics")
 
 
 def downgrade() -> None:
@@ -83,18 +77,14 @@ def downgrade() -> None:
         ("daily_value_change_abs", "daily_change_abs"),
         ("daily_value_change_pct", "daily_change_pct"),
     ]:
-        op.alter_column(
-            "fact_portfolio_daily", old, new_column_name=new, schema="analytics"
-        )
+        op.alter_column("fact_portfolio_daily", old, new_column_name=new, schema="analytics")
 
     # fact_return
     for old, new in [
         ("daily_value_return", "daily_return"),
         ("cumulative_value_return", "cumulative_return"),
     ]:
-        op.alter_column(
-            "fact_return", old, new_column_name=new, schema="analytics"
-        )
+        op.alter_column("fact_return", old, new_column_name=new, schema="analytics")
 
     # fact_signal
     op.alter_column(
@@ -117,6 +107,4 @@ def downgrade() -> None:
         ("value_low_alltime", "value_low"),
         ("value_drawdown_pct_30d", "pct_drawdown"),
     ]:
-        op.alter_column(
-            "fact_technical", old, new_column_name=new, schema="analytics"
-        )
+        op.alter_column("fact_technical", old, new_column_name=new, schema="analytics")

@@ -10,14 +10,15 @@ Tests are written to FAIL before the fix and PASS after.
 """
 
 import inspect
-import pytest
 from datetime import datetime
 from unittest.mock import MagicMock
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # Bug 3: pipeline_account_gold.py — SQL starts with ";WITH" (leading semicolon)
 # ---------------------------------------------------------------------------
+
 
 class TestBug3AccountGoldLeadingSemicolon:
     """
@@ -35,10 +36,10 @@ class TestBug3AccountGoldLeadingSemicolon:
         from pipelines.application.runners.pipeline_gold_t212 import (
             T212GoldSource,
         )
+
         src = inspect.getsource(T212GoldSource.extract)
         assert ";WITH" not in src, (
-            "SQL contains ';WITH' which is a syntax error in PostgreSQL. "
-            "The query should begin with 'WITH'."
+            "SQL contains ';WITH' which is a syntax error in PostgreSQL. The query should begin with 'WITH'."
         )
 
     def test_account_gold_sql_starts_with_valid_cte(self):
@@ -48,16 +49,17 @@ class TestBug3AccountGoldLeadingSemicolon:
         from pipelines.application.runners.pipeline_gold_t212 import (
             T212GoldSource,
         )
+
         src = inspect.getsource(T212GoldSource.extract)
         assert '";WITH' not in src and "';WITH" not in src and "\n            ;WITH" not in src, (
-            "SQL has a leading ';' before WITH — this is a syntax error. "
-            "Remove the semicolon."
+            "SQL has a leading ';' before WITH — this is a syntax error. Remove the semicolon."
         )
 
 
 # ---------------------------------------------------------------------------
 # Bug 4: policies.py — FullLoader._loader abstract method missing 'data' param
 # ---------------------------------------------------------------------------
+
 
 class TestBug4FullLoaderAbstractMethodSignature:
     """
@@ -109,6 +111,7 @@ class TestBug4FullLoaderAbstractMethodSignature:
 
         class BrokenLoader(FullLoader):
             """Implements the broken abstract signature (no data param)."""
+
             def _create_partition(self):
                 pass
 
@@ -147,6 +150,7 @@ class TestBug4FullLoaderAbstractMethodSignature:
 #         JSON string instead of Python object after session closes
 # ---------------------------------------------------------------------------
 
+
 class TestBug5T212SilverJsonbReturnedAsString:
     """
     Bug: Trading212AssetTransformationSilver.transform() at line 67:
@@ -181,13 +185,18 @@ class TestBug5T212SilverJsonbReturnedAsString:
         PASSES (returns 1 record) after the fix.
         """
         import json
+
         from pipelines.application.runners.pipeline_silver_t212 import (
             Trading212AssetTransformationSilver,
         )
 
         position_list = [
             {
-                "instrument": {"ticker": "AAPL_EQ", "name": "Apple Inc", "currency": "USD"},
+                "instrument": {
+                    "ticker": "AAPL_EQ",
+                    "name": "Apple Inc",
+                    "currency": "USD",
+                },
                 "quantity": 10.0,
                 "currentPrice": 150.0,
                 "averagePricePaid": 130.0,
@@ -219,22 +228,28 @@ class TestBug5T212SilverJsonbReturnedAsString:
             Trading212AssetTransformationSilver,
         )
 
-        row = self._make_asset_row(position_data=[
-            {
-                "instrument": {"ticker": "AAPL_EQ", "name": "Apple Inc", "currency": "USD"},
-                "quantity": 10.0,
-                "currentPrice": 150.0,
-                "averagePricePaid": 130.0,
-                "quantityInPies": 0.0,
-                "walletImpact": {
-                    "currency": "GBP",
-                    "currentValue": 1500.0,
-                    "totalCost": 1300.0,
-                    "unrealizedProfitLoss": 200.0,
-                    "fxImpact": 5.0,
-                },
-            }
-        ])
+        row = self._make_asset_row(
+            position_data=[
+                {
+                    "instrument": {
+                        "ticker": "AAPL_EQ",
+                        "name": "Apple Inc",
+                        "currency": "USD",
+                    },
+                    "quantity": 10.0,
+                    "currentPrice": 150.0,
+                    "averagePricePaid": 130.0,
+                    "quantityInPies": 0.0,
+                    "walletImpact": {
+                        "currency": "GBP",
+                        "currentValue": 1500.0,
+                        "totalCost": 1300.0,
+                        "unrealizedProfitLoss": 200.0,
+                        "fxImpact": 5.0,
+                    },
+                }
+            ]
+        )
 
         result = Trading212AssetTransformationSilver().transform([row])
 

@@ -41,7 +41,9 @@ def secondary_kpi_row(data=None, theme="light"):
                         change_sign=(
                             1
                             if (vs_benchmark or 0) > 0
-                            else -1 if (vs_benchmark or 0) < 0 else 0
+                            else -1
+                            if (vs_benchmark or 0) < 0
+                            else 0
                         ),
                     ),
                 ],

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,42 +9,47 @@ import {
   TextField,
   CircularProgress,
   Alert,
-} from '@mui/material'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchTags, assignTag } from '../../api/tags'
+} from "@mui/material";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchTags, assignTag } from "../../api/tags";
 
 interface EditTagsModalProps {
-  open: boolean
-  onClose: () => void
-  ticker: string
-  currentTags: string[]
+  open: boolean;
+  onClose: () => void;
+  ticker: string;
+  currentTags: string[];
 }
 
-export default function EditTagsModal({ open, onClose, ticker, currentTags }: EditTagsModalProps) {
-  const qc = useQueryClient()
-  const [error, setError] = useState<string | null>(null)
+export default function EditTagsModal({
+  open,
+  onClose,
+  ticker,
+  currentTags,
+}: EditTagsModalProps) {
+  const qc = useQueryClient();
+  const [error, setError] = useState<string | null>(null);
 
   const { data: allTags = [] } = useQuery({
-    queryKey: ['tags'],
+    queryKey: ["tags"],
     queryFn: fetchTags,
     enabled: open,
-  })
+  });
 
-  const tagOptions = allTags as Array<{ id: number; name: string }>
+  const tagOptions = allTags as Array<{ id: number; name: string }>;
 
   const mutation = useMutation({
     mutationFn: ({ tagId }: { tagId: number }) => assignTag(ticker, tagId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['portfolio', 'summary'] })
-      qc.invalidateQueries({ queryKey: ['assets'] })
-      setError(null)
+      qc.invalidateQueries({ queryKey: ["portfolio", "summary"] });
+      qc.invalidateQueries({ queryKey: ["assets"] });
+      setError(null);
     },
     onError: (e: Error) => setError(e.message),
-  })
+  });
 
   const handleAssign = (option: { id: number; name: string } | null) => {
-    if (option) mutation.mutate({ tagId: option.id })
-  }
+    if (option) mutation.mutate({ tagId: option.id });
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -52,10 +57,14 @@ export default function EditTagsModal({ open, onClose, ticker, currentTags }: Ed
         Assign Tags — {ticker}
       </DialogTitle>
       <DialogContent>
-        {error && <Alert severity="error" sx={{ mb: 1, fontSize: 12 }}>{error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 1, fontSize: 12 }}>
+            {error}
+          </Alert>
+        )}
         <TextField
           label="Current Tags"
-          value={currentTags.join(', ') || 'None'}
+          value={currentTags.join(", ") || "None"}
           InputProps={{ readOnly: true }}
           size="small"
           fullWidth
@@ -84,8 +93,10 @@ export default function EditTagsModal({ open, onClose, ticker, currentTags }: Ed
         />
       </DialogContent>
       <DialogActions>
-        <Button size="small" onClick={onClose}>Close</Button>
+        <Button size="small" onClick={onClose}>
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
-  )
+  );
 }

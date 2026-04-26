@@ -1,6 +1,6 @@
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from shared.repositories.base_table_repository import BaseTableRepository
 
 load_dotenv()
@@ -26,9 +26,7 @@ class PostgresRebalanceConfigRepository(BaseTableRepository):
             "correction_days": "correction_days",
             "is_active": "is_active",
         }
-        super().__init__(
-            "rebalance_config", schema_name="portfolio", field_map=field_map
-        )
+        super().__init__("rebalance_config", schema_name="portfolio", field_map=field_map)
 
     def get_asset_id_by_ticker(self, ticker: str) -> str | None:
         """Return the asset_id for a ticker (most recently created record)."""

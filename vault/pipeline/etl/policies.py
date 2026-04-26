@@ -1,11 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
-from datetime import timedelta, datetime, UTC
+from datetime import UTC, datetime, timedelta
 
-from .protocols import Source
-from .protocols import Destination
-from .protocols import Transformation
 from ..domain.models import Event
+from .protocols import Destination, Source, Transformation
 
 
 class Pipeline(ABC):
@@ -91,14 +89,10 @@ class BaseGoldPipeline(Pipeline):
             for r in result.invalid:
                 r.pipeline_name = self._pipeline_name
             self._dead_letter.load(result.invalid)
-            logging.warning(
-                f"[{self._pipeline_name}] {len(result.invalid)} records rejected — written to dead letter"
-            )
+            logging.warning(f"[{self._pipeline_name}] {len(result.invalid)} records rejected — written to dead letter")
 
         if not result.valid:
-            logging.warning(
-                f"[{self._pipeline_name}] no valid records after validation — nothing to load"
-            )
+            logging.warning(f"[{self._pipeline_name}] no valid records after validation — nothing to load")
             return
 
         records = self._to_records(result.valid)
@@ -118,9 +112,7 @@ class FullLoader(ABC):
     def __init__(self, table_name):
         self._current_datetime = datetime.now()
         self._day = self._current_datetime.strftime("%Y_%m_%d")
-        self._next_day = (self._current_datetime + timedelta(days=1)).strftime(
-            "%Y_%m_%d"
-        )
+        self._next_day = (self._current_datetime + timedelta(days=1)).strftime("%Y_%m_%d")
         self._table_name = table_name
         self._partition_name = f"{self._table_name}_{self._day}"
 
@@ -150,7 +142,7 @@ class EventProducer(ABC):
 class Origin(ABC):
     def __init__(self, origin_name: str):
         self._origin_name = origin_name
-        self._event: Event = None
+        self._event: Event | None = None
         self._metadata = None
 
     @property
@@ -158,7 +150,7 @@ class Origin(ABC):
         return self._origin_name
 
     @property
-    def event(self) -> Event:
+    def event(self) -> Event | None:
         return self._event
 
     @event.setter
@@ -173,7 +165,7 @@ class Origin(ABC):
         event = Event(
             metadata=metadata,
             payload=data,
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=datetime.now(UTC),
         )
         return event
 
@@ -185,14 +177,14 @@ class Origin(ABC):
 class EventDestination(ABC):
     def __init__(self, destination_name: str):
         self._destination_name = destination_name
-        self._event: Event = None
+        self._event: Event | None = None
 
     @property
     def destination_name(self) -> str:
         return self._destination_name
 
     @property
-    def event(self) -> Event:
+    def event(self) -> Event | None:
         return self._event
 
     @event.setter

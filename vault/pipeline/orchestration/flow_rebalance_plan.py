@@ -1,8 +1,7 @@
-from prefect import flow, task
-from prefect.logging import loggers
-from prefect.cache_policies import NO_CACHE
-
 from backend.application.rebalancing.factory import build_rebalancing_service
+from prefect import flow, task
+from prefect.cache_policies import NO_CACHE
+from prefect.logging import loggers
 
 logger = loggers.get_logger(__name__)
 

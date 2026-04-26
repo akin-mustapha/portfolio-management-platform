@@ -1,14 +1,15 @@
-import os
 import json
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
+
 from dotenv import load_dotenv
+from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
 from sqlalchemy import text
 
 from pipeline.etl.policies import FullLoader
-from shared.database.client import SQLModelClient
-from shared.database.query_loader import load_query
 
 load_dotenv()
 
@@ -60,12 +61,8 @@ class FullLoaderPostgresT212History(FullLoader):
 
     def _loader(self, data: dict):
         ingested_date = datetime.now().date()
-        insert_sql_template = load_query(
-            _QUERIES_DIR / "bronze" / "t212_history_insert.sql"
-        )
-        cursor_sql = load_query(
-            _QUERIES_DIR / "bronze" / "t212_history_cursor_upsert.sql"
-        )
+        insert_sql_template = load_query(_QUERIES_DIR / "bronze" / "t212_history_insert.sql")
+        cursor_sql = load_query(_QUERIES_DIR / "bronze" / "t212_history_cursor_upsert.sql")
 
         with self._client as client:
             for endpoint, table in _ENDPOINT_TABLES.items():
@@ -75,9 +72,7 @@ class FullLoaderPostgresT212History(FullLoader):
                     for item in items:
                         row_id = self._extract_id(endpoint, item)
                         if row_id is None:
-                            logging.warning(
-                                f"[{endpoint}] skipping item without id key: {list(item.keys())}"
-                            )
+                            logging.warning(f"[{endpoint}] skipping item without id key: {list(item.keys())}")
                             continue
                         client.execute(
                             insert_sql,
@@ -89,10 +84,7 @@ class FullLoaderPostgresT212History(FullLoader):
                         )
 
                 cursor = (data.get("cursors") or {}).get(endpoint) or {}
-                if (
-                    cursor.get("last_cursor") is not None
-                    or cursor.get("last_event_ts") is not None
-                ):
+                if cursor.get("last_cursor") is not None or cursor.get("last_event_ts") is not None:
                     client.execute(
                         cursor_sql,
                         params={
@@ -112,14 +104,14 @@ class FullLoaderPostgresT212History(FullLoader):
 
     def _exposition_abstraction(self):
         drop_dividend = "DROP VIEW IF EXISTS raw.v_bronze_dividend"
-        create_dividend = load_query(
-            _QUERIES_DIR / "bronze" / "v_bronze_dividend.sql"
-        ).format(table_name=_ENDPOINT_TABLES["dividends"])
+        create_dividend = load_query(_QUERIES_DIR / "bronze" / "v_bronze_dividend.sql").format(
+            table_name=_ENDPOINT_TABLES["dividends"]
+        )
 
         drop_order = "DROP VIEW IF EXISTS raw.v_bronze_order"
-        create_order = load_query(
-            _QUERIES_DIR / "bronze" / "v_bronze_order.sql"
-        ).format(table_name=_ENDPOINT_TABLES["orders"])
+        create_order = load_query(_QUERIES_DIR / "bronze" / "v_bronze_order.sql").format(
+            table_name=_ENDPOINT_TABLES["orders"]
+        )
 
         with self._client.engine.connect() as conn:
             conn.execute(text(drop_dividend))

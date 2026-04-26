@@ -50,7 +50,9 @@ def _discover_partitions(client: SQLModelClient, tables: list[str]) -> list[str]
     return [row[0] for row in result]
 
 
-def run(execute: bool = False, yes: bool = False, tables: list[str] | None = None) -> None:
+def run(
+    execute: bool = False, yes: bool = False, tables: list[str] | None = None
+) -> None:
     if not DATABASE_URL:
         raise RuntimeError("DATABASE_URL environment variable is not set.")
 
@@ -76,7 +78,9 @@ def run(execute: bool = False, yes: bool = False, tables: list[str] | None = Non
             return
 
         if not yes:
-            answer = input(f"\nDrop {len(partitions)} partition(s)? [y/N] ").strip().lower()
+            answer = (
+                input(f"\nDrop {len(partitions)} partition(s)? [y/N] ").strip().lower()
+            )
             if answer != "y":
                 logger.info("Aborted.")
                 return
@@ -91,7 +95,10 @@ def run(execute: bool = False, yes: bool = False, tables: list[str] | None = Non
         if remaining:
             logger.warning("Some partitions still exist: %s", remaining)
         else:
-            logger.info("All partitions dropped. Parent tables raw.%s remain intact.", " / raw.".join(tables))
+            logger.info(
+                "All partitions dropped. Parent tables raw.%s remain intact.",
+                " / raw.".join(tables),
+            )
 
     finally:
         client.close()

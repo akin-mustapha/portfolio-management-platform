@@ -202,6 +202,25 @@ Rules are formalised in `.claude/rules/`. Key rules:
 
 ---
 
+## Code Style
+
+### Comments and docstrings
+
+- All public functions in `domain/` and `application/` must have docstrings
+- Docstring format: one line summary, Args, Returns, Raises if relevant
+- Inline comments only for non-obvious logic — never describe what the code does, only why
+- No commented-out code in commits
+
+### Linting and formatting
+
+- Python: ruff (lint + format), mypy (types)
+- Frontend: eslint + prettier
+- Pre-commit hooks enforce these automatically
+- Never commit with lint errors — fix them, don't disable the rule
+- If a rule needs disabling, explain why in a comment on the same line
+
+---
+
 ## Testing
 
 ### Definition of done

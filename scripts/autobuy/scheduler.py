@@ -11,13 +11,13 @@ Run once immediately (for testing):
 import argparse
 import logging
 import sys
-from datetime import datetime, time as dtime
+from datetime import datetime
+from datetime import time as dtime
 
+import config
 import pytz
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
-
-import config
 from budget import MonthlyBudget
 from db import open_connection
 from strategy import TrancheState, run_check

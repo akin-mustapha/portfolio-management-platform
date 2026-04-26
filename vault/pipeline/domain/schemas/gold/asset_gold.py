@@ -1,5 +1,4 @@
 from uuid import UUID
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -28,52 +27,50 @@ class AssetGoldRecord(BaseModel):
     value: float
     cost_basis: float
     unrealized_pnl: float
-    unrealized_pnl_pct: Optional[float] = None  # null-safe: cost_basis may be 0
-    realized_pnl: Optional[float] = None  # not available per-position from broker
-    position_weight_pct: Optional[float] = None
-    fx_impact: Optional[float] = None
+    unrealized_pnl_pct: float | None = None  # null-safe: cost_basis may be 0
+    realized_pnl: float | None = None  # not available per-position from broker
+    position_weight_pct: float | None = None
+    fx_impact: float | None = None
 
     # Returns (fact_return)
-    daily_value_return: Optional[float] = None
-    cumulative_value_return: Optional[float] = None
+    daily_value_return: float | None = None
+    cumulative_value_return: float | None = None
 
     # Technical / Risk (fact_technical)
-    value_drawdown_pct_30d: Optional[float] = None
-    recent_price_high_7d: Optional[float] = None
-    recent_price_low_7d: Optional[float] = None
-    price_drawdown_pct_7d: Optional[float] = None
-    recent_price_high_14d: Optional[float] = None
-    recent_price_low_14d: Optional[float] = None
-    price_drawdown_pct_14d: Optional[float] = None
-    price_drawdown_pct_30d: Optional[float] = None
-    price_drawdown_pct_90d: Optional[float] = None
-    price_drawdown_pct_180d: Optional[float] = None
-    price_drawdown_pct_365d: Optional[float] = None
-    value_high_alltime: Optional[float] = None
-    value_low_alltime: Optional[float] = None
-    value_ma_20d: Optional[float] = None
-    value_ma_30d: Optional[float] = None
-    value_ma_50d: Optional[float] = None
-    price_ma_20d: Optional[float] = None
-    price_ma_50d: Optional[float] = None
-    volatility_20d: Optional[float] = None
-    volatility_30d: Optional[float] = None
-    volatility_50d: Optional[float] = None
-    var_95_1d: Optional[float] = None
-    profit_range_30d: Optional[float] = None
-    recent_profit_high_30d: Optional[float] = None
-    recent_profit_low_30d: Optional[float] = None
-    recent_value_high_30d: Optional[float] = None
-    recent_value_low_30d: Optional[float] = None
+    value_drawdown_pct_30d: float | None = None
+    recent_price_high_7d: float | None = None
+    recent_price_low_7d: float | None = None
+    price_drawdown_pct_7d: float | None = None
+    recent_price_high_14d: float | None = None
+    recent_price_low_14d: float | None = None
+    price_drawdown_pct_14d: float | None = None
+    price_drawdown_pct_30d: float | None = None
+    price_drawdown_pct_90d: float | None = None
+    price_drawdown_pct_180d: float | None = None
+    price_drawdown_pct_365d: float | None = None
+    value_high_alltime: float | None = None
+    value_low_alltime: float | None = None
+    value_ma_20d: float | None = None
+    value_ma_30d: float | None = None
+    value_ma_50d: float | None = None
+    price_ma_20d: float | None = None
+    price_ma_50d: float | None = None
+    volatility_20d: float | None = None
+    volatility_30d: float | None = None
+    volatility_50d: float | None = None
+    var_95_1d: float | None = None
+    profit_range_30d: float | None = None
+    recent_profit_high_30d: float | None = None
+    recent_profit_low_30d: float | None = None
+    recent_value_high_30d: float | None = None
+    recent_value_low_30d: float | None = None
 
     # FRED metrics (fact_technical)
-    beta_60d: Optional[float] = None  # 60-day rolling Beta vs SP500
-    sharpe_ratio_30d: Optional[float] = None  # 30-day annualised Sharpe ratio
+    beta_60d: float | None = None  # 60-day rolling Beta vs SP500
+    sharpe_ratio_30d: float | None = None  # 30-day annualised Sharpe ratio
 
     # Signals / Opportunities (fact_signal)
-    dca_bias: Optional[float] = None
-    value_ma_crossover_signal: Optional[float] = (
-        None  # value_ma_20d - value_ma_50d; positive = bullish
-    )
-    price_above_ma_20d: Optional[bool] = None
-    price_above_ma_50d: Optional[bool] = None
+    dca_bias: float | None = None
+    value_ma_crossover_signal: float | None = None  # value_ma_20d - value_ma_50d; positive = bullish
+    price_above_ma_20d: bool | None = None
+    price_above_ma_50d: bool | None = None

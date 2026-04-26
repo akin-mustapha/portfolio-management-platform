@@ -1,36 +1,36 @@
-import { Box, Skeleton, Typography, useTheme } from '@mui/material'
-import PrivacyValue from './PrivacyValue'
-import MetricInfo from './MetricInfo'
-import SparklineChart from '../charts/SparklineChart'
-import type { MetricKey } from '../../constants/metricDefinitions'
+import { Box, Skeleton, Typography, useTheme } from "@mui/material";
+import PrivacyValue from "./PrivacyValue";
+import MetricInfo from "./MetricInfo";
+import SparklineChart from "../charts/SparklineChart";
+import type { MetricKey } from "../../constants/metricDefinitions";
 
-type Variant = 'default' | 'compact' | 'hero'
+type Variant = "default" | "compact" | "hero";
 
 interface KpiCardProps {
-  label: string
-  value?: number | string | null
-  subValue?: string | null
-  prefix?: string
-  suffix?: string
-  colorCode?: 'positive' | 'negative' | 'neutral'
-  loading?: boolean
-  compact?: boolean
-  variant?: Variant
-  metricKey?: MetricKey
-  sparkline?: (number | null)[]
+  label: string;
+  value?: number | string | null;
+  subValue?: string | null;
+  prefix?: string;
+  suffix?: string;
+  colorCode?: "positive" | "negative" | "neutral";
+  loading?: boolean;
+  compact?: boolean;
+  variant?: Variant;
+  metricKey?: MetricKey;
+  sparkline?: (number | null)[];
   /** Render a bordered card frame (useful for standalone metric tiles) */
-  bordered?: boolean
+  bordered?: boolean;
   /** Reserve bottom space for a sparkline even when none is provided (baseline alignment) */
-  reserveSparklineSlot?: boolean
+  reserveSparklineSlot?: boolean;
 }
 
 export default function KpiCard({
   label,
   value,
   subValue,
-  prefix = '',
-  suffix = '',
-  colorCode = 'neutral',
+  prefix = "",
+  suffix = "",
+  colorCode = "neutral",
   loading = false,
   compact = false,
   variant,
@@ -39,53 +39,79 @@ export default function KpiCard({
   bordered = false,
   reserveSparklineSlot = true,
 }: KpiCardProps) {
-  const theme = useTheme()
-  const resolvedVariant: Variant = variant ?? (compact ? 'compact' : 'default')
-  const isHero = resolvedVariant === 'hero'
-  const isCompact = resolvedVariant === 'compact'
+  const theme = useTheme();
+  const resolvedVariant: Variant = variant ?? (compact ? "compact" : "default");
+  const isHero = resolvedVariant === "hero";
+  const isCompact = resolvedVariant === "compact";
 
-  const heroNeutral = theme.palette.mode === 'dark' ? '#ffffff' : '#000000'
+  const heroNeutral = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
   const colorMap = {
     positive: theme.palette.success.main,
     negative: theme.palette.error.main,
     neutral: isHero ? heroNeutral : theme.palette.text.primary,
-  }
-  const valueColor = colorMap[colorCode]
+  };
+  const valueColor = colorMap[colorCode];
 
-  const labelSize = isHero ? 11.5 : 10.5
+  const labelSize = isHero ? 11.5 : 10.5;
   const valueStyles = isHero
-    ? { fontSize: 40, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.02 }
+    ? {
+        fontSize: 40,
+        fontWeight: 700,
+        letterSpacing: "-0.025em",
+        lineHeight: 1.02,
+      }
     : isCompact
-      ? { fontSize: 14, fontWeight: 600, letterSpacing: '-0.005em', lineHeight: 1.25 }
-      : { fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }
-  const pad = isHero ? 2.25 : isCompact ? 0.75 : 1.5
+      ? {
+          fontSize: 14,
+          fontWeight: 600,
+          letterSpacing: "-0.005em",
+          lineHeight: 1.25,
+        }
+      : {
+          fontSize: 18,
+          fontWeight: 700,
+          letterSpacing: "-0.01em",
+          lineHeight: 1.2,
+        };
+  const pad = isHero ? 2.25 : isCompact ? 0.75 : 1.5;
 
-  const hasSparkline = !!(sparkline && sparkline.length > 0)
-  const sparklineSlotHeight = isHero ? 64 : isCompact ? 22 : 32
+  const hasSparkline = !!(sparkline && sparkline.length > 0);
+  const sparklineSlotHeight = isHero ? 64 : isCompact ? 22 : 32;
 
   return (
     <Box
       sx={{
-        height: '100%',
+        height: "100%",
         minWidth: isCompact ? 110 : isHero ? 220 : 140,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: isHero ? 'flex-start' : 'center',
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: isHero ? "flex-start" : "center",
         p: pad,
         pb: isHero ? 0 : pad,
-        bgcolor: isHero || bordered ? 'background.paper' : 'transparent',
-        border: isHero || bordered ? '1px solid' : 'none',
-        borderColor: 'divider',
+        bgcolor: isHero || bordered ? "background.paper" : "transparent",
+        border: isHero || bordered ? "1px solid" : "none",
+        borderColor: "divider",
         borderRadius: isHero || bordered ? 2 : 0,
-        transition: 'background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease',
-        '&:hover': bordered
-          ? (theme) => ({ borderColor: 'divider', boxShadow: theme.custom.shadowCardHover })
+        transition:
+          "background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease",
+        "&:hover": bordered
+          ? (theme) => ({
+              borderColor: "divider",
+              boxShadow: theme.custom.shadowCardHover,
+            })
           : isCompact
-            ? { bgcolor: 'action.hover' }
+            ? { bgcolor: "action.hover" }
             : undefined,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, mb: isHero ? 1 : 0.5 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 0.25,
+          mb: isHero ? 1 : 0.5,
+        }}
+      >
         <Typography
           variant="caption"
           color="text.secondary"
@@ -93,7 +119,7 @@ export default function KpiCard({
           sx={{
             fontSize: labelSize,
             letterSpacing: isHero ? 0.4 : 0.2,
-            textTransform: isHero ? 'uppercase' : 'none',
+            textTransform: isHero ? "uppercase" : "none",
             fontWeight: isHero ? 600 : 500,
           }}
         >
@@ -105,37 +131,50 @@ export default function KpiCard({
         <Skeleton width="80%" height={isHero ? 40 : 24} />
       ) : (
         <>
-          <Typography sx={{ color: valueColor, ...valueStyles, fontVariantNumeric: 'tabular-nums' }}>
+          <Typography
+            sx={{
+              color: valueColor,
+              ...valueStyles,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
             {value != null ? (
               <PrivacyValue
                 value={`${prefix}${
-                  typeof value === 'number'
-                    ? value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                  typeof value === "number"
+                    ? value.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
                     : value
                 }${suffix}`}
               />
             ) : (
-              '—'
+              "—"
             )}
           </Typography>
           {subValue && (
-            <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontVariantNumeric: "tabular-nums" }}
+            >
               {subValue}
             </Typography>
           )}
           {(hasSparkline || (isCompact && reserveSparklineSlot)) && (
             <Box
               sx={{
-                mt: isHero ? 'auto' : 0,
+                mt: isHero ? "auto" : 0,
                 pt: isHero ? 1.25 : 0.5,
                 mx: isHero ? -1 : -0.5,
                 minHeight: sparklineSlotHeight,
-                display: 'flex',
-                alignItems: 'flex-end',
+                display: "flex",
+                alignItems: "flex-end",
               }}
             >
               {hasSparkline && (
-                <Box sx={{ width: '100%' }}>
+                <Box sx={{ width: "100%" }}>
                   <SparklineChart
                     values={sparkline}
                     sentiment={colorCode}
@@ -149,5 +188,5 @@ export default function KpiCard({
         </>
       )}
     </Box>
-  )
+  );
 }

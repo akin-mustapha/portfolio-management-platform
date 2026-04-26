@@ -8,7 +8,6 @@ from ...charts.chart_theme import POSITIVE_COLOR, NEGATIVE_COLOR
 
 
 def asset_table(data=None):
-
     if data is None:
         return html.Div()
 

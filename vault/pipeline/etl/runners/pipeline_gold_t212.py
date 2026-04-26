@@ -8,17 +8,16 @@ joins the metrics views with `analytics.dim_asset` / `analytics.dim_portfolio`
 and returns exactly the columns its fact table expects.
 """
 
-import os
 import logging
+import os
 from pathlib import Path
+
 from dotenv import load_dotenv
-from typing import List, Dict
-
-from pipeline.etl.policies import Pipeline
-from pipeline.etl.protocols import Source, Destination
-
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
+
+from pipeline.etl.policies import Pipeline
+from pipeline.etl.protocols import Destination, Source
 from pipeline.infrastructure.repositories.repository_factory import RepositoryFactory
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
@@ -73,20 +72,16 @@ class _FactDestination(Destination):
 
     fact_name: str
     sql_file: str
-    unique_key: List[str]
+    unique_key: list[str]
 
     def __init__(self):
         self._client = SQLModelClient(DATABASE_URL)
-        self._repository = RepositoryFactory.get(
-            self.fact_name, schema_name="analytics"
-        )
+        self._repository = RepositoryFactory.get(self.fact_name, schema_name="analytics")
         self._sql = load_query(_QUERIES_DIR / "gold" / self.sql_file)
 
-    def load(self, _: Dict = None) -> None:
+    def load(self, _: dict | None = None) -> None:  # type: ignore[override]
         with self._client as db:
-            rows = db.execute(
-                self._sql, params={"portfolio_id": str(portfolio_id)}
-            )
+            rows = db.execute(self._sql, params={"portfolio_id": str(portfolio_id)})
         records = [dict(row._mapping) for row in rows]
         if not records:
             logging.warning(f"[t212_gold:{self.fact_name}] NO RECORDS — skipping")

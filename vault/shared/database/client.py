@@ -1,8 +1,10 @@
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from typing import Any
+
 from sqlalchemy import Engine
 from sqlmodel import create_engine, text
-from typing import Any, Dict, Optional, Iterable
 
 # One engine per database URL — avoids repeated create_engine() calls across repositories.
 _engines: dict[str, Engine] = {}
@@ -23,7 +25,7 @@ class DatabaseClient(ABC):
         pass
 
     @abstractmethod
-    def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> Any:
+    def execute(self, query: str, params: dict[str, Any] | None = None) -> Any:
         """Execute a SQL query."""
         pass
 

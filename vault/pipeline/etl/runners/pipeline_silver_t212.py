@@ -5,33 +5,33 @@ Reads a full snapshot from raw.t212_snapshot (account + positions together)
 and writes to staging.asset and staging.account in a single run.
 """
 
-import os
 import json
 import logging
+import os
 from pathlib import Path
+from typing import Any
+
 from dotenv import load_dotenv
-from typing import List, Dict, Any
-
-from pipeline.domain.schemas.silver.asset import AssetRecord
-from pipeline.domain.schemas.silver.account import AccountRecord
-
-from pipeline.etl.policies import Pipeline
-from pipeline.etl.protocols import Source, Destination, Transformation, RejectedRecord
-from pipeline.etl.validators.schema_validator import SchemaValidator
 
 # TODO: should depend on interface
 from shared.database.client import SQLModelClient
 from shared.database.query_loader import load_query
-from pipeline.infrastructure.repositories.repository_factory import RepositoryFactory
+
+from pipeline.domain.schemas.silver.account import AccountRecord
+from pipeline.domain.schemas.silver.asset import AssetRecord
+from pipeline.etl.policies import Pipeline
+from pipeline.etl.protocols import Destination, RejectedRecord, Source, Transformation
+from pipeline.etl.validators.schema_validator import SchemaValidator
 from pipeline.infrastructure.repositories.dead_letter_destination import (
     DeadLetterDestination,
 )
+from pipeline.infrastructure.repositories.repository_factory import RepositoryFactory
 
 _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries"
 
 
 def _reject(
-    errors: List[RejectedRecord],
+    errors: list[RejectedRecord],
     snapshot_id: str,
     raw: Any,
     error_type: str,
@@ -71,7 +71,7 @@ class Trading212SilverSource(Source):
         self._client = SQLModelClient(DATABASE_URL)
         self._sql = load_query(_QUERIES_DIR / "silver" / "t212_silver_source.sql")
 
-    def extract(self) -> List[Any]:
+    def extract(self) -> list[Any]:
         with self._client as db:
             return db.execute(self._sql)
 
@@ -83,11 +83,11 @@ class Trading212SilverSource(Source):
 
 class Trading212AssetTransformationSilver(Transformation):
     @property
-    def parse_errors(self) -> List[RejectedRecord]:
+    def parse_errors(self) -> list[RejectedRecord]:
         return self._parse_errors
 
-    def transform(self, snapshots: List[Any]) -> List[Dict]:
-        self._parse_errors: List[RejectedRecord] = []
+    def transform(self, snapshots: list[Any]) -> list[dict]:
+        self._parse_errors: list[RejectedRecord] = []
         records = []
         for row in snapshots:
             snapshot_id = row.snapshot_id
@@ -152,11 +152,11 @@ class Trading212AssetTransformationSilver(Transformation):
 
 class Trading212AccountTransformationSilver(Transformation):
     @property
-    def parse_errors(self) -> List[RejectedRecord]:
+    def parse_errors(self) -> list[RejectedRecord]:
         return self._parse_errors
 
-    def transform(self, snapshots: List[Any]) -> List[Dict]:
-        self._parse_errors: List[RejectedRecord] = []
+    def transform(self, snapshots: list[Any]) -> list[dict]:
+        self._parse_errors: list[RejectedRecord] = []
         records = []
         for row in snapshots:
             account = row.account_data
@@ -190,12 +190,8 @@ class Trading212AccountTransformationSilver(Transformation):
                     "currency": currency,
                     "total_value": account.get("totalValue", 0.0),
                     "investments_total_cost": investments.get("totalCost", 0.0),
-                    "investments_realized_pnl": investments.get(
-                        "realizedProfitLoss", 0.0
-                    ),
-                    "investments_unrealized_pnl": investments.get(
-                        "unrealizedProfitLoss", 0.0
-                    ),
+                    "investments_realized_pnl": investments.get("realizedProfitLoss", 0.0),
+                    "investments_unrealized_pnl": investments.get("unrealizedProfitLoss", 0.0),
                     "snapshot_id": row.snapshot_id,
                     "business_key": f"{external_id}_{currency}_{row.ingested_timestamp}",
                     "data_timestamp": row.ingested_timestamp,
@@ -213,7 +209,7 @@ class AssetSilverDestination(Destination):
     def __init__(self):
         self._repository = RepositoryFactory.get("asset", schema_name="staging")
 
-    def load(self, data: List[Dict]) -> None:
+    def load(self, data: list[dict]) -> None:
         self._repository.upsert(records=data, unique_key=["business_key"])
 
 
@@ -239,7 +235,7 @@ class SectorEnrichmentStep:
     """
 
     def run(self) -> None:
-        with SQLModelClient(DATABASE_URL) as client:
+        with SQLModelClient(DATABASE_URL or "") as client:
             client.execute(self._SQL)
 
 
@@ -247,7 +243,7 @@ class AccountSilverDestination(Destination):
     def __init__(self):
         self._repository = RepositoryFactory.get("account", schema_name="staging")
 
-    def load(self, data: List[Dict]) -> None:
+    def load(self, data: list[dict]) -> None:
         self._repository.upsert(records=data, unique_key=["business_key"])
 
 
@@ -280,10 +276,7 @@ class PipelineT212Silver(Pipeline):
         asset_data = self._asset_transformation.transform(snapshots)
         account_data = self._account_transformation.transform(snapshots)
 
-        parse_errors = (
-            self._asset_transformation.parse_errors
-            + self._account_transformation.parse_errors
-        )
+        parse_errors = self._asset_transformation.parse_errors + self._account_transformation.parse_errors
         if parse_errors:
             for r in parse_errors:
                 r.pipeline_name = self._pipeline_name

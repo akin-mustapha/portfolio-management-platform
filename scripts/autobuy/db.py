@@ -1,23 +1,31 @@
 import logging
 from pathlib import Path
-from typing import Optional
 
 import psycopg2
 import psycopg2.extras
 
 log = logging.getLogger(__name__)
 
-_QUERIES = Path(__file__).parent.parent.parent / "src" / "pipelines" / "infrastructure" / "queries" / "strategies" / "autobuy_budget.sql"
+_QUERIES = (
+    Path(__file__).parent.parent.parent
+    / "src"
+    / "pipelines"
+    / "infrastructure"
+    / "queries"
+    / "strategies"
+    / "autobuy_budget.sql"
+)
 
 # ---------------------------------------------------------------------------
 # SQL loading — mirrors src/shared/database/query_loader.py
 # ---------------------------------------------------------------------------
 
+
 def _load_query(name: str) -> str:
     """Extract a named query block from autobuy_budget.sql."""
     sql_text = _QUERIES.read_text()
     blocks: dict[str, list[str]] = {}
-    current: Optional[str] = None
+    current: str | None = None
     for line in sql_text.splitlines():
         stripped = line.strip()
         if stripped.startswith("-- name:"):
@@ -34,6 +42,7 @@ def _load_query(name: str) -> str:
 # Connection
 # ---------------------------------------------------------------------------
 
+
 def open_connection(database_url: str):
     return psycopg2.connect(database_url)
 
@@ -41,6 +50,7 @@ def open_connection(database_url: str):
 # ---------------------------------------------------------------------------
 # Budget persistence (replaces state.json)
 # ---------------------------------------------------------------------------
+
 
 def get_monthly_spent(conn, month: str) -> float:
     """Return cumulative GBP spent in *month* (YYYY-MM), or 0.0 if no row."""
@@ -65,7 +75,8 @@ def save_monthly_spent(conn, month: str, spent: float) -> None:
 # Portfolio data queries
 # ---------------------------------------------------------------------------
 
-def get_drawdown(conn, tickers: list[str]) -> dict[str, Optional[float]]:
+
+def get_drawdown(conn, tickers: list[str]) -> dict[str, float | None]:
     """Return {ticker: price_drawdown_pct_14d} for each ticker.
 
     Value is a negative fraction (e.g. -0.07 = 7% below 14-day high).
@@ -76,12 +87,10 @@ def get_drawdown(conn, tickers: list[str]) -> dict[str, Optional[float]]:
         cur.execute(sql, {"tickers": tickers})
         rows = cur.fetchall()
 
-    result: dict[str, Optional[float]] = {t: None for t in tickers}
+    result: dict[str, float | None] = {t: None for t in tickers}
     for row in rows:
         result[row["ticker"]] = (
-            float(row["price_drawdown_pct_14d"])
-            if row["price_drawdown_pct_14d"] is not None
-            else None
+            float(row["price_drawdown_pct_14d"]) if row["price_drawdown_pct_14d"] is not None else None
         )
 
     missing = [t for t in tickers if t not in {r["ticker"] for r in rows}]

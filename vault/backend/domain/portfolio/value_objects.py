@@ -37,9 +37,7 @@ class TrendSignal:
 
     def __post_init__(self):
         if self.value not in ("Bullish", "Bearish"):
-            raise ValueError(
-                f"TrendSignal must be 'Bullish' or 'Bearish', got '{self.value}'"
-            )
+            raise ValueError(f"TrendSignal must be 'Bullish' or 'Bearish', got '{self.value}'")
 
     @classmethod
     def from_ma_crossover(cls, signal: float | None) -> TrendSignal:

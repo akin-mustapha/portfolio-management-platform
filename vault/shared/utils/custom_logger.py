@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 
 def customer_logger(log_name):

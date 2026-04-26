@@ -108,6 +108,7 @@ FOR VALUES FROM ('{day}') TO ('{next_day}')
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _load_existing_slots(client: SQLModelClient) -> set:
     """Return set of (ingested_date, ingested_slot) already in raw.t212_snapshot."""
     result = client.execute(EXISTING_SLOTS_SQL)
@@ -119,18 +120,21 @@ def _load_account_records(client: SQLModelClient) -> list:
     result = client.execute(ACCOUNT_DEDUPED_SQL)
     rows = []
     for row in result:
-        rows.append({
-            "account_data": row[0],
-            "ingested_date": row[1],
-            "ingested_slot": row[2],
-            "ingested_timestamp": row[3],
-        })
+        rows.append(
+            {
+                "account_data": row[0],
+                "ingested_date": row[1],
+                "ingested_slot": row[2],
+                "ingested_timestamp": row[3],
+            }
+        )
     return rows
 
 
 def _ensure_partition(client: SQLModelClient, ingested_date, dry_run: bool) -> None:
     """Create the date partition for raw.t212_snapshot if it doesn't exist."""
     from datetime import date, timedelta
+
     if isinstance(ingested_date, str):
         ingested_date = date.fromisoformat(ingested_date)
     next_day = ingested_date + timedelta(days=1)
@@ -158,13 +162,16 @@ def _load_assets_for_window(client: SQLModelClient, start_ts, end_ts) -> list:
 # Main
 # ---------------------------------------------------------------------------
 
+
 def run(asset_window_minutes: int = 10, dry_run: bool = False) -> None:
     if not DATABASE_URL:
         raise RuntimeError("DATABASE_URL environment variable is not set.")
 
     logger.info(
         "Starting raw snapshot backfill (slot=%d min, asset_window=%d min, dry_run=%s)",
-        SLOT_MINUTES, asset_window_minutes, dry_run,
+        SLOT_MINUTES,
+        asset_window_minutes,
+        dry_run,
     )
 
     client = SQLModelClient(DATABASE_URL)
@@ -178,7 +185,9 @@ def run(asset_window_minutes: int = 10, dry_run: bool = False) -> None:
         )
 
         account_records = _load_account_records(client)
-        logger.info("Found %d deduplicated account records to process.", len(account_records))
+        logger.info(
+            "Found %d deduplicated account records to process.", len(account_records)
+        )
 
         skipped = 0
         inserted = 0
@@ -205,14 +214,19 @@ def run(asset_window_minutes: int = 10, dry_run: bool = False) -> None:
                 empty_position_warnings += 1
                 logger.warning(
                     "No assets for slot %s / %s (window: %s → %s)",
-                    rec["ingested_date"], rec["ingested_slot"], start_ts, end_ts,
+                    rec["ingested_date"],
+                    rec["ingested_slot"],
+                    start_ts,
+                    end_ts,
                 )
 
             snapshot = {
                 "id": str(uuid.uuid4()),
                 "ingested_date": rec["ingested_date"],
                 "ingested_timestamp": start_ts,
-                "account_data": json.dumps(rec["account_data"]) if isinstance(rec["account_data"], dict) else rec["account_data"],
+                "account_data": json.dumps(rec["account_data"])
+                if isinstance(rec["account_data"], dict)
+                else rec["account_data"],
                 "position_data": json.dumps(assets),
             }
 
@@ -231,7 +245,9 @@ def run(asset_window_minutes: int = 10, dry_run: bool = False) -> None:
 
         logger.info(
             "Backfill complete. Inserted: %d | Skipped (already exist): %d | Empty position warnings: %d",
-            inserted, skipped, empty_position_warnings,
+            inserted,
+            skipped,
+            empty_position_warnings,
         )
         if dry_run:
             logger.info("DRY RUN — no rows were written.")
@@ -241,7 +257,9 @@ def run(asset_window_minutes: int = 10, dry_run: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Backfill raw.t212_snapshot from raw.account + raw.asset")
+    parser = argparse.ArgumentParser(
+        description="Backfill raw.t212_snapshot from raw.account + raw.asset"
+    )
     parser.add_argument(
         "--asset-window-minutes",
         type=int,

@@ -1,15 +1,15 @@
+import json
 import os
 import uuid
-import json
 from datetime import datetime
 from pathlib import Path
+
 from dotenv import load_dotenv
+from shared.database.client import SQLModelClient
+from shared.database.query_loader import load_query
 from sqlalchemy import text
 
 from pipeline.etl.policies import FullLoader
-
-from shared.database.client import SQLModelClient
-from shared.database.query_loader import load_query
 
 load_dotenv()
 
@@ -24,16 +24,13 @@ _QUERIES_DIR = Path(__file__).parent.parent.parent / "infrastructure" / "queries
 
 
 class FullLoaderPostgresT212(FullLoader):
-
     def __init__(self, table_name):
         super().__init__(table_name)
         self._client = SQLModelClient(DATABASE_URL)
 
-    def _loader(self, data: list[dict]):
+    def _loader(self, data: dict):
         ingested_time = datetime.now().date()
-        sql = load_query(_QUERIES_DIR / "bronze" / "t212_snapshot_insert.sql").format(
-            table_name=self._table_name
-        )
+        sql = load_query(_QUERIES_DIR / "bronze" / "t212_snapshot_insert.sql").format(table_name=self._table_name)
 
         params = {
             "id": str(uuid.uuid4()),
@@ -58,14 +55,14 @@ class FullLoaderPostgresT212(FullLoader):
 
     def _exposition_abstraction(self):
         drop_account = "DROP VIEW IF EXISTS raw.v_bronze_account"
-        create_account = load_query(
-            _QUERIES_DIR / "bronze" / "v_bronze_account.sql"
-        ).format(table_name=self._table_name)
+        create_account = load_query(_QUERIES_DIR / "bronze" / "v_bronze_account.sql").format(
+            table_name=self._table_name
+        )
 
         drop_position = "DROP VIEW IF EXISTS raw.v_bronze_position"
-        create_position = load_query(
-            _QUERIES_DIR / "bronze" / "v_bronze_position.sql"
-        ).format(table_name=self._table_name)
+        create_position = load_query(_QUERIES_DIR / "bronze" / "v_bronze_position.sql").format(
+            table_name=self._table_name
+        )
 
         with self._client.engine.connect() as conn:
             conn.execute(text(drop_account))

@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Query
 from legacy.dashboard.controllers.portfolio_controller import PortfolioController
-from legacy.dashboard.infrastructure.repositories.repository_factory import RepositoryFactory
+from legacy.dashboard.infrastructure.repositories.repository_factory import (
+    RepositoryFactory,
+)
 from api.serialization import date_response
 
 router = APIRouter(tags=["portfolio"])

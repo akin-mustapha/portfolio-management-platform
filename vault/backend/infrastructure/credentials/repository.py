@@ -5,9 +5,7 @@ class CredentialsRepository(BaseTableRepository):
     def __init__(self):
         super().__init__("api_credentials", schema_name="portfolio")
 
-    def save(
-        self, provider: str, api_key: str, secret_token: str = None, api_url: str = None
-    ) -> None:
+    def save(self, provider: str, api_key: str, secret_token: str | None = None, api_url: str | None = None) -> None:
         """Upsert credentials for a provider. One row per provider."""
         self.upsert(
             [

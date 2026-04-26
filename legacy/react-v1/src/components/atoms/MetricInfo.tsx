@@ -1,25 +1,31 @@
-import { useState } from 'react'
-import { Box, Divider, IconButton, Popover, Typography } from '@mui/material'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import { metricDefinitions, type MetricKey } from '../../constants/metricDefinitions'
+import { useState } from "react";
+import { Box, Divider, IconButton, Popover, Typography } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import {
+  metricDefinitions,
+  type MetricKey,
+} from "../../constants/metricDefinitions";
 
 interface MetricInfoProps {
-  metricKey: MetricKey
-  size?: 'small' | 'inherit'
+  metricKey: MetricKey;
+  size?: "small" | "inherit";
 }
 
-export default function MetricInfo({ metricKey, size = 'small' }: MetricInfoProps) {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+export default function MetricInfo({
+  metricKey,
+  size = "small",
+}: MetricInfoProps) {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    event.stopPropagation()
-    setAnchorEl(event.currentTarget)
-  }
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
 
-  const handleClose = () => setAnchorEl(null)
+  const handleClose = () => setAnchorEl(null);
 
-  const open = Boolean(anchorEl)
-  const { title, definition, interpret } = metricDefinitions[metricKey]
+  const open = Boolean(anchorEl);
+  const { title, definition, interpret } = metricDefinitions[metricKey];
 
   return (
     <>
@@ -29,18 +35,24 @@ export default function MetricInfo({ metricKey, size = 'small' }: MetricInfoProp
         onClick={handleClick}
         sx={{
           p: 0,
-          color: 'text.disabled',
-          '&:hover': { color: 'text.secondary', backgroundColor: 'transparent' },
+          color: "text.disabled",
+          "&:hover": {
+            color: "text.secondary",
+            backgroundColor: "transparent",
+          },
         }}
       >
-        <InfoOutlinedIcon fontSize={size} sx={{ fontSize: size === 'inherit' ? '0.85em' : 14 }} />
+        <InfoOutlinedIcon
+          fontSize={size}
+          sx={{ fontSize: size === "inherit" ? "0.85em" : 14 }}
+        />
       </IconButton>
       <Popover
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
         disableRestoreFocus
       >
         <Box sx={{ p: 1.5, maxWidth: 280 }}>
@@ -57,5 +69,5 @@ export default function MetricInfo({ metricKey, size = 'small' }: MetricInfoProp
         </Box>
       </Popover>
     </>
-  )
+  );
 }

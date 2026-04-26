@@ -1,5 +1,6 @@
-import os
 import asyncio
+import os
+
 from dotenv import load_dotenv
 
 from pipeline.etl.policies import Origin
@@ -38,9 +39,7 @@ class Trading212AssetAPIOrigin(Origin):
         self._endpoint = "equity/positions"
         self._api_token = API_TOKEN
         self._secret_token = SECRET_TOKEN
-        self._api_client = Trading212APIClient(
-            self._url, self._api_token, self._secret_token
-        )
+        self._api_client = Trading212APIClient(self._url, self._api_token, self._secret_token)
 
     def _handler(self):
         data = asyncio.run(self._api_client.get(endpoint=self._endpoint))

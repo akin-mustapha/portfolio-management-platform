@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from pipeline.infrastructure.kafka.consumer_adapter import KafkaAdapter
 

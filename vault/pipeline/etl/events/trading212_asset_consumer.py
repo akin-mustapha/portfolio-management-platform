@@ -1,7 +1,9 @@
+from datetime import UTC, datetime
+
+import yaml  # type: ignore[import-untyped]
+
 from pipeline.etl.policies import EventConsumer, Mapper
 from pipeline.infrastructure.kafka.consumer_db_client import DestinationFactory
-import yaml
-from datetime import datetime, UTC
 
 asset_schema = """
 table: asset
@@ -55,9 +57,7 @@ class AssetMapper(Mapper):
                 "quantity": asset.get("quantity", 0),
                 "quantity_in_pies": asset.get("quantityInPies", 0),
                 "current_price": asset.get("currentPrice", 0),
-                "quantity_available_for_trading": asset.get(
-                    "quantityAvailableForTrading", 0
-                ),
+                "quantity_available_for_trading": asset.get("quantityAvailableForTrading", 0),
                 "average_price_paid": asset.get("averagePricePaid", 0),
                 "current_value": wallet_impact.get("currentValue", 0),
                 "total_cost": wallet_impact.get("totalCost", 0),
@@ -66,11 +66,7 @@ class AssetMapper(Mapper):
                 "currency": instrument.get("currency", ""),
                 "local_currency": wallet_impact.get("currency", ""),
             }
-            data = {
-                col: data.get(source)
-                for col, source in fields.items()
-                if data.get(source) is not None
-            }
+            data = {col: data.get(source) for col, source in fields.items() if data.get(source) is not None}
             data["source_name"] = "Trading 212"
             data["created_timestamp"] = datetime.now(UTC)
             mapped_data.append(data)

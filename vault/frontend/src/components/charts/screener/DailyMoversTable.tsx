@@ -1,29 +1,39 @@
-import { Box, Table, TableBody, TableCell, TableHead, TableRow, useTheme } from '@mui/material'
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  useTheme,
+} from "@mui/material";
 
 export interface DailyMoverRow {
-  ticker: string
-  daily_value_return: number
-  name: string
+  ticker: string;
+  daily_value_return: number;
+  name: string;
   /** Pre-formatted return string, e.g. "+1.23%" — from portfolioPresenter */
-  formattedReturn: string
+  formattedReturn: string;
 }
 
 interface DailyMoversTableProps {
-  movers?: DailyMoverRow[]
+  movers?: DailyMoverRow[];
 }
 
 export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
-  const theme = useTheme()
-  if (!movers?.length) return null
+  const theme = useTheme();
+  if (!movers?.length) return null;
 
   return (
-    <Box sx={{ height: 300, overflowY: 'auto', overflowX: 'hidden' }}>
+    <Box sx={{ height: 300, overflowY: "auto", overflowX: "hidden" }}>
       <Table size="small" stickyHeader>
         <TableHead>
           <TableRow>
             <TableCell sx={{ fontSize: 11, fontWeight: 700 }}>Ticker</TableCell>
             <TableCell sx={{ fontSize: 11, fontWeight: 700 }}>Name</TableCell>
-            <TableCell align="right" sx={{ fontSize: 11, fontWeight: 700 }}>Daily Return</TableCell>
+            <TableCell align="right" sx={{ fontSize: 11, fontWeight: 700 }}>
+              Daily Return
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -35,9 +45,9 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
                   fontSize: 11,
                   color: theme.palette.text.secondary,
                   maxWidth: 180,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
                 title={m.name}
               >
@@ -48,7 +58,10 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
                 sx={{
                   fontSize: 11,
                   fontWeight: 600,
-                  color: m.daily_value_return >= 0 ? theme.palette.success.main : theme.palette.error.main,
+                  color:
+                    m.daily_value_return >= 0
+                      ? theme.palette.success.main
+                      : theme.palette.error.main,
                 }}
               >
                 {m.formattedReturn}
@@ -58,5 +71,5 @@ export default function DailyMoversTable({ movers }: DailyMoversTableProps) {
         </TableBody>
       </Table>
     </Box>
-  )
+  );
 }

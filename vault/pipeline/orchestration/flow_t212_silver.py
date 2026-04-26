@@ -1,11 +1,12 @@
 import os
+
 from dotenv import load_dotenv
 from prefect import flow, task
-from prefect.logging import loggers
 from prefect.cache_policies import NO_CACHE
+from prefect.logging import loggers
+from shared.database.client import SQLModelClient
 
 from pipeline.infrastructure.factories.pipeline_factory import PipelineFactory
-from shared.database.client import SQLModelClient
 
 load_dotenv()
 

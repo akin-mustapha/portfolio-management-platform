@@ -1,7 +1,7 @@
 import json
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 from shared.database.client import SQLModelClient
 
 load_dotenv()
@@ -29,9 +29,7 @@ class PostgresRebalancePlanRepository:
             "target_completion_date": record["target_completion_date"],
             "status": record["status"],
             "plan_json": (
-                json.dumps(record["plan_json"])
-                if isinstance(record["plan_json"], dict)
-                else record["plan_json"]
+                json.dumps(record["plan_json"]) if isinstance(record["plan_json"], dict) else record["plan_json"]
             ),
             "email_sent": record["email_sent"],
         }
@@ -61,9 +59,7 @@ class PostgresRebalancePlanRepository:
             JOIN analytics.dim_asset da ON da.asset_id = fv.asset_id
         """
         rows = self._client.execute(sql)
-        return {
-            r._mapping["ticker"]: float(r._mapping["position_weight_pct"]) for r in rows
-        }
+        return {r._mapping["ticker"]: float(r._mapping["position_weight_pct"]) for r in rows}
 
     def get_latest(self) -> dict | None:
         sql = """

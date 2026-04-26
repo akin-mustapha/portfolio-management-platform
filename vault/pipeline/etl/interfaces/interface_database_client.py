@@ -1,5 +1,6 @@
-from typing import Dict, Optional, Iterable, Any
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from typing import Any
 
 
 class DatabaseClient(ABC):
@@ -11,7 +12,7 @@ class DatabaseClient(ABC):
         pass
 
     @abstractmethod
-    def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> Any:
+    def execute(self, query: str, params: dict[str, Any] | None = None) -> Any:
         """Execute a SQL query."""
         pass
 

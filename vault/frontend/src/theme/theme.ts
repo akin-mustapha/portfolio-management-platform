@@ -1,33 +1,33 @@
-import { createTheme, type PaletteMode } from '@mui/material'
-import { lightTokens, darkTokens } from './tokens'
+import { createTheme, type PaletteMode } from "@mui/material";
+import { lightTokens, darkTokens } from "./tokens";
 
-declare module '@mui/material/styles' {
+declare module "@mui/material/styles" {
   interface Theme {
     custom: {
-      shadowCard: string
-      shadowCardHover: string
-      shadowPop: string
-      bgZebra: string
-      bgRowHover: string
-      bgRowSelected: string
-      bgSurface: string
-    }
+      shadowCard: string;
+      shadowCardHover: string;
+      shadowPop: string;
+      bgZebra: string;
+      bgRowHover: string;
+      bgRowSelected: string;
+      bgSurface: string;
+    };
   }
   interface ThemeOptions {
     custom?: {
-      shadowCard?: string
-      shadowCardHover?: string
-      shadowPop?: string
-      bgZebra?: string
-      bgRowHover?: string
-      bgRowSelected?: string
-      bgSurface?: string
-    }
+      shadowCard?: string;
+      shadowCardHover?: string;
+      shadowPop?: string;
+      bgZebra?: string;
+      bgRowHover?: string;
+      bgRowSelected?: string;
+      bgSurface?: string;
+    };
   }
 }
 
 export function buildTheme(mode: PaletteMode) {
-  const t = mode === 'dark' ? darkTokens : lightTokens
+  const t = mode === "dark" ? darkTokens : lightTokens;
 
   return createTheme({
     palette: {
@@ -49,10 +49,10 @@ export function buildTheme(mode: PaletteMode) {
     typography: {
       fontFamily: '"Inter", "Roboto", "Helvetica Neue", Arial, sans-serif',
       fontSize: 13,
-      h6: { letterSpacing: '-0.01em', fontWeight: 700 },
-      subtitle1: { letterSpacing: '-0.01em' },
-      subtitle2: { letterSpacing: '-0.005em' },
-      button: { textTransform: 'none', fontWeight: 500 },
+      h6: { letterSpacing: "-0.01em", fontWeight: 700 },
+      subtitle1: { letterSpacing: "-0.01em" },
+      subtitle2: { letterSpacing: "-0.005em" },
+      button: { textTransform: "none", fontWeight: 500 },
     },
     custom: {
       shadowCard: t.shadowCard,
@@ -69,9 +69,9 @@ export function buildTheme(mode: PaletteMode) {
           body: {
             backgroundColor: t.bgApp,
             color: t.textPrimary,
-            fontVariantNumeric: 'tabular-nums',
+            fontVariantNumeric: "tabular-nums",
           },
-          'input, button, select, textarea': {
+          "input, button, select, textarea": {
             fontFeatureSettings: '"tnum" 1',
           },
         },
@@ -83,7 +83,8 @@ export function buildTheme(mode: PaletteMode) {
             border: `1px solid ${t.bgCardBorder}`,
             borderRadius: 12,
             boxShadow: t.shadowCard,
-            transition: 'box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease',
+            transition:
+              "box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease",
           },
         },
       },
@@ -99,5 +100,5 @@ export function buildTheme(mode: PaletteMode) {
         },
       },
     },
-  })
+  });
 }
