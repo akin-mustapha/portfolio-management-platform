@@ -1,0 +1,29 @@
+from typing import Any, cast
+
+import pytest
+
+from pipeline.etl.policies import Origin
+
+
+class TestOrigin:
+    @pytest.fixture
+    def fixture_origin(self):
+        class TestOriginImpl(Origin):
+            def _handler(self) -> Any:
+                # Origin._metadata is typed None on the base; cast to allow dict assignment.
+                self._metadata = cast(None, {"origin_name": self._origin_name})
+                return {"key": "value"}
+
+        origin = TestOriginImpl(origin_name="test_origin")
+        return origin
+
+    def test_origin_is_created_correctly(self, fixture_origin: Origin):
+        assert fixture_origin.origin_name == "test_origin"
+        assert fixture_origin.event is None
+
+    def test_origin_fetches_data_and_creates_event(self, fixture_origin: Origin):
+        event = fixture_origin.fetch()
+        assert event.metadata is not None
+        assert event.metadata.get("origin_name") == "test_origin"
+        assert event.payload == {"key": "value"}
+        assert event.timestamp is not None

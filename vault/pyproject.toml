@@ -40,4 +40,7 @@ where = ["."]
 exclude = ["frontend*", "scripts*"]
 
 [tool.pytest.ini_options]
-testpaths = ["../tests"]
+testpaths = ["backend/tests", "pipeline/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
