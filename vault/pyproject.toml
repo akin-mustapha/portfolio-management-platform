@@ -28,6 +28,13 @@ dependencies = [
     "confluent-kafka",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "pytest",
+    "pytest-mock",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 exclude = ["frontend*", "scripts*"]
