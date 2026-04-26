@@ -86,7 +86,7 @@ class _FactDestination(Destination):
         with self._client as db:
             rows = db.execute(
                 self._sql, params={"portfolio_id": str(portfolio_id)}
-            ).fetchall()
+            )
         records = [dict(row._mapping) for row in rows]
         if not records:
             logging.warning(f"[t212_gold:{self.fact_name}] NO RECORDS — skipping")

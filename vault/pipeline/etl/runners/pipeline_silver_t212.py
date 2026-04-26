@@ -73,8 +73,7 @@ class Trading212SilverSource(Source):
 
     def extract(self) -> List[Any]:
         with self._client as db:
-            result = db.execute(self._sql)
-        return result.fetchall()
+            return db.execute(self._sql)
 
 
 # ─────────────────────────────────────────────

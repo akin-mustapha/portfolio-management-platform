@@ -17,11 +17,6 @@ class BaseTableRepository(RepositoryInterface):
         schema_name: str = None,
         field_map: Dict[str, str] = None,
     ):
-        """
-        :param entity_name: Table name in DB
-        :param schema_name: Schema name (Postgres only; omit for SQLite)
-        :param field_map: Mapping from domain name -> DB column name
-        """
         self._entity_name = entity_name
         self._schema_name = schema_name
         self._client = SQLModelClient(DATABASE_URL)
@@ -42,13 +37,11 @@ class BaseTableRepository(RepositoryInterface):
         return self._entity_name
 
     def _to_db_fields(self, data: Dict) -> Dict:
-        """Map domain-friendly fields to DB column names. Passthrough when no field_map."""
         if not self._field_map:
             return data
         return {self._field_map.get(k, k): v for k, v in data.items()}
 
     def _from_db_fields(self, data: Dict) -> Dict:
-        """Map DB column names back to domain-friendly fields. Passthrough when no field_map."""
         if not self._field_map:
             return data
         reverse_map = {v: k for k, v in self._field_map.items()}

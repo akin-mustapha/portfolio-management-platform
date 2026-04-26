@@ -47,8 +47,7 @@ class AssetPortfolioSource(Source):
 
     def extract(self) -> list:
         with SQLModelClient(DATABASE_URL) as client:
-            res = client.execute(self._sql)
-            return res.fetchall()
+            return client.execute(self._sql)
 
 
 class AssetPortfolioDestination(Destination):

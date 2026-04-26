@@ -166,8 +166,8 @@ class Trading212HistorySource(Source):
     def _get_stored_high_water_mark(self, endpoint_key: str):
         sql = load_query(_QUERIES_DIR / "bronze" / "t212_history_cursor_select.sql")
         with self._db_client as client:
-            result = client.execute(sql, params={"endpoint": endpoint_key})
-            row = result.fetchone() if result is not None else None
+            rows = client.execute(sql, params={"endpoint": endpoint_key})
+            row = rows[0] if rows else None
         if row is None:
             return None
         return _parse_ts(getattr(row, "last_event_ts", None))

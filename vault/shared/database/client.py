@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 from sqlalchemy import Engine
-from sqlmodel import create_engine, Session, text
+from sqlmodel import create_engine, text
 from typing import Any, Dict, Optional, Iterable
 
 # One engine per database URL — avoids repeated create_engine() calls across repositories.
@@ -61,10 +61,10 @@ class SQLModelClient(DatabaseClient):
 
     def execute(self, query: str, params=None):
         try:
-            with Session(self.engine) as session:
-                result = session.exec(text(query), params=params or {})
-                rows = result.fetchall()
-                session.commit()
+            with self.engine.connect() as conn:
+                result = conn.execute(text(query), params or {})
+                rows = result.fetchall() if result.returns_rows else []
+                conn.commit()
             return rows
         except Exception as e:
             logging.error(f"Error executing query: {e}")
