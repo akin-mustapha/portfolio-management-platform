@@ -24,4 +24,4 @@ jobs:
       - name: Run Units
         working-directory: vault
         run: |
-          pytest tests/
+          pytest backend/tests/ pipeline/tests/ --ignore=pipeline/tests/integration
