@@ -1,0 +1,81 @@
+name: asset-monitoring-system
+prefect-version: 3.6.15
+
+build: null
+push: null
+
+pull:
+  - prefect.deployments.steps.set_working_directory:
+      directory: /Users/kunmi/workspace/projects/engineering/projects/portfolio-management-platform/vault
+
+deployments:
+
+  - name: t212_bronze
+    entrypoint: ./pipeline/orchestration/flow_t212_bronze.py:flow_t212_bronze
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  - name: t212_history_bronze
+    entrypoint: ./pipeline/orchestration/flow_t212_history_bronze.py:flow_t212_history_bronze
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  - name: t212_silver
+    entrypoint: ./pipeline/orchestration/flow_t212_silver.py:flow_t212_silver
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  - name: t212_gold
+    entrypoint: ./pipeline/orchestration/flow_t212_gold.py:flow_t212_gold
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+        anchor_date: "2024-01-01T00:00:00Z"
+
+  - name: t212_asset_portfolio_sync
+    entrypoint: ./pipeline/orchestration/asset_flow_portfolio.py:flow_t212_asset_portfolio_sync
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+
+  - name: t212_enrichment_synchronization
+    entrypoint: ./pipeline/orchestration/enrichment_synchronization.py:flow_t212_enrichment_sychronization
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 3600          # hourly
+
+  - name: rebalance_plan
+    entrypoint: ./pipeline/orchestration/flow_rebalance_plan.py:flow_rebalance_plan
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 86400          # daily
+        anchor_date: "2026-01-01T07:00:00Z"
+
+  - name: fred_daily
+    entrypoint: ./pipeline/orchestration/flow_fred.py:flow_fred
+    work_pool:
+      name: asset-monitoring-pool
+    schedules:
+      - interval: 86400          # daily
+        anchor_date: "2026-01-01T07:30:00Z"
+
+  # - name: trading_212_asset_event_producer
+  #   entrypoint: ./pipeline/orchestration/asset_flow_event_producer.py:trading_212_asset_event_producer
+  #   work_pool:
+  #     name: asset-monitoring-pool
+  #   schedules:
+  #     - interval: 3600
+  #   is_schedule_active: false  # disabled — enable when ready

@@ -16,7 +16,6 @@ repo's existing test style (see tests/ingestion/test_pipeline_bugs.py).
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-
 # ---------------------------------------------------------------------------
 # Shared helpers
 # ---------------------------------------------------------------------------
@@ -34,6 +33,7 @@ def _async_gen(pages):
     async def _gen(*_args, **_kwargs):
         for page in pages:
             yield page
+
     return _gen
 
 
@@ -43,7 +43,6 @@ def _async_gen(pages):
 
 
 class TestSourcePagination:
-
     def _build_source(self, paginated_factory, stored_ts=None):
         from pipelines.application.runners.pipeline_bronze_t212_history import (
             Trading212HistorySource,
@@ -84,8 +83,7 @@ class TestSourcePagination:
         }
 
         def fake_paginated(endpoint, cursor=None, limit=50, stop_predicate=None):
-            for page in pages_by_endpoint[endpoint]:
-                yield page
+            yield from pages_by_endpoint[endpoint]
 
         source = self._build_source(fake_paginated, stored_ts=None)
         result = source.extract()
@@ -159,7 +157,6 @@ class TestSourcePagination:
 
 
 class TestLoader:
-
     def _build_loader(self):
         from pipelines.application.runners.loaders.loader_bronze_t212_history import (
             FullLoaderPostgresT212History,
@@ -197,8 +194,11 @@ class TestLoader:
         assert any("raw.t212_history_dividend" in s for s in executed_sqls)
         assert any("raw.t212_history_order" in s for s in executed_sqls)
         assert any("raw.t212_history_transaction" in s for s in executed_sqls)
-        assert all("ON CONFLICT (id, ingested_date) DO NOTHING" in s
-                   for s in executed_sqls if s.strip().startswith("INSERT INTO raw.t212_history_"))
+        assert all(
+            "ON CONFLICT (id, ingested_date) DO NOTHING" in s
+            for s in executed_sqls
+            if s.strip().startswith("INSERT INTO raw.t212_history_")
+        )
 
     def test_upserts_cursor_with_newest_event(self):
         loader, mock_client = self._build_loader()
@@ -215,8 +215,7 @@ class TestLoader:
         loader._loader(data)
 
         cursor_calls = [
-            call for call in mock_client.execute.call_args_list
-            if "raw.t212_history_cursor" in call.args[0]
+            call for call in mock_client.execute.call_args_list if "raw.t212_history_cursor" in call.args[0]
         ]
         assert len(cursor_calls) == 1
         params = cursor_calls[0].kwargs["params"]
@@ -239,8 +238,7 @@ class TestLoader:
         loader._loader(data)
 
         dividend_inserts = [
-            call for call in mock_client.execute.call_args_list
-            if "raw.t212_history_dividend" in call.args[0]
+            call for call in mock_client.execute.call_args_list if "raw.t212_history_dividend" in call.args[0]
         ]
         assert len(dividend_inserts) == 1
         assert dividend_inserts[0].kwargs["params"]["id"] == "d_ok"
@@ -252,7 +250,6 @@ class TestLoader:
 
 
 class TestPipelineWiring:
-
     def test_run_wires_source_to_destination(self):
         from pipelines.application.runners.pipeline_bronze_t212_history import (
             PipelineT212History,

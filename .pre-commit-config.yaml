@@ -1,0 +1,30 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.20.2
+    hooks:
+      - id: mypy
+        files: ^vault/(backend|pipeline)/
+        additional_dependencies:
+          - types-requests
+          - types-python-dateutil
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v10.2.1
+    hooks:
+      - id: eslint
+        files: ^vault/frontend/.*\.[jt]sx?$
+        args: [--fix]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        files: \.[jt]sx?$

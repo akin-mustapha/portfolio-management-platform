@@ -6,16 +6,20 @@ import logging
 from datetime import date
 from dataclasses import dataclass
 
-from src.services.ingestion.infra.repositories.table_repository_factory import TableRepositoryFactory
+from src.services.ingestion.infra.repositories.table_repository_factory import (
+    TableRepositoryFactory,
+)
 from src.shared.database.client import SQLModelClient
 
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+
 class QueryRepository:
     def __init__(self):
         self._client = SQLModelClient(DATABASE_URL)
+
     def select_all_asset_not_updated_since(self):
         query = """
         WITH base AS (
@@ -159,27 +163,34 @@ class Asset:
 
     def calculate_metrics(self):
         if self.open_price and self.close_price:
-            self.return_pct = (self.close_price - self.open_price) / self.open_price * 100
+            self.return_pct = (
+                (self.close_price - self.open_price) / self.open_price * 100
+            )
             self.risk_level = "High" if self.return_pct < -0.05 else "Low"
 
 
 # ───────────────────────── Consumer ─────────────────────────
 
+
 class AnalyticsConsumer:
     def __init__(self):
         logging.info("Initializing AnalyticsConsumer")
 
-        self._consumer = Consumer({
-            "bootstrap.servers": "localhost:9092",
-            "group.id": "discovery-group-1",
-            "enable.auto.commit": True,
-            # "auto.offset.reset": "earliest",
-        })
+        self._consumer = Consumer(
+            {
+                "bootstrap.servers": "localhost:9092",
+                "group.id": "discovery-group-1",
+                "enable.auto.commit": True,
+                # "auto.offset.reset": "earliest",
+            }
+        )
 
         self._topics = ["analytics.ingestion"]
 
         self._query_repo = QueryRepository()
-        self._fact_asset_price_daily_repo = TableRepositoryFactory.get("fact_asset_price_daily")
+        self._fact_asset_price_daily_repo = TableRepositoryFactory.get(
+            "fact_asset_price_daily"
+        )
 
     # ───────────────────────── Runtime ─────────────────────────
 
@@ -204,6 +215,7 @@ class AnalyticsConsumer:
             return
 
         print(event)
+
 
 # ───────────────────────── Entrypoint ─────────────────────────
 

@@ -1,0 +1,38 @@
+# Drawdown-based auto-buy watchlist.
+#
+# monthly_limit: combined GBP cap on total orders placed in a calendar month.
+# ticker: must match Trading212's external_id format exactly (e.g. "VUSA_EQ", "VWRPl")
+# tranches: list of thresholds in ascending order; deepest breached fires first.
+#   drawdown_pct: positive %, e.g. 5.0 means 5% below 14-day rolling high
+#   order_value:  GBP amount to invest at this tranche
+
+monthly_limit: 50.0
+
+assets:
+  - name: Vanguard S&P 500 (Dist)
+    ticker: VUSAl
+    tranches:
+      - drawdown_pct: 5.0
+        order_value: 5.0
+      - drawdown_pct: 10.0
+        order_value: 10.0
+      - drawdown_pct: 15.0
+        order_value: 15.0
+
+  - name: Vanguard FTSE All-World (Acc)
+    ticker: VWRPl
+    tranches:
+      - drawdown_pct: 5.0
+        order_value: 5.0
+      - drawdown_pct: 10.0
+        order_value: 10.0
+      - drawdown_pct: 15.0
+        order_value: 15.0
+
+  - name: iShares MSCI World Mid-Cap Equal Weight (Acc)
+    ticker: IWSZl
+    tranches:
+      - drawdown_pct: 5.0
+        order_value: 5.0
+      - drawdown_pct: 10.0
+        order_value: 10.0

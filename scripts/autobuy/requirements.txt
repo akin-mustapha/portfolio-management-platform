@@ -1,0 +1,6 @@
+psycopg2-binary>=2.9
+requests>=2.31
+APScheduler>=3.10
+pytz>=2024.1
+python-dotenv>=1.0
+PyYAML>=6.0

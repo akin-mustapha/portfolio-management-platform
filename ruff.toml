@@ -1,0 +1,14 @@
+exclude = [
+    "legacy/",
+    "sandbox/",
+    ".claude/",
+]
+line-length = 120
+
+[lint]
+select = ["E", "F", "I", "UP"]
+# E501 ignored: migration files and pipeline SQL strings exceed any reasonable limit
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+"vault/migrations/*" = ["UP007", "UP035", "UP045"]

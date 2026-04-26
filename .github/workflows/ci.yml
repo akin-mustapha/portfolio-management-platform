@@ -5,22 +5,23 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python 3.13
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.13
+          python-version: "3.13"
       - name: Install dependencies
+        working-directory: vault
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -e .
+          pip install -e ".[dev]"
       - name: Run Linter
         run: |
-          ruff check .    
+          ruff check .
       - name: Run Formatter
         run: |
-          python3 -m black src/
+          ruff format --check .
       - name: Run Units
+        working-directory: vault
         run: |
-          pytest tests/
+          pytest backend/tests/ pipeline/tests/ --ignore=pipeline/tests/integration

@@ -1,12 +1,14 @@
 from confluent_kafka import Consumer
 import json
 
-consumer = Consumer({
-    "bootstrap.servers": "localhost:9092",
-    "group.id": "discovery-group-1",
-    # "auto.offset.reset": "earliest",
-    "enable.auto.commit": True
-})
+consumer = Consumer(
+    {
+        "bootstrap.servers": "localhost:9092",
+        "group.id": "discovery-group-1",
+        # "auto.offset.reset": "earliest",
+        "enable.auto.commit": True,
+    }
+)
 
 consumer.subscribe(["asset.ingestion"])
 

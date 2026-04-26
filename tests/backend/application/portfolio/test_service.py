@@ -3,19 +3,19 @@ PortfolioService unit tests — all repository calls are mocked.
 No database connection is required.
 """
 
-import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-from backend.domain.portfolio.value_objects import Ticker
-from backend.domain.portfolio.entities import (
+import pytest
+from v2.backend.application.portfolio.service import PortfolioService
+from v2.backend.domain.portfolio.entities import (
     Asset,
-    Tag,
-    Category,
     AssetTag,
+    Category,
     Industry,
     Sector,
+    Tag,
 )
-from backend.application.portfolio.service import PortfolioService
+from v2.backend.domain.portfolio.value_objects import Ticker
 
 
 @pytest.fixture
@@ -26,12 +26,13 @@ def mock_repo_factory():
 
 @pytest.fixture
 def service(mock_repo_factory):
-    with patch(
-        "backend.application.portfolio.service.RepositoryFactory",
-        return_value=mock_repo_factory,
-    ):
-        svc = PortfolioService()
-    svc._repo_factory = mock_repo_factory
+    mock_analytics_repo = MagicMock()
+    mock_portfolio_query_repo = MagicMock()
+    svc = PortfolioService(
+        repo_factory=mock_repo_factory,
+        analytics_repo=mock_analytics_repo,
+        portfolio_query_repo=mock_portfolio_query_repo,
+    )
     return svc
 
 
@@ -49,9 +50,7 @@ class TestCreateTag:
         )
         result = service.create_tag(tag)
 
-        tag_repo.upsert.assert_called_once_with(
-            [tag.to_record()], ["name", "tag_type_id"]
-        )
+        tag_repo.upsert.assert_called_once_with([tag.to_record()], ["name", "tag_type_id"])
         assert result is tag
 
     def test_raises_when_repo_raises(self, service, mock_repo_factory):
@@ -79,9 +78,7 @@ class TestTagAsset:
         asset_tag_repo = MagicMock()
 
         def get_repo(name):
-            return {"asset": asset_repo, "tag": tag_repo, "asset_tag": asset_tag_repo}[
-                name
-            ]
+            return {"asset": asset_repo, "tag": tag_repo, "asset_tag": asset_tag_repo}[name]
 
         mock_repo_factory.get.side_effect = get_repo
 
@@ -96,9 +93,7 @@ class TestTagAsset:
         tag_repo = MagicMock()
 
         def get_repo(name):
-            return {"asset": asset_repo, "tag": tag_repo, "asset_tag": MagicMock()}[
-                name
-            ]
+            return {"asset": asset_repo, "tag": tag_repo, "asset_tag": MagicMock()}[name]
 
         mock_repo_factory.get.side_effect = get_repo
 
@@ -112,9 +107,7 @@ class TestTagAsset:
         tag_repo.select.return_value = []  # tag not found
 
         def get_repo(name):
-            return {"asset": asset_repo, "tag": tag_repo, "asset_tag": MagicMock()}[
-                name
-            ]
+            return {"asset": asset_repo, "tag": tag_repo, "asset_tag": MagicMock()}[name]
 
         mock_repo_factory.get.side_effect = get_repo
 
@@ -138,9 +131,7 @@ class TestRemoveTagFromAsset:
         mock_repo_factory.get.return_value = asset_tag_repo
 
         with pytest.raises(RuntimeError, match="constraint error"):
-            service.remove_tag_from_asset(
-                AssetTag(asset_id=1, tag_id=2, created_timestamp=None)
-            )
+            service.remove_tag_from_asset(AssetTag(asset_id=1, tag_id=2, created_timestamp=None))
 
 
 class TestAssignIndustryToSector:
@@ -157,9 +148,7 @@ class TestAssignIndustryToSector:
 
         service.assign_industry_to_sector(sector_id=3, industry_id=1)
 
-        sector_repo.update.assert_called_once_with(
-            params={"id": 3}, data={"industry_id": 1}
-        )
+        sector_repo.update.assert_called_once_with(params={"id": 3}, data={"industry_id": 1})
 
     def test_raises_when_industry_not_found(self, service, mock_repo_factory):
         sector_repo = MagicMock()
@@ -239,9 +228,7 @@ class TestSearchTagByAsset:
         assert len(result) == 1
 
     def test_raises_when_asset_has_no_id(self, service, mock_repo_factory):
-        asset = Asset(
-            id=None, ticker=Ticker("AAPL"), name="Apple", broker=None, currency=None
-        )
+        asset = Asset(id=None, ticker=Ticker("AAPL"), name="Apple", broker=None, currency=None)
 
         with pytest.raises(ValueError, match="Asset must have an id"):
             service.search_tag_by_asset(asset)
@@ -269,13 +256,9 @@ class TestGetAssetByTicker:
         asset_repo.select.return_value = {"id": "1", "ticker": "AAPL"}
         mock_repo_factory.get.return_value = asset_repo
 
-        result = service.get_asset_by_ticker(
-            "AAPL", broker="Trading212", currency="USD"
-        )
+        result = service.get_asset_by_ticker("AAPL", broker="Trading212", currency="USD")
 
-        asset_repo.select.assert_called_once_with(
-            {"ticker": "AAPL", "broker": "Trading212", "currency": "USD"}
-        )
+        asset_repo.select.assert_called_once_with({"ticker": "AAPL", "broker": "Trading212", "currency": "USD"})
         assert result["ticker"] == "AAPL"
 
     def test_returns_none_when_ticker_is_empty(self, service, mock_repo_factory):
@@ -295,9 +278,7 @@ class TestGetAllMethods:
             ("get_all_categories", "category"),
         ],
     )
-    def test_happy_path_delegates_to_repo(
-        self, service, mock_repo_factory, method, repo_key
-    ):
+    def test_happy_path_delegates_to_repo(self, service, mock_repo_factory, method, repo_key):
         repo = MagicMock()
         repo.select_all.return_value = [{"id": 1}]
         mock_repo_factory.get.return_value = repo
@@ -329,18 +310,14 @@ class TestCreateIndustry:
         )
         service.create_industry(industry)
 
-        industry_repo.upsert.assert_called_once_with(
-            records=[industry.to_record()], unique_key=["name"]
-        )
+        industry_repo.upsert.assert_called_once_with(records=[industry.to_record()], unique_key=["name"])
 
     def test_raises_when_repo_raises(self, service, mock_repo_factory):
         industry_repo = MagicMock()
         industry_repo.upsert.side_effect = RuntimeError("unique violation")
         mock_repo_factory.get.return_value = industry_repo
 
-        industry = Industry(
-            id=None, name="Technology", description="", created_timestamp="2026-01-01"
-        )
+        industry = Industry(id=None, name="Technology", description="", created_timestamp="2026-01-01")
         with pytest.raises(RuntimeError, match="unique violation"):
             service.create_industry(industry)
 
@@ -359,9 +336,7 @@ class TestCreateSector:
         )
         service.create_sector(sector)
 
-        sector_repo.upsert.assert_called_once_with(
-            records=[sector.to_record()], unique_key=["name"]
-        )
+        sector_repo.upsert.assert_called_once_with(records=[sector.to_record()], unique_key=["name"])
 
     def test_raises_when_repo_raises(self, service, mock_repo_factory):
         sector_repo = MagicMock()
@@ -392,17 +367,13 @@ class TestCreateCategory:
         )
         service.create_category(category)
 
-        category_repo.upsert.assert_called_once_with(
-            records=[category.to_record()], unique_key=["name"]
-        )
+        category_repo.upsert.assert_called_once_with(records=[category.to_record()], unique_key=["name"])
 
     def test_raises_when_repo_raises(self, service, mock_repo_factory):
         category_repo = MagicMock()
         category_repo.upsert.side_effect = RuntimeError("DB error")
         mock_repo_factory.get.return_value = category_repo
 
-        category = Category(
-            id=None, name="Equity", description="", created_timestamp="2026-01-01"
-        )
+        category = Category(id=None, name="Equity", description="", created_timestamp="2026-01-01")
         with pytest.raises(RuntimeError, match="DB error"):
             service.create_category(category)

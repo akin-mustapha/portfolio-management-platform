@@ -1,4 +1,3 @@
-
 import os
 from dotenv import load_dotenv
 from random import randint
@@ -19,57 +18,58 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 
 if __name__ == "__main__":
-  # Example usage
-  t_item = Asset(
-              id=4,
-              external_id=f"instrument_{randint(1000, 9999)}",
-              name="Sample Instrument",
-              description="Sample Instrument Description",
-              source_name="trading212",
-              is_active=True,
-              created_datetime=datetime.now(UTC),
-              updated_datetime=None,
-          )
-  t_tag = Tag(
-              id=1,
-              name=f"Sample Tag_{randint(1000, 9999)}",
-              description="Sample Tag Description",
-              tag_type_id=randint(1, 5),
-              is_active=True,
-              created_datetime=datetime.now(UTC),
-              updated_datetime=None,
-          )
-  database_client = SQLModelClient(database_url=DATABASE_URL)
+    # Example usage
+    t_item = Asset(
+        id=4,
+        external_id=f"instrument_{randint(1000, 9999)}",
+        name="Sample Instrument",
+        description="Sample Instrument Description",
+        source_name="trading212",
+        is_active=True,
+        created_datetime=datetime.now(UTC),
+        updated_datetime=None,
+    )
+    t_tag = Tag(
+        id=1,
+        name=f"Sample Tag_{randint(1000, 9999)}",
+        description="Sample Tag Description",
+        tag_type_id=randint(1, 5),
+        is_active=True,
+        created_datetime=datetime.now(UTC),
+        updated_datetime=None,
+    )
+    database_client = SQLModelClient(database_url=DATABASE_URL)
 
-  item_repo = EntityRepositoryFactory.get_repository("asset", schema_name="portfolio")
-  tag_repo = EntityRepositoryFactory.get_repository("tag", schema_name="portfolio")
-  item_tag_repo = EntityRepositoryFactory.get_repository("asset_tag", schema_name="portfolio")
-  item_query_repo = ItemSQLQueryRepository(database_client)
+    item_repo = EntityRepositoryFactory.get_repository("asset", schema_name="portfolio")
+    tag_repo = EntityRepositoryFactory.get_repository("tag", schema_name="portfolio")
+    item_tag_repo = EntityRepositoryFactory.get_repository(
+        "asset_tag", schema_name="portfolio"
+    )
+    item_query_repo = ItemSQLQueryRepository(database_client)
 
-  tag_service = PortfolioService(item_repo, tag_repo, item_tag_repo, item_query_repo)
+    tag_service = PortfolioService(item_repo, tag_repo, item_tag_repo, item_query_repo)
 
-  # res = tag_service.create_item(t_item)
-  # print(res)
+    # res = tag_service.create_item(t_item)
+    # print(res)
 
-  res_tag = tag_service.create_tag(t_tag)
-  print(res_tag)
+    res_tag = tag_service.create_tag(t_tag)
+    print(res_tag)
 
-  t_tag_item = AssetTag(
-                item_id=randint(1, 20),
-                tag_id=1,
-                is_active=True,
-                created_datetime=datetime.now(UTC),
-                updated_datetime=None,
-            )
-  res_tag_item = tag_service.tag_asset(t_tag_item)
-  print(res_tag_item)
+    t_tag_item = AssetTag(
+        item_id=randint(1, 20),
+        tag_id=1,
+        is_active=True,
+        created_datetime=datetime.now(UTC),
+        updated_datetime=None,
+    )
+    res_tag_item = tag_service.tag_asset(t_tag_item)
+    print(res_tag_item)
 
-  # tag_service.remove_tag_from_item(t_tag_item)
-  # tag_service.tag_item(t_tag_item)
+    # tag_service.remove_tag_from_item(t_tag_item)
+    # tag_service.tag_item(t_tag_item)
 
+    x = tag_service.search_item_by_tag(t_tag)
+    y = tag_service.search_tag_by_item(t_item)
 
-  x = tag_service.search_item_by_tag(t_tag)
-  y = tag_service.search_tag_by_item(t_item)
-
-  print(x)
-  print(y)
+    print(x)
+    print(y)
