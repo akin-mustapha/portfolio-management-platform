@@ -186,9 +186,9 @@ class PipelineT212History(Pipeline):
     def run(self):
         try:
             data = self._source.extract()
-            # if not self._has_payload(data):
-            #     logging.info("[t212_history] no new events; skipping load")
-            #     return None
+            if not self._has_payload(data):
+                logging.info("[t212_history] no new events; skipping load")
+                return None
             self._destination.load(data)
             return None
         except Exception as e:
