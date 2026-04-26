@@ -40,4 +40,4 @@ where = ["."]
 exclude = ["frontend*", "scripts*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["../tests"]
