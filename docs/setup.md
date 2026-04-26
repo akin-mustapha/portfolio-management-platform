@@ -112,6 +112,7 @@ bash scripts/deploy/prefect_deploy.sh
 ```
 
 This script:
+
 1. Starts the Prefect server (UI at `http://127.0.0.1:4200`)
 2. Creates the `asset-monitoring-pool` work pool (skips if it already exists)
 3. Registers all deployments from `prefect.yaml`

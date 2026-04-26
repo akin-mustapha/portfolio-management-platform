@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/material";
+import { useTheme, type Theme } from "@mui/material";
 import {
   ComposedChart,
   Area,
@@ -28,7 +28,7 @@ function CustomTooltip({
 }: {
   active?: boolean;
   payload?: unknown[];
-  theme: ReturnType<typeof useTheme>;
+  theme: Theme;
 }) {
   if (!active || !payload?.length) return null;
   const d = (payload as Array<{ payload: DataPoint }>)[0].payload;

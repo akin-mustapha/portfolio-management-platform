@@ -50,7 +50,11 @@ export default function Section({
         sx={{ minHeight: 36, "& .MuiAccordionSummary-content": { my: 0.5 } }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flex: 1 }}>
-          <Typography variant="subtitle2" fontWeight={600}>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 600 }}
+            component="div"
+          >
             {title}
           </Typography>
           {metricKey && <MetricInfo metricKey={metricKey} />}

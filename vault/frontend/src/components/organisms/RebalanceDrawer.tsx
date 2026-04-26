@@ -69,8 +69,10 @@ export default function RebalanceDrawer({
       anchor="bottom"
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { maxHeight: "60vh", borderRadius: "12px 12px 0 0", p: 2 },
+      slotProps={{
+        paper: {
+          sx: { maxHeight: "60vh", borderRadius: "12px 12px 0 0", p: 2 },
+        },
       }}
     >
       <Box
@@ -81,7 +83,7 @@ export default function RebalanceDrawer({
           mb: 1,
         }}
       >
-        <Typography variant="subtitle1" fontWeight={700}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
           Rebalancing
         </Typography>
         <Button size="small" onClick={onClose}>
@@ -105,7 +107,7 @@ export default function RebalanceDrawer({
             return (
               <Box key={c.ticker}>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography variant="body2" fontWeight={600}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {c.ticker}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">

@@ -35,31 +35,35 @@ function CustomTooltip({
   const sym = currencySymbol ?? "";
   return (
     <Paper sx={{ p: 1.5, fontSize: 11, minWidth: 140 }}>
-      <Typography variant="caption" fontWeight={700} display="block">
+      <Typography
+        variant="caption"
+        sx={{ fontWeight: 700, display: "block" }}
+        component="div"
+      >
         {d.ticker}
       </Typography>
       <Typography
         variant="caption"
         color="text.secondary"
-        display="block"
-        sx={{ mb: 0.5 }}
+        sx={{ display: "block", mb: 0.5 }}
+        component="div"
       >
         {d.name}
       </Typography>
-      <Typography variant="caption" display="block">
+      <Typography variant="caption" sx={{ display: "block" }} component="div">
         ROI: {d.roi_pct.toFixed(2)}%
       </Typography>
-      <Typography variant="caption" display="block">
+      <Typography variant="caption" sx={{ display: "block" }} component="div">
         Return: {sym}
         {d.profit.toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}
       </Typography>
-      <Typography variant="caption" display="block">
+      <Typography variant="caption" sx={{ display: "block" }} component="div">
         Weight: {d.weight_pct.toFixed(2)}%
       </Typography>
-      <Typography variant="caption" display="block">
+      <Typography variant="caption" sx={{ display: "block" }} component="div">
         Value: {sym}
         {d.value.toLocaleString(undefined, {
           minimumFractionDigits: 2,

@@ -56,14 +56,29 @@ export default function MetricInfo({
         disableRestoreFocus
       >
         <Box sx={{ p: 1.5, maxWidth: 280 }}>
-          <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 700 }}
+            gutterBottom
+            component="div"
+          >
             {title}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            component="div"
+            sx={{ display: "block" }}
+          >
             {definition}
           </Typography>
           <Divider sx={{ my: 1 }} />
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block" }}
+            component="div"
+          >
             {interpret}
           </Typography>
         </Box>

@@ -96,8 +96,8 @@ export default function Navbar({
           </Box>
           <Typography
             variant="subtitle1"
-            fontWeight={700}
-            letterSpacing="-0.02em"
+            sx={{ fontWeight: 700, letterSpacing: "-0.02em" }}
+            component="div"
           >
             Ledger
           </Typography>

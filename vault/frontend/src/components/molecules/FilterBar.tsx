@@ -24,25 +24,6 @@ export default function FilterBar() {
     setIndicator({ left: rect.left - container.left, width: rect.width });
   }, [timeframe]);
 
-  const toggleGroupSx = {
-    "& .MuiToggleButton-root": {
-      border: "none",
-      borderRadius: "6px",
-      px: 1.5,
-      py: 0.5,
-      color: "text.secondary",
-      fontSize: "0.8125rem",
-      fontWeight: 500,
-      textTransform: "none",
-      "&.Mui-selected": {
-        color: "primary.main",
-        bgcolor: alpha(theme.palette.primary.main, 0.12),
-        "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.18) },
-      },
-      "&:hover": { bgcolor: "action.hover" },
-    },
-  };
-
   return (
     <Box
       sx={{

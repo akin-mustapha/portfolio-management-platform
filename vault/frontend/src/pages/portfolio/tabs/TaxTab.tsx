@@ -17,9 +17,7 @@ export default function TaxTab() {
       </div>
       <Typography
         variant="h4"
-        fontWeight={700}
-        letterSpacing="-0.025em"
-        sx={{ mt: "4px", mb: 2 }}
+        sx={{ fontWeight: 700, letterSpacing: "-0.025em", mt: "4px", mb: 2 }}
       >
         Tax overview
       </Typography>

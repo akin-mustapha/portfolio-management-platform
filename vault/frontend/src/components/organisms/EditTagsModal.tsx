@@ -65,7 +65,7 @@ export default function EditTagsModal({
         <TextField
           label="Current Tags"
           value={currentTags.join(", ") || "None"}
-          InputProps={{ readOnly: true }}
+          slotProps={{ input: { readOnly: true } }}
           size="small"
           fullWidth
           sx={{ mb: 2 }}
@@ -79,14 +79,18 @@ export default function EditTagsModal({
               {...params}
               label="Add Tag"
               size="small"
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {mutation.isPending ? <CircularProgress size={14} /> : null}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
+              slotProps={{
+                input: {
+                  ...params.slotProps?.input,
+                  endAdornment: (
+                    <>
+                      {mutation.isPending ? (
+                        <CircularProgress size={14} />
+                      ) : null}
+                      {params.slotProps?.input?.endAdornment}
+                    </>
+                  ),
+                },
               }}
             />
           )}

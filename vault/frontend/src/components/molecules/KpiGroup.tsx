@@ -54,9 +54,13 @@ export default function KpiGroup({
       <Typography
         variant="caption"
         color="text.disabled"
-        fontWeight={600}
-        letterSpacing={1}
-        sx={{ textTransform: "uppercase", fontSize: 10 }}
+        sx={{
+          fontWeight: 600,
+          letterSpacing: 1,
+          textTransform: "uppercase",
+          fontSize: 10,
+        }}
+        component="div"
       >
         {label}
       </Typography>

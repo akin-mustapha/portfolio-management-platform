@@ -86,18 +86,23 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           type={showKey ? "text" : "password"}
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton size="small" onClick={() => setShowKey((v) => !v)}>
-                  {showKey ? (
-                    <VisibilityOffIcon fontSize="small" />
-                  ) : (
-                    <VisibilityIcon fontSize="small" />
-                  )}
-                </IconButton>
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowKey((v) => !v)}
+                  >
+                    {showKey ? (
+                      <VisibilityOffIcon fontSize="small" />
+                    ) : (
+                      <VisibilityIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
 

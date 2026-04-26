@@ -112,8 +112,8 @@ export default function AssetProfileDrawer({
               <TickerLogo ticker={ticker} size={28} />
               <Typography
                 variant="subtitle1"
-                fontWeight={700}
-                sx={{ letterSpacing: "-0.01em" }}
+                sx={{ fontWeight: 700, letterSpacing: "-0.01em" }}
+                component="div"
               >
                 {ticker}
               </Typography>

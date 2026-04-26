@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useTheme } from "@mui/material";
 import {
   ComposedChart,
-  Area,
   Line,
   XAxis,
   YAxis,
