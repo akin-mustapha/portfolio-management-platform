@@ -18,3 +18,7 @@ def flow_t212_history_bronze():
     logger.info("Ingestion Trading212 history events")
     task_trading212_history_bronze()
     logger.info("flow complete")
+
+
+if __name__ == "__main__":
+    flow_t212_history_bronze()

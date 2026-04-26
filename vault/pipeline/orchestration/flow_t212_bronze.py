@@ -18,3 +18,7 @@ def flow_t212_bronze():
     logger.info("Ingestion Trading212 Snapshot")
     task_trading212_bronze()
     logger.info("flow complete")
+
+
+if __name__ == "__main__":
+    flow_t212_bronze()

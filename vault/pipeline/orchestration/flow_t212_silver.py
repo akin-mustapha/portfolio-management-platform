@@ -38,3 +38,7 @@ def flow_t212_silver():
     task_mark_snapshot_processed()
 
     logger.info("Silver pipeline complete")
+
+
+if __name__ == "__main__":
+    flow_t212_silver()

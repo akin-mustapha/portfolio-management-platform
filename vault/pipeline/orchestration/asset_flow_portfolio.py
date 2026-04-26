@@ -19,3 +19,7 @@ def flow_t212_asset_portfolio_sync():
     logging.info("Starting data ingestion process")
     task_asset_portfolio_sync()
     logging.info("End data ingestion process")
+
+
+if __name__ == "__main__":
+    flow_t212_asset_portfolio_sync()

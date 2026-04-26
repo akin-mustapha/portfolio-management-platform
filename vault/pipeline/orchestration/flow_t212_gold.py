@@ -19,3 +19,7 @@ def flow_t212_gold():
     logger.info("Starting gold pipeline")
     task_gold()
     logger.info("Gold pipeline complete")
+
+
+if __name__ == "__main__":
+    flow_t212_gold()

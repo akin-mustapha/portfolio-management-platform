@@ -26,3 +26,7 @@ def flow_fred():
     task_fred_bronze()
     task_fred_silver()
     logger.info("FRED flow complete")
+
+
+if __name__ == "__main__":
+    flow_fred()

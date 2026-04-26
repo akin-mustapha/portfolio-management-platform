@@ -20,3 +20,7 @@ def flow_t212_enrichment_sychronization():
     logging.info("Starting the Data Enrichment Synchronization")
     task_enrichment_sychronization()
     logging.info("End process")
+
+
+if __name__ == "__main__":
+    flow_t212_enrichment_sychronization()

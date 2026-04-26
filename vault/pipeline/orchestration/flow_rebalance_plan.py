@@ -23,3 +23,7 @@ def flow_rebalance_plan(log_prints=True):
     logger.info("Starting rebalance plan flow")
     task_generate_rebalance_plan()
     logger.info("Rebalance plan flow complete")
+
+
+if __name__ == "__main__":
+    flow_rebalance_plan()
